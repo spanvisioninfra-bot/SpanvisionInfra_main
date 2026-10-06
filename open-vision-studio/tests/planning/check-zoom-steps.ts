@@ -122,7 +122,7 @@ eq('03k setZoom bereikt de kwartiergrens', S().view.zoom, 4000);
     const scan = (pattern: string): string[] => execSync(
       `grep -rnE ${JSON.stringify(pattern)} ${JSON.stringify(srcDir)} --include=*.ts --include=*.tsx || true`,
       { encoding: 'utf8' },
-    ).split('\n').filter(Boolean).map(l => relative(root, l));
+    ).split('\n').filter(Boolean).map(l => relative(root, l).replace(/\\/g, '/'));
 
     // FALEN-DICHT. De scans hieronder verwachten een LEGE lijst, en `|| true` slikt elke
     // grep-fout — ontbreekt `grep`, of gaat er iets anders mis, dan zijn ze stil groen. Een

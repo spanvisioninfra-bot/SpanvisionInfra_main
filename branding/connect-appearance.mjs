@@ -3,7 +3,7 @@ function append(file,code){let text=fs.readFileSync(file,'utf8');if(!text.includ
 const theme="document.documentElement.dataset.svMode === 'light' ? 'light' : 'spanvision-mono'";
 append('spanvision-2d-cad-workspace/src/main.tsx',`import { useAppStore } from './state/appStore';\nconst applyColorMode=()=>useAppStore.getState().setUITheme(${theme});\nwindow.addEventListener('spanvision:mode-change',applyColorMode);\napplyColorMode();`);
 append('spanvision-pointcloud-workspace/src/main.tsx',`const applyColorMode=()=>useAppStore.getState().setUITheme(${theme});\nwindow.addEventListener('spanvision:mode-change',applyColorMode);\napplyColorMode();`);
-append('open-vision-studio/src/main.tsx',`import { useAppStore } from '@/state/appStore';\nconst applyColorMode=()=>useAppStore.getState().setUI({uiTheme:${theme}});\nwindow.addEventListener('spanvision:mode-change',applyColorMode);\napplyColorMode();`);
+append('open-vision-studio/src/main.tsx',`import { useAppStore } from '@/state/appStore';\nconst applyColorMode=()=>useAppStore.getState().setUI({uiTheme:${theme}});\nwindow.addEventListener('spanvision:mode-change',applyColorMode);`);
 append('fem-vision-studio/src/main.tsx',`import { setTheme as setColorMode } from './lib/theme';\nwindow.addEventListener('spanvision:mode-change',()=>setColorMode(${theme}));`);
 append('frame-vision-studio/ui/src/main.js',`window.addEventListener('spanvision:mode-change',async()=>{const {setTheme}=await import('./stores/ui.js');setTheme(${theme});});`);
 append('ifc-view/apps/desktop/src/index.tsx',`import {setTheme} from '@/state/appearance-store';\nwindow.addEventListener('spanvision:mode-change',()=>setTheme(${theme}));`);

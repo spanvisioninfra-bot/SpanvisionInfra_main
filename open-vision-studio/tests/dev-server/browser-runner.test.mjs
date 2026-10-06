@@ -79,3 +79,20 @@ test('een geslaagde headless launch volstaat zonder full-Chromiumpad', async () 
 
   assert.equal(exitCode, 0);
 });
+
+test('het expliciete Chromium-kanaal wordt in de headless preflight gebruikt', async () => {
+  let launched;
+  const exitCode = await runBrowserTests({
+    root: '/tmp/ops-fixture/werkboom-d',
+    allocate: async () => 3145,
+    preflightHeadless: async (options) => {
+      launched = options;
+      return { close: async () => {} };
+    },
+    spawnTest: async () => 0,
+    args: [],
+    launchOptions: { headless: true, channel: 'msedge' },
+  });
+  assert.equal(exitCode, 0);
+  assert.deepEqual(launched, { headless: true, channel: 'msedge' });
+});

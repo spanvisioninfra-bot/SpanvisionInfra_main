@@ -15,7 +15,7 @@ pub fn create_vliesgevel(
     mullion_spacing: f64,
     transom_spacing: f64,
 ) -> Result<Vliesgevel, String> {
-    let mut vg = grid::create_regular_grid(width, height, mullion_spacing, transom_spacing);
+    let mut vg = grid::create_regular_grid(width, height, mullion_spacing, transom_spacing)?;
     vg.name = name;
     vg.mark = mark;
     let mut project = state.project.lock().map_err(|e| e.to_string())?;
@@ -35,7 +35,7 @@ pub fn create_vliesgevel_from_template(
         "unitized" => grid::template_unitized(width, height),
         "shopfront" => grid::template_shopfront(width, height),
         _ => grid::create_regular_grid(width, height, 1500.0, 1200.0),
-    };
+    }?;
     let mut project = state.project.lock().map_err(|e| e.to_string())?;
     project.vliesgevels.push(vg.clone());
     Ok(vg)

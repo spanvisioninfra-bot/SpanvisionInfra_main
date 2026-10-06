@@ -45,4 +45,3 @@ initLocale()
 import { useAppStore } from '@/state/appStore';
 const applyColorMode=()=>useAppStore.getState().setUI({uiTheme:document.documentElement.dataset.svMode === 'light' ? 'light' : 'spanvision-mono'});
 window.addEventListener('spanvision:mode-change',applyColorMode);
-applyColorMode();

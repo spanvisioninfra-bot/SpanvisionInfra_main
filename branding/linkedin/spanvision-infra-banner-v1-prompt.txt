@@ -1,0 +1,14 @@
+Generation method: built-in image_gen tool.
+Brand reference: user-provided LinkedIn screenshot and branding/brand.json.
+Delivered image: spanvision-infra-banner-v1.png. Use LinkedIn's cover-photo crop controls for the profile header shown in the reference.
+
+Final prompt:
+Use case: ads-marketing.
+Asset type: finished standalone LinkedIn banner for SPANVISION INFRA, suited to the wide 4:1 header shape shown in the reference screenshot.
+Input image: brand and layout reference ONLY. Extract the exact company name and the monochrome metallic visual identity. Do not recreate the LinkedIn UI or profile photo.
+Create a sophisticated, highly polished monochrome infrastructure and digital engineering cover image. Ultra-wide horizontal composition, target 1584 by 396 pixels, 4:1. Edge-to-edge finished artwork, no mockup, no margins.
+Backdrop: deep charcoal-to-black atmosphere with fine, restrained silver CAD construction lines. On the far right, a beautiful photorealistic architectural cityscape and elegant cable-stayed bridge blend into a precise white wireframe/BIM rendering of the same structures, communicating digital design meeting built infrastructure. Beautiful silver highlights and architectural detail, cinematic contrast, purposeful simplicity, refined engineering brand.
+Composition: leave the leftmost 28 percent especially quiet and dark, with no text or essential objects there because the circular profile logo covers the lower left. Place the name in the middle-right region, around 57 percent of image width, with architecture concentrated at 80 to 100 percent. Keep all brand text comfortably inside the middle vertical band so the very wide LinkedIn crop is safe. No important details near the extreme top/bottom edges.
+Typography: large, elegant, clean uppercase sans-serif letters in white/light silver, generous tracking, readable at cover scale. Exact text on two lines: "SPANVISION" and beneath it smaller widely spaced "INFRA". Spell SPANVISION exactly S P A N V I S I O N. No other text.
+Palette: black, charcoal, silver, white only, matching the existing metallic folded S logo and the company's black-and-white branding. Do not add a new logo; the existing profile logo stays separate. No marketing slogan, no website, no contact details, no invented services, no watermarks. Return only the finished banner.
+

@@ -17,7 +17,7 @@ import { buildOfferteRequest } from '@/services/offerte/offerteRequest';
 export type ApiExportAction = 'export_pdf_request' | 'export_ifc_request';
 
 const PDF_VIEWS = new Set([
-  'werkbeschrijving', 'hoofdaanneming', "subcontracting", 'inschrijfstaat',
+  'werkbeschrijving', 'hoofdaanneming', "onderaanneming", 'inschrijfstaat',
   'nacalculatie', 'bouw1', 'ibis', 'directie', 'offerte',
 ]);
 

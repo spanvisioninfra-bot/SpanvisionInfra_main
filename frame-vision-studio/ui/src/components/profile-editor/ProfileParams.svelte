@@ -1,19 +1,19 @@
 <script>
   import { _ } from "svelte-i18n";
   import { profileEditor, editorProfile, editorBounds, editorIsDirty } from "../../stores/profileEditor.js";
-  import { refreshCustomProfiles } from "../../stores/profiles.js";
   import { toast } from "../../stores/toast.js";
+  import { saveEditorProfile } from '../../lib/profile-actions.js';
+  import { confirmUnsavedChanges } from '../../lib/project-actions.js';
 
   let profile = $derived($editorProfile);
   let bounds = $derived($editorBounds);
 
   let sponning = $state({ width: 12, depth: 17, position: "buiten" });
+  let saving = $state(false);
 
   // Sync sponning from store
   $effect(() => {
-    let s;
-    profileEditor.subscribe(v => s = v)();
-    sponning = { ...s.sponning };
+    sponning = { ...$profileEditor.sponning };
   });
 
   function updateName(e) {
@@ -70,27 +70,22 @@
   }
 
   async function handleSave() {
+    if (saving) return;
     if (!profile?.name?.trim()) {
       toast.warning($_("profileEditor.nameRequired") || "Voer een profielnaam in.");
       return;
     }
 
-    const data = profileEditor.getExportData();
-    const id = data.id || `custom-${data.name.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`;
-    const profileJson = JSON.stringify({ ...data, id });
-
+    saving = true;
     try {
-      const isTauri = typeof window !== "undefined" && !!window.__TAURI_INTERNALS__;
-      if (isTauri) {
-        const { invoke } = await import("@tauri-apps/api/core");
-        await invoke("add_custom_profile", { profileJson });
-        await refreshCustomProfiles();
-      }
-      toast.success($_("profileEditor.saved") || `Profiel "${data.name}" opgeslagen.`);
-      profileEditor.update((s) => ({ ...s, isDirty: false, profile: { ...s.profile, id } }));
+      await saveEditorProfile();
+      toast.success($_("profileEditor.saved"));
     } catch (e) {
       toast.error(($_("profileEditor.saveFailed") || "Save failed") + ": " + e);
-    }
+    } finally { saving = false; }
+  }
+  async function newProfile() {
+    if (await confirmUnsavedChanges({profileOnly:true})) profileEditor.newProfile();
   }
 
   const applicableTypes = [
@@ -98,7 +93,7 @@
     { key: "sash", label: "Sash" },
     { key: "divider", label: "Divider" },
     { key: "sill", label: "Sill" },
-    { key: "kozijn_stijl", label: "Kozijnstijl" },
+    { key: "kozijn_stijl", label: "Frame jamb" },
     { key: "bovendorpel", label: "Top rail" },
     { key: "onderdorpel", label: "Sill" },
     { key: "tussenstijl", label: "Mullion" },
@@ -126,7 +121,7 @@
       </label>
       <label class="field">
         <span class="label">{$_("profileEditor.series") || "Serie"}</span>
-        <input type="text" value={profile.series || ""} oninput={updateSeries} placeholder="bijv. 67mm" />
+        <input type="text" value={profile.series || ""} oninput={updateSeries} placeholder="e.g. 67 mm" />
       </label>
     </div>
   </div>
@@ -146,8 +141,8 @@
       </label>
     </div>
     <div class="computed-row">
-      <span>{$_("profileEditor.sightline") || "Zichtlijn"}: <strong>{Math.round((bounds.width - sponning.width) * 10) / 10}mm</strong></span>
-      <span>{$_("profileEditor.glazingRebate") || "Glasfalz"}: <strong>{sponning.depth}mm</strong></span>
+      <span>{$_("profileEditor.sightline", { values: { value: Math.round((bounds.width - sponning.width) * 10) / 10 } })}</span>
+      <span>{$_("profileEditor.glazingRebate", { values: { value: sponning.depth } })}</span>
     </div>
   </div>
 
@@ -200,7 +195,7 @@
   </div>
 
   <div class="section actions">
-    <button class="btn-primary" onclick={handleSave} disabled={!$editorIsDirty && !!profile.id}>
+    <button class="btn-primary" onclick={handleSave} disabled={saving || (!$editorIsDirty && !!profile.id)} aria-busy={saving}>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
         <polyline points="17 21 17 13 7 13 7 21"/>
@@ -208,7 +203,7 @@
       </svg>
       {$_("profileEditor.save") || "Save"}
     </button>
-    <button class="btn-secondary" onclick={() => profileEditor.newProfile()}>
+    <button class="btn-secondary" onclick={newProfile}>
       {$_("profileEditor.newProfile") || "New section"}
     </button>
   </div>

@@ -1,0 +1,25 @@
+[
+  {
+    "id": "bim",
+    "passed": true,
+    "checks": [
+      "private project",
+      "IFC upload",
+      "geometry conversion",
+      "IDS validation",
+      "private validation job"
+    ]
+  },
+  {
+    "id": "stl",
+    "passed": true,
+    "checks": [
+      "private project",
+      "live geocoding",
+      "design parsing",
+      "live map data",
+      "geometry build",
+      "private downloads"
+    ]
+  }
+]

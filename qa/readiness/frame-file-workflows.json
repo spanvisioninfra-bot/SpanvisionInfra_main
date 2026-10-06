@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-06T04:29:23.418Z",
+  "passed": true,
+  "checks": [
+    "Profile editor saves real custom geometry and updates the same profile without duplicating it",
+    "Unsaved profile replacement can be cancelled and project Save commits the current profile draft",
+    "Browser Save downloads a complete .ofs file containing real frames and custom profiles",
+    "Browser Open restores the actual downloaded project and resets the selected frame correctly",
+    "Corrupt project input leaves the complete current project unchanged",
+    "Unsaved project Cancel preserves edits, Save downloads them before New, and Discard creates a clean project",
+    "Browser production export downloads one ZIP containing real Rust-generated CSV files",
+    "Generic CNC preview downloads as a single archive for later machine-specific validation"
+  ],
+  "errors": []
+}

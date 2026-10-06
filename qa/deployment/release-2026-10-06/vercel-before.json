@@ -1,0 +1,122 @@
+{
+  "cad2d": {
+    "id": "cad2d",
+    "url": "https://spanvision-cad2d.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_H8XvfxLqCUqk8h4dfQ8jZbeZ6YXC",
+    "verifiedAt": "2026-10-04T16:18:36.494Z"
+  },
+  "pdf": {
+    "id": "pdf",
+    "url": "https://spanvision-pdf.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_A8qC5CZTvUaKiM7M86iwjKiJs2JK",
+    "verifiedAt": "2026-10-04T16:19:08.013Z"
+  },
+  "ifc": {
+    "id": "ifc",
+    "url": "https://spanvision-ifc.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_GToBgU84ohdNbqyXuZxzFt6tS3vo",
+    "verifiedAt": "2026-10-04T16:19:28.610Z"
+  },
+  "calc": {
+    "id": "calc",
+    "url": "https://spanvision-calc.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_8nzeRZdW28ib8HswPPvXJ1fvVu4Y",
+    "verifiedAt": "2026-10-04T16:19:51.344Z"
+  },
+  "planner": {
+    "id": "planner",
+    "url": "https://spanvision-planner.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_Cf56oH3RStJB3Rdn5dwC7bdLF516",
+    "verifiedAt": "2026-10-04T16:20:22.448Z"
+  },
+  "fem": {
+    "id": "fem",
+    "url": "https://spanvision-fem.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_3Yjt18wH82YobHfCE2onAfgVBJYA",
+    "verifiedAt": "2026-10-04T16:20:38.202Z"
+  },
+  "frame": {
+    "id": "frame",
+    "url": "https://spanvision-frame.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_38kGrYMMLS9xKmtKZTXcpr43SNvJ",
+    "verifiedAt": "2026-10-04T16:20:53.512Z"
+  },
+  "calculation": {
+    "id": "calculation",
+    "url": "https://spanvision-calculation.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_5cmnNsBXCYtfK5PyL7qkq8iTitPh",
+    "verifiedAt": "2026-10-04T16:21:23.345Z"
+  },
+  "geo": {
+    "id": "geo",
+    "url": "https://spanvision-geo.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_9LvBg33qzycenhh5b53rtdBpkEJc",
+    "verifiedAt": "2026-10-04T16:21:38.165Z"
+  },
+  "speech": {
+    "id": "speech",
+    "url": "https://spanvision-speech.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_2HJupFLAAZNWT21cKn1QozpBYECA",
+    "verifiedAt": "2026-10-04T16:21:50.704Z"
+  },
+  "field": {
+    "id": "field",
+    "url": "https://spanvision-field.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_2DrbusPweSGjm5fkZ5zwqRGsVGBT",
+    "verifiedAt": "2026-10-04T16:22:06.787Z"
+  },
+  "pointcloud": {
+    "id": "pointcloud",
+    "url": "https://spanvision-pointcloud.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_GweWscbGocFDUzpVTx7j2wGwMuS8",
+    "verifiedAt": "2026-10-04T16:22:34.345Z"
+  },
+  "pile": {
+    "id": "pile",
+    "url": "https://spanvision-pile.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_FxSuGPSZrnxFondZUDLaae6YUC5C",
+    "verifiedAt": "2026-10-04T16:22:58.319Z"
+  },
+  "cad": {
+    "id": "cad",
+    "url": "https://spanvision-cad.vercel.app/app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_jCSUdBUujWxGK1DZE7yLxAcPyahQ",
+    "verifiedAt": "2026-10-04T16:25:43.961Z"
+  },
+  "hub": {
+    "id": "hub",
+    "url": "https://spanvision-infra.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_942spJjVmzzNQLzPFE2ey2dnNvKx",
+    "verifiedAt": "2026-10-04T16:30:32.996Z"
+  }
+}

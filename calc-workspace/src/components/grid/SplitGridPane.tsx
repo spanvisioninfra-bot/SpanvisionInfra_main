@@ -93,7 +93,7 @@ export const SplitGridPane: React.FC<SplitGridPaneProps> = ({ documentId, onClos
           </thead>
           <tbody>
             {visibleItems.map((item) => {
-              const isChapter = item.rowType === 'chapter';
+              const isChapter = item.rowType === "chapter";
               const isBgr = item.rowType === 'begrotingspost' || item.rowType === 'bewakingspost';
               const isRegel = item.rowType === 'regel';
               const isTekst = item.rowType === 'tekstregel' || item.rowType === 'witregel';

@@ -1,0 +1,9 @@
+{
+  "command": "node node_modules/typescript/bin/tsc --noEmit",
+  "directory": "spanvision-field-workspace",
+  "started": "2026-10-06T04:56:06.545Z",
+  "finished": "2026-10-06T04:56:06.811Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/field-types.log"
+}

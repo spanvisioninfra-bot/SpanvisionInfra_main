@@ -3734,6 +3734,7 @@ ${(ho.signatures||[]).map(s=>`<div class="sig-block"><p><strong>${this.esc(s.nam
         const file = e.target.files[0]; if (!file) return;
         const r = new FileReader();
         r.onload = (ev) => { this.applyLoadedJSON(ev.target.result); };
+        r.onerror = () => this.showNotification(this.t('msg_load_error'), 'error');
         r.readAsText(file); e.target.value = '';
     }
 
@@ -3753,9 +3754,34 @@ ${(ho.signatures||[]).map(s=>`<div class="sig-block"><p><strong>${this.esc(s.nam
         }
     }
 
+    validateLoadedJSON(data) {
+        const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+        if (!isRecord(data) || !isRecord(data.project)) throw new Error('Invalid project document');
+        const collections = ['contacts', 'floorPlans', 'locationPoints', 'tickets', 'inspections', 'handovers', 'checklistTemplates', 'activityLog'];
+        for (const key of collections) {
+            if (!(key in data)) continue;
+            if (!Array.isArray(data[key]) || data[key].some(item => !isRecord(item))) {
+                throw new Error(`Invalid project collection: ${key}`);
+            }
+            for (const item of data[key]) {
+                for (const nested of ['photos', 'comments', 'history', 'items', 'signatures']) {
+                    if (nested in item && (!Array.isArray(item[nested]) || item[nested].some(value => !isRecord(value)))) {
+                        throw new Error(`Invalid project collection: ${key}.${nested}`);
+                    }
+                }
+            }
+        }
+    }
+
     applyLoadedJSON(text) {
+        const fields = ['project', 'contacts', 'floorPlans', 'tickets', 'inspections', 'handovers', 'checklistTemplates', 'activityLog'];
+        let previous;
         try {
             const d = JSON.parse(text);
+            // Validate the complete input before replacing any active data.
+            // Otherwise a late rendering error could leave half a project imported.
+            this.validateLoadedJSON(d);
+            previous = Object.fromEntries(fields.map(key => [key, this[key]]));
             if (d.project) this.project = d.project;
             if (d.contacts) this.contacts = d.contacts;
             if (d.floorPlans) this.floorPlans = d.floorPlans;
@@ -3767,7 +3793,15 @@ ${(ho.signatures||[]).map(s=>`<div class="sig-block"><p><strong>${this.esc(s.nam
             if (d.activityLog) this.activityLog = d.activityLog;
             this.loadProjectForm(); this.renderContacts(); this.renderFloorPlansList(); this.updateFloorPlanSelector(); this.saveToLocalStorage();
             this.showNotification(this.t('msg_loaded'), 'success');
-        } catch(err) { this.showNotification(this.t('msg_load_error'), 'error'); console.error(err); }
+            return true;
+        } catch(err) {
+            if (previous) {
+                for (const key of fields) this[key] = previous[key];
+                this.loadProjectForm(); this.renderContacts(); this.renderFloorPlansList(); this.updateFloorPlanSelector();
+            }
+            this.showNotification(this.t('msg_load_error'), 'error'); console.error(err);
+            return false;
+        }
     }
 
     // =====================================================

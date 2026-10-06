@@ -1,0 +1,24 @@
+{
+  "checkedAt": "2026-10-05T07:08:27.049Z",
+  "auditReportVersion": 2,
+  "vulnerabilities": {},
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 36,
+      "dev": 256,
+      "optional": 93,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 291
+    }
+  },
+  "exitCode": 0
+}

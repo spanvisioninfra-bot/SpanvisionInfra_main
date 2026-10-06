@@ -1,398 +1,140 @@
-//! PDF export for kozijnstaat, workshop drawing, and production lists.
-//!
-//! Uses printpdf 0.9 Op-based API.
-
-use printpdf::*;
-
-use crate::kozijn::{Kozijn, Material, PanelType, Project, WoodType};
+//! Actual, paginated schedules and production documents shared by both apps.
+use crate::kozijn::{Kozijn, Material, Project, WoodType};
 use crate::production::ProductionData;
+use super::pdf_document::{Report, INK, MUTED};
 
-const DEEP_FORGE: (f32, f32, f32) = (0.071, 0.071, 0.071);
-const AMBER: (f32, f32, f32) = (0.6, 0.6, 0.6);
-const LIGHT_GRAY: (f32, f32, f32) = (0.906, 0.906, 0.906);
-const ALT_ROW: (f32, f32, f32) = (0.961, 0.961, 0.961);
-const GRID_CLR: (f32, f32, f32) = (0.8, 0.8, 0.8);
-const WHITE_C: (f32, f32, f32) = (1.0, 1.0, 1.0);
-
-const A4_W: f32 = 297.0;
-const A4_H: f32 = 210.0;
-const A3_W: f32 = 420.0;
-const A3_H: f32 = 297.0;
-
-fn col(c: (f32, f32, f32)) -> Color {
-    Color::Rgb(Rgb { r: c.0, g: c.1, b: c.2, icc_profile: None })
+pub fn generate_kozijnstaat_pdf(project: &Project, path: &str) -> Result<(), String> {
+    super::write_export_bytes(path, &kozijnstaat_pdf_bytes(project)?)
 }
 
-fn font() -> PdfFontHandle { PdfFontHandle::Builtin(BuiltinFont::Helvetica) }
-fn font_bold() -> PdfFontHandle { PdfFontHandle::Builtin(BuiltinFont::HelveticaBold) }
-
-fn text_ops(s: &str, size: f32, x: f32, y: f32, f: PdfFontHandle, c: (f32, f32, f32)) -> Vec<Op> {
-    vec![
-        Op::SetFillColor { col: col(c) },
-        Op::StartTextSection,
-        Op::SetFont { font: f, size: Pt(size) },
-        Op::SetTextCursor { pos: Point { x: Mm(x).into(), y: Mm(y).into() } },
-        Op::ShowText { items: vec![TextItem::Text(s.to_string())] },
-        Op::EndTextSection,
-    ]
-}
-
-fn fill_rect_ops(x: f32, y: f32, w: f32, h: f32, c: (f32, f32, f32)) -> Vec<Op> {
-    vec![
-        Op::SetFillColor { col: col(c) },
-        Op::DrawPolygon { polygon: Polygon {
-            rings: vec![PolygonRing {
-                points: vec![
-                    LinePoint { p: Point { x: Mm(x).into(), y: Mm(y).into() }, bezier: false },
-                    LinePoint { p: Point { x: Mm(x+w).into(), y: Mm(y).into() }, bezier: false },
-                    LinePoint { p: Point { x: Mm(x+w).into(), y: Mm(y+h).into() }, bezier: false },
-                    LinePoint { p: Point { x: Mm(x).into(), y: Mm(y+h).into() }, bezier: false },
-                ],
-            }],
-            mode: PaintMode::Fill,
-            winding_order: WindingOrder::NonZero,
-        }},
-    ]
-}
-
-fn line_ops(x1: f32, y1: f32, x2: f32, y2: f32, c: (f32, f32, f32), t: f32) -> Vec<Op> {
-    vec![
-        Op::SetOutlineColor { col: col(c) },
-        Op::SetOutlineThickness { pt: Pt(t) },
-        Op::DrawLine { line: Line {
-            points: vec![
-                LinePoint { p: Point { x: Mm(x1).into(), y: Mm(y1).into() }, bezier: false },
-                LinePoint { p: Point { x: Mm(x2).into(), y: Mm(y2).into() }, bezier: false },
-            ],
-            is_closed: false,
-        }},
-    ]
-}
-
-fn save_doc(doc: &PdfDocument, path: &str) -> Result<(), String> {
-    let mut warnings = Vec::new();
-    let bytes = doc.save(&PdfSaveOptions::default(), &mut warnings);
-    std::fs::write(path, bytes).map_err(|e| format!("Kan PDF niet opslaan: {}", e))
-}
-
-// ══════════════════════════════════════════════════════════════
-// Kozijnstaat PDF
-// ══════════════════════════════════════════════════════════════
-
-pub fn generate_kozijnstaat_pdf(project: &Project, output_path: &str) -> Result<(), String> {
-    let mut doc = PdfDocument::new("Kozijnstaat");
-    let margin: f32 = 15.0;
-    let mut ops = Vec::new();
-    let mut y = A4_H - margin;
-
-    ops.extend(text_ops(
-        &format!("Kozijnstaat \u{2014} {}", project.project_info.name),
-        18.0, margin, y, font_bold(), DEEP_FORGE,
-    ));
-    y -= 8.0;
-    ops.extend(text_ops(
-        &format!("Nr: {} | {}", project.project_info.number, project.project_info.client),
-        10.0, margin, y, font(), (0.5, 0.5, 0.5),
-    ));
-    y -= 12.0;
-
-    let col_w: [f32; 12] = [12.0,18.0,14.0,14.0,18.0,10.0,10.0,10.0,35.0,20.0,16.0,16.0];
-    let rh: f32 = 6.0;
-    let tw: f32 = col_w.iter().sum();
-
-    ops.extend(fill_rect_ops(margin, y - rh, tw, rh, DEEP_FORGE));
-    let headers = ["Mark","Name","W","H","Material","Col","Row","Cells","Types","Glass","In","Out"];
-    let mut x = margin;
-    for (i, h) in headers.iter().enumerate() {
-        ops.extend(text_ops(h, 7.0, x + 1.0, y - rh + 1.5, font_bold(), WHITE_C));
-        x += col_w[i];
-    }
-    ops.extend(line_ops(margin, y - rh, margin + tw, y - rh, AMBER, 1.5));
-    y -= rh;
-
-    for (ri, kozijn) in project.kozijnen.iter().enumerate() {
-        if y < margin + rh { break; }
-        if ri % 2 == 1 {
-            ops.extend(fill_rect_ops(margin, y - rh, tw, rh, ALT_ROW));
-        }
-        let f = &kozijn.frame;
-        let vals = [
-            kozijn.mark.clone(), kozijn.name.clone(),
-            format!("{}", f.outer_width as i64), format!("{}", f.outer_height as i64),
-            mat_label(&f.material),
-            format!("{}", kozijn.grid.columns.len()), format!("{}", kozijn.grid.rows.len()),
-            format!("{}", kozijn.cells.len()),
-            String::new(), String::new(),
-            f.color_inside.clone(), f.color_outside.clone(),
-        ];
-        let mut x = margin;
-        for (i, v) in vals.iter().enumerate() {
-            let s = if v.len() > 25 { &v[..22] } else { v.as_str() };
-            ops.extend(text_ops(s, 7.0, x + 1.0, y - rh + 1.5, font(), DEEP_FORGE));
-            x += col_w[i];
-        }
-        ops.extend(line_ops(margin, y - rh, margin + tw, y - rh, GRID_CLR, 0.3));
-        y -= rh;
-    }
-
-    y -= 6.0;
-    ops.extend(text_ops(
-        "Generated by Frame Vision Studio \u{2014} Spanvision infra",
-        8.0, margin, y, font(), (0.5, 0.5, 0.5),
-    ));
-
-    doc.pages.push(PdfPage::new(Mm(A4_W), Mm(A4_H), ops));
-    save_doc(&doc, output_path)
-}
-
-// ══════════════════════════════════════════════════════════════
-// Workshop drawing PDF
-// ══════════════════════════════════════════════════════════════
-
-pub fn generate_workshop_pdf(
-    kozijn: &Kozijn,
-    project: &Project,
-    output_path: &str,
-) -> Result<(), String> {
-    let mut doc = PdfDocument::new("Werkplaatstekening");
-    let mut ops = Vec::new();
-    let margin: f32 = 15.0;
-    let tb_h: f32 = 40.0;
-    let daw = A3_W - 2.0 * margin;
-    let dah = A3_H - 2.0 * margin - tb_h;
-
-    let frame = &kozijn.frame;
-    let ow = frame.outer_width as f32;
-    let oh = frame.outer_height as f32;
-    let fw = frame.frame_width as f32;
-
-    // Title block
-    ops.extend(fill_rect_ops(margin, margin, daw, tb_h, DEEP_FORGE));
-    ops.extend(line_ops(margin, margin + tb_h, margin + daw, margin + tb_h, AMBER, 3.0));
-    let pi = &project.project_info;
-    ops.extend(text_ops("Frame Vision Studio", 14.0, margin + 8.0, margin + tb_h - 14.0, font_bold(), WHITE_C));
-    ops.extend(text_ops("Spanvision infra", 8.0, margin + 8.0, margin + tb_h - 20.0, font(), AMBER));
-
-    // Project info
-    let px = margin + 90.0;
-    ops.extend(text_ops(&pi.name, 10.0, px, margin + tb_h - 14.0, font_bold(), WHITE_C));
-    ops.extend(text_ops(
-        &format!("Nr: {} | {}", pi.number, pi.client),
-        8.0, px, margin + tb_h - 22.0, font(), (0.8, 0.8, 0.8),
-    ));
-
-    // Kozijn info
-    let kx = margin + 220.0;
-    ops.extend(text_ops(&kozijn.mark, 16.0, kx, margin + tb_h - 20.0, font_bold(), AMBER));
-    ops.extend(text_ops(&kozijn.name, 9.0, kx + 30.0, margin + tb_h - 18.0, font(), WHITE_C));
-    ops.extend(text_ops(
-        &format!("{} x {} mm | {}", ow as i64, oh as i64, mat_label(&frame.material)),
-        8.0, kx, margin + tb_h - 28.0, font(), (0.8, 0.8, 0.8),
-    ));
-
-    // Scale
-    let dim_m: f32 = 60.0;
-    let aw = daw - 2.0 * dim_m;
-    let ah = dah - 2.0 * dim_m;
-    let sc = (aw / ow).min(ah / oh) * 0.85;
-    let ox = margin + dim_m + (aw - ow * sc) / 2.0;
-    let oy = margin + tb_h + dim_m + (ah - oh * sc) / 2.0;
-
-    let sx = |v: f32| -> f32 { ox + v * sc };
-    let sy = |v: f32| -> f32 { oy + v * sc };
-
-    // Outer frame
-    ops.extend(line_ops(sx(0.0), sy(0.0), sx(ow), sy(0.0), DEEP_FORGE, 2.0));
-    ops.extend(line_ops(sx(ow), sy(0.0), sx(ow), sy(oh), DEEP_FORGE, 2.0));
-    ops.extend(line_ops(sx(ow), sy(oh), sx(0.0), sy(oh), DEEP_FORGE, 2.0));
-    ops.extend(line_ops(sx(0.0), sy(oh), sx(0.0), sy(0.0), DEEP_FORGE, 2.0));
-
-    // Frame members
-    for (fx, fy, fw2, fh) in [
-        (0.0, oh - fw, ow, fw), (0.0, 0.0, ow, fw),
-        (0.0, fw, fw, oh - 2.0 * fw), (ow - fw, fw, fw, oh - 2.0 * fw),
-    ] {
-        ops.extend(fill_rect_ops(sx(fx), sy(fy), fw2 * sc, fh * sc, LIGHT_GRAY));
-    }
-
-    // Cell labels
-    let columns = &kozijn.grid.columns;
-    let rows = &kozijn.grid.rows;
-    let nc = columns.len();
-    let mut col_pos = Vec::new();
-    let mut cx = fw;
-    for (i, c) in columns.iter().enumerate() {
-        col_pos.push(cx);
-        cx += c.size as f32;
-        if i < columns.len() - 1 { cx += fw; }
-    }
-    let mut row_pos = Vec::new();
-    let mut ry = fw;
-    for (i, r) in rows.iter().enumerate() {
-        row_pos.push(ry);
-        ry += r.size as f32;
-        if i < rows.len() - 1 { ry += fw; }
-    }
-
-    for (ri, row) in rows.iter().enumerate() {
-        for (ci, col) in columns.iter().enumerate() {
-            let idx = ri * nc + ci;
-            if idx >= kozijn.cells.len() { continue; }
-            let cx = col_pos[ci];
-            let cy = row_pos[ri];
-            let cw = col.size as f32;
-            let ch = row.size as f32;
-            ops.extend(text_ops(
-                panel_label(kozijn.cells[idx].panel_type),
-                8.0, sx(cx + cw/2.0) - 2.0, sy(cy + ch/2.0) - 1.5, font_bold(), DEEP_FORGE,
-            ));
-        }
-    }
-
-    // Dimensions
-    let dim_off: f32 = 15.0;
-    let tick: f32 = 3.0;
-    let yd = sy(0.0) - dim_off;
-    ops.extend(line_ops(sx(0.0), yd, sx(ow), yd, DEEP_FORGE, 0.5));
-    ops.extend(line_ops(sx(0.0), yd-tick, sx(0.0), yd+tick, DEEP_FORGE, 0.5));
-    ops.extend(line_ops(sx(ow), yd-tick, sx(ow), yd+tick, DEEP_FORGE, 0.5));
-    ops.extend(text_ops(&format!("{}", ow as i32), 7.0, sx(ow/2.0)-5.0, yd-5.0, font(), DEEP_FORGE));
-
-    let xd = sx(ow) + dim_off;
-    ops.extend(line_ops(xd, sy(0.0), xd, sy(oh), DEEP_FORGE, 0.5));
-    ops.extend(line_ops(xd-tick, sy(0.0), xd+tick, sy(0.0), DEEP_FORGE, 0.5));
-    ops.extend(line_ops(xd-tick, sy(oh), xd+tick, sy(oh), DEEP_FORGE, 0.5));
-    ops.extend(text_ops(&format!("{}", oh as i32), 7.0, xd+3.0, sy(oh/2.0), font(), DEEP_FORGE));
-
-    let st = if sc < 1.0 { format!("1:{}", (1.0/sc) as i32) } else { format!("{:.1}:1", sc) };
-    ops.extend(text_ops(&st, 8.0, margin+5.0, margin+tb_h+5.0, font(), (0.5,0.5,0.5)));
-
-    doc.pages.push(PdfPage::new(Mm(A3_W), Mm(A3_H), ops));
-    save_doc(&doc, output_path)
-}
-
-// ══════════════════════════════════════════════════════════════
-// Production lists PDF
-// ══════════════════════════════════════════════════════════════
-
-pub fn generate_production_pdf(
-    production_data: &[ProductionData],
-    output_path: &str,
-) -> Result<(), String> {
-    let mut doc = PdfDocument::new("Productiestaten");
-    let margin: f32 = 12.0;
-
-    for prod in production_data {
-        let mut ops = Vec::new();
-        let mut y = A4_H - margin;
-
-        ops.extend(text_ops(
-            &format!("Productiestaten \u{2014} {} {}", prod.kozijn_mark, prod.kozijn_name),
-            16.0, margin, y, font_bold(), DEEP_FORGE,
-        ));
-        y -= 10.0;
-
-        if !prod.cut_list.is_empty() {
-            ops.extend(text_ops("Kortlijst", 12.0, margin, y, font_bold(), AMBER));
-            y -= 6.0;
-            let h = ["Pos.","Part","Profile","Mat.","Net","Gross","L\u{00b0}","R\u{00b0}","Qty"];
-            let w = [18.0,28.0,28.0,22.0,16.0,16.0,12.0,12.0,12.0_f32];
-            let rows: Vec<Vec<String>> = prod.cut_list.iter().map(|i| vec![
-                i.piece_id.clone(), i.member_type.label_nl().into(), i.profile_name.clone(),
-                i.material.clone(), format!("{:.0}", i.net_length_mm), format!("{:.0}", i.gross_length_mm),
-                format!("{:.0}\u{00b0}", i.miter_left_deg), format!("{:.0}\u{00b0}", i.miter_right_deg),
-                format!("{}", i.quantity),
-            ]).collect();
-            y = pdf_table(&mut ops, margin, y, &h, &w, &rows);
-            y -= 4.0;
-        }
-
-        if !prod.glass_list.is_empty() {
-            ops.extend(text_ops("Glaslijst", 12.0, margin, y, font_bold(), AMBER));
-            y -= 6.0;
-            let h = ["Pos.","Type","W","H","D","Ug","m\u{00b2}","Qty"];
-            let w = [18.0,30.0,18.0,18.0,18.0,14.0,16.0,12.0_f32];
-            let rows: Vec<Vec<String>> = prod.glass_list.iter().map(|i| vec![
-                i.piece_id.clone(), i.glass_type.clone(),
-                format!("{:.0}", i.width_mm), format!("{:.0}", i.height_mm),
-                format!("{:.0}", i.thickness_mm), format!("{:.1}", i.ug_value),
-                format!("{:.2}", i.area_m2), format!("{}", i.quantity),
-            ]).collect();
-            y = pdf_table(&mut ops, margin, y, &h, &w, &rows);
-            y -= 4.0;
-        }
-
-        if !prod.bom.is_empty() {
-            ops.extend(text_ops("Stuklijst (BOM)", 12.0, margin, y, font_bold(), AMBER));
-            y -= 6.0;
-            let h = ["Category","Description","Unit","Qty"];
-            let w = [25.0,60.0,16.0,16.0_f32];
-            let rows: Vec<Vec<String>> = prod.bom.iter().map(|i| vec![
-                i.category.clone(), i.description.clone(), i.unit.clone(), format!("{:.2}", i.quantity),
-            ]).collect();
-            pdf_table(&mut ops, margin, y, &h, &w, &rows);
-        }
-
-        doc.pages.push(PdfPage::new(Mm(A4_W), Mm(A4_H), ops));
-    }
-
-    if doc.pages.is_empty() {
-        doc.pages.push(PdfPage::new(Mm(A4_W), Mm(A4_H), vec![]));
-    }
-
-    save_doc(&doc, output_path)
-}
-
-fn pdf_table(ops: &mut Vec<Op>, x0: f32, y0: f32, headers: &[&str], widths: &[f32], rows: &[Vec<String>]) -> f32 {
-    let rh: f32 = 5.0;
-    let tw: f32 = widths.iter().sum();
-
-    ops.extend(fill_rect_ops(x0, y0 - rh, tw, rh, DEEP_FORGE));
-    let mut x = x0;
-    for (i, h) in headers.iter().enumerate() {
-        ops.extend(text_ops(h, 7.0, x + 1.0, y0 - rh + 1.5, font_bold(), WHITE_C));
-        x += widths[i];
-    }
-
-    let mut y = y0 - rh;
-    for (ri, row) in rows.iter().enumerate() {
-        if y < 15.0 { break; }
-        if ri % 2 == 0 {
-            ops.extend(fill_rect_ops(x0, y - rh, tw, rh, ALT_ROW));
-        }
-        ops.extend(line_ops(x0, y - rh, x0 + tw, y - rh, GRID_CLR, 0.3));
-        let mut x = x0;
-        for (i, v) in row.iter().enumerate() {
-            if i < widths.len() {
-                let s = if v.len() > 30 { &v[..27] } else { v.as_str() };
-                ops.extend(text_ops(s, 7.0, x + 1.0, y - rh + 1.5, font(), DEEP_FORGE));
-                x += widths[i];
+pub fn kozijnstaat_pdf_bytes(project: &Project) -> Result<Vec<u8>, String> {
+    if project.kozijnen.is_empty() { return Err("Add a frame before exporting its schedule.".into()); }
+    let mut pdf = Report::new("Frame schedule", 297.0, 210.0, 12.0)?;
+    pdf.paragraph(&format!("Project: {} | Number: {} | Client: {}", project.project_info.name,
+        project.project_info.number, project.project_info.client), 9.0, false);
+    pdf.y -= 4.0;
+    let rows = project.kozijnen.iter().map(|k| {
+        let mut types = std::collections::BTreeMap::new();
+        let mut glass = std::collections::BTreeSet::new();
+        for cell in &k.cells {
+            *types.entry(cell.panel_type.label_en()).or_insert(0) += 1;
+            if cell.panel_type != crate::kozijn::PanelType::Panel {
+                glass.insert(format!("{} {} mm", cell.glazing.glass_type, cell.glazing.thickness_mm));
             }
         }
-        y -= rh;
-    }
-    y
+        vec![k.mark.clone(), k.name.clone(), k.frame.outer_width.to_string(),
+            k.frame.outer_height.to_string(), material_label(&k.frame.material),
+            k.grid.columns.len().to_string(), k.grid.rows.len().to_string(), k.cells.len().to_string(),
+            types.iter().map(|(t,n)| format!("{n} x {t}")).collect::<Vec<_>>().join(", "),
+            glass.into_iter().collect::<Vec<_>>().join(", "), k.frame.color_inside.clone(), k.frame.color_outside.clone()]
+    }).collect::<Vec<_>>();
+    pdf.table("Frames (dimensions in mm)", &["Mark","Name","Width","Height","Material","Columns","Rows","Cells","Panel types","Glazing","Inside","Outside"],
+        &[16.0,32.0,18.0,18.0,26.0,14.0,12.0,12.0,42.0,43.0,20.0,20.0], &rows);
+    pdf.finish()
 }
 
-fn panel_label(pt: PanelType) -> &'static str {
-    match pt {
-        PanelType::FixedGlass => "VG", PanelType::TurnTilt => "DK",
-        PanelType::Turn => "D", PanelType::Tilt => "K",
-        PanelType::Sliding => "S", PanelType::Door => "DR",
-        PanelType::Panel => "P", PanelType::Ventilation => "V",
-        PanelType::TopHung => "KL", PanelType::BottomHung => "TM",
-        PanelType::LiftSlide => "HS", PanelType::Pivot => "PV",
-    }
+pub fn generate_workshop_pdf(k: &Kozijn, project: &Project, path: &str) -> Result<(), String> {
+    super::write_export_bytes(path, &workshop_pdf_bytes(k, project)?)
 }
 
-fn mat_label(m: &Material) -> String {
+pub fn workshop_pdf_bytes(k: &Kozijn, project: &Project) -> Result<Vec<u8>, String> {
+    super::ifc::validate_ifc_export(k, super::ifc::LodLevel::Lod300)?;
+    if k.frame.outer_width > 1_000_000.0 || k.frame.outer_height > 1_000_000.0 {
+        return Err("Workshop dimensions exceed the supported drawing range of 1,000,000 mm.".into());
+    }
+    if k.layout.is_some() || !k.extensions.is_empty() {
+        return Err("Workshop PDF currently supports rectangular grid frames without extensions. Export IFC to share other modeled layouts.".into());
+    }
+    let mut pdf = Report::new("Workshop drawing", 420.0, 297.0, 15.0)?;
+    pdf.paragraph(&format!("Project: {} | Frame: {} - {}", project.project_info.name, k.mark, k.name), 10.0, false);
+    pdf.paragraph(&format!("{} x {} mm | {} | Depth {} mm", k.frame.outer_width,
+        k.frame.outer_height, material_label(&k.frame.material), k.frame.frame_depth), 9.0, false);
+    let ow = k.frame.outer_width as f32;
+    let oh = k.frame.outer_height as f32;
+    // Reserve a right-hand band for dimension text, including large values.
+    let available_w = 310.0;
+    let available_h = pdf.y - 65.0;
+    if available_h < 40.0 { return Err("Project and frame descriptions are too long for one workshop sheet.".into()); }
+    let scale = (available_w / ow).min(available_h / oh);
+    let ox = (420.0 - 60.0 - ow * scale) / 2.0;
+    let oy = 45.0;
+    let sx = |x: f64| ox + x as f32 * scale;
+    let sy = |y: f64| oy + y as f32 * scale;
+    let geo = crate::geometry::compute_2d_geometry(k);
+    if geo.frame_polygons.is_empty() {
+        for rect in &geo.frame_rects { pdf.rect(sx(rect.x), sy(rect.y), rect.width as f32 * scale,
+            rect.height as f32 * scale, (0.82,0.84,0.86)); }
+    } else {
+        use printpdf::*;
+        for ring in &geo.frame_polygons {
+            pdf.ops.extend([Op::SetFillColor { col: super::pdf_document::color((0.82,0.84,0.86)) },
+                Op::DrawPolygon { polygon: Polygon { rings: vec![PolygonRing { points: ring.iter().map(|p|
+                    LinePoint { p: Point { x: Mm(sx(p[0])).into(), y: Mm(sy(p[1])).into() }, bezier: false }).collect() }],
+                    mode: PaintMode::FillStroke, winding_order: WindingOrder::NonZero } }]);
+        }
+    }
+    for rect in geo.h_dividers.iter().chain(&geo.v_dividers) {
+        pdf.rect(sx(rect.x), sy(rect.y), rect.width as f32 * scale, rect.height as f32 * scale, (0.82,0.84,0.86));
+    }
+    for cell in &geo.cell_rects {
+        let r = &cell.rect;
+        pdf.line(sx(r.x),sy(r.y),sx(r.x+r.width),sy(r.y),0.4);
+        pdf.line(sx(r.x+r.width),sy(r.y),sx(r.x+r.width),sy(r.y+r.height),0.4);
+        pdf.line(sx(r.x+r.width),sy(r.y+r.height),sx(r.x),sy(r.y+r.height),0.4);
+        pdf.line(sx(r.x),sy(r.y+r.height),sx(r.x),sy(r.y),0.4);
+        pdf.text(&format!("Cell {}",cell.cell_index+1),8.0,sx(r.x+r.width/2.0)-8.0,sy(r.y+r.height/2.0),false,INK);
+    }
+    // Print the actual scale rather than an inaccurate rounded standard scale.
+    pdf.line(ox,oy-10.0,ox+ow*scale,oy-10.0,0.5);
+    for x in [ox,ox+ow*scale] { pdf.line(x,oy-7.0,x,oy-13.0,0.5); }
+    pdf.text(&format!("{} mm",k.frame.outer_width),9.0,ox+ow*scale/2.0-10.0,oy-17.0,false,INK);
+    let xd = ox+ow*scale+12.0;
+    pdf.line(xd,oy,xd,oy+oh*scale,0.5);
+    for y in [oy,oy+oh*scale] { pdf.line(xd-3.0,y,xd+3.0,y,0.5); }
+    pdf.text(&format!("{} mm",k.frame.outer_height),9.0,xd+4.0,oy+oh*scale/2.0,false,INK);
+    pdf.text(&format!("Drawing scale 1:{:.3} | Dimensions in mm | Print at 100%",1.0/scale),8.0,15.0,16.0,false,MUTED);
+    pdf.finish()
+}
+
+pub fn generate_production_pdf(data: &[ProductionData], path: &str) -> Result<(), String> {
+    super::write_export_bytes(path, &production_pdf_bytes(data)?)
+}
+
+pub fn production_pdf_bytes(data: &[ProductionData]) -> Result<Vec<u8>, String> {
+    if data.is_empty() { return Err("Add a frame before exporting production lists.".into()); }
+    let mut pdf = Report::new("Production lists",297.0,210.0,12.0)?;
+    for (i, prod) in data.iter().enumerate() {
+        if i > 0 { pdf.new_page(); }
+        pdf.paragraph(&format!("Frame: {} - {} | Dimensions in mm",prod.kozijn_mark,prod.kozijn_name),10.0,true);
+        pdf.y -= 4.0;
+        let rows = prod.cut_list.iter().map(|p| vec![p.piece_id.clone(),p.member_type.label_en().into(),
+            p.profile_name.clone(),p.material.clone(),p.net_length_mm.to_string(),p.gross_length_mm.to_string(),
+            p.miter_left_deg.to_string(),p.miter_right_deg.to_string(),p.quantity.to_string()]).collect::<Vec<_>>();
+        pdf.table("Cut list", &["Position","Member","Profile","Material","Net mm","Gross mm","Left deg","Right deg","Qty"],
+            &[26.0,35.0,55.0,35.0,28.0,28.0,22.0,22.0,22.0], &rows);
+        let rows = prod.glass_list.iter().map(|p| vec![p.piece_id.clone(),p.glass_type.clone(),p.width_mm.to_string(),
+            p.height_mm.to_string(),p.thickness_mm.to_string(),p.ug_value.to_string(),format!("{:.4}",p.area_m2),p.quantity.to_string()]).collect::<Vec<_>>();
+        pdf.table("Glass list", &["Position","Type","Width mm","Height mm","Thickness mm","Ug W/m2K","Area m2","Qty"],
+            &[35.0,55.0,32.0,32.0,35.0,32.0,28.0,24.0], &rows);
+        let rows = prod.hardware_list.iter().map(|p| vec![(p.cell_index+1).to_string(),p.component.clone(),p.description.clone(),p.quantity.to_string()]).collect::<Vec<_>>();
+        pdf.table("Hardware list", &["Cell","Component","Description","Qty"], &[24.0,65.0,160.0,24.0], &rows);
+        let rows = prod.gasket_list.iter().map(|p| vec![p.gasket_type.label_en().into(),p.length_mm.to_string(),p.quantity.to_string()]).collect::<Vec<_>>();
+        pdf.table("Gasket list", &["Type","Length mm","Qty"], &[160.0,85.0,28.0], &rows);
+        let rows = prod.panel_list.iter().map(|p| vec![p.piece_id.clone(),p.width_mm.to_string(),p.height_mm.to_string(),p.panel_type.clone(),p.quantity.to_string()]).collect::<Vec<_>>();
+        pdf.table("Panel list", &["Position","Width mm","Height mm","Type","Qty"], &[45.0,35.0,35.0,130.0,28.0], &rows);
+        let rows = prod.glaslat_list.iter().map(|p| vec![p.piece_id.clone(),(p.cell_index+1).to_string(),p.position.clone(),p.material.clone(),
+            p.width_mm.to_string(),p.height_mm.to_string(),p.total_length_mm.to_string(),if p.mitered {"Yes"}else{"No"}.into(),p.quantity.to_string()]).collect::<Vec<_>>();
+        pdf.table("Glazing bead list", &["Position","Cell","Side","Material","Width mm","Height mm","Cut length mm","Mitred","Qty"],
+            &[40.0,18.0,28.0,60.0,28.0,28.0,33.0,20.0,18.0], &rows);
+        let rows = prod.bom.iter().map(|p| vec![p.category.clone(),p.description.clone(),p.unit.clone(),format!("{:.4}",p.quantity)]).collect::<Vec<_>>();
+        pdf.table("Bill of materials", &["Category","Description","Unit","Quantity"], &[50.0,170.0,25.0,28.0], &rows);
+    }
+    pdf.finish()
+}
+
+pub(super) fn material_label(m: &Material) -> String {
     match m {
-        Material::Wood(w) => format!("Hout ({})", match w {
-            WoodType::Meranti => "meranti", WoodType::Accoya => "accoya",
-            WoodType::Vuren => "vuren", WoodType::Eiken => "eiken",
-        }),
-        Material::Aluminum => "Aluminium".into(),
-        Material::Pvc => "Kunststof".into(),
-        Material::WoodAluminum => "Hout-Aluminium".into(),
+        Material::Wood(w) => format!("Wood ({})",match w { WoodType::Meranti=>"Meranti",WoodType::Accoya=>"Accoya",WoodType::Vuren=>"Spruce",WoodType::Eiken=>"Oak" }),
+        Material::Aluminum=>"Aluminium".into(),Material::Pvc=>"PVC".into(),Material::WoodAluminum=>"Wood-aluminium".into(),
     }
 }

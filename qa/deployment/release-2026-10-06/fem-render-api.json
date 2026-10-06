@@ -1,0 +1,11 @@
+{
+  "base": "https://spanvision-fem-engine.onrender.com",
+  "checkedAt": "2026-10-06T06:49:23.551Z",
+  "passed": true,
+  "findings": [
+    "both Rust executables installed",
+    "rectangle area and both inertias match independent formulae",
+    "invalid sections, JSON, commands, fields and oversized input rejected",
+    "service recovers after invalid requests"
+  ]
+}

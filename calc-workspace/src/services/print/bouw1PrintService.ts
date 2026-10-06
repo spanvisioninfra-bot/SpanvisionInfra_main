@@ -106,7 +106,7 @@ function computeBouw1Rows(items: CostItem[], schedule: CostSchedule): Bouw1Row[]
     const rt = item.resourceType;
     let loon = 0, materiaal = 0, materieel = 0, stelpost = 0, ondaann = 0, uren = 0;
 
-    if (item.rowType === "calc ") {
+    if (item.rowType === "regel") {
       // Uren volgens de canonieke normformule: aantal × norm / capaciteit
       // (zoals calculator.ts en urenProrate.ts — normFactor is een deler).
       uren = (item.quantity ?? 0) * (item.normQuantity ?? 0);
@@ -121,7 +121,7 @@ function computeBouw1Rows(items: CostItem[], schedule: CostSchedule): Bouw1Row[]
         loon = total;
       } else if (rt === 'materiaal') {
         materiaal = total;
-      } else if (rt === "equipment") {
+      } else if (rt === "materieel") {
         materieel = total;
       } else if (rt === 'onderaannemer') {
         ondaann = total;
@@ -155,7 +155,7 @@ function computeBouw1Rows(items: CostItem[], schedule: CostSchedule): Bouw1Row[]
       // Standalone begrotingspost without children
       if (rt === 'arbeid') loon = total;
       else if (rt === 'materiaal') materiaal = total;
-      else if (rt === "equipment") materieel = total;
+      else if (rt === "materieel") materieel = total;
       else if (rt === 'onderaannemer') ondaann = total;
       else if (rt === 'overig') stelpost = total;
       else ondaann = total; // default: onderaanneming for standalone posts
@@ -227,7 +227,7 @@ interface ColumnTotals {
 function computeColumnTotals(items: CostItem[], schedule: CostSchedule): ColumnTotals {
   const rows = computeBouw1Rows(items, schedule);
   // Only sum top-level chapters
-  const topLevelRows = rows.filter(r => r.item.parentId === null && r.item.rowType === 'chapter');
+  const topLevelRows = rows.filter(r => r.item.parentId === null && r.item.rowType === "chapter");
   let uren = 0, loon = 0, materiaal = 0, materieel = 0, stelpost = 0, ondaann = 0;
   for (const r of topLevelRows) {
     uren += r.uren;
@@ -281,7 +281,7 @@ export function buildBouw1Html(
     const item = dr.item;
 
     // When entering a new top-level chapter, emit subtotal for previous one
-    if (item.rowType === 'chapter' && item.depth === 0) {
+    if (item.rowType === "chapter" && item.depth === 0) {
       if (currentTopChapter && idx > 0) {
         // Find the Bouw1Row for the current chapter to get totals
         const chapterDR = bouw1Rows.find(r => r.item.id === currentTopChapter!.id);
@@ -396,7 +396,7 @@ function buildDataRow(dr: Bouw1Row, fx: Bouw1Fmt): string {
   const fmtNL = fx.num;
   const fmtNorm = fx.norm;
 
-  if (item.rowType === 'chapter') {
+  if (item.rowType === "chapter") {
     // Chapter rows: only show hst (at depth 0) or hst+par (depth 1), plus description
     // They don't have amount columns in the Bouw1 format (totals shown separately)
     return `<tr class="chapter-row depth-${item.depth}">

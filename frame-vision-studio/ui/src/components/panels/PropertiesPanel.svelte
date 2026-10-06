@@ -347,20 +347,19 @@
     {#if $currentKozijn.layout}
       <div class="section">
         <h3>{$_('props.gridSizes')}</h3>
-        <p class="hint-text">Vrije indeling actief — vakken bewerk je in de tekening:
-          klik een vak om te splitsen/vullen, versleep de deellijnen, Ctrl+klik
-          plaatst een tussenstijl op de klikpositie (Ctrl+Alt = tussendorpel).</p>
+        <p class="hint-text">Free layout is active. Click a cell to split it or choose its infill.
+          Drag a divider to reposition it. Ctrl+click adds a vertical divider;
+          Ctrl+Alt+click adds a horizontal divider.</p>
       </div>
     {:else}
     <div class="section">
       <h3>{$_('props.gridSizes')}</h3>
       <div class="field">
         <button class="convert-btn" onclick={() => setKozijnLayout(gridToLayout($currentKozijn))}>
-          → Vrije indeling activeren
+          → Enable free layout
         </button>
-        <p class="hint-text">Zet het raster om naar de vrije indeling: per vak
-          splitsen, samenvoegen en vullingen kiezen, met getrapte vormen
-          (melkmeisje). De vakken hieronder blijven anders rasterbreed.</p>
+        <p class="hint-text">Convert the grid to a free layout to split or merge individual
+          cells and choose their infills, including stepped side lights.</p>
       </div>
       <div class="field">
         <label>{$_('props.columns')}</label>
@@ -599,7 +598,7 @@
 
     <div class="section">
       <h3>Borders</h3>
-      {#each ["Links", "Rechts", "Boven", "Onder"] as eName, ei}
+      {#each ["Left", "Right", "Top", "Bottom"] as eName, ei}
         {@const edge = ($currentKozijn.frame.edges || [])[ei]}
         <div class="field">
           <label>{eName}</label>
@@ -623,10 +622,10 @@
                 }).then(k => k && currentKozijn.set(k));
               }}
             >
-              <option value="haaks">Haaks</option>
-              <option value="kalksponning">Kalksponning</option>
+              <option value="haaks">Square edge</option>
+              <option value="kalksponning">Wall rebate</option>
               <option value="renovatie">Renovation</option>
-              <option value="vlak">Area</option>
+              <option value="vlak">Flat edge</option>
             </select>
             <select
               value={edge?.spouwlat?.width || 100}

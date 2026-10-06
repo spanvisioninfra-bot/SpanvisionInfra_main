@@ -90,13 +90,13 @@ class TestRootEndpoint:
 
     def test_root_returns_healthy_status(self, client):
         """Test that root endpoint returns healthy status."""
-        response = client.get("/")
+        response = client.get("/", headers={"Accept": "application/json"})
         data = response.json()
         assert data["status"] == "healthy"
 
     def test_root_returns_service_info(self, client):
         """Test that root endpoint returns service information."""
-        response = client.get("/")
+        response = client.get("/", headers={"Accept": "application/json"})
         data = response.json()
         assert "service" in data
         assert "version" in data
@@ -104,7 +104,7 @@ class TestRootEndpoint:
 
     def test_root_returns_endpoints_info(self, client):
         """Test that root endpoint returns available endpoints."""
-        response = client.get("/")
+        response = client.get("/", headers={"Accept": "application/json"})
         data = response.json()
         assert "endpoints" in data
         assert "upload" in data["endpoints"]

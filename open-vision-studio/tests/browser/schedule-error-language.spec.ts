@@ -17,20 +17,20 @@ test('solverfouten verschijnen in de gekozen UI-taal, in de melding en in het wa
   }, first);
 
   await page.getByRole('button', { name: /^(Language|Taal)$/, exact: true }).click();
-  await page.getByRole('option', { name: /Deutsch/ }).click();
-  await expect(page.locator('html')).toHaveAttribute('lang', 'de');
+  await page.getByRole('option', { name: /English/ }).click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   // Sinds #233 heeft het sluitkruisje zelf de naam "Sluiten" (naast de voetknop met dezelfde
   // tekst); kies daarom expliciet het kruisje, en bewijs meteen dat ook zijn naam meevertaalt.
   const closeX = page.getByRole('dialog').locator('.modal-close-btn');
-  await expect(closeX).toHaveAccessibleName('Schließen');
+  await expect(closeX).toHaveAccessibleName('Close');
   await closeX.click();
 
-  await page.locator('.ribbon-tab').filter({ hasText: /^Planung$/ }).click();
+  await page.locator('.ribbon-tab').filter({ hasText: /^Planning$/ }).click();
   const ribbon = page.locator('.ribbon-content');
-  await ribbon.getByRole('button', { name: /^Berechnen$/ }).click();
+  await ribbon.getByRole('button', { name: /^Calculate$/ }).click();
   const toast = page.locator('.ops-toast.toast-error');
-  await expect(toast.locator('.ops-toast-message')).toHaveText('Zeitplan konnte nicht berechnet werden');
-  await expect(toast.locator('.ops-toast-detail')).toHaveText("Ungültiges Startdatum für Aufgabe 'Erdarbeiten'");
+  await expect(toast.locator('.ops-toast-message')).toHaveText('Schedule could not be calculated');
+  await expect(toast.locator('.ops-toast-detail')).toHaveText("Invalid start date for task 'Erdarbeiten'");
 
   await page.evaluate(([a, b]) => {
     window.__OPS__!.store.setState((s) => {
@@ -39,13 +39,13 @@ test('solverfouten verschijnen in de gekozen UI-taal, in de melding en in het wa
       s.sequences.push({ id: 'seq-kring-2', predecessorId: b, successorId: a, type: 'FINISH_START', lagDays: 0 });
     });
   }, [first, second]);
-  await ribbon.getByRole('button', { name: /^Berechnen$/ }).click();
-  const cycleText = /^Zirkelbezug zwischen Aufgaben: (Erdarbeiten → Rohbau → Erdarbeiten|Rohbau → Erdarbeiten → Rohbau)$/;
+  await ribbon.getByRole('button', { name: /^Calculate$/ }).click();
+  const cycleText = /^Circular dependency between tasks: (Erdarbeiten → Rohbau → Erdarbeiten|Rohbau → Erdarbeiten → Rohbau)$/;
   await expect(toast.locator('.ops-toast-detail')).toHaveText(cycleText);
 
-  await ribbon.getByRole('button', { name: /^Warnungen$/ }).click();
+  await ribbon.getByRole('button', { name: /^Warnings$/ }).click();
   const panel = page.locator('[data-ops-warnings-panel]');
-  await expect(panel).toContainText('Der Terminplan konnte nicht berechnet werden: Zirkelbezug zwischen Aufgaben:');
-  await expect(panel).not.toContainText('Circular dependency');
-  await expect(toast).not.toContainText(/Ongeldige|Circular dependency/);
+  await expect(panel).toContainText('The schedule could not be calculated: Circular dependency between tasks:');
+  await expect(panel).not.toContainText('Zirkelbezug');
+  await expect(toast).not.toContainText(/Ongeldige|Ungültiges/);
 });

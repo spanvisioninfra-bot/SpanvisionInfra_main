@@ -144,7 +144,7 @@ export function tijdstempelStatusSleutel(tijdstempel) {
       ? `${V}.status.valid`
       : `${V}.status.unknownCertificate`;
   }
-  if (uitkomst === "changed") return `${V}.status.modified`;
+  if (uitkomst === 'gewijzigd') return `${V}.status.modified`;
   if (uitkomst === 'ongeldig') return `${V}.status.invalid`;
   return `${V}.status.notVerifiable`;
 }

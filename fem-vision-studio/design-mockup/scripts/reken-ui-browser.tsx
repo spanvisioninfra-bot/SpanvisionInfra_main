@@ -47,7 +47,7 @@ let logs=0;
 zetSolverLogOpvanger(()=>{logs++;});
 
 async function run(){
- await i18next.use(initReactI18next).init({lng:'nl',fallbackLng:'nl',defaultNS:'common',resources:{nl:{common:nl,check:nlCheck,ribbon:nlRibbon},en:{common:en,check:enCheck},de:{common:de,check:deCheck},fr:{common:fr,check:frCheck}},interpolation:{escapeValue:false}});
+ await i18next.use(initReactI18next).init({lng:'nl',supportedLngs:['nl','en','de','fr'],fallbackLng:'nl',defaultNS:'common',resources:{nl:{common:nl,check:nlCheck,ribbon:nlRibbon},en:{common:en,check:enCheck},de:{common:de,check:deCheck},fr:{common:fr,check:frCheck}},interpolation:{escapeValue:false}});
  document.documentElement.dataset.theme='openaec';
  const perCase=calculate();
  test('actueel centraal G-resultaat zonder canvasberekening',()=>{

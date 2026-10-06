@@ -159,7 +159,7 @@ function importStandardCuf(doc: Document): ImportResult {
 
     if (subBundels.length > 0) {
       const chapter = makeCostItem({
-        parentId, sortOrder: sort++, depth, rowType: 'chapter',
+        parentId, sortOrder: sort++, depth, rowType: "chapter",
         code, description: omschrijving,
       });
       items.push(chapter);
@@ -207,7 +207,7 @@ function importLegacyCuf(doc: Document): ImportResult {
       parentId: null,
       sortOrder: items.length,
       depth: 0,
-      rowType: 'chapter',
+      rowType: "chapter",
       code: h.getAttribute('code') ?? `H${idx + 1}`,
       description: h.getAttribute('omschrijving') ?? '',
     });
@@ -236,8 +236,8 @@ function importLegacyCuf(doc: Document): ImportResult {
         const resourceType: ResourceType =
           typeAttr === 'arbeid' ? 'arbeid' :
           typeAttr === 'materiaal' ? 'materiaal' :
-          typeAttr === "equipment" ? "equipment" :
-          (typeAttr === "subcontracting" || typeAttr === 'onderaannemer') ? 'onderaannemer' :
+          typeAttr === "materieel" ? "materieel" :
+          (typeAttr === "onderaanneming" || typeAttr === 'onderaannemer') ? 'onderaannemer' :
           'overig';
         items.push(
           makeCostItem({

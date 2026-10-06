@@ -7,15 +7,13 @@
   "type": "module",
   "scripts": {
     "test:branding": "node --experimental-strip-types --test tests/branding.test.mjs",
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
+    "dev": "npm --prefix design-mockup run dev",
+    "build": "npm --prefix design-mockup run build",
+    "preview": "npm --prefix design-mockup run preview",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "mcp:sidecar": "node scripts/mcp-sidecar.mjs",
-    "tauri:build": "node scripts/mcp-sidecar.mjs && tauri build --config src-tauri/tauri.bundel.conf.json",
-    "predev": "node vendor/openaec-style-book/packages/tokens/build.js",
-    "prebuild": "node vendor/openaec-style-book/packages/tokens/build.js"
+    "tauri:build": "node scripts/mcp-sidecar.mjs && tauri build --config src-tauri/tauri.bundel.conf.json"
   },
   "dependencies": {
     "@openaec/design-tokens": "file:vendor/openaec-style-book/packages/tokens",

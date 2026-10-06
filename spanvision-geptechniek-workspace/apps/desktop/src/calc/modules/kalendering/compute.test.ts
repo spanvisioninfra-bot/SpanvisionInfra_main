@@ -197,7 +197,7 @@ describe("computeKalendering — foutmeldingen", () => {
     inp.customValhoogteM = 1.0;
     const r = computeKalendering(inp);
     expect(r.ok).toBe(false);
-    expect(r.error).toMatch(/custom valblok/i);
+    expect(r.error).toMatch(/custom drop hammer/i);
   });
 
   it("error bij ronde paal met 0 diameter", () => {
@@ -215,7 +215,7 @@ describe("computeKalendering — foutmeldingen", () => {
     inp.zijdeBMm = 0;
     const r = computeKalendering(inp);
     expect(r.ok).toBe(false);
-    expect(r.error).toMatch(/beide zijdes/i);
+    expect(r.error).toMatch(/both sides/i);
   });
 
   it("error bij q_c ≤ 0", () => {

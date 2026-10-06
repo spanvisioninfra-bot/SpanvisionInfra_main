@@ -77,7 +77,7 @@ function buildExportRequest(
         description: item.description || '',
         rowType: item.rowType,
         quantity: item.quantity,
-        unit: item.unit || "pcs",
+        unit: item.unit || "st",
         unitPrice: item.unitPrice || 0,
         total: item.total || 0,
         materialPrice: item.materialPrice,

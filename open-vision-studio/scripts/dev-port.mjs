@@ -1,6 +1,7 @@
 // scripts/dev-port.mjs
 import { readFileSync, realpathSync, writeFileSync, renameSync, mkdirSync } from 'node:fs';
-import { basename, join, dirname } from 'node:path';
+import { basename, join, dirname, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createServer } from 'node:net';
 import { withAllocLock } from './dev-lock.mjs';
@@ -60,6 +61,12 @@ export function worktreeRoot(cwd = process.cwd()) {
   } catch {
     return null;
   }
+}
+
+/** App-root blijft de map van deze scripts, ook als Planner in een monorepo zit. */
+export function projectRoot() {
+  const root = realpathSync(join(dirname(fileURLToPath(import.meta.url)), '..'));
+  return worktreeRoot(root) ? root : null;
 }
 
 export function worktreeSlug(root) {
@@ -125,12 +132,14 @@ function isSameRoot(a, b) {
 }
 
 function listWorktreePaths(root) {
+  const gitRoot = worktreeRoot(root);
+  const projectPath = gitRoot ? relative(gitRoot, root) : '';
   const out = execFileSync('git', ['worktree', 'list', '--porcelain'], {
     cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
   });
   return out.split('\n')
     .filter((l) => l.startsWith('worktree '))
-    .map((l) => l.slice('worktree '.length).trim());
+    .map((l) => join(l.slice('worktree '.length).trim(), projectPath));
 }
 
 /**

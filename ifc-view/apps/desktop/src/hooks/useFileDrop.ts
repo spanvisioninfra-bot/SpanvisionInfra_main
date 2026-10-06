@@ -25,7 +25,7 @@ export function useFileDrop(
       prevent(e);
       setIsDragOver(false);
       const file = e.dataTransfer?.files[0];
-      if (file && (file.name.endsWith('.ifc') || file.name.endsWith('.ifczip'))) {
+      if (file) {
         onFile(file);
       }
     };

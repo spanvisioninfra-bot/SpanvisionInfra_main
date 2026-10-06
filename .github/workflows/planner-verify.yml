@@ -1,0 +1,57 @@
+name: Planner release verification
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [version/V.1.0]
+    paths:
+      - open-vision-studio/**
+      - branding/**
+      - .github/workflows/planner-verify.yml
+  pull_request:
+    paths:
+      - open-vision-studio/**
+      - branding/**
+      - .github/workflows/planner-verify.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: planner-verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: open-vision-studio
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: open-vision-studio/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps --only-shell chromium
+      - name: Run the complete release gate
+        run: npm run verify 2>&1 | tee planner-verify.log
+      - name: Build the verified browser application
+        run: npm run build
+      - name: Retain verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: planner-verification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            open-vision-studio/planner-verify.log
+            open-vision-studio/playwright-report/
+            open-vision-studio/test-results/
+          if-no-files-found: ignore
+          retention-days: 7

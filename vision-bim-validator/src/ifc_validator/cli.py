@@ -208,7 +208,7 @@ def validate(
         err_console.print(f"[red]Memory Error:[/red] {e}")
         raise typer.Exit(code=1)
 
-    except click.exceptions.Exit:
+    except (typer.Exit, click.exceptions.Exit):
         # Re-raise typer.Exit/click.Exit - don't catch these
         # (they inherit from RuntimeError but should propagate)
         raise

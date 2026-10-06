@@ -9,12 +9,14 @@ serde.workspace = true
 serde_json.workspace = true
 uuid.workspace = true
 thiserror.workspace = true
-printpdf = { version = "0.9", optional = true }
+printpdf = { version = "0.9", optional = true, default-features = false }
+ttf-parser = { version = "0.25", optional = true }
 rust_xlsxwriter = { version = "0.94", optional = true }
 chrono = "0.4"
 calamine = { version = "0.34", optional = true }
 
 [features]
 default = ["export", "import"]
-export = ["dep:printpdf", "dep:rust_xlsxwriter"]
+export = ["dep:printpdf", "dep:rust_xlsxwriter", "dep:ttf-parser"]
+web-export = ["export", "rust_xlsxwriter/wasm", "printpdf/js-sys"]
 import = ["dep:calamine"]

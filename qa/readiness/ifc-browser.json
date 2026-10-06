@@ -1,0 +1,64 @@
+{
+  "checkedAt": "2026-10-05T15:30:48.076Z",
+  "status": "passed",
+  "records": [
+    {
+      "name": "Invalid initial IFC is rejected without a false success or stuck loading state"
+    },
+    {
+      "name": "Real web-ifc WASM parses the six-element IFC and exposes three Mark groups"
+    },
+    {
+      "name": "The file chooser opens through keyboard activation"
+    },
+    {
+      "name": "Button/keyboard playback share one timer; keyboard pause stays paused and slider arrows advance once"
+    },
+    {
+      "name": "Parameter CSV download contains every actual IFC Express ID",
+      "rows": 6,
+      "filename": "readiness-demo-parameters.csv"
+    },
+    {
+      "name": "A bad second import preserves the active document, selected parameter and rendered geometry"
+    },
+    {
+      "name": "Value-group filtering changes real rendered geometry",
+      "changedPixels": 204401
+    },
+    {
+      "name": "Document switching restores the first document's isolation and camera"
+    },
+    {
+      "name": "Single-group parameters work, and clearing the parameter disables stale playback/export"
+    },
+    {
+      "name": "Light mode changes the live WebGL canvas and active geometry contrast",
+      "canvasColor": "rgb(238, 241, 245)"
+    },
+    {
+      "name": "IFC workspace fits the viewport",
+      "width": 320
+    },
+    {
+      "name": "IFC workspace fits the viewport",
+      "width": 390
+    },
+    {
+      "name": "IFC workspace fits the viewport",
+      "width": 820
+    },
+    {
+      "name": "IFC workspace fits the viewport",
+      "width": 1440
+    },
+    {
+      "name": "Closing all documents releases the viewer and stored theme survives a reload"
+    }
+  ],
+  "pageErrors": [],
+  "limits": [
+    "IFC2X3 six-element fixture only; large/corrupt schema coverage and native Windows GUI/installer remain unverified.",
+    "CSV exports parameters; IFC authoring/export is not implemented."
+  ]
+}

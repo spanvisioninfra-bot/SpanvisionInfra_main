@@ -1,0 +1,9 @@
+{
+  "command": "node ../../deployment/run-pdf-tests.mjs",
+  "directory": "spanvision-pdf-workspace/open-pdf-studio",
+  "started": "2026-10-06T04:48:20.374Z",
+  "finished": "2026-10-06T04:49:59.752Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/pdf-tests.log"
+}

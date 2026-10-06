@@ -8,7 +8,7 @@ rust-version.workspace = true
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-ofs-core = { path = "../ofs-core", default-features = false }
+ofs-core = { path = "../ofs-core", default-features = false, features = ["web-export"] }
 serde.workspace = true
 serde_json.workspace = true
 uuid = { version = "1", features = ["v4", "serde", "js"] }

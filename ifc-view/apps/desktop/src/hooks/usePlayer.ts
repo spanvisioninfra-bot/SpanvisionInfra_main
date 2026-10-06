@@ -32,16 +32,6 @@ export function usePlayer() {
 
     setIsPlaying(true);
 
-    playInterval = setInterval(() => {
-      const cur = currentIndex();
-      const vals = sortedValues();
-      if (cur < vals.length - 1) {
-        goToNext();
-      } else {
-        stopPlayback();
-      }
-    }, speed());
-
     goToNext();
   }
 
@@ -71,11 +61,15 @@ export function usePlayer() {
     if (playInterval) clearInterval(playInterval);
   });
 
-  // Restart interval when speed changes during playback
+  // One timer owns playback, including stops triggered by imports/tab changes.
   createEffect(() => {
     const s = speed();
-    if (isPlaying() && playInterval) {
+    const playing = isPlaying();
+    if (playInterval) {
       clearInterval(playInterval);
+      playInterval = null;
+    }
+    if (playing) {
       playInterval = setInterval(() => {
         const cur = currentIndex();
         const vals = sortedValues();
@@ -99,3 +93,5 @@ export function usePlayer() {
     goToValue,
   };
 }
+
+export type PlayerActions = ReturnType<typeof usePlayer>;

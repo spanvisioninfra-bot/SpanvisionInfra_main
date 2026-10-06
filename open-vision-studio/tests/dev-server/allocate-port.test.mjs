@@ -195,7 +195,7 @@ test('een symlink-pad naar onszelf telt niet als botsing', async () => {
   // op macOS): hetzelfde worktree kan onder een ander pad opduiken. Dat is nog
   // steeds ONSZELF en mag onze eigen stempel niet als botsing aanmerken.
   const alias = join(me, '..', 'alias');
-  symlinkSync(me, alias, 'dir');
+  symlinkSync(me, alias, process.platform === 'win32' ? 'junction' : 'dir');
   const { calls, deps: d } = spyDeps({ paths: [alias] });
 
   assert.equal(await allocatePort(me, d), 3050);

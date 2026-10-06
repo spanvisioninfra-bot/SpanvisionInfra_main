@@ -1,0 +1,11 @@
+{
+  "passed": false,
+  "checkedAt": "2026-10-06T06:51:03.761Z",
+  "checks": [
+    "Actual two-page PDF opens and paints its page canvas",
+    "Rectangle drawn through mouse input; page and annotation canvases remain sized in both themes",
+    "Save As downloads a PDF retaining both pages, 90-degree page rotation and a bounded rectangle appearance"
+  ],
+  "errors": [],
+  "error": "TimeoutError: page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://spanvision-pdf.vercel.app/\", waiting until \"load\"\u001b[22m\n"
+}

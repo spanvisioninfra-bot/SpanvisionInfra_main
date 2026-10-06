@@ -112,13 +112,13 @@ export default function HomeTab() {
   const handleAddChapter = () => {
     pushHistory(items, tCommon('newChapter'));
     // Add as sibling of active chapter, or at root after current item
-    const parentId = activeItem?.rowType === 'chapter' ? activeItem.parentId : (activeItem?.parentId ?? null);
+    const parentId = activeItem?.rowType === "chapter" ? activeItem.parentId : (activeItem?.parentId ?? null);
     addChapter(parentId, activeItem?.id);
   };
 
   const handleAddBegrotingspost = () => {
     pushHistory(items, tCommon('newBudgetPost'));
-    const parentId = activeItem?.rowType === 'chapter' ? activeItem.id : (activeItem?.parentId ?? null);
+    const parentId = activeItem?.rowType === "chapter" ? activeItem.id : (activeItem?.parentId ?? null);
     addItem(parentId, activeRow);
   };
 
@@ -153,13 +153,13 @@ export default function HomeTab() {
     if (!activeItem) return;
     // Tekstregel can go under bewakingspost, begrotingspost, or chapter
     let parentId = '';
-    if (activeItem.rowType === 'bewakingspost' || activeItem.rowType === 'begrotingspost' || activeItem.rowType === 'chapter') {
+    if (activeItem.rowType === 'bewakingspost' || activeItem.rowType === 'begrotingspost' || activeItem.rowType === "chapter") {
       parentId = activeItem.id;
     } else {
       // Walk up to find nearest container
       let current = activeItem;
       while (current) {
-        if (current.rowType === 'bewakingspost' || current.rowType === 'begrotingspost' || current.rowType === 'chapter') {
+        if (current.rowType === 'bewakingspost' || current.rowType === 'begrotingspost' || current.rowType === "chapter") {
           parentId = current.id;
           break;
         }

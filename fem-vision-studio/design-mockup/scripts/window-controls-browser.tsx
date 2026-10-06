@@ -57,15 +57,15 @@ async function click(selector: string) {
 }
 async function run() {
   await i18next.use(initReactI18next).init({ lng: "nl", resources: { nl: { common: nl } }, defaultNS: "common", initImmediate: false });
-  await test("browser-sluitknop geeft uitleg in plaats van een onafgehandelde desktopfout", async () => {
-    await mount(); await click(".titlebar-close");
-    ok(/tabblad/.test(host.querySelector('[role="status"]')?.textContent ?? ""), "Sluit het browsertabblad-melding ontbreekt");
+  await test("browser hides the native close control", async () => {
+    await mount();
+    ok(host.querySelector('.titlebar-close') === null, "Native close control must not appear in the browser");
     ok(errors.length === 0, errors.join("; "));
   });
   await test("minimaliseren en maximaliseren zijn in browser niet beschikbaar", async () => {
     await mount();
-    ok(host.querySelector<HTMLButtonElement>(".titlebar-minimize")?.disabled, "Minimaliseren lijkt beschikbaar");
-    ok(host.querySelector<HTMLButtonElement>(".titlebar-maximize")?.disabled, "Maximaliseren lijkt beschikbaar");
+    ok(host.querySelector(".titlebar-minimize") === null, "Native minimize control must not appear in the browser");
+    ok(host.querySelector(".titlebar-maximize") === null, "Native maximize control must not appear in the browser");
     flushSync(() => host.querySelector(".titlebar")!.dispatchEvent(new MouseEvent("dblclick", { bubbles: true })));
     await tick();
     ok(errors.length === 0, errors.join("; "));

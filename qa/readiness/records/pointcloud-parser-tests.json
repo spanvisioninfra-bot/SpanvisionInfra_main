@@ -1,0 +1,9 @@
+{
+  "command": "node --experimental-strip-types --test src/engine/pointcloud/XYZParser.test.ts src/engine/pointcloud/TextScanParsers.test.ts src/engine/pointcloud/PLYParser.test.ts src/engine/pointcloud/LASParser.test.ts src/engine/pointcloud/PointcloudTransforms.test.ts",
+  "directory": "spanvision-pointcloud-workspace",
+  "started": "2026-10-05T11:25:21.727Z",
+  "finished": "2026-10-05T11:25:22.041Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/pointcloud-parser-tests.log"
+}

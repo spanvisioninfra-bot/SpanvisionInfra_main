@@ -14,6 +14,7 @@ pub fn update_pricing_config(
 ) -> Result<(), String> {
     let config: ofs_core::pricing::PricingConfig = serde_json::from_str(&config_json)
         .map_err(|e| format!("Invalid pricing config: {}", e))?;
+    config.validate()?;
     let mut project = state.project.lock().map_err(|e| e.to_string())?;
     project.pricing_config = Some(config);
     Ok(())

@@ -1,0 +1,10 @@
+{
+  "base": "https://spanvision-fem.vercel.app",
+  "checkedAt": "2026-10-06T06:50:21.045Z",
+  "passed": true,
+  "findings": [
+    "rectangle area and both inertias match independent formulae",
+    "invalid sections, JSON, commands, fields and oversized input rejected",
+    "service recovers after invalid requests"
+  ]
+}

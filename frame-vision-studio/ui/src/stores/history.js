@@ -8,6 +8,7 @@ import { writable, get } from "svelte/store";
 import { currentKozijn, currentGeometry } from "./kozijn.js";
 import { invoke } from "../lib/tauri.js";
 import { refreshProject, markDirty } from "./project.js";
+import { activeWorkspaceView } from './ui.js';
 
 const MAX_HISTORY = 50;
 
@@ -147,6 +148,8 @@ export function clearHistory() {
  */
 export function registerUndoRedoShortcuts() {
   function handler(e) {
+    if (e.defaultPrevented || e.target.closest('input, textarea, select, [role="dialog"]')
+      || get(activeWorkspaceView) !== 'editor') return;
     if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
       e.preventDefault();
       undo();

@@ -1,0 +1,9 @@
+{
+  "command": ".venv\\Scripts\\python.exe -m pytest tests -q",
+  "directory": "spanvision-stl-3d-map-workspace",
+  "started": "2026-10-04T18:03:30.228Z",
+  "finished": "2026-10-04T18:03:45.288Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/stl-backend-tests.log"
+}

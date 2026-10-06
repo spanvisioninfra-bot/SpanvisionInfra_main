@@ -9,8 +9,8 @@
   --sv-text:#ffffff;--sv-text-soft:#eeeeee;--sv-muted:#999999;
   --sv-border:rgba(255,255,255,.16);--sv-focus:rgba(255,255,255,.58);
 }
-.sv-appearance-control {display:inline-flex;align-items:center;gap:5px;flex-shrink:0;margin-inline:6px;color:var(--sv-text-soft);font:12px/1.2 system-ui,sans-serif;-webkit-app-region:no-drag;position:relative;z-index:1;}
-.sv-appearance-icon {font-size:17px;}
+.sv-appearance-control {display:inline-flex;align-items:center;gap:5px;flex-shrink:0;margin-inline:6px;color:var(--sv-text-soft);font:var(--text-large,12px)/1.2 system-ui,sans-serif;-webkit-app-region:no-drag;position:relative;z-index:1;}
+.sv-appearance-icon {width:17px;height:17px;flex-shrink:0;}
 .sv-appearance-control select {box-sizing:border-box;min-height:30px;max-width:82px;padding:4px 6px;border:1px solid var(--sv-border);border-radius:5px;background:var(--sv-surface);color:var(--sv-text-soft);font:inherit;cursor:pointer;color-scheme:inherit;}
 .sv-appearance-control select:focus-visible {outline:2px solid var(--sv-focus);outline-offset:2px;}
 [data-sv-tool="cad"] body > .sv-appearance-control {position:fixed;right:16px;top:8px;z-index:10;}

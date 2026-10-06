@@ -36,7 +36,7 @@ export function buildBudgetContext(schedule: CostSchedule, items: CostItem[]): s
       i.rowType,
       i.description,
       [fmt(i.quantity), i.unit ?? ''].filter(Boolean).join(' '),
-      i.rowType === "calc " ? `prijs=${fmt(i.normUnitPrice)} loon/eh=${fmt(i.laborPrice)} norm=${fmt(i.normQuantity)} tarief=${i.tariefGroep ?? ''} soort=${i.resourceType ?? ''}` : '',
+      i.rowType === "regel" ? `prijs=${fmt(i.normUnitPrice)} loon/eh=${fmt(i.laborPrice)} norm=${fmt(i.normQuantity)} tarief=${i.tariefGroep ?? ''} soort=${i.resourceType ?? ''}` : '',
       `totaal=${fmt(i.total)}`,
     ];
     return kolommen.filter(Boolean).join(' | ');
@@ -130,7 +130,7 @@ function nieuwItem(rowType: RowType, parentId: string | null, overrides: Partial
     normUnitPrice: null,
     resourceType: null,
     resourceLibraryId: null,
-    verrekenbaar: rowType === 'chapter' ? 'V' : null,
+    verrekenbaar: rowType === "chapter" ? 'V' : null,
     tariefGroep: null,
     ...overrides,
   } as CostItem;
@@ -166,7 +166,7 @@ export function applyActies(acties: AssistantActie[]): string[] {
           break;
         }
         case 'add_hoofdstuk': {
-          const item = nieuwItem('chapter', null, {
+          const item = nieuwItem("chapter", null, {
             code: String(actie.code ?? ''),
             description: String(actie.omschrijving ?? "New chapter"),
           });
@@ -180,7 +180,7 @@ export function applyActies(acties: AssistantActie[]): string[] {
           const item = nieuwItem('begrotingspost', ouder.id, {
             description: String(actie.omschrijving ?? 'Nieuwe post'),
             quantity: actie.aantal != null ? Number(actie.aantal) : null,
-            unit: (actie.eenheid as CostItem['unit']) ?? "pcs",
+            unit: (actie.eenheid as CostItem['unit']) ?? "st",
           });
           useAppStore.getState().setItems([...useAppStore.getState().items, item]);
           resultaten.push(`✔ Post "${item.description}" toegevoegd onder ${actie.onderNr}`);
@@ -189,9 +189,9 @@ export function applyActies(acties: AssistantActie[]): string[] {
         case 'add_regel': {
           const ouder = vindOpNr(actie.onderNr);
           if (!ouder) throw new Error(`onderNr ${actie.onderNr} niet gevonden`);
-          const eenheid = String(actie.eenheid ?? "pcs");
+          const eenheid = String(actie.eenheid ?? "st");
           const groep = (String(actie.tariefgroep ?? 'A').toUpperCase() as 'A' | 'B' | 'C');
-          const isUren = eenheid.toLowerCase() === "hrs";
+          const isUren = eenheid.toLowerCase() === "uur";
           // Uur-regels volgen de vaste calculatieregels: norm 1, loon via de
           // tariefgroep, géén materiaalprijs — anders belandt loon in de
           // materiaalkolom.

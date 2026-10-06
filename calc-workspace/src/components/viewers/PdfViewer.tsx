@@ -24,6 +24,10 @@ export function PdfViewer() {
   const overlayRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pdfRef = useRef<any>(null);
+  const loadingTaskRef = useRef<any>(null);
+  const renderTaskRef = useRef<any>(null);
+  const drawOverlayRef = useRef<() => void>(() => {});
+  const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [numPages, setNumPages] = useState(0);
   const [tool, setTool] = useState<Tool>('pan');
@@ -52,18 +56,24 @@ export function PdfViewer() {
   // Render current page
   const renderPage = useCallback(async (pageNum: number) => {
     if (!pdfRef.current || !canvasRef.current) return;
+    renderTaskRef.current?.cancel();
+    const document = pdfRef.current;
     const pdfPage = await pdfRef.current.getPage(pageNum);
+    if (pdfRef.current !== document || !canvasRef.current) return;
     const viewport = pdfPage.getViewport({ scale: zoom });
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d')!;
     canvas.width = viewport.width;
     canvas.height = viewport.height;
-    await pdfPage.render({ canvasContext: ctx, viewport, canvas }).promise;
+    const task = pdfPage.render({ canvasContext: ctx, viewport, canvas });
+    renderTaskRef.current = task;
+    await task.promise;
+    if (renderTaskRef.current !== task) return;
 
     if (overlayRef.current) {
       overlayRef.current.width = viewport.width;
       overlayRef.current.height = viewport.height;
-      drawOverlay();
+      drawOverlayRef.current();
     }
   }, [zoom]);
 
@@ -82,9 +92,9 @@ export function PdfViewer() {
       if (m.points.length === 0) continue;
 
       ctx.beginPath();
-      ctx.moveTo(m.points[0].x, m.points[0].y);
+      ctx.moveTo(m.points[0].x * zoom, m.points[0].y * zoom);
       for (let i = 1; i < m.points.length; i++) {
-        ctx.lineTo(m.points[i].x, m.points[i].y);
+        ctx.lineTo(m.points[i].x * zoom, m.points[i].y * zoom);
       }
       if (m.type === 'area') {
         ctx.closePath();
@@ -96,7 +106,7 @@ export function PdfViewer() {
       for (const p of m.points) {
         ctx.fillStyle = ctx.strokeStyle;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.arc(p.x * zoom, p.y * zoom, 4, 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -106,7 +116,7 @@ export function PdfViewer() {
       ctx.font = 'bold 13px sans-serif';
       ctx.fillText(
         m.type === 'length' ? `${m.value.toFixed(2)} m` : `${m.value.toFixed(2)} m²`,
-        last.x + 8, last.y - 8
+        last.x * zoom + 8, last.y * zoom - 8
       );
     }
 
@@ -116,50 +126,64 @@ export function PdfViewer() {
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 5]);
       ctx.beginPath();
-      ctx.moveTo(currentPoints[0].x, currentPoints[0].y);
+      ctx.moveTo(currentPoints[0].x * zoom, currentPoints[0].y * zoom);
       for (let i = 1; i < currentPoints.length; i++) {
-        ctx.lineTo(currentPoints[i].x, currentPoints[i].y);
+        ctx.lineTo(currentPoints[i].x * zoom, currentPoints[i].y * zoom);
       }
       ctx.stroke();
       ctx.setLineDash([]);
       for (const p of currentPoints) {
         ctx.fillStyle = ctx.strokeStyle;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.arc(p.x * zoom, p.y * zoom, 4, 0, Math.PI * 2);
         ctx.fill();
       }
     }
-  }, [measurements, page, currentPoints, tool]);
+  }, [measurements, page, currentPoints, tool, zoom]);
+  drawOverlayRef.current = drawOverlay;
 
   useEffect(() => { drawOverlay(); }, [drawOverlay]);
 
   useEffect(() => {
-    if (pdfRef.current) renderPage(page);
-  }, [page, renderPage]);
+    if (pdfRef.current) void renderPage(page).catch(reason => {
+      if (reason?.name !== 'RenderingCancelledException') setError('The PDF page could not be rendered. Try reopening the document.');
+    });
+    return () => renderTaskRef.current?.cancel();
+  }, [page, fileName, renderPage]);
+
+  useEffect(() => () => {
+    renderTaskRef.current?.cancel();
+    void loadingTaskRef.current?.destroy();
+  }, []);
 
   const loadPdf = useCallback(async (file: File) => {
-    // pdfjs-dist needs a worker; bind it inline
+    setError('');
     const pdfjs = await import('pdfjs-dist');
-    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-      'pdfjs-dist/build/pdf.worker.mjs',
-      import.meta.url
-    ).href;
+    const { default: pdfWorkerUrl } = await import('pdfjs-dist/build/pdf.worker.mjs?url');
+    pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
+    renderTaskRef.current?.cancel();
+    await loadingTaskRef.current?.destroy();
+    pdfRef.current = null;
+    setFileName('');
     const buffer = await file.arrayBuffer();
-    const pdf = await pdfjs.getDocument({ data: buffer }).promise;
+    const task = pdfjs.getDocument({ data: buffer });
+    loadingTaskRef.current = task;
+    const pdf = await task.promise;
+    if (loadingTaskRef.current !== task) return;
     pdfRef.current = pdf;
     setNumPages(pdf.numPages);
     setPage(1);
     setFileName(file.name);
     setMeasurements([]);
-    await renderPage(1);
-  }, [renderPage]);
+    setCurrentPoints([]);
+  }, []);
 
   const handleCanvasClick = (e: React.MouseEvent) => {
     if (tool === 'pan' || !overlayRef.current) return;
     const rect = overlayRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = (e.clientX - rect.left) / zoom;
+    const y = (e.clientY - rect.top) / zoom;
     setCurrentPoints([...currentPoints, { x, y }]);
   };
 
@@ -196,7 +220,7 @@ export function PdfViewer() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) loadPdf(file);
+    if (file) void loadPdf(file).catch(() => setError('The PDF could not be opened. Choose a valid, unencrypted PDF document.'));
     e.target.value = '';
   };
 
@@ -264,6 +288,7 @@ export function PdfViewer() {
       </div>
 
       {/* PDF canvas */}
+      {error && <p role="alert" style={{ padding: '8px 16px', color: 'var(--theme-danger-color)' }}>{error}</p>}
       <div style={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center', padding: 16 }}>
         {!fileName ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--theme-text-secondary)', fontSize: 14 }}>

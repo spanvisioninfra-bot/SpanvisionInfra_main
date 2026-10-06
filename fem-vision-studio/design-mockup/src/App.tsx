@@ -175,9 +175,9 @@ function DetachedApp({ view, title }: { view: string; title: string }) {
   const { t } = useTranslation();
 
   useEffect(() => {
-    getSetting("theme", "light").then((saved) => applyTheme(saved));
+    getSetting("theme", "spanvision-mono").then((saved) => applyTheme(saved));
     // Browservenster (window.open-fallback): venstertitel zelf zetten.
-    document.title = `${title} — Open FEM2D Studio`;
+    document.title = `${title} — FEM Vision Studio — Spanvision Infra`;
     import("@tauri-apps/api/window").then(({ getCurrentWindow }) => {
       getCurrentWindow().show();
     }).catch(() => {});
@@ -272,7 +272,7 @@ function App() {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [projectSettingsOpen, setProjectSettingsOpen] = useState(false);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState("spanvision-mono");
   // Bibliotheek-dialoog (Instellingen-ribbon: Materialen / Profielen) —
   // alleen-lezen naslag, geen editor.
   const [libraryOpen, setLibraryOpen] = useState(false);
@@ -2027,7 +2027,7 @@ function App() {
   // zodat venstertitel en documenttab nooit verschillende namen tonen.
   useEffect(() => {
     const name = projectPath ? projectPath.split(/[\\/]/).pop() : i18next.t("ribbon:report.unnamedProject");
-    document.title = `${isDirty ? "● " : ""}${name} — Open FEM2D Studio`;
+    document.title = `${isDirty ? "● " : ""}${name} — FEM Vision Studio — Spanvision Infra`;
   }, [isDirty, projectPath]);
 
   // Startvenster verwijderd op verzoek: de app opent direct in het model.
@@ -2087,7 +2087,7 @@ function App() {
   const isSplitResizing = useRef(false);
 
   useEffect(() => {
-    getSetting("theme", "light").then((saved) => {
+    getSetting("theme", "spanvision-mono").then((saved) => {
       setTheme(saved);
       applyTheme(saved);
     });

@@ -61,7 +61,7 @@ export function importIfcx(jsonText: string): ImportResult {
   let sort = 0;
   const walk = (node: IfcxNode, parentId: string | null, depth: number): void => {
     const a: Attrs = node.attributes ?? {};
-    const rowType = (str(a['ifcx::ocs::rowType']) || "calc ") as RowType;
+    const rowType = (str(a['ifcx::ocs::rowType']) || "regel") as RowType;
     const qty = a['bsi::ifc::prop::Quantity'];
     const quantity = qty && typeof qty === 'object' ? numOrNull((qty as Record<string, unknown>).value) : null;
     const unitStr = qty && typeof qty === 'object' ? str((qty as Record<string, unknown>).unit) : '';
@@ -69,7 +69,7 @@ export function importIfcx(jsonText: string): ImportResult {
     const verr = str(a['ifcx::ocs::verrekenbaar']);
     const verrekenbaar = verr === 'V' || verr === 'A' || verr === 'N' || verr === 'F' ? verr : null;
     const tg = str(a['ifcx::ocs::tariefGroep']);
-    const tariefGroep = tg === 'A' || tg === "V" || tg === 'C' ? tg : null;
+    const tariefGroep = tg === 'A' || tg === "B" || tg === 'C' ? tg : null;
 
     const partial: Partial<CostItem> & { rowType: RowType } = {
       parentId,

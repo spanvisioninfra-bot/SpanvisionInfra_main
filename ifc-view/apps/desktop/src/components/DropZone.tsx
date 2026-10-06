@@ -8,7 +8,10 @@ export default function DropZone() {
 
   const handleFileChange = (e: Event) => {
     const input = e.target as HTMLInputElement;
-    if (input.files?.[0]) loadFile(input.files[0]);
+    const file = input.files?.[0];
+    if (file) void loadFile(file);
+    // Permit retrying the same file after an import error.
+    input.value = '';
   };
 
   return (
@@ -25,10 +28,10 @@ export default function DropZone() {
           <span class={styles.formatBadge}>.ifc</span>
         </div>
         <p class={styles.dropZoneOr}>{t('drop.or')}</p>
-        <label class={styles.fileInputLabel} onClick={() => fileInputRef?.click()}>
-          <span>{'\u{1F4C2}'}</span>
+        <button type="button" class={styles.fileInputLabel} onClick={() => fileInputRef?.click()}>
+          <span aria-hidden="true">{'\u{1F4C2}'}</span>
           {t('drop.chooseFile')}
-        </label>
+        </button>
         <input
           ref={fileInputRef}
           type="file"

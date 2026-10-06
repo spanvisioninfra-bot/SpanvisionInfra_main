@@ -1,0 +1,9 @@
+{
+  "command": "vision-bim-validator\\.venv\\Scripts\\python.exe -m unittest deployment.test_fem_api -v",
+  "directory": "",
+  "started": "2026-10-05T08:14:16.707Z",
+  "finished": "2026-10-05T08:14:19.485Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/fem-api-tests.log"
+}

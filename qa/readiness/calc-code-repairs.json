@@ -1,0 +1,902 @@
+[
+  {
+    "file": "calc-workspace\\src\\components\\chat\\ChatPanel.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\CostGrid.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\CostGrid.tsx",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\CostGrid.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridCell.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridCell.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridCell.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridCell.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridCell.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridCell.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridCell.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridCell.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridCellEditor.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\gridConstants.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\gridConstants.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridContextMenu.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridContextMenu.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridContextMenu.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridContextMenu.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridContextMenu.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridContextMenu.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridContextMenu.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridRow.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\GridRow.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\SplitGridPane.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\grid\\WpCalcBottomPanel.tsx",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\offerte\\OfferteView.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\panels\\SchedulePanel.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\report\\SummaryPanel.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\ribbon\\HomeTab.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\ribbon\\HomeTab.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\ribbon\\HomeTab.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\components\\ribbon\\HomeTab.tsx",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\assistant\\assistantActions.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\assistant\\assistantActions.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\assistant\\assistantActions.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\assistant\\assistantActions.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\assistant\\assistantActions.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\assistant\\assistantActions.ts",
+    "from": "hrs",
+    "to": "uur"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\calculation\\calculator.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\calculation\\calculator.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\calculation\\calculator.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\calculation\\calculator.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\calculation\\calculator.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\calculation\\calculator.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\calculation\\calculator.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\calculation\\calculator.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\clipboard\\excelClipboard.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\clipboard\\excelClipboard.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\clipboard\\excelClipboard.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\clipboard\\excelClipboard.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\bc3Exporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\bc3Exporter.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\bc3Exporter.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\bc3Exporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\inschrijfstaatExporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\inschrijfstaatExporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\inschrijfstaatExporter.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\inschrijfstaatExporter.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\inschrijfstaatExporter.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\inschrijfstaatExporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\inschrijfstaatExporter.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\inschrijfstaatExporter.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\onlvExporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\onlvExporter.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\onlvExporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\onlvExporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\onlvExporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\export\\wpcalcExporter.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\exporters\\cufExporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\exporters\\cufExporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\exporters\\cufExporter.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\exporters\\cufExporter.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\exporters\\cufExporter.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\exporters\\rsxExporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\exporters\\rsxExporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\exporters\\rsxExporter.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\exporters\\tradxmlExporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\exporters\\tradxmlExporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\exporters\\tradxmlExporter.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\exporters\\tradxmlExporter.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\file\\fileService.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\file\\fileService.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\file\\fileService.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\grid\\gridRows.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\grid\\hideTotal.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\ifc\\ifcCostGenerator.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\ifc\\ifcCostParser.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\ifc\\ifcCostParser.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\ifc\\ifcxJsonGenerator.ts",
+    "from": "equipment",
+    "to": "materieel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\ifc\\ifcxJsonGenerator.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\ifc\\ifcxJsonGenerator.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\ifc\\ifcxJsonGenerator.ts",
+    "from": "equipment",
+    "to": "materieel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\ifc\\ifcxJsonGenerator.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\ifc\\ifcxJsonGenerator.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\ifc\\ifcxJsonGenerator.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\bascalcImporter.ts",
+    "from": "equipment",
+    "to": "materieel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\bascalcImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\bascalcImporter.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\bc3Importer.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\bc3Importer.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\bmecatImporter.ts",
+    "from": "equipment",
+    "to": "materieel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\core.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\cufImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\cufImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\cufImporter.ts",
+    "from": "equipment",
+    "to": "materieel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\cufImporter.ts",
+    "from": "equipment",
+    "to": "materieel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\cufImporter.ts",
+    "from": "subcontracting",
+    "to": "onderaanneming"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\dncImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\genericTabularImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\ifcxImporter.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\inschrijfstaatImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\inschrijfstaatImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\inschrijfstaatImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\inschrijfstaatImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\inschrijfstaatImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\inschrijfstaatImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\inschrijfstaatImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\inschrijfstaatImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\onlvImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\rsxImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\rsxImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\rsxImporter.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\s01Importer.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\sufxImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\tradxmlImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\wpcalcImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\wpcalcImporter.ts",
+    "from": "equipment",
+    "to": "materieel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\xtbImporter.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\xtbImporter.ts",
+    "from": "equipment",
+    "to": "materieel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\zsxImporter.ts",
+    "from": "equipment",
+    "to": "materieel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\zsxImporter.ts",
+    "from": "equipment",
+    "to": "materieel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\importers\\zsxImporter.ts",
+    "from": "subcontracting",
+    "to": "onderaanneming"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\mcp\\apiExports.ts",
+    "from": "subcontracting",
+    "to": "onderaanneming"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\mcp\\mcpBridge.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\offerte\\templateService.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\bouw1PrintService.ts",
+    "from": "calc ",
+    "to": "regel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\bouw1PrintService.ts",
+    "from": "equipment",
+    "to": "materieel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\bouw1PrintService.ts",
+    "from": "equipment",
+    "to": "materieel"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\bouw1PrintService.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\bouw1PrintService.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\bouw1PrintService.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\printService.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\printService.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\printService.ts",
+    "from": "subcontracting",
+    "to": "onderaanneming"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\printService.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\printService.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\printService.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\printService.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\print\\printService.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\report\\reportGenerator.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\report\\reportGenerator.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\wizard\\hsbWandCalculator.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\wizard\\hsbWandCalculator.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\services\\wizard\\hsbWandCalculator.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\costItemsSlice.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\costItemsSlice.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\costItemsSlice.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\costItemsSlice.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\costItemsSlice.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\costItemsSlice.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\costItemsSlice.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\costItemsSlice.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\costItemsSlice.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\costItemsSlice.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\resourceLibrarySlice.ts",
+    "from": "equipment",
+    "to": "materieel"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\resourceLibrarySlice.ts",
+    "from": "hrs",
+    "to": "uur"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\resourceLibrarySlice.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\resourceLibrarySlice.ts",
+    "from": "days",
+    "to": "dgn"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\resourceLibrarySlice.ts",
+    "from": "wk",
+    "to": "week"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\resourceLibrarySlice.ts",
+    "from": "mo",
+    "to": "mnd"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\resourceLibrarySlice.ts",
+    "from": "item",
+    "to": "post"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\resourceLibrarySlice.ts",
+    "from": "LS",
+    "to": "ls"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\resourceLibrarySlice.ts",
+    "from": "PM",
+    "to": "pm"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\resourceLibrarySlice.ts",
+    "from": "times",
+    "to": "keer"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\resourceLibrarySlice.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\resourceLibrarySlice.ts",
+    "from": "pcs",
+    "to": "st"
+  },
+  {
+    "file": "calc-workspace\\src\\state\\slices\\versionSlice.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\types\\costModel.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  },
+  {
+    "file": "calc-workspace\\src\\types\\costModel.ts",
+    "from": "chapter",
+    "to": "hoofdstuk"
+  }
+]

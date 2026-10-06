@@ -374,9 +374,9 @@ const round2 = (value: number) => Math.round(value * 100) / 100;
 /** Weigeringsreden bij een duur korter dan het gedane werk van een lopende taak. */
 function durationBelowDoneWorkReason(refused: { done: number; unit: 'days' | 'hours' }, completion: number): string {
   const unit = refused.unit === 'hours' ? "hrs" : "work days";
-  return `de taak is al voor ${Math.round(completion * 100)}% gedaan (${round2(refused.done)} ${unit} gedaan werk): `
-    + `een nieuwe duur korter dan het gedane werk kan niet — het gedane werk blijft gelijk bij een `
-    + `duurwijziging. Kies een duur van minstens ${round2(refused.done)} ${unit}, of pas eerst de voortgang aan (\`progress\`)`;
+  return `The task is ${Math.round(completion * 100)}% complete (${round2(refused.done)} ${unit} of completed work). `
+    + `Duration cannot be shorter than completed work. Changing duration preserves completed work. `
+    + `Choose a duration of at least ${round2(refused.done)} ${unit}, or first change progress (\`progress\`).`;
 }
 
 /** Synchrone, transactie-vrije kern van `update_tasks`. */

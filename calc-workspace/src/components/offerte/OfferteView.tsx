@@ -66,7 +66,7 @@ export function OfferteView() {
   );
 
   const chapters = useMemo(
-    () => items.filter(i => i.rowType === 'chapter' && i.depth === 0),
+    () => items.filter(i => i.rowType === "chapter" && i.depth === 0),
     [items]
   );
 

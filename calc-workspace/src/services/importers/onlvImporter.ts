@@ -223,7 +223,7 @@ export function importOnlv(xml: string): ImportResult {
   /** Hoofdstuk voor hg/og/lg/ulg; `eigenschaften` is het *-eigenschaften-element. */
   const addGroup = (parent: CostItem | null, nr: string, eigenschaften: XElement | null, depth: number): CostItem =>
     add({
-      rowType: 'chapter',
+      rowType: "chapter",
       parentId: parent?.id ?? null,
       depth,
       code: nr,
@@ -276,7 +276,7 @@ export function importOnlv(xml: string): ImportResult {
       ctx.optionalCount++;
       notesLines.unshift(isEventual ? POSART_MARKERS.eventual : POSART_MARKERS.wahl);
     }
-    if (kidText(eig, 'wesentlicheposition') === "V") notesLines.unshift('Wesentliche Position (W)');
+    if (kidText(eig, 'wesentlicheposition') === 'W') notesLines.unshift('Wesentliche Position (W)');
 
     const quantity = ctx.isLb ? 0 : num(kidText(eig, 'lvmenge'));
 

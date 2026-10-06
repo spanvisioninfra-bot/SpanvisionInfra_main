@@ -57,7 +57,7 @@ export function normaliseerSparing(sparing) {
     borstweringMm: Number.isFinite(Number(sparing?.borstweringMm))
       ? Number(sparing.borstweringMm) : std.borstweringMm,
     hoogteMm: Number(sparing?.hoogteMm) > 0 ? Number(sparing.hoogteMm) : std.hoogteMm,
-    draairichting: sparing?.draairichting === 'rechts' ? "right" : 'links',
+    draairichting: sparing?.draairichting === 'rechts' ? "rechts" : 'links',
   };
 }
 

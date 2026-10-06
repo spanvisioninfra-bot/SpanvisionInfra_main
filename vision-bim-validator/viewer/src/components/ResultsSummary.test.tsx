@@ -134,7 +134,7 @@ describe('ResultsSummary', () => {
       const result = createSuccessfulResult({ total_specifications: 13 });
       render(<ResultsSummary result={result} />);
 
-      expect(screen.getByText('13')).toBeInTheDocument();
+      expect(screen.getByText('Total').parentElement).toHaveTextContent('13');
       expect(screen.getByText('Total')).toBeInTheDocument();
     });
 

@@ -6,12 +6,12 @@ import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
-import { worktreeRoot, worktreeSlug, allocatePort } from './dev-port.mjs';
+import { projectRoot, worktreeSlug, allocatePort } from './dev-port.mjs';
 import { acquireGuardLock } from './dev-lock.mjs';
 
 const printOnly = process.argv.includes('--print-plan');
 
-const root = worktreeRoot();
+const root = projectRoot();
 if (!root) {
   console.error('Niet in een git-worktree — kan geen dev-poort toewijzen.');
   process.exit(1);
@@ -48,6 +48,7 @@ const viteEntry = join(root, 'node_modules', 'vite', 'bin', 'vite.js');
 const child = spawn(process.platform === 'win32' ? process.execPath : viteBin,
   process.platform === 'win32' ? [viteEntry] : [], {
   stdio: 'inherit',
+  cwd: root,
   env: { ...process.env, OPS_DEV_PORT: String(port) },
 });
 

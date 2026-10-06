@@ -4,7 +4,7 @@ import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
 import { chromium } from '@playwright/test';
-import { allocateNamedPort, worktreeRoot } from './dev-port.mjs';
+import { allocateNamedPort, projectRoot } from './dev-port.mjs';
 
 const INSTALL_COMMAND = 'npx playwright install --only-shell chromium';
 
@@ -26,15 +26,17 @@ function spawnPlaywright({ executable, cwd, env, args }) {
   });
 }
 
-export async function runBrowserTests({ root, allocate, preflightHeadless, spawnTest, args }) {
+export async function runBrowserTests({ root, allocate, preflightHeadless, spawnTest, args, launchOptions = { headless: true } }) {
   if (!root) throw new Error('Niet in een git-worktree — browsertests kunnen niet starten.');
   const port = await allocate(root, 'browser');
 
   let browser;
   try {
-    browser = await preflightHeadless({ headless: true });
+    browser = await preflightHeadless(launchOptions);
   } catch (cause) {
-    throw new Error(`Playwright headless shell ontbreekt; voer uit: ${INSTALL_COMMAND}`, { cause });
+    throw new Error(launchOptions.channel
+      ? `Playwright kon browserkanaal ${launchOptions.channel} niet starten; controleer de installatie.`
+      : `Playwright headless shell ontbreekt; voer uit: ${INSTALL_COMMAND}`, { cause });
   } finally {
     if (browser) await browser.close();
   }
@@ -54,11 +56,12 @@ const isCli = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(impo
 if (isCli) {
   try {
     const exitCode = await runBrowserTests({
-      root: worktreeRoot(),
+      root: projectRoot(),
       allocate: allocateNamedPort,
       preflightHeadless: (options) => chromium.launch(options),
       spawnTest: spawnPlaywright,
       args: process.argv.slice(2),
+      launchOptions: { headless: true, ...(process.env.OPS_BROWSER_CHANNEL ? { channel: process.env.OPS_BROWSER_CHANNEL } : {}) },
     });
     process.exitCode = exitCode;
   } catch (error) {

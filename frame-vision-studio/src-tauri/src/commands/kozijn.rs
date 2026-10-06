@@ -601,10 +601,7 @@ pub fn add_custom_profile(
     profile_json: String,
 ) -> Result<(), String> {
     let mut project = state.project.lock().map_err(|e| e.to_string())?;
-    let profile: ofs_core::profile::ProfileDefinition =
-        serde_json::from_str(&profile_json).map_err(|e| format!("Ongeldig profiel: {}", e))?;
-    project.custom_profiles.push(profile);
-    Ok(())
+    ofs_core::profile::store_custom_profile(&mut project, &profile_json)
 }
 
 #[tauri::command]

@@ -56,7 +56,7 @@ export async function beslisOpslaanVraag(doc, vraag, { wachttijdMs = WACHTTIJD_M
 export function moetOpnieuwVerifieren(doc) {
   if (!doc) return false;
   if (doc._handtekeningBelofte) return true;
-  return !!doc.handtekeningToestand && doc.handtekeningToestand !== "none";
+  return !!doc.handtekeningToestand && doc.handtekeningToestand !== 'geen';
 }
 
 function vergelijkbaarPad(pad) {
@@ -72,7 +72,7 @@ function vergelijkbaarPad(pad) {
 export function opslaanVraagSoort(doc, doelPad) {
   const origineel = doc?.saveTargetPath || doc?.filePath;
   if (!doelPad || !origineel || doc?.isUntitled) return 'overschrijven';
-  return vergelijkbaarPad(doelPad) === vergelijkbaarPad(origineel) ? 'overschrijven' : "copy";
+  return vergelijkbaarPad(doelPad) === vergelijkbaarPad(origineel) ? 'overschrijven' : 'kopie';
 }
 
 /** Verzenden per e-mail: alleen opslaan als het bestand op schijf niet actueel is. */

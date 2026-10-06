@@ -68,12 +68,12 @@ test('tour layout: een ontbrekend anker wordt eenmaal vooruit overgeslagen', asy
   await expect(card).toHaveCount(0);
 });
 
-test('tour layout: Nederlandse inhoud en een volgende stap worden hermeet zonder lus', async ({ page, ops: _ops }) => {
+test('tour layout: Engelse inhoud en een volgende stap worden hermeet zonder lus', async ({ page, ops: _ops }) => {
   // Letterlijke taalkeuze vóór de modale tour: tijdens de tour blokkeert de overlay terecht alle
   // onderliggende bediening. De daaropvolgende Next-klik verandert de gemeten kaartinhoud live.
   await page.evaluate(() => window.__OPS__!.store.getState().setUI({ showSettingsDialog: true }));
   await page.getByRole('button', { name: /^(Language|Taal)$/, exact: true }).click();
-  await page.getByRole('option', { name: /Nederlands/ }).click();
+  await page.getByRole('option', { name: /English/ }).click();
   // De tekstknop in de voet; het kopkruisje heet hetzelfde maar heeft geen tekstinhoud.
   const closeName = /^(Close|Sluiten)$/;
   await page.getByRole('dialog').getByRole('button', { name: closeName }).filter({ hasText: closeName }).click();
@@ -94,12 +94,12 @@ test('tour layout: Nederlandse inhoud en een volgende stap worden hermeet zonder
   });
   await startTour(page);
   const card = page.locator('[data-ops-tour-card]');
-  await expect(card).toContainText('Lint-tabbladen');
+  await expect(card).toContainText('Ribbon tabs');
   const first = await card.boundingBox();
   expect(first).not.toBeNull();
 
-  await page.getByRole('button', { name: 'Volgende' }).click();
-  await expect(card).toContainText('Taaktabel en Gantt-diagram');
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(card).toContainText('Task table and Gantt chart');
   const second = await card.boundingBox();
   expect(second).not.toBeNull();
   const viewport = page.viewportSize()!;

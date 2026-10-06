@@ -97,7 +97,7 @@ export function gevalNeemtHandmatigeLasten(
  * projectbestand staat en dat de gebruiker kan hernoemen — het kenmerk, niet
  * de naam, bepaalt de werking.
  */
-export const EIGEN_GEWICHT_NAAM = "Eigen gewicht";
+export const EIGEN_GEWICHT_NAAM = "Self-weight";
 
 /**
  * Id van het standaardgeval in een nieuw project. NIET 1: de vier bestaande
@@ -112,8 +112,8 @@ export const EIGEN_GEWICHT_STANDAARD_ID = 5;
 /** De vier handmatige gevallen van een nieuw project — ongewijzigd. */
 export const HANDMATIGE_STANDAARDGEVALLEN: readonly LoadCase[] = [
   { id: 1, name: "Permanent (G)", type: "dead" },
-  { id: 2, name: "Variabel (Q)",  type: "live" },
-  { id: 3, name: "Sneeuw (S)",    type: "snow" },
+  { id: 2, name: "Variable (Q)",  type: "live" },
+  { id: 3, name: "Snow (S)",      type: "snow" },
   { id: 4, name: "Wind (W)",      type: "wind" },
 ];
 

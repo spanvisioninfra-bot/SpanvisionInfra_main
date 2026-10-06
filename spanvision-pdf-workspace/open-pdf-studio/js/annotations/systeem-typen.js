@@ -28,7 +28,7 @@ export const SYSTEEMTYPE_VERSION = 1;
 /** Randprofielen die een type kan voorschrijven (spiegel van
  *  SYSTEEM_EDGE_PROFIELEN in systeemraster.js — hier herhaald zodat deze
  *  module zelfstandig blijft). */
-const EDGE_PROFIELEN = ["none", 'hoeklijn', 'schaduwvoeg'];
+const EDGE_PROFIELEN = ["geen", 'hoeklijn', 'schaduwvoeg'];
 
 /** Nieuw stabiel systeemtype-id. */
 export function newSysteemTypeId() {
@@ -92,7 +92,7 @@ export function normalizeSysteemType(t) {
     ifcPredefinedType: t.ifcPredefinedType ? String(t.ifcPredefinedType) : undefined,
     celXMm: num(t.celXMm, 600),
     celYMm: num(t.celYMm, 600),
-    edgeProfiel: EDGE_PROFIELEN.includes(t.edgeProfiel) ? t.edgeProfiel : "none",
+    edgeProfiel: EDGE_PROFIELEN.includes(t.edgeProfiel) ? t.edgeProfiel : "geen",
     // LAYOUT-VORM: 'raster' (cellen in twee richtingen) of 'strook'
     // (stroken van strookBreedteMm die in ÉÉN richting — de rasterhoek —
     // over de volledige overspanning lopen; kanaalplaatvloer).

@@ -112,7 +112,10 @@ export function extractGeometry(
             const verts = getVertexArray(geomData.GetVertexData(), geomData.GetVertexDataSize());
             const indices = getIndexArray(geomData.GetIndexData(), geomData.GetIndexDataSize());
 
-            if (indices.length === 0) continue;
+            if (indices.length === 0) {
+              geomData.delete?.();
+              continue;
+            }
 
             const positions = new Float32Array(verts.length / 2);
             const normals = new Float32Array(verts.length / 2);
@@ -130,7 +133,10 @@ export function extractGeometry(
             const threeGeom = new THREE.BufferGeometry();
             threeGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             threeGeom.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
-            threeGeom.setIndex(new THREE.BufferAttribute(indices, 1));
+            // These arrays are views into the WASM heap. Retain an owned copy
+            // before releasing/reusing the IFC geometry allocation.
+            threeGeom.setIndex(new THREE.BufferAttribute(indices.slice(), 1));
+            geomData.delete?.();
 
             const material = baseMaterial.clone();
             const mesh = new THREE.Mesh(threeGeom, material);

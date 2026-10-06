@@ -183,7 +183,7 @@ export function buildFromMapping(data: TabularData, mapping: ColumnMapping): Imp
 
     if (!hasQty && !hasMoney) {
       const ch = builder.add({
-        parentId: null, depth: 0, rowType: 'chapter',
+        parentId: null, depth: 0, rowType: "chapter",
         code, description: description || code, unit: 'st',
       });
       currentChapterId = ch.id;

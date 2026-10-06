@@ -188,7 +188,7 @@ function getEstimatedSeconds(model: string, recordingMs: number): number {
 export default function App() {
   const { t, setLocale } = useI18n();
   const views: View[]=["landing","suggestions","login","signup","account","home","settings","dictionary","models","mic-test","meeting","transcribe","tts","about"];
-  const route=():View=>{const value=location.hash.slice(1)==="workspace"?"home":location.hash.slice(1);return views.includes(value as View)?value as View:runtime.native?"home":"landing";};
+  const route=():View=>{if(["login","signup"].includes(location.hash.slice(1))){history.replaceState(history.state,"",location.pathname+location.search+"#account");return "account";}const value=location.hash.slice(1)==="workspace"?"home":location.hash.slice(1);return views.includes(value as View)?value as View:runtime.native?"home":"landing";};
   const [view, setViewInternal] = createSignal<View>(route());
   const [navigationOpen,setNavigationOpen]=createSignal(false);
   const closeNavigation=()=>{setNavigationOpen(false);document.querySelector<HTMLButtonElement>(".mobile-menu")?.focus();};

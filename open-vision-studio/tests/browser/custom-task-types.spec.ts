@@ -157,7 +157,7 @@ test('Taak bewerken: aanmaken blijft app-breed na Annuleren maar materialiseert 
   });
 });
 
-test('taaktypen blijven bruikbaar in RTL en corrupte app-opslag wordt veilig genegeerd', async ({ page, ops: _ops }) => {
+test('taaktypen blijven bruikbaar met een oude Arabische voorkeur en corrupte app-opslag wordt veilig genegeerd', async ({ page, ops: _ops }) => {
   await page.evaluate(() => {
     localStorage.setItem('ops-personalTaskTypes', '{kapot');
     localStorage.setItem('ops-locale', 'ar');
@@ -172,7 +172,8 @@ test('taaktypen blijven bruikbaar in RTL en corrupte app-opslag wordt veilig gen
   });
   const [taskId] = await seedProject(page, [{ name: 'RTL', start: '2026-09-07', finish: '2026-09-08' }]);
   await showProperties(page, taskId);
-  await expect.poll(() => page.evaluate(() => document.documentElement.dir)).toBe('rtl');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect.poll(() => page.evaluate(() => document.documentElement.dir)).toBe('ltr');
   expect(await page.evaluate(() => localStorage.getItem('ops-personalTaskTypes'))).toBe('{kapot');
 
   const selector = page.locator('[data-ops-task-type]');
@@ -188,16 +189,16 @@ test('taaktypen blijven bruikbaar in RTL en corrupte app-opslag wordt veilig gen
   expect(box!.x + box!.width).toBeLessThanOrEqual(viewportWidth);
   await expect(dialog.getByRole('textbox')).toBeFocused();
   await dialog.getByRole('textbox').fill('نوع مراجعة');
-  await dialog.getByRole('button', { name: 'إنشاء' }).click();
+  await dialog.getByRole('button', { name: 'Create' }).click();
 
   await selector.getByRole('button').click();
   const managerOptions = page.getByRole('listbox').getByRole('option');
   await managerOptions.nth((await managerOptions.count()) - 1).click();
   const manager = page.locator('[data-ops-task-type-manager]');
-  const editButton = manager.getByRole('button', { name: 'تحرير' });
-  const removeButton = manager.getByRole('button', { name: 'حذف' });
-  await expect(editButton).toHaveAttribute('title', 'تحرير');
-  await expect(removeButton).toHaveAttribute('title', 'حذف');
+  const editButton = manager.getByRole('button', { name: 'Edit' });
+  const removeButton = manager.getByRole('button', { name: 'Remove' });
+  await expect(editButton).toHaveAttribute('title', 'Edit');
+  await expect(removeButton).toHaveAttribute('title', 'Remove');
   expect(await editButton.locator('svg').count()).toBe(1);
   expect(await removeButton.locator('svg').count()).toBe(1);
 });

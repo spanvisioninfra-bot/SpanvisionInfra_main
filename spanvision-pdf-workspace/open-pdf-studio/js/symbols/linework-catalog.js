@@ -15,7 +15,7 @@
 // linework-catalog-store.js.
 
 // Alleen gebruikt als een familie geen eigen preview meelevert.
-const FALLBACK_PREVIEW = '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="26" width="52" height="12"/><path d="M6 32h52"/></svg>';
+const FALLBACK_PREVIEW = '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="geen" stroke="currentColor" stroke-width="2"><rect x="6" y="26" width="52" height="12"/><path d="M6 32h52"/></svg>';
 
 export const LINEWORK_TEMPLATE_PREFIX = 'linework-';
 export const LINEWORK_FORMAT = 'linework-variants';

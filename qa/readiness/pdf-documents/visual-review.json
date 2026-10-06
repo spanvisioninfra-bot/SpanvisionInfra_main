@@ -1,0 +1,10 @@
+{
+  "reviewedAt": "2026-10-06T04:45:00Z",
+  "reviewedPages": 2,
+  "files": ["annotated-1.png", "annotated-2.png"],
+  "findings": [
+    "Page one text and rectangle are visible and inside the page",
+    "Page two preserves its 90-degree rotation and legible source text"
+  ],
+  "limits": "This two-page fixture does not establish coverage of all fonts or annotation types. Poppler reports missing display fonts for unused Symbol and ArialUnicode resources."
+}

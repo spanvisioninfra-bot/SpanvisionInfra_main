@@ -4,6 +4,7 @@
   import { invoke } from "../../lib/tauri.js";
   import { toast } from "../../stores/toast.js";
   import { exportQuotationPdf } from "../../lib/export.js";
+  import { markDirty, refreshProject } from "../../stores/project.js";
 
   // QuotationStatus enum values as serialized by the backend (snake_case serde)
   const STATUSES = ["draft", "sent", "accepted", "rejected", "expired"];
@@ -18,14 +19,16 @@
     try {
       quotations = await invoke("get_quotations", {}) || [];
     } catch (e) {
-      console.error("Offertes laden mislukt:", e);
+      toast.error("Unable to load quotations: " + e);
     }
     loading = false;
   }
 
   async function createQuotation() {
     try {
-      await invoke("create_quotation", { kozijnMarks: [], totalInclBtw: 0 });
+      await invoke("create_quotation", {});
+      markDirty();
+      await refreshProject();
       await loadQuotations();
       toast.success($_("quotation.created"));
     } catch (e) {
@@ -37,6 +40,8 @@
     if (!status || status === q.status) return;
     try {
       await invoke("update_quotation_status", { quotationId: q.id, status });
+      markDirty();
+      await refreshProject();
       await loadQuotations();
       toast.success($_("quotation.statusUpdated"));
     } catch (e) {
@@ -50,13 +55,15 @@
     if (!desc) return;
     const totalStr = prompt($_("quotation.revisionTotalPrompt"), String(q.totalInclBtw ?? 0));
     if (totalStr === null) return;
-    const newTotal = parseFloat(totalStr.replace(",", "."));
-    if (Number.isNaN(newTotal) || newTotal < 0) {
+    const newTotal = Number(totalStr.trim().replace(",", "."));
+    if (!totalStr.trim() || !Number.isFinite(newTotal) || newTotal < 0) {
       toast.error($_("quotation.invalidTotal"));
       return;
     }
     try {
       await invoke("create_quotation_revision", { quotationId: q.id, newTotal, changeDescription: desc });
+      markDirty();
+      await refreshProject();
       await loadQuotations();
       toast.success($_("quotation.revisionCreated"));
     } catch (e) {
@@ -74,6 +81,7 @@
       <button class="action-btn primary" onclick={createQuotation}>{$_("quotation.new")}</button>
     </div>
   </div>
+  <p class="hint">New drafts use the current project reference estimate in EUR. Confirm local prices and tax before commercial issue. Export PDF uses the current project values.</p>
   {#if loading}
     <p class="hint">{$_("quotation.loading")}</p>
   {:else if quotations.length === 0}

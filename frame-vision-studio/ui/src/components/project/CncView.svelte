@@ -56,7 +56,7 @@
 
   async function handleExportGcode() {
     try {
-      await exportCncGcode();
+      await exportCncGcode(selectedId);
     } catch (e) {
       console.error("G-code export mislukt:", e);
       toast.error($_("cnc.exportError") + ": " + e);
@@ -116,9 +116,11 @@
         {/each}
       </select>
       <button class="action-btn" onclick={load}>{$_("cnc.refresh")}</button>
-      <button class="action-btn primary" onclick={handleExportGcode}>{$_("cnc.exportGcode")}</button>
+      <button class="action-btn primary" onclick={handleExportGcode} disabled={loading || !selectedId || !parts.length}>{$_("cnc.exportGcode")}</button>
     </div>
   </div>
+  <p class="hint">Generic G-code is a preview. Tenon operations currently have no executable toolpath;
+    production requires a verified machine postprocessor and simulation.</p>
 
   {#if loading}
     <p class="hint">{$_("cnc.loading")}</p>

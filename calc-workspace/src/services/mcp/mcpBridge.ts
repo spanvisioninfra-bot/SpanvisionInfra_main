@@ -151,7 +151,7 @@ function handleMutation(mutation: McpMutation) {
 
       if (rowType === 'bewakingspost') {
         newId = store.addBewakingspost(parentId);
-      } else if (rowType === "calc ") {
+      } else if (rowType === "regel") {
         newId = store.addRegel(parentId);
       } else {
         newId = store.addItem(parentId);

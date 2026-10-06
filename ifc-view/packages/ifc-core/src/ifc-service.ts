@@ -16,7 +16,9 @@ export function getIfcApi(): any {
 
 export function openModel(data: Uint8Array): number {
   if (!ifcApi) throw new Error('IFC API not initialized');
-  return ifcApi.OpenModel(data);
+  const modelId = ifcApi.OpenModel(data);
+  if (modelId < 0 || !ifcApi.IsModelOpen(modelId)) throw new Error('The file does not contain a supported IFC model.');
+  return modelId;
 }
 
 export function closeModel(modelId: number): void {

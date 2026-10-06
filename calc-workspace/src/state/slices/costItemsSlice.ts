@@ -144,7 +144,7 @@ function createDefaultItem(parentId: string | null, sortOrder: number, depth: nu
     normUnitPrice: null,
     resourceType: null,
     resourceLibraryId: null,
-    verrekenbaar: rowType === 'chapter' ? 'V' : null,
+    verrekenbaar: rowType === "chapter" ? 'V' : null,
     tariefGroep: null,
   };
 }
@@ -198,7 +198,7 @@ export const createCostItemsSlice: StateCreator<CostItemsSlice> = (set, get) => 
     const depth = parentId ? (state.items.find((i) => i.id === parentId)?.depth ?? 0) + 1 : 0;
     const siblings = state.items.filter((i) => i.parentId === parentId);
     const newItem: CostItem = {
-      ...createDefaultItem(parentId, siblings.length, depth, 'chapter'),
+      ...createDefaultItem(parentId, siblings.length, depth, "chapter"),
       description: i18next.t('newChapter', { defaultValue: 'New chapter' }),
     };
     const newItems = [...state.items];
@@ -257,7 +257,7 @@ export const createCostItemsSlice: StateCreator<CostItemsSlice> = (set, get) => 
     let parentId = '';
     if (item.rowType === 'bewakingspost' || item.rowType === 'begrotingspost') {
       parentId = item.id;
-    } else if (item.rowType === 'chapter') {
+    } else if (item.rowType === "chapter") {
       // Op een hoofdstuk: laatste post-kind gebruiken of er één aanmaken.
       const child = state.items
         .filter((i) => i.parentId === item.id && (i.rowType === 'begrotingspost' || i.rowType === 'bewakingspost'))
@@ -277,7 +277,7 @@ export const createCostItemsSlice: StateCreator<CostItemsSlice> = (set, get) => 
     if (!parentId) return '';
     // afterItemId = het aangeklikte item → de regel komt direct onder zijn
     // subtree. Bij een hoofdstuk: gewoon achteraan in de gevonden post.
-    return get().addRegel(parentId, item.rowType === 'chapter' ? undefined : item.id);
+    return get().addRegel(parentId, item.rowType === "chapter" ? undefined : item.id);
   },
 
   addTekstregel: (parentId, afterItemId) => {
@@ -327,7 +327,7 @@ export const createCostItemsSlice: StateCreator<CostItemsSlice> = (set, get) => 
     // Verrekenbaar only allowed on chapter rows
     if (field === 'verrekenbaar') {
       const item = get().items.find((i) => i.id === id);
-      if (item && item.rowType !== 'chapter') return;
+      if (item && item.rowType !== "chapter") return;
     }
     const state = get() as any;
     const tarieven = (field === 'tariefGroep' || field === 'normQuantity')
@@ -392,7 +392,7 @@ export const createCostItemsSlice: StateCreator<CostItemsSlice> = (set, get) => 
     let newParentId: string | null;
     let newParentDepth: number;
     if (position === 'inside') {
-      if (target.rowType !== 'chapter' && target.rowType !== 'begrotingspost' && target.rowType !== 'bewakingspost') {
+      if (target.rowType !== "chapter" && target.rowType !== 'begrotingspost' && target.rowType !== 'bewakingspost') {
         return; // cannot drop inside a non-container
       }
       newParentId = target.id;
@@ -495,7 +495,7 @@ export const createCostItemsSlice: StateCreator<CostItemsSlice> = (set, get) => 
     if (idx <= 0) return;
     const newParent = siblings[idx - 1];
     // Can only indent into a container row type
-    if (newParent.rowType !== 'chapter' && newParent.rowType !== 'begrotingspost' && newParent.rowType !== 'bewakingspost') return;
+    if (newParent.rowType !== "chapter" && newParent.rowType !== 'begrotingspost' && newParent.rowType !== 'bewakingspost') return;
     const newItems = state.items.map((i) =>
       i.id === id ? { ...i, parentId: newParent.id, depth: newParent.depth + 1 } : i
     );
@@ -545,9 +545,9 @@ export const createCostItemsSlice: StateCreator<CostItemsSlice> = (set, get) => 
     const dicht = (i: CostItem): boolean => {
       switch (niveau) {
         case 'hoofdstuk':
-          return i.rowType === 'chapter' && i.depth === 0;
+          return i.rowType === "chapter" && i.depth === 0;
         case 'paragraaf':
-          return i.rowType === 'chapter' && i.depth >= 1;
+          return i.rowType === "chapter" && i.depth >= 1;
         case 'begrotingspost':
           return i.rowType === 'begrotingspost';
         case 'bewakingspost':
@@ -559,7 +559,7 @@ export const createCostItemsSlice: StateCreator<CostItemsSlice> = (set, get) => 
     set({
       items: state.items.map((item) => {
         const isContainer =
-          item.rowType === 'chapter' || item.rowType === 'begrotingspost' || item.rowType === 'bewakingspost';
+          item.rowType === "chapter" || item.rowType === 'begrotingspost' || item.rowType === 'bewakingspost';
         if (!isContainer) return item;
         const val = dicht(item);
         return item.isCollapsed === val ? item : { ...item, isCollapsed: val };

@@ -1,0 +1,38 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { spawn, execFileSync } from 'node:child_process';
+import { createGzip, constants } from 'node:zlib';
+import { pipeline } from 'node:stream/promises';
+const root = path.resolve(import.meta.dirname, '../../..');
+const started = new Date().toISOString();
+const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
+const logfile = path.join(import.meta.dirname, 'planner-verify.log.gz');
+const gzip = createGzip({ flush: constants.Z_SYNC_FLUSH });
+const logDone = pipeline(gzip, fs.createWriteStream(logfile));
+const env = { ...process.env, OPS_BROWSER_CHANNEL: 'msedge' };
+const inherited = process.env.PATH || process.env.Path || '';
+for (const k of Object.keys(env)) if (k.toLowerCase() === 'path') delete env[k];
+env.PATH = 'D:\\Git\\bin;C:\\Windows\\System32;' + inherited;
+const child = spawn(process.env.ComSpec, ['/d', '/s', '/c', 'npm run verify'], { cwd: path.join(root, 'open-vision-studio'), env, windowsHide: true });
+fs.writeFileSync(path.join(import.meta.dirname, 'planner-verify-current.json'), JSON.stringify({ status: 'running', started, sourceCommit, command: 'npm run verify', pid: child.pid }, null, 2));
+let tail = '';
+let writeError;
+logDone.catch(error => { writeError = error.message; child.kill(); });
+const capture = chunk => {
+  gzip.write(chunk);
+  const content = chunk.toString();
+  tail = (tail + content).slice(-18000);
+  for (const line of content.split(/\r?\n/)) if (/^> |EINDOORDEEL|failed|Error:|passed \(/.test(line)) console.log(line.slice(0, 400));
+};
+child.stdout.on('data', capture);
+child.stderr.on('data', capture);
+console.log('START full Planner verification at ' + started);
+const exitCode = await new Promise(resolve => { child.on('error', error => { writeError = error.message; resolve(null); }); child.on('close', resolve); });
+gzip.end();
+await logDone.catch(() => {});
+const record = { command: 'npm run verify', directory: 'open-vision-studio', sourceCommit, started, finished: new Date().toISOString(), passed: exitCode === 0 && !writeError, exitCode, log: path.relative(root, logfile).replaceAll('\\', '/'), ...(writeError ? { error: writeError } : {}) };
+record.resourceConfiguration = { nodeOptions: env.NODE_OPTIONS, goMemoryLimit: env.GOMEMLIMIT, goMaxProcs: env.GOMAXPROCS, temporaryDirectory: env.TEMP };
+fs.writeFileSync(path.join(import.meta.dirname, 'planner-verify.json'), JSON.stringify(record, null, 2));
+fs.writeFileSync(path.join(import.meta.dirname, 'planner-verify-current.json'), JSON.stringify({ ...record, status: 'finished' }, null, 2));
+console.log(JSON.stringify(record));
+if (!record.passed) { console.log(tail); process.exitCode = 1; }

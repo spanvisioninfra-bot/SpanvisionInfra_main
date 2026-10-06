@@ -31,6 +31,9 @@ pub enum GlaslatPosition {
 }
 
 impl GlaslatPosition {
+    pub fn label_en(&self) -> &'static str {
+        match self { Self::Binnen => "Inside", Self::Buiten => "Outside" }
+    }
     pub fn label_nl(&self) -> &'static str {
         match self {
             Self::Binnen => "Binnen",

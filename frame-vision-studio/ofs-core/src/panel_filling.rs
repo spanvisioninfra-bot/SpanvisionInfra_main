@@ -43,6 +43,10 @@ pub enum FillingType {
 }
 
 impl FillingType {
+    pub fn label_en(&self) -> &'static str {
+        match self { Self::Sandwich => "Sandwich panel", Self::Solid => "Solid panel",
+            Self::DoorPanel => "Door panel", Self::Ventilation => "Ventilation grille", Self::Blind => "Blind panel" }
+    }
     pub fn label_nl(&self) -> &'static str {
         match self {
             Self::Sandwich => "Sandwichpaneel",

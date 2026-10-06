@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { PDFDocumentLoadingTask, PDFDocumentProxy, RenderTask } from "pdfjs-dist";
 import CropStage, { type CropStageHandle } from "./CropStage";
 import "./ImageCropDialog.css";
 import "./PdfCropDialog.css";
@@ -45,6 +46,7 @@ export default function PdfCropDialog({
 }: Props) {
   const [thumbs, setThumbs] = useState<string[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [pdfDoc, setPdfDoc] = useState<PDFDocumentProxy | null>(null);
   // 1-indexed page number — null while the user is still picking.
   const [selectedPage, setSelectedPage] = useState<number | null>(null);
   // PNG data URL of the chosen page at PAGE_SCALE.
@@ -53,10 +55,8 @@ export default function PdfCropDialog({
   const [info, setInfo] = useState("…");
 
   // ── Phase 1: load PDF and render thumbnails ──────────────────
-  // We load the document once on mount and re-use the resulting
-  // PDFDocumentProxy for both the thumbnail walk and the high-res
-  // page render later. pdfjs's `getDocument` is cached internally
-  // by URL so multiple loads of the same blob are cheap.
+  // Keep one document/worker for thumbnails and the crop render.
+  // Destroy it on close, cancellation or replacement.
   //
   // pdfjs-dist is loaded *lazily* via a dynamic import so the
   // (relatively large) library and its Web Worker only land in the
@@ -65,11 +65,21 @@ export default function PdfCropDialog({
   // the whole app at startup.
   useEffect(() => {
     let cancelled = false;
+    let task: PDFDocumentLoadingTask | undefined;
+    let render: RenderTask | undefined;
+    setError(null);
+    setThumbs(null);
+    setPdfDoc(null);
+    setSelectedPage(null);
+    setPageImage(null);
     (async () => {
       try {
         const { getDocument } = await import("../../utils/pdfjsSetup");
-        const task = getDocument(pdfSrc);
+        if (cancelled) return;
+        task = getDocument({ url: pdfSrc });
         const doc = await task.promise;
+        if (cancelled) return;
+        setPdfDoc(doc);
         const out: string[] = [];
         for (let i = 1; i <= doc.numPages; i++) {
           if (cancelled) return;
@@ -83,11 +93,12 @@ export default function PdfCropDialog({
           // pdfjs ≥ 5 requires `canvas` in the render params; older
           // versions accepted just `canvasContext`. We pass both so
           // we don't depend on which subminor is installed.
-          await page.render({
+          render = page.render({
             canvasContext: ctx,
             canvas,
             viewport,
-          } as Parameters<typeof page.render>[0]).promise;
+          } as Parameters<typeof page.render>[0]);
+          await render.promise;
           out.push(canvas.toDataURL("image/png"));
           page.cleanup();
         }
@@ -101,31 +112,33 @@ export default function PdfCropDialog({
     })();
     return () => {
       cancelled = true;
+      render?.cancel();
+      void task?.destroy().catch(() => {});
     };
   }, [pdfSrc]);
 
   // ── Phase 2: render the picked page at higher resolution ─────
   useEffect(() => {
-    if (selectedPage === null) return;
+    if (selectedPage === null || !pdfDoc) return;
     let cancelled = false;
+    let render: RenderTask | undefined;
     (async () => {
       try {
         setPageImage(null);
-        const { getDocument } = await import("../../utils/pdfjsSetup");
-        const task = getDocument(pdfSrc);
-        const doc = await task.promise;
-        const page = await doc.getPage(selectedPage);
+        const page = await pdfDoc.getPage(selectedPage);
+        if (cancelled) return;
         const viewport = page.getViewport({ scale: PAGE_SCALE });
         const canvas = document.createElement("canvas");
         canvas.width = Math.round(viewport.width);
         canvas.height = Math.round(viewport.height);
         const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-        await page.render({
+        if (!ctx) throw new Error("Unable to create the PDF page canvas");
+        render = page.render({
           canvasContext: ctx,
           canvas,
           viewport,
-        } as Parameters<typeof page.render>[0]).promise;
+        } as Parameters<typeof page.render>[0]);
+        await render.promise;
         if (!cancelled) setPageImage(canvas.toDataURL("image/png"));
         page.cleanup();
       } catch (err) {
@@ -137,8 +150,9 @@ export default function PdfCropDialog({
     })();
     return () => {
       cancelled = true;
+      render?.cancel();
     };
-  }, [pdfSrc, selectedPage]);
+  }, [pdfDoc, selectedPage]);
 
   const doConfirm = useCallback(() => {
     const dataUrl = stageRef.current?.commit();
@@ -293,7 +307,7 @@ export default function PdfCropDialog({
         <footer className="icrop-footer">
           <div className="icrop-info">
             {thumbs
-              ? `${thumbs.length} pagina${thumbs.length === 1 ? "" : "'s"}`
+              ? `${thumbs.length} page${thumbs.length === 1 ? "" : "s"}`
               : ""}
           </div>
           <div className="icrop-actions">

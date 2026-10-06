@@ -151,7 +151,7 @@ log("\n[2] Nieuw project: het standaardgeval \"Eigen gewicht\"");
   // clients die "caseId 1 = permanent" aannemen blijven kloppen.
   gelijk("de vier bestaande gevallen houden id 1–4, in dezelfde volgorde",
     gevallen.slice(1).map((c) => [c.id, c.name, c.type]),
-    [[1, "Permanent (G)", "dead"], [2, "Variabel (Q)", "live"], [3, "Sneeuw (S)", "snow"], [4, "Wind (W)", "wind"]]);
+    [[1, "Permanent (G)", "dead"], [2, "Variable (Q)", "live"], [3, "Snow (S)", "snow"], [4, "Wind (W)", "wind"]]);
   gelijk("id van het nieuwe geval = het volgende vrije id", EIGEN_GEWICHT_STANDAARD_ID, volgendVrijId(HANDMATIGE_STANDAARDGEVALLEN, 1));
   ok("precies één geval draagt het kenmerk", gevallen.filter((c) => c.eigenGewicht === true).length === 1);
   ok("eigen gewicht staat in een nieuw project AAN", EIGEN_GEWICHT_STANDAARD_AAN === true);

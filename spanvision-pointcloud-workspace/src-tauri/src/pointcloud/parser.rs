@@ -10,6 +10,7 @@ use super::types::{BoundingBox3D, PointRecord, PointcloudMetadata};
 struct LasHeader {
     version_major: u8,
     version_minor: u8,
+    header_size: u16,
     point_data_format: u8,
     point_data_record_length: u16,
     number_of_points: u64,
@@ -41,19 +42,40 @@ fn parse_las_header(data: &[u8]) -> Result<LasHeader, String> {
     }
 
     let offset_to_points = u32::from_le_bytes([data[96], data[97], data[98], data[99]]);
+    let header_size = u16::from_le_bytes([data[94], data[95]]);
+    let minimum_header = match version_minor { 4 => 375, 3 => 235, _ => 227 };
+    if usize::from(header_size) < minimum_header || usize::from(header_size) > data.len()
+        || offset_to_points < u32::from(header_size) || offset_to_points as usize > data.len() {
+        return Err("Invalid or truncated LAS header offsets".into());
+    }
     // LAZ uses the high bits for compression flags; the record format is six bits.
     let point_data_format = data[104] & 0x3f;
     let point_data_record_length = u16::from_le_bytes([data[105], data[106]]);
+    let minimum_records = [20u16, 28, 26, 34, 57, 63, 30, 36, 38, 59, 67];
+    let maximum_format = match version_minor { 4 => 10, 3 => 5, 2 => 3, _ => 1 };
+    if usize::from(point_data_format) > maximum_format || point_data_record_length < minimum_records[usize::from(point_data_format)] {
+        return Err("Unsupported LAS point format or invalid record length".into());
+    }
 
     // Point count: LAS 1.4 uses 64-bit at offset 247, older uses 32-bit at offset 107
-    let number_of_points = if version_minor >= 4 && data.len() >= 255 {
-        u64::from_le_bytes([
+    let legacy_count = u32::from_le_bytes([data[107], data[108], data[109], data[110]]) as u64;
+    let number_of_points = if version_minor == 4 {
+        let extended_count = u64::from_le_bytes([
             data[247], data[248], data[249], data[250],
             data[251], data[252], data[253], data[254],
-        ])
+        ]);
+        if extended_count > 0 { extended_count } else { legacy_count }
     } else {
-        u32::from_le_bytes([data[107], data[108], data[109], data[110]]) as u64
+        legacy_count
     };
+    // The current octree owns all decoded points; bound this allocation explicitly.
+    if number_of_points == 0 || number_of_points > 50_000_000 {
+        return Err("LAS/LAZ point count must be between 1 and 50,000,000 for this desktop engine".into());
+    }
+    if data[104] & 0xc0 == 0 {
+        let end = u64::from(offset_to_points) + number_of_points * u64::from(point_data_record_length);
+        if end > data.len() as u64 { return Err("Truncated LAS point data".into()); }
+    }
 
     let read_f64 = |off: usize| -> f64 {
         f64::from_le_bytes([
@@ -64,12 +86,19 @@ fn parse_las_header(data: &[u8]) -> Result<LasHeader, String> {
 
     let scale = [read_f64(131), read_f64(139), read_f64(147)];
     let offset = [read_f64(155), read_f64(163), read_f64(171)];
+    if scale.iter().any(|value| !value.is_finite() || *value <= 0.0) || offset.iter().any(|value| !value.is_finite()) {
+        return Err("Invalid LAS scale or coordinate offset".into());
+    }
     let max_x = read_f64(179);
     let min_x = read_f64(187);
     let max_y = read_f64(195);
     let min_y = read_f64(203);
     let max_z = read_f64(211);
     let min_z = read_f64(219);
+    if [min_x, min_y, min_z, max_x, max_y, max_z].iter().any(|value| !value.is_finite())
+        || min_x > max_x || min_y > max_y || min_z > max_z {
+        return Err("Invalid LAS coordinate bounds".into());
+    }
 
     // Point formats with RGB: 2, 3, 5, 7, 8, 10
     let has_color = matches!(point_data_format, 2 | 3 | 5 | 7 | 8 | 10);
@@ -78,6 +107,7 @@ fn parse_las_header(data: &[u8]) -> Result<LasHeader, String> {
     Ok(LasHeader {
         version_major,
         version_minor,
+        header_size,
         point_data_format,
         point_data_record_length,
         number_of_points,
@@ -107,12 +137,12 @@ impl PointcloudParser {
             .map(|e| e.to_lowercase())
             .unwrap_or_default();
 
-        let is_laz = ext == "laz";
-
         let file = File::open(path).map_err(|e| format!("Failed to open file: {}", e))?;
         let mmap = unsafe { Mmap::map(&file) }.map_err(|e| format!("Failed to mmap file: {}", e))?;
 
         let header = parse_las_header(&mmap)?;
+        let is_laz = mmap[104] & 0xc0 != 0;
+        if ext == "laz" && !is_laz { return Err("The .laz file contains uncompressed LAS data; use the .las extension".into()); }
 
         Ok(Self { mmap, header, is_laz })
     }
@@ -164,6 +194,7 @@ impl PointcloudParser {
 
     /// Read a range of points from an uncompressed LAS file.
     pub fn read_points(&self, start_index: u64, count: u64) -> Result<Vec<PointRecord>, String> {
+        if self.is_laz { return Err("Compressed LAZ points must be read with the decompression stream".into()); }
         let record_len = self.header.point_data_record_length as u64;
         let data_start = self.header.offset_to_points as u64;
         let total = self.header.number_of_points;
@@ -197,6 +228,7 @@ impl PointcloudParser {
             let x = xi as f64 * scale[0] + offset[0];
             let y = yi as f64 * scale[1] + offset[1];
             let z = zi as f64 * scale[2] + offset[2];
+            if ![x, y, z].iter().all(|value| value.is_finite()) { return Err("LAS contains non-finite point coordinates".into()); }
 
             let intensity = u16::from_le_bytes([rec[12], rec[13]]);
 
@@ -204,7 +236,7 @@ impl PointcloudParser {
             let classification = if format >= 6 {
                 rec[16] // Point Data Record Format 6+
             } else {
-                rec[15] // Point Data Record Format 0-5
+                if self.header.version_minor > 0 { rec[15] & 0x1f } else { rec[15] }
             };
 
             let (r, g, b) = if has_color && color_offset > 0 {
@@ -248,8 +280,8 @@ impl PointcloudParser {
         let data = &self.mmap[..];
         let header_size = self.header.offset_to_points as usize;
 
-        // VLRs start after the fixed header (94 bytes for LAS 1.2, varies by version)
-        let vlr_start = if self.header.version_minor >= 3 { 235usize } else { 227usize };
+        // LAS 1.4 has a 375-byte public header; the declared size also permits extensions.
+        let vlr_start = usize::from(self.header.header_size);
         let num_vlrs = u32::from_le_bytes([data[100], data[101], data[102], data[103]]) as usize;
 
         let mut offset = vlr_start;
@@ -266,7 +298,7 @@ impl PointcloudParser {
 
             // LASzip VLR: user_id starts with "laszip encoded", record_id = 22204
             if record_id == 22204 && user_id.starts_with(b"laszip encoded") {
-                if vlr_data_end <= data.len() {
+                if vlr_data_end <= header_size {
                     return Ok(data[vlr_data_start..vlr_data_end].to_vec());
                 }
             }
@@ -325,11 +357,12 @@ impl PointcloudParser {
             let z = zi as f64 * scale[2] + offset[2];
 
             let intensity = u16::from_le_bytes([rec[12], rec[13]]);
+            if ![x, y, z].iter().all(|value| value.is_finite()) { return Err("LAZ contains non-finite point coordinates".into()); }
 
             let classification = if format >= 6 {
                 rec[16]
             } else {
-                rec[15]
+                if self.header.version_minor > 0 { rec[15] & 0x1f } else { rec[15] }
             };
 
             let (r, g, b) = if has_color && color_offset > 0 && color_offset + 5 < rec.len() {
@@ -356,6 +389,7 @@ impl PointcloudParser {
     where
         F: FnMut(&[PointRecord], u64) -> bool, // return false to stop
     {
+        if batch_size == 0 { return Err("Point batch size must be greater than zero".into()); }
         if self.is_laz {
             // For LAZ: decompress all points, then deliver in batches
             let all_points = self.read_laz_all_points()?;
@@ -409,5 +443,43 @@ mod compressed_color_tests {
         let points=parser.read_laz_all_points().unwrap();
         assert_eq!(points.len(),64);assert_eq!(points[0].r,160);assert_eq!(points[0].g,100);assert_eq!(points[0].b,70);
         assert_eq!(points[0].classification,2);assert_eq!(points[1].classification,6);
+    }
+    fn las_fixture() -> Vec<u8> {
+        std::fs::read(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../tests/fixtures/rgb-classified.las")).unwrap()
+    }
+    #[test]
+    fn header_rejects_truncation_bad_record_lengths_scales_counts_and_offsets() {
+        let original = las_fixture();
+        assert!(parse_las_header(&original[..20]).unwrap_err().contains("header"));
+        assert!(parse_las_header(&original[..original.len()-1]).unwrap_err().contains("Truncated LAS point"));
+        let mut bad = original.clone(); bad[105..107].copy_from_slice(&1u16.to_le_bytes());
+        assert!(parse_las_header(&bad).unwrap_err().contains("record length"));
+        let mut bad = original.clone(); bad[131..139].copy_from_slice(&f64::NAN.to_le_bytes());
+        assert!(parse_las_header(&bad).unwrap_err().contains("scale"));
+        let mut bad = original.clone(); bad[107..111].copy_from_slice(&50_000_001u32.to_le_bytes());
+        assert!(parse_las_header(&bad).unwrap_err().contains("50,000,000"));
+        let mut bad = original.clone(); bad[96..100].copy_from_slice(&1u32.to_le_bytes());
+        assert!(parse_las_header(&bad).unwrap_err().contains("offsets"));
+    }
+    #[test]
+    fn las14_uses_extended_count_and_declared_375_byte_header() {
+        let original = las_fixture();
+        let mut data = vec![0u8; original.len()+148];
+        data[..227].copy_from_slice(&original[..227]);
+        data[375..].copy_from_slice(&original[227..]);
+        data[25]=4;
+        data[94..96].copy_from_slice(&375u16.to_le_bytes());
+        data[96..100].copy_from_slice(&375u32.to_le_bytes());
+        data[107..111].copy_from_slice(&1u32.to_le_bytes());
+        data[247..255].copy_from_slice(&64u64.to_le_bytes());
+        let header=parse_las_header(&data).unwrap();
+        assert_eq!(header.number_of_points,64);
+        assert_eq!(header.header_size,375);
+    }
+    #[test]
+    fn zero_batch_is_rejected_without_starting_an_infinite_stream() {
+        let file=std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../tests/fixtures/rgb-classified.las");
+        let parser=PointcloudParser::open(&file).unwrap();
+        assert!(parser.stream_points(0,|_,_|true).unwrap_err().contains("greater than zero"));
     }
 }

@@ -45,7 +45,7 @@ describe("product information", () => {
     assert.equal(packageJson.name, "@spanvision-infra/pile-plane-workspace");
     assert.equal(tauriConfig.productName, "Pile Plane Workspace");
     assert.equal(tauriConfig.identifier, "com.spanvisioninfra.pileplaneworkspace");
-    assert.equal(tauriConfig.app?.windows?.[0]?.title, "Pile Plane Workspace — Spanvision infra");
+    assert.equal(tauriConfig.app?.windows?.[0]?.title, "Pile Plane Workspace — Spanvision Infra");
     assert.match(settingsStore, /pile-plan-studio-settings/);
     assert.match(recoveryStore, /pile-plan-studio-recovery/);
     assert.match(browserStore, /pile-plan-studio:/);

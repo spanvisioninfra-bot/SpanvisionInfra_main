@@ -10,8 +10,8 @@ function mapType(raw: string): ResourceType {
   const t = raw.toLowerCase().trim();
   if (t === 'arbeid') return 'arbeid';
   if (t === 'materiaal') return 'materiaal';
-  if (t === "equipment") return "equipment";
-  if (t === "subcontracting" || t === 'onderaannemer') return 'onderaannemer';
+  if (t === "materieel") return "materieel";
+  if (t === "onderaanneming" || t === 'onderaannemer') return 'onderaannemer';
   return 'overig';
 }
 

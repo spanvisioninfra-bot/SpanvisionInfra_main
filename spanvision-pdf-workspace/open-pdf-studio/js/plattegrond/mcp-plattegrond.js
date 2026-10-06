@@ -246,7 +246,7 @@ function leesOpening(o, i, wand, pakket) {
     hartMm: langs ?? 0,
     borstweringMm: getal(o?.sillMm),
     hoogteMm: getal(o?.heightMm),
-    draairichting: o?.swing === 'rechts' || o?.swing === 'right' ? "right" : 'links',
+    draairichting: o?.swing === 'rechts' || o?.swing === 'right' ? "rechts" : 'links',
   });
   s.draaizijde = draaizijde(wand, o);
   s.raamtype = RAAMTYPEN.includes(o?.windowType) ? o.windowType : 'fixed';
@@ -310,7 +310,7 @@ export function kozijnProps(wand, plaatsing, bron, pxPerMm, pakket = null) {
   if (deur) {
     // De deur draait naar de kant van `zijde` (-zijde langs n); is dat de
     // binnenkant, dan draait hij naar binnen.
-    params.draaiNaar = -zijde === binnenN ? 'binnen' : "outside";
+    params.draaiNaar = -zijde === binnenN ? 'binnen' : "buiten";
     params.angle = 90;
     params.showWall = false;
     params.deurbladDikteMm = getal(kz.deurbladDikteMm) || 40;
@@ -364,7 +364,7 @@ async function actieGelaagdeWand(params, omgeving, page, pxPerMm) {
   if (!pakket.lagen.some((l) => l.getekend)) {
     return fout('layers: at least one layer needs a material other than none');
   }
-  const binnenzijde = params?.insideSide === 'left' ? 'links' : "right";
+  const binnenzijde = params?.insideSide === 'left' ? 'links' : "rechts";
   const binnenN = binnenzijde === 'rechts' ? 1 : -1;
   const T = pakket.dikteMm;
   const ref = {

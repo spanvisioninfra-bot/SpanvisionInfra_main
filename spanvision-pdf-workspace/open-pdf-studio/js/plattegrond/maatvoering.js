@@ -104,7 +104,7 @@ export function ankerPunt(anker, index, extra = {}) {
     case 'sparingVan':
     case 'sparingTot':
     case 'sparingHart': {
-      const veld = anker.punt === 'sparingVan' ? "or" : anker.punt === 'sparingTot' ? 'tot' : 'hart';
+      const veld = anker.punt === 'sparingVan' ? 'van' : anker.punt === 'sparingTot' ? 'tot' : 'hart';
       const kanten = sparingKanten(ann);
       if (kanten) return kanten[veld];
       const sp = (extra.sparingen || []).find((s) => s.id === anker.annotationId);

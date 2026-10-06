@@ -1,0 +1,378 @@
+{
+  "status": "passed",
+  "records": [
+    {
+      "name": "legacy-import-and-media-reload"
+    },
+    {
+      "name": "ticket-edit"
+    },
+    {
+      "name": "inspection-and-signature"
+    },
+    {
+      "name": "handover-with-signature"
+    },
+    {
+      "name": "branded-reports-preserve-media"
+    },
+    {
+      "name": "rendered-report-brand-audit"
+    },
+    {
+      "name": "json-roundtrip"
+    },
+    {
+      "name": "bcf-export"
+    },
+    {
+      "name": "bcf-fallback-brand-audit"
+    },
+    {
+      "name": "connector-browser-and-native-bridge"
+    },
+    {
+      "name": "lazy-ifc-render",
+      "status": "sample.ifc loaded — 6 objects rendered."
+    },
+    {
+      "name": "project",
+      "width": 320
+    },
+    {
+      "name": "plattegrond",
+      "width": 320
+    },
+    {
+      "name": "opname",
+      "width": 320
+    },
+    {
+      "name": "ifc",
+      "width": 320
+    },
+    {
+      "name": "inspectie",
+      "width": 320
+    },
+    {
+      "name": "oplevering",
+      "width": 320
+    },
+    {
+      "name": "dashboard",
+      "width": 320
+    },
+    {
+      "name": "export",
+      "width": 320
+    },
+    {
+      "name": "koppelingen",
+      "width": 320
+    },
+    {
+      "name": "handleiding",
+      "width": 320
+    },
+    {
+      "name": "dialogs",
+      "width": 320
+    },
+    {
+      "name": "project",
+      "width": 390
+    },
+    {
+      "name": "plattegrond",
+      "width": 390
+    },
+    {
+      "name": "opname",
+      "width": 390
+    },
+    {
+      "name": "ifc",
+      "width": 390
+    },
+    {
+      "name": "inspectie",
+      "width": 390
+    },
+    {
+      "name": "oplevering",
+      "width": 390
+    },
+    {
+      "name": "dashboard",
+      "width": 390
+    },
+    {
+      "name": "export",
+      "width": 390
+    },
+    {
+      "name": "koppelingen",
+      "width": 390
+    },
+    {
+      "name": "handleiding",
+      "width": 390
+    },
+    {
+      "name": "dialogs",
+      "width": 390
+    },
+    {
+      "name": "project",
+      "width": 820
+    },
+    {
+      "name": "plattegrond",
+      "width": 820
+    },
+    {
+      "name": "opname",
+      "width": 820
+    },
+    {
+      "name": "ifc",
+      "width": 820
+    },
+    {
+      "name": "inspectie",
+      "width": 820
+    },
+    {
+      "name": "oplevering",
+      "width": 820
+    },
+    {
+      "name": "dashboard",
+      "width": 820
+    },
+    {
+      "name": "export",
+      "width": 820
+    },
+    {
+      "name": "koppelingen",
+      "width": 820
+    },
+    {
+      "name": "handleiding",
+      "width": 820
+    },
+    {
+      "name": "dialogs",
+      "width": 820
+    },
+    {
+      "name": "project",
+      "width": 1440
+    },
+    {
+      "name": "plattegrond",
+      "width": 1440
+    },
+    {
+      "name": "opname",
+      "width": 1440
+    },
+    {
+      "name": "ifc",
+      "width": 1440
+    },
+    {
+      "name": "inspectie",
+      "width": 1440
+    },
+    {
+      "name": "oplevering",
+      "width": 1440
+    },
+    {
+      "name": "dashboard",
+      "width": 1440
+    },
+    {
+      "name": "export",
+      "width": 1440
+    },
+    {
+      "name": "koppelingen",
+      "width": 1440
+    },
+    {
+      "name": "handleiding",
+      "width": 1440
+    },
+    {
+      "name": "dialogs",
+      "width": 1440
+    },
+    {
+      "name": "focus-visible"
+    },
+    {
+      "name": "hover-selected-and-disabled-contrast"
+    },
+    {
+      "name": "saved-theme-and-canvas-preferences"
+    },
+    {
+      "name": "English-only language preference compatibility"
+    },
+    {
+      "name": "hub-layout",
+      "route": "landing",
+      "width": 320
+    },
+    {
+      "name": "hub-layout",
+      "route": "modules",
+      "width": 320
+    },
+    {
+      "name": "hub-layout",
+      "route": "suggestions",
+      "width": 320
+    },
+    {
+      "name": "hub-layout",
+      "route": "login",
+      "width": 320
+    },
+    {
+      "name": "hub-layout",
+      "route": "signup",
+      "width": 320
+    },
+    {
+      "name": "hub-layout",
+      "route": "account",
+      "width": 320
+    },
+    {
+      "name": "hub-scan",
+      "width": 320
+    },
+    {
+      "name": "hub-layout",
+      "route": "landing",
+      "width": 390
+    },
+    {
+      "name": "hub-layout",
+      "route": "modules",
+      "width": 390
+    },
+    {
+      "name": "hub-layout",
+      "route": "suggestions",
+      "width": 390
+    },
+    {
+      "name": "hub-layout",
+      "route": "login",
+      "width": 390
+    },
+    {
+      "name": "hub-layout",
+      "route": "signup",
+      "width": 390
+    },
+    {
+      "name": "hub-layout",
+      "route": "account",
+      "width": 390
+    },
+    {
+      "name": "hub-scan",
+      "width": 390
+    },
+    {
+      "name": "hub-layout",
+      "route": "landing",
+      "width": 820
+    },
+    {
+      "name": "hub-layout",
+      "route": "modules",
+      "width": 820
+    },
+    {
+      "name": "hub-layout",
+      "route": "suggestions",
+      "width": 820
+    },
+    {
+      "name": "hub-layout",
+      "route": "login",
+      "width": 820
+    },
+    {
+      "name": "hub-layout",
+      "route": "signup",
+      "width": 820
+    },
+    {
+      "name": "hub-layout",
+      "route": "account",
+      "width": 820
+    },
+    {
+      "name": "hub-scan",
+      "width": 820
+    },
+    {
+      "name": "hub-layout",
+      "route": "landing",
+      "width": 1440
+    },
+    {
+      "name": "hub-layout",
+      "route": "modules",
+      "width": 1440
+    },
+    {
+      "name": "hub-layout",
+      "route": "suggestions",
+      "width": 1440
+    },
+    {
+      "name": "hub-layout",
+      "route": "login",
+      "width": 1440
+    },
+    {
+      "name": "hub-layout",
+      "route": "signup",
+      "width": 1440
+    },
+    {
+      "name": "hub-layout",
+      "route": "account",
+      "width": 1440
+    },
+    {
+      "name": "hub-scan",
+      "width": 1440
+    },
+    {
+      "name": "field-launcher-ready"
+    },
+    {
+      "name": "no-upstream-update-requests-or-page-errors"
+    }
+  ],
+  "errors": [],
+  "upstreamRequests": [],
+  "checkedAt": "2026-10-06T04:58:42.056Z",
+  "sourceBuild": {
+    "id": "field",
+    "brandDigest": "00e67a91746e18d257794b25dad7db677b67fb3fecdb139057114c9107d611cb",
+    "sourceFingerprint": "f716514c3cef3fa8c38b2a253b6cb7b45c191fe45ea48a37de39aea8bca94b5e",
+    "builtAt": "2026-10-06T04:55:54.995Z"
+  }
+}

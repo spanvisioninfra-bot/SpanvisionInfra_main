@@ -8,7 +8,7 @@ export const SchedulePanel: React.FC = () => {
   // Gerenderde rijenlijst: hoofdstuk-klik moet naar de grid-rij-index springen.
   const { items, schedule, activeRow, setActiveCell, toggleCollapse, getGridRows } = useAppStore();
   const visibleItems = getGridRows();
-  const chapters = items.filter((i) => i.rowType === 'chapter');
+  const chapters = items.filter((i) => i.rowType === "chapter");
 
   return (
     <div style={{ padding: 4 }}>

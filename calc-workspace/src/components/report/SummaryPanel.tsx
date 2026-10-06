@@ -14,7 +14,7 @@ export const SummaryPanel: React.FC = () => {
   const hasStaart = items.some(i => i.rowType === 'staart_ukk' || i.rowType === 'staart_ak' || i.rowType === 'staart_wr' || i.rowType === 'staart_afronding');
 
   // Count chapters and items
-  const chapters = items.filter(i => i.rowType === 'chapter');
+  const chapters = items.filter(i => i.rowType === "chapter");
   const normalItems = items.filter(i => i.rowType === 'begrotingspost');
 
   return (

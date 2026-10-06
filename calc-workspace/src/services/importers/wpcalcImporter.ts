@@ -257,7 +257,7 @@ export function importWpCalcFile(buffer: ArrayBuffer): {
         sortOrder: sortOrder++,
         code: row.code || String(row.groep).padStart(2, '0'),
         description: desc,
-        rowType: 'chapter',
+        rowType: "chapter",
         depth: 0,
       }));
     } else if (row.rectype === 4) {
@@ -310,7 +310,7 @@ export function importWpCalcFile(buffer: ArrayBuffer): {
       // Determine resource type from boolean flags
       let resourceType: ResourceType | null = null;
       if (row.onderaanneming) resourceType = 'onderaannemer';
-      else if (row.materieel) resourceType = "equipment";
+      else if (row.materieel) resourceType = "materieel";
       else if (row.stelpost) resourceType = 'overig';
       else resourceType = 'materiaal'; // default: materiaal (loon wordt apart berekend)
 
@@ -348,7 +348,7 @@ export function importWpCalcFile(buffer: ArrayBuffer): {
         resourceType,
         normQuantity: normUren,
         normUnitPrice: materialPrice,
-        tariefGroep: (tariefGroep === 'A' || tariefGroep === "V" || tariefGroep === 'C') ? tariefGroep : null,
+        tariefGroep: (tariefGroep === 'A' || tariefGroep === "B" || tariefGroep === 'C') ? tariefGroep : null,
       }));
     }
   }

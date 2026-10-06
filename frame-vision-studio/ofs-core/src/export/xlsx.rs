@@ -2,7 +2,7 @@
 
 use rust_xlsxwriter::{Format, FormatAlign, FormatBorder, Color, Workbook};
 
-use crate::kozijn::{Material, Project, WoodType};
+use crate::kozijn::Project;
 use crate::production::ProductionData;
 
 const DEEP_FORGE: u32 = 0x36363E;
@@ -14,6 +14,7 @@ fn header_format() -> Format {
         .set_bold()
         .set_font_name("Calibri")
         .set_font_size(9.0)
+        .set_text_wrap()
         .set_font_color(Color::White)
         .set_background_color(Color::RGB(DEEP_FORGE))
         .set_align(FormatAlign::Center)
@@ -25,6 +26,7 @@ fn data_format(alt: bool) -> Format {
     let mut f = Format::new()
         .set_font_name("Calibri")
         .set_font_size(9.0)
+        .set_text_wrap()
         .set_border(FormatBorder::Thin)
         .set_border_color(Color::RGB(BORDER_COLOR));
     if alt {
@@ -40,25 +42,30 @@ fn data_format_center(alt: bool) -> Format {
 // ── Kozijnstaat (window schedule) ──────────────────────────────
 
 pub fn generate_kozijnstaat_xlsx(project: &Project, output_path: &str) -> Result<(), String> {
+    super::write_export_bytes(output_path, &kozijnstaat_xlsx_bytes(project)?)
+}
+
+pub fn kozijnstaat_xlsx_bytes(project: &Project) -> Result<Vec<u8>, String> {
+    if project.kozijnen.is_empty() { return Err("Add a frame before exporting its schedule.".into()); }
     let mut wb = Workbook::new();
     let ws = wb.add_worksheet();
-    ws.set_name("Kozijnstaat").map_err(|e| e.to_string())?;
+    ws.set_name("Frame schedule").map_err(|e| e.to_string())?;
 
     let hfmt = header_format();
 
     let headers = [
-        "Merk",
-        "Naam",
-        "Breedte (mm)",
-        "Hoogte (mm)",
-        "Materiaal",
-        "Kolommen",
-        "Rijen",
-        "Cellen",
-        "Paneel types",
-        "Beglazing",
-        "Kleur binnen",
-        "Kleur buiten",
+        "Mark",
+        "Name",
+        "Width (mm)",
+        "Height (mm)",
+        "Material",
+        "Columns",
+        "Rows",
+        "Cells",
+        "Panel types",
+        "Glazing",
+        "Inside colour",
+        "Outside colour",
     ];
 
     for (col, header) in headers.iter().enumerate() {
@@ -80,7 +87,7 @@ pub fn generate_kozijnstaat_xlsx(project: &Project, output_path: &str) -> Result
         let mut type_counts: std::collections::BTreeMap<&str, usize> =
             std::collections::BTreeMap::new();
         for cell in cells {
-            let label = cell.panel_type.label_nl();
+            let label = cell.panel_type.label_en();
             *type_counts.entry(label).or_insert(0) += 1;
         }
         let type_summary: Vec<String> = type_counts
@@ -89,18 +96,11 @@ pub fn generate_kozijnstaat_xlsx(project: &Project, output_path: &str) -> Result
             .collect();
         let type_str = type_summary.join(", ");
 
-        let mat_label = material_label_xlsx(&frame.material);
+        let mat_label = super::pdf::material_label(&frame.material);
 
-        let glaz_label = cells
-            .first()
-            .map(|c| {
-                format!(
-                    "{} {}mm",
-                    c.glazing.glass_type,
-                    c.glazing.thickness_mm as i64
-                )
-            })
-            .unwrap_or_else(|| "-".into());
+        let glaz_label = cells.iter().filter(|c| c.panel_type != crate::kozijn::PanelType::Panel)
+            .map(|c| format!("{} {} mm", c.glazing.glass_type, c.glazing.thickness_mm))
+            .collect::<std::collections::BTreeSet<_>>().into_iter().collect::<Vec<_>>().join(", ");
 
         ws.write_string_with_format(row, 0, &kozijn.mark, &dfmt)
             .map_err(|e| e.to_string())?;
@@ -135,45 +135,27 @@ pub fn generate_kozijnstaat_xlsx(project: &Project, output_path: &str) -> Result
             .map_err(|e| e.to_string())?;
     }
 
-    wb.save(output_path)
-        .map_err(|e| format!("Kan XLSX niet opslaan: {}", e))?;
-
-    Ok(())
-}
-
-fn material_label_xlsx(mat: &Material) -> String {
-    match mat {
-        Material::Wood(wt) => {
-            let name = match wt {
-                WoodType::Meranti => "meranti",
-                WoodType::Accoya => "accoya",
-                WoodType::Vuren => "vuren",
-                WoodType::Eiken => "eiken",
-            };
-            format!("wood ({})", name)
-        }
-        Material::Aluminum => "aluminum".into(),
-        Material::Pvc => "pvc".into(),
-        Material::WoodAluminum => "wood_aluminum".into(),
-    }
+    wb.save_to_buffer().map_err(|e| format!("Cannot generate Excel workbook: {e}"))
 }
 
 // ── Production lists XLSX ──────────────────────────────────────
 
-pub fn generate_production_xlsx(
-    production_data: &[ProductionData],
-    output_path: &str,
-) -> Result<(), String> {
+pub fn generate_production_xlsx(production_data: &[ProductionData], output_path: &str) -> Result<(), String> {
+    super::write_export_bytes(output_path, &production_xlsx_bytes(production_data)?)
+}
+
+pub fn production_xlsx_bytes(production_data: &[ProductionData]) -> Result<Vec<u8>, String> {
+    if production_data.is_empty() { return Err("Add a frame before exporting production lists.".into()); }
     let mut wb = Workbook::new();
     let hfmt = header_format();
 
     // Kortlijst
     {
         let ws = wb.add_worksheet();
-        ws.set_name("Kortlijst").map_err(|e| e.to_string())?;
+        ws.set_name("Cut list").map_err(|e| e.to_string())?;
         let headers = [
-            "Kozijn", "Pos.", "Onderdeel", "Profiel", "Materiaal",
-            "Netto (mm)", "Bruto (mm)", "Hoek L", "Hoek R", "Aantal",
+            "Frame", "Pos.", "Member", "Profile", "Material",
+            "Net (mm)", "Gross (mm)", "Left angle (deg)", "Right angle (deg)", "Quantity",
         ];
         write_headers(ws, &headers, &hfmt)?;
 
@@ -186,13 +168,13 @@ pub fn generate_production_xlsx(
 
                 ws.write_string_with_format(row, 0, &prod.kozijn_mark, &df).map_err(|e| e.to_string())?;
                 ws.write_string_with_format(row, 1, &item.piece_id, &df).map_err(|e| e.to_string())?;
-                ws.write_string_with_format(row, 2, item.member_type.label_nl(), &df).map_err(|e| e.to_string())?;
+                ws.write_string_with_format(row, 2, item.member_type.label_en(), &df).map_err(|e| e.to_string())?;
                 ws.write_string_with_format(row, 3, &item.profile_name, &df).map_err(|e| e.to_string())?;
                 ws.write_string_with_format(row, 4, &item.material, &df).map_err(|e| e.to_string())?;
-                ws.write_number_with_format(row, 5, item.net_length_mm.round(), &dfc).map_err(|e| e.to_string())?;
-                ws.write_number_with_format(row, 6, item.gross_length_mm.round(), &dfc).map_err(|e| e.to_string())?;
-                ws.write_string_with_format(row, 7, &format!("{:.0}\u{00b0}", item.miter_left_deg), &dfc).map_err(|e| e.to_string())?;
-                ws.write_string_with_format(row, 8, &format!("{:.0}\u{00b0}", item.miter_right_deg), &dfc).map_err(|e| e.to_string())?;
+                ws.write_number_with_format(row, 5, item.net_length_mm, &dfc).map_err(|e| e.to_string())?;
+                ws.write_number_with_format(row, 6, item.gross_length_mm, &dfc).map_err(|e| e.to_string())?;
+                ws.write_number_with_format(row, 7, item.miter_left_deg, &dfc).map_err(|e| e.to_string())?;
+                ws.write_number_with_format(row, 8, item.miter_right_deg, &dfc).map_err(|e| e.to_string())?;
                 ws.write_number_with_format(row, 9, item.quantity as f64, &dfc).map_err(|e| e.to_string())?;
                 row += 1;
             }
@@ -203,9 +185,9 @@ pub fn generate_production_xlsx(
     // Glaslijst
     {
         let ws = wb.add_worksheet();
-        ws.set_name("Glaslijst").map_err(|e| e.to_string())?;
+        ws.set_name("Glass list").map_err(|e| e.to_string())?;
         let headers = [
-            "Kozijn", "Pos.", "Glastype", "Breedte", "Hoogte", "Dikte", "Ug", "Opp. (m\u{00b2})", "Aantal",
+            "Frame", "Pos.", "Glass type", "Width (mm)", "Height (mm)", "Thickness (mm)", "Ug", "Area (m2)", "Quantity",
         ];
         write_headers(ws, &headers, &hfmt)?;
 
@@ -219,11 +201,11 @@ pub fn generate_production_xlsx(
                 ws.write_string_with_format(row, 0, &prod.kozijn_mark, &df).map_err(|e| e.to_string())?;
                 ws.write_string_with_format(row, 1, &item.piece_id, &df).map_err(|e| e.to_string())?;
                 ws.write_string_with_format(row, 2, &item.glass_type, &df).map_err(|e| e.to_string())?;
-                ws.write_number_with_format(row, 3, item.width_mm.round(), &dfc).map_err(|e| e.to_string())?;
-                ws.write_number_with_format(row, 4, item.height_mm.round(), &dfc).map_err(|e| e.to_string())?;
-                ws.write_number_with_format(row, 5, item.thickness_mm.round(), &dfc).map_err(|e| e.to_string())?;
-                ws.write_number_with_format(row, 6, (item.ug_value * 10.0).round() / 10.0, &dfc).map_err(|e| e.to_string())?;
-                ws.write_number_with_format(row, 7, (item.area_m2 * 100.0).round() / 100.0, &dfc).map_err(|e| e.to_string())?;
+                ws.write_number_with_format(row, 3, item.width_mm, &dfc).map_err(|e| e.to_string())?;
+                ws.write_number_with_format(row, 4, item.height_mm, &dfc).map_err(|e| e.to_string())?;
+                ws.write_number_with_format(row, 5, item.thickness_mm, &dfc).map_err(|e| e.to_string())?;
+                ws.write_number_with_format(row, 6, item.ug_value, &dfc).map_err(|e| e.to_string())?;
+                ws.write_number_with_format(row, 7, item.area_m2, &dfc).map_err(|e| e.to_string())?;
                 ws.write_number_with_format(row, 8, item.quantity as f64, &dfc).map_err(|e| e.to_string())?;
                 row += 1;
             }
@@ -234,8 +216,8 @@ pub fn generate_production_xlsx(
     // Beslaglijst
     {
         let ws = wb.add_worksheet();
-        ws.set_name("Beslaglijst").map_err(|e| e.to_string())?;
-        let headers = ["Kozijn", "Cel", "Component", "Omschrijving", "Aantal"];
+        ws.set_name("Hardware list").map_err(|e| e.to_string())?;
+        let headers = ["Frame", "Cell", "Component", "Description", "Quantity"];
         write_headers(ws, &headers, &hfmt)?;
 
         let mut row = 1u32;
@@ -259,8 +241,8 @@ pub fn generate_production_xlsx(
     // Rubberlijst
     {
         let ws = wb.add_worksheet();
-        ws.set_name("Rubberlijst").map_err(|e| e.to_string())?;
-        let headers = ["Kozijn", "Type", "Lengte (mm)", "Aantal"];
+        ws.set_name("Gasket list").map_err(|e| e.to_string())?;
+        let headers = ["Frame", "Type", "Length (mm)", "Quantity"];
         write_headers(ws, &headers, &hfmt)?;
 
         let mut row = 1u32;
@@ -271,8 +253,8 @@ pub fn generate_production_xlsx(
                 let dfc = data_format_center(alt);
 
                 ws.write_string_with_format(row, 0, &prod.kozijn_mark, &df).map_err(|e| e.to_string())?;
-                ws.write_string_with_format(row, 1, item.gasket_type.label_nl(), &df).map_err(|e| e.to_string())?;
-                ws.write_number_with_format(row, 2, item.length_mm.round(), &dfc).map_err(|e| e.to_string())?;
+                ws.write_string_with_format(row, 1, item.gasket_type.label_en(), &df).map_err(|e| e.to_string())?;
+                ws.write_number_with_format(row, 2, item.length_mm, &dfc).map_err(|e| e.to_string())?;
                 ws.write_number_with_format(row, 3, item.quantity as f64, &dfc).map_err(|e| e.to_string())?;
                 row += 1;
             }
@@ -284,8 +266,8 @@ pub fn generate_production_xlsx(
     let has_panels = production_data.iter().any(|p| !p.panel_list.is_empty());
     if has_panels {
         let ws = wb.add_worksheet();
-        ws.set_name("Paneellijst").map_err(|e| e.to_string())?;
-        let headers = ["Kozijn", "Pos.", "Breedte", "Hoogte", "Type", "Aantal"];
+        ws.set_name("Panel list").map_err(|e| e.to_string())?;
+        let headers = ["Frame", "Pos.", "Width (mm)", "Height (mm)", "Type", "Quantity"];
         write_headers(ws, &headers, &hfmt)?;
 
         let mut row = 1u32;
@@ -297,8 +279,8 @@ pub fn generate_production_xlsx(
 
                 ws.write_string_with_format(row, 0, &prod.kozijn_mark, &df).map_err(|e| e.to_string())?;
                 ws.write_string_with_format(row, 1, &item.piece_id, &df).map_err(|e| e.to_string())?;
-                ws.write_number_with_format(row, 2, item.width_mm.round(), &dfc).map_err(|e| e.to_string())?;
-                ws.write_number_with_format(row, 3, item.height_mm.round(), &dfc).map_err(|e| e.to_string())?;
+                ws.write_number_with_format(row, 2, item.width_mm, &dfc).map_err(|e| e.to_string())?;
+                ws.write_number_with_format(row, 3, item.height_mm, &dfc).map_err(|e| e.to_string())?;
                 ws.write_string_with_format(row, 4, &item.panel_type, &df).map_err(|e| e.to_string())?;
                 ws.write_number_with_format(row, 5, item.quantity as f64, &dfc).map_err(|e| e.to_string())?;
                 row += 1;
@@ -307,11 +289,36 @@ pub fn generate_production_xlsx(
         autofit_widths(ws, &headers, row)?;
     }
 
+    // Glazing beads are physical production pieces, not just BOM totals.
+    if production_data.iter().any(|p| !p.glaslat_list.is_empty()) {
+        let ws = wb.add_worksheet();
+        ws.set_name("Glazing bead list").map_err(|e| e.to_string())?;
+        let headers = ["Frame","Position","Cell","Side","Material","Width (mm)","Height (mm)","Cut length (mm)","Mitred","Quantity"];
+        write_headers(ws,&headers,&hfmt)?;
+        let mut row = 1u32;
+        for prod in production_data {
+            for item in &prod.glaslat_list {
+                let df = data_format(row % 2 == 0);
+                let dc = data_format_center(row % 2 == 0);
+                for (col,value) in [&prod.kozijn_mark,&item.piece_id,&item.position,&item.material].iter().enumerate() {
+                    let column = [0,1,3,4][col];
+                    ws.write_string_with_format(row,column,*value,&df).map_err(|e|e.to_string())?;
+                }
+                for (column,value) in [(2,(item.cell_index+1) as f64),(5,item.width_mm),(6,item.height_mm),(7,item.total_length_mm),(9,item.quantity as f64)] {
+                    ws.write_number_with_format(row,column,value,&dc).map_err(|e|e.to_string())?;
+                }
+                ws.write_string_with_format(row,8,if item.mitered {"Yes"}else{"No"},&df).map_err(|e|e.to_string())?;
+                row += 1;
+            }
+        }
+        autofit_widths(ws,&headers,row)?;
+    }
+
     // Stuklijst
     {
         let ws = wb.add_worksheet();
-        ws.set_name("Stuklijst").map_err(|e| e.to_string())?;
-        let headers = ["Kozijn", "Categorie", "Omschrijving", "Eenheid", "Hoeveelheid"];
+        ws.set_name("Bill of materials").map_err(|e| e.to_string())?;
+        let headers = ["Frame", "Category", "Description", "Unit", "Quantity"];
         write_headers(ws, &headers, &hfmt)?;
 
         let mut row = 1u32;
@@ -325,17 +332,14 @@ pub fn generate_production_xlsx(
                 ws.write_string_with_format(row, 1, &item.category, &df).map_err(|e| e.to_string())?;
                 ws.write_string_with_format(row, 2, &item.description, &df).map_err(|e| e.to_string())?;
                 ws.write_string_with_format(row, 3, &item.unit, &df).map_err(|e| e.to_string())?;
-                ws.write_number_with_format(row, 4, (item.quantity * 100.0).round() / 100.0, &dfc).map_err(|e| e.to_string())?;
+                ws.write_number_with_format(row, 4, item.quantity, &dfc).map_err(|e| e.to_string())?;
                 row += 1;
             }
         }
         autofit_widths(ws, &headers, row)?;
     }
 
-    wb.save(output_path)
-        .map_err(|e| format!("Kan XLSX niet opslaan: {}", e))?;
-
-    Ok(())
+    wb.save_to_buffer().map_err(|e| format!("Cannot generate Excel workbook: {e}"))
 }
 
 fn write_headers(

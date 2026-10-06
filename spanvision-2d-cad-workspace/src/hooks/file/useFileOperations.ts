@@ -61,6 +61,15 @@ export function useFileOperations() {
           );
         }
 
+        // Parse before switching documents so failed imports preserve the active drawing.
+        const staged = useUnderlay
+          ? (() => { const image = parseDXFAsUnderlay(content, 'import-layer', 'import-drawing', fileName); return image ? [image] : []; })()
+          : parseDXF(content, 'import-layer', 'import-drawing');
+        if (staged.length === 0) {
+          await showInfo('No supported entities found in the DXF file.');
+          return false;
+        }
+
         const s = useAppStore.getState();
         const prevDocId = s.activeDocumentId;
         const isEmptyUntitled = !s.isModified && !s.currentFilePath
@@ -76,25 +85,8 @@ export function useFileOperations() {
 
         const newState = useAppStore.getState();
 
-        if (useUnderlay) {
-          const underlay = parseDXFAsUnderlay(content, newState.activeLayerId, newState.activeDrawingId, fileName);
-          if (!underlay) {
-            await showInfo('Could not rasterize DXF file. No supported entities found.');
-            return false;
-          }
-          useAppStore.getState().addShapes([underlay]);
-          logger.info(`Opened DXF as underlay: ${fileName}`, 'File');
-        } else {
-          // Now parse DXF using the new document's layer/drawing IDs
-          const shapes = parseDXF(content, newState.activeLayerId, newState.activeDrawingId);
-          if (shapes.length === 0) {
-            await showInfo('No supported entities found in the DXF file.\n\nSupported entities: LINE, CIRCLE, ARC, ELLIPSE, POLYLINE, LWPOLYLINE, SPLINE, TEXT, MTEXT, POINT, SOLID, 3DFACE, TRACE');
-            return false;
-          }
-
-          // Add the parsed shapes to the new document
-          useAppStore.getState().addShapes(shapes);
-        }
+        useAppStore.getState().addShapes(staged.map(shape => ({ ...shape,
+          layerId: newState.activeLayerId, drawingId: newState.activeDrawingId })));
 
         // Detect and apply DXF units
         const dxfUnit = parseDXFInsUnits(content);
@@ -105,6 +97,7 @@ export function useFileOperations() {
         if (isEmptyUntitled) {
           useAppStore.getState().closeDocument(prevDocId);
         }
+        useAppStore.getState().zoomToFit();
         logger.info(`Opened DXF file: ${fileName}`, 'File');
         addRecentFile(filePath, fileName).catch(() => {});
         return true;
@@ -117,6 +110,17 @@ export function useFileOperations() {
     if (extension === 'dwg') {
       try {
         const fileName = filePath.split(/[/\\]/).pop()?.replace('.dwg', '') || 'Untitled';
+
+        if (!isTauriEnvironment()) {
+          await showError('DWG import requires the Windows app. Convert the drawing to DXF to open it in the browser.');
+          return false;
+        }
+        // Stage native parsing before creating or switching a document.
+        const staged = await importDwgFile(filePath, 'import-layer', 'import-drawing');
+        if (staged.length === 0) {
+          await showInfo('No supported entities found in the DWG file.');
+          return false;
+        }
 
         const s = useAppStore.getState();
         const prevDocId = s.activeDocumentId;
@@ -131,14 +135,10 @@ export function useFileOperations() {
         });
 
         const newState = useAppStore.getState();
-        const shapes = await importDwgFile(filePath, newState.activeLayerId, newState.activeDrawingId);
-
-        if (shapes.length === 0) {
-          await showInfo('No supported entities found in the DWG file.');
-          return;
-        }
-
+        const shapes = staged.map(shape => ({ ...shape, layerId: newState.activeLayerId, drawingId: newState.activeDrawingId }));
         useAppStore.getState().addShapes(shapes);
+        useAppStore.getState().fitBoundaryToContent(newState.activeDrawingId, 100);
+        useAppStore.getState().zoomToFit();
 
         if (isEmptyUntitled) {
           useAppStore.getState().closeDocument(prevDocId);
@@ -396,6 +396,7 @@ export function useFileOperations() {
       }
 
       addShapes(shapes);
+      useAppStore.getState().zoomToFit();
 
       // Detect and apply DXF units
       const dxfUnit = parseDXFInsUnits(content);
@@ -423,6 +424,7 @@ export function useFileOperations() {
       }
 
       addShapes([underlay]);
+      useAppStore.getState().zoomToFit();
 
       // Detect and apply DXF units
       const dxfUnit = parseDXFInsUnits(content);
@@ -439,13 +441,19 @@ export function useFileOperations() {
    * Open a file by its absolute path (used by the Recent Files list).
    * Reuses the same logic as handleOpen but skips the file-picker dialog.
    */
-  const handleOpenPath = useCallback(async (filePath: string) => {
+  const handleOpenPath = useCallback(async (filePath: string): Promise<void> => {
     const extension = filePath.split('.').pop()?.toLowerCase();
 
     if (extension === 'dxf') {
       try {
         const content = await readTextFileUniversal(filePath);
         const fileName = filePath.split(/[/\\]/).pop()?.replace('.dxf', '') || 'Untitled';
+
+        const staged = parseDXF(content, 'import-layer', 'import-drawing');
+        if (staged.length === 0) {
+          await showInfo('No supported entities found in the DXF file.');
+          return;
+        }
 
         const s = useAppStore.getState();
         const prevDocId = s.activeDocumentId;
@@ -460,13 +468,8 @@ export function useFileOperations() {
         });
 
         const newState = useAppStore.getState();
-        const shapes = parseDXF(content, newState.activeLayerId, newState.activeDrawingId);
-        if (shapes.length === 0) {
-          await showInfo('No supported entities found in the DXF file.');
-          return;
-        }
-
-        useAppStore.getState().addShapes(shapes);
+        useAppStore.getState().addShapes(staged.map(shape => ({ ...shape,
+          layerId: newState.activeLayerId, drawingId: newState.activeDrawingId })));
 
         const dxfUnit = parseDXFInsUnits(content);
         if (dxfUnit) {
@@ -476,6 +479,7 @@ export function useFileOperations() {
         if (isEmptyUntitled) {
           useAppStore.getState().closeDocument(prevDocId);
         }
+        useAppStore.getState().zoomToFit();
         logger.info(`Opened DXF file: ${fileName}`, 'File');
         addRecentFile(filePath, fileName).catch(() => {});
       } catch (err) {
@@ -488,6 +492,17 @@ export function useFileOperations() {
       try {
         const fileName = filePath.split(/[/\\]/).pop()?.replace('.dwg', '') || 'Untitled';
 
+        if (!isTauriEnvironment()) {
+          await showError('DWG import requires the Windows app. Convert the drawing to DXF to open it in the browser.');
+          return;
+        }
+        // Stage native parsing before creating or switching a document.
+        const staged = await importDwgFile(filePath, 'import-layer', 'import-drawing');
+        if (staged.length === 0) {
+          await showInfo('No supported entities found in the DWG file.');
+          return;
+        }
+
         const s = useAppStore.getState();
         const prevDocId = s.activeDocumentId;
         const isEmptyUntitled = !s.isModified && !s.currentFilePath
@@ -501,20 +516,10 @@ export function useFileOperations() {
         });
 
         const newState = useAppStore.getState();
-        const shapes = await importDwgFile(filePath, newState.activeLayerId, newState.activeDrawingId);
-
-        if (shapes.length === 0) {
-          await showInfo('No supported entities found in the DWG file.');
-          return;
-        }
-
+        const shapes = staged.map(shape => ({ ...shape, layerId: newState.activeLayerId, drawingId: newState.activeDrawingId }));
         useAppStore.getState().addShapes(shapes);
-
-        // Zoom to fit so imported geometry is visible regardless of coordinates
-        setTimeout(() => {
-          useAppStore.getState().fitBoundaryToContent(useAppStore.getState().activeDrawingId, 100);
-          useAppStore.getState().zoomToFit();
-        }, 100);
+        useAppStore.getState().fitBoundaryToContent(newState.activeDrawingId, 100);
+        useAppStore.getState().zoomToFit();
 
         if (isEmptyUntitled) {
           useAppStore.getState().closeDocument(prevDocId);

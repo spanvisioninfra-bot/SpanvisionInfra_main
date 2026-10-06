@@ -49,19 +49,19 @@ describe('Clean besteksopmaak (HTML-print)', () => {
 
   it('hoofdaanneming heeft een subtotaal per paragraaf', async () => {
     const html = await generatePrintHtml(schedule(), sampleItems(), 'hoofdaanneming');
-    const subtotals = html.match(/>Subtotaal</g) ?? [];
+    const subtotals = html.match(/>Subtotal</g) ?? [];
     // Twee paragrafen met posten → twee subtotalen
     expect(subtotals.length).toBe(2);
-    expect(html).toContain('1.920,00');
-    expect(html).toContain('400,00');
+    expect(html).toContain('1,920.00');
+    expect(html).toContain('400.00');
   });
 
   it('hoofdaanneming toont het hoofdstuktotaal alleen in de totaalregel', async () => {
     const html = await generatePrintHtml(schedule(), sampleItems(), 'hoofdaanneming');
     // 2.320,00 hoort exact één keer voor te komen: in "Totaal excl. BTW" —
     // niet ook nog eens naast de hoofdstukregel.
-    const hits = html.match(/2\.320,00/g) ?? [];
+    const hits = html.match(/2,320\.00/g) ?? [];
     expect(hits.length).toBe(1);
-    expect(html).toMatch(/Totaal excl\. BTW[\s\S]{0,120}2\.320,00/);
+    expect(html).toMatch(/Total excl\. VAT[\s\S]{0,120}2,320\.00/);
   });
 });

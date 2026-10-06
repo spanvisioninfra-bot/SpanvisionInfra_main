@@ -319,8 +319,8 @@ test('hook synchronization: een taalwissel start de recoverycontrole niet opnieu
   ).__opsRecoveryOpenCount ?? 0);
 
   await page.getByRole('button', { name: /^(Language|Taal)$/, exact: true }).click();
-  await page.getByRole('option', { name: /Nederlands/ }).click();
-  await expect(page.locator('html')).toHaveAttribute('lang', 'nl');
+  await page.getByRole('option', { name: /English/ }).click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await page.waitForTimeout(250);
   expect(await page.evaluate(() => (
     window as Window & { __opsRecoveryOpenCount?: number }

@@ -1,0 +1,199 @@
+{
+  "updatedAt": "2026-10-06T07:01:42.986Z",
+  "sourceCommit": "36aa5c04e5cd6470095365ae72b86c903dbd6e11",
+  "branch": "version/V.1.0",
+  "hub": {
+    "id": "hub",
+    "url": "https://spanvision-infra.vercel.app/",
+    "available": true,
+    "platform": "vercel",
+    "deploymentId": "dpl_AjRH9rRCEJuGvFtqBLqBR5LRVzvX",
+    "verifiedAt": "2026-10-06T06:50:50.422Z"
+  },
+  "vercel": [
+    {
+      "id": "cad2d",
+      "url": "https://spanvision-cad2d.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_3G1GyrM2kbkWNd2qxy5m2Y8FaEya",
+      "verifiedAt": "2026-10-06T06:44:41.330Z",
+      "updated": true,
+      "rollbackDeploymentId": "dpl_H8XvfxLqCUqk8h4dfQ8jZbeZ6YXC"
+    },
+    {
+      "id": "pdf",
+      "url": "https://spanvision-pdf.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_HCAU2CCgH2AszVHWeEXAgp6bgqaK",
+      "verifiedAt": "2026-10-06T06:45:03.963Z",
+      "updated": true,
+      "rollbackDeploymentId": "dpl_A8qC5CZTvUaKiM7M86iwjKiJs2JK"
+    },
+    {
+      "id": "ifc",
+      "url": "https://spanvision-ifc.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_7ZdWTimJMuB6u5HN2uABRSF5w4ah",
+      "verifiedAt": "2026-10-06T06:45:18.040Z",
+      "updated": true,
+      "rollbackDeploymentId": "dpl_GToBgU84ohdNbqyXuZxzFt6tS3vo"
+    },
+    {
+      "id": "calc",
+      "url": "https://spanvision-calc.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_8SHSEBVKnid7DwAp42V6UfTnf5iX",
+      "verifiedAt": "2026-10-06T06:45:34.990Z",
+      "updated": true,
+      "rollbackDeploymentId": "dpl_8nzeRZdW28ib8HswPPvXJ1fvVu4Y"
+    },
+    {
+      "id": "planner",
+      "url": "https://spanvision-planner.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_Cf56oH3RStJB3Rdn5dwC7bdLF516",
+      "verifiedAt": "2026-10-04T16:20:22.448Z",
+      "updated": false,
+      "rollbackDeploymentId": "dpl_Cf56oH3RStJB3Rdn5dwC7bdLF516"
+    },
+    {
+      "id": "fem",
+      "url": "https://spanvision-fem.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_2RaJVzcVWtstyGNWG8PYVLfrg4vm",
+      "verifiedAt": "2026-10-06T06:49:41.438Z",
+      "updated": true,
+      "rollbackDeploymentId": "dpl_3Yjt18wH82YobHfCE2onAfgVBJYA"
+    },
+    {
+      "id": "frame",
+      "url": "https://spanvision-frame.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_2cnRdY81gRLPPur6vi6V4XnZ6AyP",
+      "verifiedAt": "2026-10-06T06:45:50.861Z",
+      "updated": true,
+      "rollbackDeploymentId": "dpl_38kGrYMMLS9xKmtKZTXcpr43SNvJ"
+    },
+    {
+      "id": "calculation",
+      "url": "https://spanvision-calculation.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_5yvqV9kfm7t8TA13iUGzexF841kh",
+      "verifiedAt": "2026-10-06T06:46:09.363Z",
+      "updated": true,
+      "rollbackDeploymentId": "dpl_5cmnNsBXCYtfK5PyL7qkq8iTitPh"
+    },
+    {
+      "id": "geo",
+      "url": "https://spanvision-geo.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_8aP3VbHPKy3TtBNpvckxfCKcVNF8",
+      "verifiedAt": "2026-10-06T06:46:28.784Z",
+      "updated": true,
+      "rollbackDeploymentId": "dpl_9LvBg33qzycenhh5b53rtdBpkEJc"
+    },
+    {
+      "id": "speech",
+      "url": "https://spanvision-speech.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_BXihEP1YcCdVjm8b6KSpCJWWwpoU",
+      "verifiedAt": "2026-10-06T06:46:47.722Z",
+      "updated": true,
+      "rollbackDeploymentId": "dpl_2HJupFLAAZNWT21cKn1QozpBYECA"
+    },
+    {
+      "id": "field",
+      "url": "https://spanvision-field.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_GqsRQVggKxJ14YFDfpM233GY1Uqd",
+      "verifiedAt": "2026-10-06T06:47:03.376Z",
+      "updated": true,
+      "rollbackDeploymentId": "dpl_2DrbusPweSGjm5fkZ5zwqRGsVGBT"
+    },
+    {
+      "id": "pointcloud",
+      "url": "https://spanvision-pointcloud.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_Gwbg3tpboRXw9mkCkpNR6uAAHMf9",
+      "verifiedAt": "2026-10-06T06:47:29.721Z",
+      "updated": true,
+      "rollbackDeploymentId": "dpl_GweWscbGocFDUzpVTx7j2wGwMuS8"
+    },
+    {
+      "id": "pile",
+      "url": "https://spanvision-pile.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_3nSPxeuWGkBPcUcGt1VVCSFR4vJf",
+      "verifiedAt": "2026-10-06T06:47:50.243Z",
+      "updated": true,
+      "rollbackDeploymentId": "dpl_FxSuGPSZrnxFondZUDLaae6YUC5C"
+    },
+    {
+      "id": "cad",
+      "url": "https://spanvision-cad.vercel.app/app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_HWXMiQwU2q1mTjjzAGuRtpg9t1Uh",
+      "verifiedAt": "2026-10-06T06:48:11.407Z",
+      "updated": true,
+      "rollbackDeploymentId": "dpl_jCSUdBUujWxGK1DZE7yLxAcPyahQ"
+    }
+  ],
+  "render": {
+    "bim": {
+      "commit": {
+        "createdAt": "2026-10-06T06:20:50Z",
+        "id": "36aa5c04e5cd6470095365ae72b86c903dbd6e11",
+        "message": "feat: update all 16 tools and documentation - 6 October 2026"
+      },
+      "createdAt": "2026-10-06T06:43:55.252926Z",
+      "finishedAt": "2026-10-06T06:45:53.440792Z",
+      "id": "dep-db29haui0phs73drn9kg",
+      "startedAt": "2026-10-06T06:43:55.227758Z",
+      "status": "live",
+      "trigger": "api",
+      "updatedAt": "2026-10-06T06:46:24.733383Z"
+    },
+    "stl": {
+      "commit": {
+        "createdAt": "2026-10-06T06:20:50Z",
+        "id": "36aa5c04e5cd6470095365ae72b86c903dbd6e11",
+        "message": "feat: update all 16 tools and documentation - 6 October 2026"
+      },
+      "createdAt": "2026-10-06T06:43:58.718258Z",
+      "finishedAt": "2026-10-06T06:45:42.143261Z",
+      "id": "dep-db29hbjncjis73dt94kg",
+      "startedAt": "2026-10-06T06:43:58.691627Z",
+      "status": "live",
+      "trigger": "api",
+      "updatedAt": "2026-10-06T06:46:08.861162Z"
+    },
+    "fem": {
+      "commit": {
+        "createdAt": "2026-10-06T06:20:50Z",
+        "id": "36aa5c04e5cd6470095365ae72b86c903dbd6e11",
+        "message": "feat: update all 16 tools and documentation - 6 October 2026"
+      },
+      "createdAt": "2026-10-06T06:45:49.568302Z",
+      "finishedAt": "2026-10-06T06:48:50.376269Z",
+      "id": "dep-db29i7e7bikc73cvrm8g",
+      "startedAt": "2026-10-06T06:45:49.563493Z",
+      "status": "live",
+      "trigger": "manual",
+      "updatedAt": "2026-10-06T06:49:17.030356Z"
+    }
+  }
+}

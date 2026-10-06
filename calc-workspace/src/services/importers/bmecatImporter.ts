@@ -21,7 +21,7 @@ export interface PriceImportResult {
 function guessType(text: string): ResourceType {
   const t = text.toLowerCase();
   if (/\b(arbeid|loon|montage|manuur|mankracht)\b/.test(t)) return 'arbeid';
-  if (/\b(huur|verhuur|machine|materieel|kraan|steiger)\b/.test(t)) return "equipment";
+  if (/\b(huur|verhuur|machine|materieel|kraan|steiger)\b/.test(t)) return "materieel";
   if (/\b(onderaannem|uitbested)/.test(t)) return 'onderaannemer';
   return 'materiaal';
 }

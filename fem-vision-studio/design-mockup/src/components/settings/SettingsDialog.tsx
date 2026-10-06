@@ -8,11 +8,8 @@ import "../ThemedSelect.css";
 import "./SettingsDialog.css";
 
 const THEME_OPTIONS = [
-  { value: "light",     labelKey: "appearance.light",     swatches: ["#FAFAF9", "#FFFFFF", "#D97706", "#36363E"] },
-  { value: "forge",     labelKey: "appearance.forge",     swatches: ["#36363E", "#44444C", "#D97706", "#FAFAF9"] },
-  { value: "openaec",   labelKey: "appearance.dark",      swatches: ["#27272A", "#1C1917", "#D97706", "#FAFAF9"] },
-  { value: "blueprint", labelKey: "appearance.blueprint", swatches: ["#0F1B2D", "#1A2C45", "#60A5FA", "#E0E7FF"] },
-  { value: "contrast",  labelKey: "appearance.contrast",  swatches: ["#000000", "#0A0A0A", "#FFD700", "#FFFFFF"] },
+  { value: "light",     labelKey: "appearance.light",     swatches: ["#F5F6F8", "#FFFFFF", "#18222E", "#344054"] },
+  { value: "spanvision-mono", labelKey: "appearance.dark", swatches: ["#000000", "#121212", "#FFFFFF", "#EEEEEE"] },
 ];
 
 /* ─── Tab configuratie ──────────────────────────────────────
@@ -25,7 +22,7 @@ const THEME_OPTIONS = [
 const TAB_IDS = ["general", "appearance", "about"] as const;
 
 export function applyTheme(theme?: string) {
-  document.documentElement.setAttribute("data-theme", theme || "light");
+  document.documentElement.setAttribute("data-theme", theme === 'light' ? 'light' : 'spanvision-mono');
 }
 
 interface SettingsDialogProps {
@@ -47,7 +44,7 @@ export default function SettingsDialog({
 
   // Draft state — only committed on Save
   const [draftTheme, setDraftTheme] = useState(theme);
-  const [draftLang, setDraftLang] = useState("auto");
+  const [draftLang, setDraftLang] = useState("en");
   const [confirmResetOpen, setConfirmResetOpen] = useState(false);
 
   // Snapshot of original values when dialog opens, for reverting on Cancel
@@ -59,7 +56,8 @@ export default function SettingsDialog({
     if (open) {
       originalTheme.current = theme;
       setDraftTheme(theme);
-      getSetting("language", "auto").then((lang) => {
+      getSetting("language", "en").then(() => {
+        const lang = 'en';
         originalLang.current = lang;
         setDraftLang(lang);
       });
@@ -106,10 +104,10 @@ export default function SettingsDialog({
   };
 
   const handleConfirmReset = () => {
-    setDraftTheme("light");
-    applyTheme("light");
-    setDraftLang("auto");
-    changeLanguage("auto");
+    setDraftTheme("spanvision-mono");
+    applyTheme("spanvision-mono");
+    setDraftLang("en");
+    changeLanguage("en");
     setConfirmResetOpen(false);
   };
 

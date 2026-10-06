@@ -70,7 +70,7 @@ export function normaliseerPaneel(p, presetId) {
   const w = paneelType(type)?.weergave;
   if (w === 'deur' || w === 'draairaam') {
     uit.scharnier = ruw.scharnier === 'eind' ? 'eind' : 'begin';
-    uit.draaiNaar = ruw.draaiNaar === 'buiten' ? "outside" : 'binnen';
+    uit.draaiNaar = ruw.draaiNaar === 'buiten' ? "buiten" : 'binnen';
   } else {
     delete uit.scharnier;
     delete uit.draaiNaar;
@@ -173,7 +173,7 @@ export function indeling(params, presetId) {
     preset: pr.id,
     lengteMm: L,
     diepteMm: Math.max(...stijlen.map((s) => s.diepteMm)),
-    binnenzijde: params?.binnenzijde === 'links' ? 'links' : "right",
+    binnenzijde: params?.binnenzijde === 'links' ? 'links' : "rechts",
     expliciet,
     stijlen,
     velden,

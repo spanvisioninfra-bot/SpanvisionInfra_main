@@ -543,7 +543,7 @@ const PointcloudViewerInner = () => {
       // LODController cleanup — remove deleted pointclouds
       const existingLodIds = new Set(lodControllersRef.current.keys());
       for (const id of existingLodIds) {
-        if (!currentIds.has(id)) {
+        if (!currentIds.has(id) || getBrowserPointcloud(id)) {
           const ctrl = lodControllersRef.current.get(id);
           if (ctrl) {
             ctrl.dispose();

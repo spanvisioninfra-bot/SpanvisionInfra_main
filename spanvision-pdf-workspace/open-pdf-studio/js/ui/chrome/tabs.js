@@ -35,6 +35,9 @@ export function createTab(filePath = null, autoSwitch = true) {
 
   // Create new document
   const doc = createDocument(filePath);
+  // Remember the active document so a failed new-file load can restore it,
+  // including when it was not the tab immediately preceding the new one.
+  if (autoSwitch && filePath) doc._openFallbackDocumentId = getActiveDocument()?.id;
   // Weergavemodus uit de voorkeuren; enkelpagina is de standaard
   // (createDocument zelf blijft een pure helper).
   doc.viewMode = state.preferences?.defaultViewMode === 'continuous' ? 'continuous' : 'single';

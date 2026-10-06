@@ -2,6 +2,9 @@ import { Show, createSignal, onMount, onCleanup } from 'solid-js';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { t } from '@/state/locale-store';
 import { loadFile } from '@/actions/load-file';
+import { createParameterCsv } from '@spanvision-infra/ifc-core';
+import { allParameters, selectedParameter, fileName } from '@/state/ifc-store';
+import { controlsEnabled } from '@/state/player-store';
 import LanguageSelector from '@/components/LanguageSelector';
 import AppearanceMenu from '@/components/AppearanceMenu';
 import { brand } from '@/brand';
@@ -36,6 +39,18 @@ export default function Header() {
     }
   };
 
+  function exportParameter() {
+    const name = selectedParameter();
+    const parameter = allParameters.get(name);
+    if (!parameter) return;
+    const url = URL.createObjectURL(new Blob([createParameterCsv(name, parameter)], { type: 'text/csv;charset=utf-8' }));
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `${fileName().replace(/\.ifc$/i, '')}-parameters.csv`;
+    anchor.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   return (
     <header class={styles.header} data-tauri-drag-region>
       <img src={brandMark} alt="" class={styles.appIcon} />
@@ -50,6 +65,11 @@ export default function Header() {
             stroke="currentColor"
             stroke-width="1.3"
           />
+        </svg>
+      </button>
+      <button class={styles.openBtn} onClick={exportParameter} disabled={!controlsEnabled()} title="Export parameter CSV" aria-label="Export parameter CSV">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5" />
         </svg>
       </button>
       <input

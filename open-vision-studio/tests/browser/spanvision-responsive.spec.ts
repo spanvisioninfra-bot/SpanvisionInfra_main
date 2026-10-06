@@ -33,7 +33,7 @@ for (const width of [390, 768, 1440]) {
     await waitForOps(page);
     await expect(page.locator('[data-ops-welcome-dialog]')).toBeVisible();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'spanvision-mono');
-    await expect(page.getByRole('dialog')).toContainText('Spanvision infra');
+    await expect(page.getByRole('dialog')).toContainText('Spanvision Infra');
     await expect(page.getByRole('dialog')).toContainText('Open Vision Studio');
     await dialogFits(page);
     await page.evaluate(() => document.fonts.ready);

@@ -21,7 +21,7 @@ function makeItem(
     sortOrder: overrides.sortOrder,
     code: overrides.code ?? '',
     description: overrides.description,
-    unit: overrides.unit ?? "pcs",
+    unit: overrides.unit ?? "st",
     quantity: overrides.quantity ?? null,
     materialPrice: overrides.materialPrice ?? null,
     laborPrice: overrides.laborPrice ?? null,
@@ -40,7 +40,7 @@ function makeItem(
     normUnitPrice: overrides.normUnitPrice ?? null,
     resourceType: overrides.resourceType ?? null,
     resourceLibraryId: null,
-    verrekenbaar: overrides.rowType === 'chapter' ? 'V' : null,
+    verrekenbaar: overrides.rowType === "chapter" ? 'V' : null,
     tariefGroep: null,
   };
 }
@@ -115,7 +115,7 @@ function calculateHsbWand(params: Record<string, number | string>): WizardResult
   items.push(makeItem({
     id: chapterId,
     description: `HSB-wand ${lengte.toFixed(1)}×${hoogte.toFixed(1)}m`,
-    rowType: 'chapter',
+    rowType: "chapter",
     parentId: null,
     sortOrder: sortOrder++,
     depth: 0,

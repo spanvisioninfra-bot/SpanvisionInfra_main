@@ -29,6 +29,7 @@ export interface OidcUser {
  * Call once on app startup.
  */
 export function initOidc(): UserManager {
+  if (userManager) return userManager;
   const authority = import.meta.env.VITE_OIDC_AUTHORITY as string | undefined;
   const clientId = import.meta.env.VITE_OIDC_CLIENT_ID as string | undefined;
 

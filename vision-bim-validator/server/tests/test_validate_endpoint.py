@@ -15,6 +15,7 @@ Usage:
 
 import io
 import sys
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -28,6 +29,17 @@ from server.main import MAX_FILE_SIZE, MAX_IDS_FILE_SIZE
 # =============================================================================
 # Input Validation Tests - IFC File
 # =============================================================================
+
+
+def completed_result(client, response):
+    """Verify async acceptance and retrieve the real completed job response."""
+    assert response.status_code == 202, response.text
+    job_id = response.json()['job_id']
+    status = client.get('/api/v1/jobs/' + job_id)
+    assert status.status_code == 200, status.text
+    job = status.json()
+    assert job['status'] == 'completed', job
+    return job['result']
 
 
 class TestValidateEndpointIfcValidation:
@@ -60,23 +72,35 @@ class TestValidateEndpointIfcValidation:
         files = {"ifc_file": sample_ifc_file, "ids_file": sample_ids_file}
         response = client.post("/api/v1/validate", files=files)
         # Should not return 400 for extension - may return 200 or 422 depending on content
-        assert response.status_code != 400 or "Invalid IFC file type" not in response.json().get("detail", "")
+        assert response.status_code == 202
 
-    def test_validate_accepts_ifcxml_extension(self, client, sample_ids_file, sample_ifc_content):
-        """Test that endpoint accepts .ifcxml extension."""
+    def test_validate_rejects_unsupported_ifcxml_extension(self, client, sample_ids_file, sample_ifc_content):
+        """Reject a format the installed native parser cannot read."""
         ifcxml_file = ("model.ifcxml", io.BytesIO(sample_ifc_content), "application/octet-stream")
         files = {"ifc_file": ifcxml_file, "ids_file": sample_ids_file}
         response = client.post("/api/v1/validate", files=files)
-        # Should not return 400 for extension
-        assert response.status_code != 400 or "Invalid IFC file type" not in response.json().get("detail", "")
+        assert response.status_code == 400
+        assert "not supported" in response.json()["detail"]
 
     def test_validate_accepts_ifczip_extension(self, client, sample_ids_file, sample_ifc_content):
-        """Test that endpoint accepts .ifczip extension."""
-        ifczip_file = ("model.ifczip", io.BytesIO(sample_ifc_content), "application/octet-stream")
+        """Read a real zipped IFC without extracting visitor-supplied paths."""
+        archive = io.BytesIO()
+        with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED) as zipped:
+            zipped.writestr('../../model.ifc', sample_ifc_content)
+        archive.seek(0)
+        ifczip_file = ("model.ifczip", archive, "application/octet-stream")
         files = {"ifc_file": ifczip_file, "ids_file": sample_ids_file}
         response = client.post("/api/v1/validate", files=files)
-        # Should not return 400 for extension
-        assert response.status_code != 400 or "Invalid IFC file type" not in response.json().get("detail", "")
+        result = completed_result(client, response)
+        assert result['ifc_file'] == 'model.ifczip'
+
+    def test_validate_invalid_zip_returns_actionable_error(self, client, sample_ids_file):
+        response = client.post('/api/v1/validate', files={
+            'ifc_file': ('broken.ifczip', b'not a zip', 'application/octet-stream'),
+            'ids_file': sample_ids_file,
+        })
+        assert response.status_code == 400
+        assert 'archive' in response.json()['detail']
 
     def test_validate_ifc_case_insensitive_extension(self, client, sample_ids_file, sample_ifc_content):
         """Test that endpoint accepts .IFC extension (case insensitive)."""
@@ -206,14 +230,14 @@ class TestValidateEndpointSuccess:
         """Test that validation with custom IDS file returns 200."""
         files = {"ifc_file": sample_ifc_file, "ids_file": sample_ids_file}
         response = client.post("/api/v1/validate", files=files)
-        assert response.status_code == 200
+        assert response.status_code == 202
 
     def test_validate_with_custom_ids_returns_validation_result(self, client, sample_ifc_file, sample_ids_file):
         """Test that validation returns ValidationResult structure."""
         files = {"ifc_file": sample_ifc_file, "ids_file": sample_ids_file}
         response = client.post("/api/v1/validate", files=files)
-        assert response.status_code == 200
-        data = response.json()
+        assert response.status_code == 202
+        data = completed_result(client, response)
 
         # Check required fields from ValidationResult model
         assert "success" in data
@@ -230,14 +254,14 @@ class TestValidateEndpointSuccess:
         files = {"ifc_file": sample_ifc_file}
         response = client.post("/api/v1/validate?ids_standard=nl-bim", files=files)
         # Should complete (200) or have validation errors (not 4xx input errors)
-        assert response.status_code in [200, 422]
+        assert response.status_code in [202, 422]
 
     def test_validate_with_rvb_standard_returns_200(self, client, sample_ifc_file):
         """Test that validation with rvb standard returns 200."""
         files = {"ifc_file": sample_ifc_file}
         response = client.post("/api/v1/validate?ids_standard=rvb", files=files)
         # Should complete (200) or have validation errors (not 4xx input errors)
-        assert response.status_code in [200, 422]
+        assert response.status_code in [202, 422]
 
     def test_validate_returns_correct_filenames(self, client, sample_ifc_content, sample_ids_content):
         """Test that validation returns correct filenames in response."""
@@ -246,8 +270,8 @@ class TestValidateEndpointSuccess:
         files = {"ifc_file": ifc_file, "ids_file": ids_file}
         response = client.post("/api/v1/validate", files=files)
 
-        if response.status_code == 200:
-            data = response.json()
+        if response.status_code == 202:
+            data = completed_result(client, response)
             assert data["ifc_file_name"] == "my_model.ifc"
             assert data["ids_file_name"] == "my_spec.ids"
 
@@ -265,8 +289,8 @@ class TestValidationResultSchema:
         files = {"ifc_file": sample_ifc_file, "ids_file": sample_ids_file}
         response = client.post("/api/v1/validate", files=files)
 
-        if response.status_code == 200:
-            data = response.json()
+        if response.status_code == 202:
+            data = completed_result(client, response)
             assert isinstance(data["specifications"], list)
 
     def test_specification_result_structure(self, client, sample_ifc_file, sample_ids_file):
@@ -274,8 +298,8 @@ class TestValidationResultSchema:
         files = {"ifc_file": sample_ifc_file, "ids_file": sample_ids_file}
         response = client.post("/api/v1/validate", files=files)
 
-        if response.status_code == 200:
-            data = response.json()
+        if response.status_code == 202:
+            data = completed_result(client, response)
             if data["specifications"]:
                 spec = data["specifications"][0]
                 assert "specification_name" in spec
@@ -290,8 +314,8 @@ class TestValidationResultSchema:
         files = {"ifc_file": sample_ifc_file, "ids_file": sample_ids_file}
         response = client.post("/api/v1/validate", files=files)
 
-        if response.status_code == 200:
-            data = response.json()
+        if response.status_code == 202:
+            data = completed_result(client, response)
             assert isinstance(data["success"], bool)
 
     def test_validation_timestamp_format(self, client, sample_ifc_file, sample_ids_file):
@@ -299,8 +323,8 @@ class TestValidationResultSchema:
         files = {"ifc_file": sample_ifc_file, "ids_file": sample_ids_file}
         response = client.post("/api/v1/validate", files=files)
 
-        if response.status_code == 200:
-            data = response.json()
+        if response.status_code == 202:
+            data = completed_result(client, response)
             assert isinstance(data["validation_timestamp"], str)
             # Should be ISO format: 2025-01-01T12:00:00
             assert "T" in data["validation_timestamp"] or "-" in data["validation_timestamp"]
@@ -323,8 +347,8 @@ class TestValidateEndpointIntegration:
             }
             response = client.post("/api/v1/validate", files=files)
 
-        assert response.status_code == 200
-        data = response.json()
+        assert response.status_code == 202
+        data = completed_result(client, response)
         assert "success" in data
         assert "specifications" in data
 
@@ -337,8 +361,8 @@ class TestValidateEndpointIntegration:
             }
             response = client.post("/api/v1/validate", files=files)
 
-        assert response.status_code == 200
-        data = response.json()
+        assert response.status_code == 202
+        data = completed_result(client, response)
         # The sample-fail.ifc should fail the wall naming convention spec
         assert data["failed_specifications"] > 0 or data["success"] is False
 
@@ -370,8 +394,8 @@ class TestQAAcceptanceCriteria:
         files = {"ifc_file": sample_ifc_file, "ids_file": sample_ids_file}
         response = client.post("/api/v1/validate", files=files)
 
-        assert response.status_code == 200
-        data = response.json()
+        assert response.status_code == 202
+        data = completed_result(client, response)
 
         # Verify ValidationResult structure
         assert "success" in data
@@ -394,10 +418,10 @@ class TestQAAcceptanceCriteria:
         response = client.post("/api/v1/validate?ids_standard=nl-bim", files=files)
 
         # Should complete successfully or fail validation (not input error)
-        assert response.status_code in [200, 422], f"Unexpected status: {response.status_code}"
+        assert response.status_code in [202, 422], f"Unexpected status: {response.status_code}"
 
-        if response.status_code == 200:
-            data = response.json()
+        if response.status_code == 202:
+            data = completed_result(client, response)
             assert "success" in data
             assert "specifications" in data
 
@@ -410,10 +434,10 @@ class TestQAAcceptanceCriteria:
         response = client.post("/api/v1/validate?ids_standard=rvb", files=files)
 
         # Should complete successfully or fail validation (not input error)
-        assert response.status_code in [200, 422], f"Unexpected status: {response.status_code}"
+        assert response.status_code in [202, 422], f"Unexpected status: {response.status_code}"
 
-        if response.status_code == 200:
-            data = response.json()
+        if response.status_code == 202:
+            data = completed_result(client, response)
             assert "success" in data
             assert "specifications" in data
 
@@ -498,8 +522,8 @@ class TestQAIntegrationCriteria:
             response = client.post("/api/v1/validate", files=files)
 
         # Validation should complete successfully
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
-        data = response.json()
+        assert response.status_code == 202, f"Expected 200, got {response.status_code}: {response.text}"
+        data = completed_result(client, response)
 
         # Verify top-level ValidationResult fields
         assert "success" in data, "Missing 'success' field"
@@ -580,8 +604,8 @@ class TestQAIntegrationCriteria:
             }
             response = client.post("/api/v1/validate", files=files)
 
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
-        data = response.json()
+        assert response.status_code == 202, f"Expected 200, got {response.status_code}: {response.text}"
+        data = completed_result(client, response)
 
         # Parse the response using Pydantic model - will raise if schema doesn't match
         validation_result = ValidationResult(**data)
@@ -639,8 +663,8 @@ class TestQAIntegrationCriteria:
             }
             response = client.post("/api/v1/validate", files=files)
 
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
-        data = response.json()
+        assert response.status_code == 202, f"Expected 200, got {response.status_code}: {response.text}"
+        data = completed_result(client, response)
 
         # The sample-fail.ifc should have validation failures
         assert data["failed_specifications"] > 0 or data["success"] is False, \
@@ -682,10 +706,10 @@ class TestQAIntegrationCriteria:
             response = client.post("/api/v1/validate?ids_standard=nl-bim", files=files)
 
         # Should complete (200) or have validation processing error (422)
-        assert response.status_code in [200, 422], f"Unexpected status: {response.status_code}"
+        assert response.status_code in [202, 422], f"Unexpected status: {response.status_code}"
 
-        if response.status_code == 200:
-            data = response.json()
+        if response.status_code == 202:
+            data = completed_result(client, response)
             # Parse the response using Pydantic model
             validation_result = ValidationResult(**data)
             assert isinstance(validation_result.success, bool)

@@ -5,7 +5,7 @@ import { buildXml, formatDutch, denormalizeUnit, type XmlNode } from './xmlBuild
 export function exportTradxml(input: ExportInput): ExportResult {
   const _warnings: string[] = [];
   const { schedule, items } = input;
-  const topChapters = items.filter((it) => it.rowType === 'chapter' && !it.parentId);
+  const topChapters = items.filter((it) => it.rowType === "chapter" && !it.parentId);
 
   const root: XmlNode = {
     tag: 'Begroting',
@@ -20,13 +20,13 @@ export function exportTradxml(input: ExportInput): ExportResult {
 
 function renderChapter(ch: CostItem, all: CostItem[], depth: number, _warnings: string[]): XmlNode {
   const kids = all.filter((it) => it.parentId === ch.id);
-  const subs = kids.filter((it) => it.rowType === 'chapter');
+  const subs = kids.filter((it) => it.rowType === "chapter");
   const acts = kids.filter(
-    (it) => it.rowType === 'begrotingspost' || it.rowType === 'bewakingspost' || it.rowType === "calc ",
+    (it) => it.rowType === 'begrotingspost' || it.rowType === 'bewakingspost' || it.rowType === "regel",
   );
 
   // Top = Hoofdstuk, nested = Element
-  const tag = depth === 0 ? "Chapter" : "Unitized";
+  const tag = depth === 0 ? 'Hoofdstuk' : 'Element';
 
   return {
     tag,
@@ -44,7 +44,7 @@ function renderActivity(a: CostItem): XmlNode {
     attrs: { code: a.code, omschrijving: a.description },
     children: [
       { tag: 'Hoeveelheid', children: [formatDutch(a.quantity ?? 0, 2)] },
-      { tag: 'Eenheid', children: [denormalizeUnit(a.unit ?? "pcs")] },
+      { tag: 'Eenheid', children: [denormalizeUnit(a.unit ?? "st")] },
       { tag: 'Eenheidsprijs', children: [formatDutch(a.unitPrice ?? 0, 2)] },
     ],
   };

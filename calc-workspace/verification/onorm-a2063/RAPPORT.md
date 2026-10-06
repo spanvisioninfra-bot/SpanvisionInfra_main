@@ -68,14 +68,14 @@ Counts of lg/ulg/grundtextnr/positions are taken from the raw XML (independent o
 
 | File | Namespace | Size | lg | ulg | grundtextnr | folgepositionen | ungeteilte | Chapters | Positions | Text rows | Positions with gaps | Wahl/Eventual | Units used | Units without equivalent | Import |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |
-| `LB-SCHOKO_V2021.onlb` | 2021-03-01 | 0.1 MB | 1 | 2 | 2 | 5 | 0 | 3 | 5 | 0 | 5 | 0 | 1 | none | 1 ms |
+| `LB-SCHOKO_V2021.onlb` | 2021-03-01 | 0.1 MB | 1 | 2 | 2 | 5 | 0 | 3 | 5 | 0 | 5 | 0 | 1 | none | 2 ms |
 
 ### Round trip
 
 | LV | Source | LV type | Items A | Items B | Positions | Text rows | Direct cost A | Direct cost B | Difference | Rows differing | Export (bytes) | Export | Import | Schema |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| `lb-schoko-lv.onlv` | LB-SCHOKO_V2021.onlb | kostenschaetzungs-lv | 8 | 8 | 5 | 0 | 1,123,805.17 | 1,123,805.17 | 0.00 | 0 | 14,019 | 4 ms | 2 ms | skipped (python not found) |
-| `voorbeeld.onlv` | public/data/voorbeeld.ifcCalc | kostenschaetzungs-lv | 31 | 18 | 6 | 0 | 28,109.00 | 28,108.78 | -0.22 (explained rounding, 3 positions) | totals only (see below) | 16,898 | 1 ms | 1 ms | skipped (python not found) |
+| `lb-schoko-lv.onlv` | LB-SCHOKO_V2021.onlb | kostenschaetzungs-lv | 8 | 8 | 5 | 0 | 1,123,805.17 | 1,123,805.17 | 0.00 | 0 | 14,009 | 6 ms | 3 ms | skipped (python not found) |
+| `voorbeeld.onlv` | public/data/voorbeeld.ifcCalc | kostenschaetzungs-lv | 31 | 18 | 6 | 0 | 28,109.00 | 28,108.78 | -0.22 (explained rounding, 3 positions) | totals only (see below) | 16,888 | 4 ms | 2 ms | skipped (python not found) |
 
 #### lb-schoko-lv.onlv
 

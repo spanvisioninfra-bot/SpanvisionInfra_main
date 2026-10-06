@@ -14,10 +14,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import process from 'node:process';
-import { worktreeRoot, worktreeSlug, allocatePort } from './dev-port.mjs';
+import { projectRoot, worktreeSlug, allocatePort } from './dev-port.mjs';
 import { acquireGuardLock } from './dev-lock.mjs';
 
-const root = worktreeRoot();
+const root = projectRoot();
 if (!root) {
   console.error('Niet in een git-worktree — kan geen dev-poort toewijzen.');
   process.exit(1);
@@ -40,8 +40,12 @@ const localBin = join(dirname(fileURLToPath(import.meta.url)), '..', 'node_modul
 const tauriBin = existsSync(localBin) ? localBin : binName;
 const config = JSON.stringify({ build: { devUrl: `http://localhost:${port}` } });
 
-const child = spawn(tauriBin, ['dev', '--config', config], {
+const child = spawn(process.platform === 'win32' ? process.execPath : tauriBin,
+  process.platform === 'win32'
+    ? [join(root, 'node_modules', '@tauri-apps', 'cli', 'tauri.js'), 'dev', '--config', config]
+    : ['dev', '--config', config], {
   stdio: 'inherit',
+  cwd: root,
   env: {
     ...process.env,
     OPS_DEV_PORT: String(port),

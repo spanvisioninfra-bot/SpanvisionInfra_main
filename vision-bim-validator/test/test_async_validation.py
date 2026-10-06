@@ -370,7 +370,7 @@ class TestValidateEndpointInvalidFileTypes:
         """
         files = {
             "ifc_file": ("model.ifc", io.BytesIO(sample_ifc_content), "application/octet-stream"),
-            "ids_file": ("spec.xml", io.BytesIO(sample_ids_content), "application/xml"),
+            "ids_file": ("spec.txt", io.BytesIO(sample_ids_content), "application/xml"),
         }
 
         response = client.post("/api/v1/validate", files=files)
@@ -1365,7 +1365,7 @@ class TestJobExpirationViaEndpoint:
         job = job_manager.create_job()
 
         # Mock time to simulate TTL expiration
-        future_time = datetime.now(timezone.utc) + timedelta(seconds=3601)
+        future_time = datetime.now(timezone.utc) + timedelta(seconds=14401)
         with patch("server.job_manager.datetime") as mock_datetime:
             mock_datetime.now.return_value = future_time
             mock_datetime.side_effect = lambda *args, **kwargs: datetime(*args, **kwargs)

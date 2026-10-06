@@ -11,6 +11,8 @@ import hashlib
 import time
 from threading import RLock
 from urllib.parse import urlsplit
+import asyncio
+from tempfile import SpooledTemporaryFile
 
 from starlette.responses import JSONResponse
 
@@ -54,8 +56,9 @@ class SessionMapping(SessionObject, MutableMapping):
 
 
 class CloudSessions:
-    def __init__(self, app, secure=True):
+    def __init__(self, app, secure=True, max_body_bytes=55 * 1024 * 1024):
         self.app, self.secure = app, secure
+        self.max_body_bytes = max_body_bytes
         self.cookie_name = COOKIE if secure else 'spanvision-workspace-test'
 
     async def __call__(self, scope, receive, send):
@@ -65,7 +68,8 @@ class CloudSessions:
             return await self.app(scope, receive, send)
         headers = dict(scope.get('headers', []))
         try:
-            too_large = int(headers.get(b'content-length', b'0')) > 55 * 1024 * 1024
+            length = int(headers.get(b'content-length', b'0'))
+            too_large = length < 0 or length > self.max_body_bytes
         except ValueError:
             too_large = True
         if too_large:
@@ -117,9 +121,49 @@ class CloudSessions:
                 message['headers'] = list(message.get('headers', [])) + extra
             await send(message)
 
+        # Content-Length is optional and untrusted. Bound the actual streamed
+        # body before handing it to a multipart/JSON parser. Spooling avoids
+        # keeping a whole model in RAM while preserving ASGI streaming reads.
+        body = SpooledTemporaryFile(max_size=1024 * 1024)
+        async def collect_body():
+            size = 0
+            while True:
+                message = await receive()
+                if message['type'] == 'http.disconnect':
+                    return 400
+                chunk = message.get('body', b'')
+                size += len(chunk)
+                if size > self.max_body_bytes:
+                    return 413
+                body.write(chunk)
+                if not message.get('more_body', False):
+                    body.seek(0)
+                    return None
+
+        body_delivered = False
+        async def bounded_receive():
+            nonlocal body_delivered
+            if body_delivered:
+                return await receive()
+            chunk = body.read(1024 * 1024)
+            more = body.tell() < body_size
+            body_delivered = not more
+            return {'type': 'http.request', 'body': chunk, 'more_body': more}
+
         try:
-            await self.app(scoped, receive, send_private)
+            try:
+                status = await asyncio.wait_for(collect_body(), timeout=120)
+            except asyncio.TimeoutError:
+                status = 408
+            if status:
+                detail = 'Choose an upload smaller than 50 MB for this cloud preview.' if status == 413 else 'The upload did not complete. Please try again.'
+                return await JSONResponse({'detail': detail}, status)(scope, receive, send_private)
+            body.seek(0, 2)
+            body_size = body.tell()
+            body.seek(0)
+            await self.app(scoped, bounded_receive, send_private)
         finally:
+            body.close()
             session_id.reset(token)
             with _lock:
                 _activity[sid] = (time.monotonic(), _activity[sid][1] - 1)

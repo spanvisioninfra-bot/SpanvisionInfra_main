@@ -11,7 +11,7 @@ import {
   addRow,
   updateCellType,
 } from "../stores/kozijn.js";
-import { zoom } from "../stores/ui.js";
+import { zoom, activeWorkspaceView } from "../stores/ui.js";
 
 const PANEL_TYPE_KEYS = {
   "1": "fixed_glass",
@@ -73,6 +73,7 @@ export function registerShortcuts({ onDuplicate, onNew, onOpen, onSave, onSaveAs
   document.addEventListener("contextmenu", (e) => e.preventDefault());
 
   document.addEventListener("keydown", (e) => {
+    if (e.defaultPrevented || e.target.closest('[role="dialog"]')) return;
     const tag = e.target.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
@@ -101,6 +102,7 @@ export function registerShortcuts({ onDuplicate, onNew, onOpen, onSave, onSaveAs
       if (onSave) onSave();
       return;
     }
+    if (get(activeWorkspaceView) !== 'editor') return;
 
     // ── Undo/Redo ───────────────────────────────────────
     // Ctrl+Z / Ctrl+Y handled by history.js registerUndoRedoShortcuts

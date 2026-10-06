@@ -1,0 +1,9 @@
+{
+  "command": "cargo check --manifest-path src-tauri/Cargo.toml --locked --jobs 1",
+  "directory": "frame-vision-studio",
+  "started": "2026-10-05T18:02:03.913Z",
+  "finished": "2026-10-05T18:09:57.786Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/frame-desktop-check.log"
+}

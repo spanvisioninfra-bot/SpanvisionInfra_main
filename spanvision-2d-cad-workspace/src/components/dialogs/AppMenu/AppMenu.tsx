@@ -512,7 +512,7 @@ export function AppMenu({ isOpen, onClose, initialView, onOpenSheetTemplateImpor
                   <rect x="8" y="12" width="8" height="6" rx="1" strokeDasharray="2 2"/>
                 </svg>
                 <div>
-                  <div className="text-sm font-medium text-cad-text">DXF als Underlay</div>
+                  <div className="text-sm font-medium text-cad-text">DXF as Underlay</div>
                   <div className="text-xs text-cad-text-muted mt-0.5">Import DXF as a fast background image for large files</div>
                 </div>
               </button>

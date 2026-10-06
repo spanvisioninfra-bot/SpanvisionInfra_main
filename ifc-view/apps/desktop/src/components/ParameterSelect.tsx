@@ -9,7 +9,7 @@ export default function ParameterSelect() {
   const handleChange = (e: Event) => {
     const val = (e.target as HTMLSelectElement).value;
     setSelectedParameter(val);
-    if (val) selectParameter(val);
+    selectParameter(val);
   };
 
   return (
@@ -18,6 +18,7 @@ export default function ParameterSelect() {
       <div class={styles.paramSelectWrapper}>
         <select
           class={styles.paramSelect}
+          aria-label="Sequence parameter"
           value={selectedParameter()}
           onChange={handleChange}
           disabled={parameterOptions().length === 0}

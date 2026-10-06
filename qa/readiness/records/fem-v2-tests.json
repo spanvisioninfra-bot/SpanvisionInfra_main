@@ -1,0 +1,9 @@
+{
+  "command": "npm test",
+  "directory": "fem-vision-studio/design-mockup",
+  "started": "2026-10-05T09:39:10.530Z",
+  "finished": "2026-10-05T09:43:41.074Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/fem-v2-tests.log"
+}

@@ -19,7 +19,7 @@ export const profileCategories = derived(
   [libraryCategories, customProfiles],
   ([$library, $custom]) =>
     $custom.length
-      ? [...$library, { id: "custom", label: "Eigen / geïmporteerd", profiles: $custom }]
+      ? [...$library, { id: "custom", label: "Custom / imported", profiles: $custom }]
       : $library
 );
 

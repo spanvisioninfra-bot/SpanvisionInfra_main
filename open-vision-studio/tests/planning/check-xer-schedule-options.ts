@@ -1155,7 +1155,7 @@ eq('X5: het optieblok na lezen draagt alleen projectopties',
   ));
   eq('nivellering: RSRCLEVELLIST-rij met lege of onbekende schedoptions_id valt zichtbaar weg (nooit stil)',
     orphan.fallbacks.map(item => [item.field, item.token, item.fallback]),
-    [['RSRCLEVELLIST.schedoptions_id', '(leeg)', 'weggelaten (geen SCHEDOPTIONS-rij)'],
+    [['RSRCLEVELLIST.schedoptions_id', '(empty)', 'weggelaten (geen SCHEDOPTIONS-rij)'],
       ['RSRCLEVELLIST.schedoptions_id', '77', 'weggelaten (geen SCHEDOPTIONS-rij)']]);
   eq('nivellering: de verweesde rijen komen niet in de lijst van P1',
     orphan.schedulingOptions.leveling?.resources, [{ resourceId: 'xer-resource:R1' }]);

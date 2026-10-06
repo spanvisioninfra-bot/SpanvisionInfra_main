@@ -83,7 +83,7 @@ export function buildBc3(schedule: CostSchedule, items: CostItem[], charset: Bc3
     byParent.set(it.parentId, list);
   }
   const isContainer = (it: CostItem): boolean =>
-    it.rowType === 'chapter' || it.rowType === 'begrotingspost' || it.rowType === 'bewakingspost';
+    it.rowType === "chapter" || it.rowType === 'begrotingspost' || it.rowType === 'bewakingspost';
 
   // ── Codes en gedeelde concepten ──────────────────────────────────────────
   // `used` bewaakt uniciteit (hoofdletterongevoelig, zoals lezers de codes
@@ -140,7 +140,7 @@ export function buildBc3(schedule: CostSchedule, items: CostItem[], charset: Bc3
   const catalog = new Map<string, number>(); // ~C-prijs als die van een middel komt
   const byBase = new Map<string, string[]>(); // kop zonder prijs → codes
   const concept = (it: CostItem, unit: string, price: number, type: string, parts: string[]): string => {
-    const isRegel = it.rowType === "calc ";
+    const isRegel = it.rowType === "regel";
     const base = [it.code, unit, esc(it.description), escText(it.notes)].join(SEP);
     const head = [base, num(price)].join(SEP);
     const sig = parts.length > 0 ? [head, ...parts].join(SEP) : head;
@@ -261,7 +261,7 @@ export function buildBc3(schedule: CostSchedule, items: CostItem[], charset: Bc3
     let unitCost = 0;
     let labour = 0;
     for (const k of byParent.get(post.id) ?? []) {
-      if (k.rowType === "calc ") {
+      if (k.rowType === "regel") {
         const base = percentageBase(k, unitCost, labour);
         if (base != null) {
           // Percentage-concept: prijs 0 in ~C (de grondslag is per partida
@@ -327,7 +327,7 @@ export function buildBc3(schedule: CostSchedule, items: CostItem[], charset: Bc3
     const dIndex = dRecords.length;
     kids.forEach((k, i) => {
       const childPath = [...path, i + 1];
-      if (k.rowType === 'chapter') {
+      if (k.rowType === "chapter") {
         parts.push(`${codeOfChapter(k)}\\1\\1`);
         writeChapter(k, childPath);
       } else {

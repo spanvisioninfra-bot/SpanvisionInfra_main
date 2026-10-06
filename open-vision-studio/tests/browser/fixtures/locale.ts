@@ -1,13 +1,9 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect } from './ops';
 
-/** Twee rechts-naar-linkstalen en twee ltr-talen: dezelfde stappen in nl/en bewijzen dat ltr niet
- *  veranderde. */
+/** Alleen Engels wordt aangeboden; geometrie blijft getest met echte UI-keuzes. */
 export const LOCALE_CASES = [
-  { code: 'ar', option: /العربية/, rtl: true },
-  { code: 'fa', option: /فارسی/, rtl: true },
-  { code: 'nl', option: /Nederlands/, rtl: false },
-  { code: 'en', option: /English/, rtl: false },
+  { code: 'en', option: /English/, rtl: false as boolean },
 ] as const;
 export type LocaleCase = typeof LOCALE_CASES[number];
 

@@ -507,7 +507,7 @@ export function importBc3(text: string): ImportResult {
   const emit = (parentItem: CostItem | null, parentKey: string, c: Bc3Concept, ch: Bc3Child | null, path: number[], depth: number): void => {
     if (isContainer(c)) {
       const chapter = add({
-        rowType: 'chapter',
+        rowType: "chapter",
         parentId: parentItem?.id ?? null,
         depth,
         code: plainCode(c.code),
@@ -599,7 +599,7 @@ export function importBc3(text: string): ImportResult {
         'noProjectStructure',
         'Geen projectstructuur (##/#) gevonden — concepten als prijzenboek onder één hoofdstuk geïmporteerd.',
       );
-      const chapter = add({ rowType: 'chapter', parentId: null, depth: 0, code: '01', description: 'Prijzenboek', id: genId() });
+      const chapter = add({ rowType: "chapter", parentId: null, depth: 0, code: '01', description: 'Prijzenboek', id: genId() });
       for (const c of all) {
         if (c.isRoot) continue;
         add({

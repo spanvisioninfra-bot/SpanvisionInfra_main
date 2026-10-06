@@ -4,10 +4,10 @@
   "version": "0.3.15",
   "identifier": "org.openaec.fem2d-studio",
   "build": {
-    "frontendDist": "../dist",
-    "devUrl": "http://localhost:1430",
-    "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build"
+    "frontendDist": "../design-mockup/dist",
+    "devUrl": "http://localhost:1440",
+    "beforeDevCommand": "npm --prefix design-mockup run dev",
+    "beforeBuildCommand": "npm --prefix design-mockup run build"
   },
   "app": {
     "windows": [

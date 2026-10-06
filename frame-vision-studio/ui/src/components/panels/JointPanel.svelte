@@ -4,14 +4,14 @@
 
   let { visible = true } = $props();
 
-  const CORNER_LABELS = ["Linksboven", "Rechtsboven", "Linksonder", "Rechtsonder"];
+  const CORNER_LABELS = ["Top left", "Top right", "Bottom left", "Bottom right"];
   const CORNER_IDS = ["top_left", "top_right", "bottom_left", "bottom_right"];
 
   const JOINT_TYPES = [
-    { value: "pen_slis", label: "Pen/slis" },
-    { value: "verstek", label: "Verstek (45°)" },
-    { value: "contramal", label: "Contramal" },
-    { value: "stomp", label: "Stomp" },
+    { value: "pen_slis", label: "Mortise and tenon" },
+    { value: "verstek", label: "Miter (45°)" },
+    { value: "contramal", label: "Scribed joint" },
+    { value: "stomp", label: "Butt joint" },
   ];
 
   const THROUGH_TYPES = [

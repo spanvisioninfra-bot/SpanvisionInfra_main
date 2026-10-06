@@ -77,13 +77,13 @@ function assert(cond: boolean, msg: string): void {
   assert(useAppStore.getState().resources.find(r => r.id === resId)?.libraryOrigin === undefined,
     '2a: eerste bind (vanuit ongebonden) strip geen stempels — er was nog niets gestempeld');
 
-  // 2b. "+ Nieuwe resourcebibliotheek…"-materialisatie: addCompany() gevolgd door bindProjectToCompany()
+  // 2b. "+ New resource library…"-materialisatie: addCompany() gevolgd door bindProjectToCompany()
   // op een AL gebonden project is een REBIND — dat strip bewust de stempels van het VORIGE bedrijf
   // (bestaand, gewenst gedrag, ongewijzigd door deze fix). Simuleert de submit()-volgorde uit
   // ProjectInfoPanelContent.handleSubmit precies.
   const companyB = useAppStore.getState().addCompany(''); // lege naam ⇒ addCompany valt terug op zijn eigen default-literal
-  assert(useAppStore.getState().companies.find(c => c.id === companyB)?.name === 'Nieuwe resourcebibliotheek',
-    '2b: addCompany() met lege naam valt terug op "Nieuwe resourcebibliotheek" (hernoemings-restje, GO-NA-fix 5)');
+  assert(useAppStore.getState().companies.find(c => c.id === companyB)?.name === 'New resource library',
+    '2b: addCompany() met lege naam valt terug op "New resource library" (hernoemings-restje, GO-NA-fix 5)');
   useAppStore.getState().bindProjectToCompany(companyB);
   assert(useAppStore.getState().project.companyId === companyB, '2b: rebind koppelt aan de net-aangemaakte bedrijf B');
   assert(useAppStore.getState().resources.find(r => r.id === resId)?.libraryOrigin === undefined,

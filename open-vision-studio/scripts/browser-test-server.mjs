@@ -2,7 +2,7 @@
 import { spawn } from 'node:child_process';
 import { join } from 'node:path';
 import process from 'node:process';
-import { PORT_LANES, worktreeRoot, worktreeSlug } from './dev-port.mjs';
+import { PORT_LANES, projectRoot, worktreeSlug } from './dev-port.mjs';
 import { acquireNamedGuardLock } from './dev-lock.mjs';
 
 const port = Number(process.env.OPS_BROWSER_TEST_PORT);
@@ -12,7 +12,7 @@ if (!Number.isInteger(port) || port < min || port > max) {
   process.exit(1);
 }
 
-const root = worktreeRoot();
+const root = projectRoot();
 if (!root) {
   console.error('Niet in een git-worktree — browser-testserver kan niet starten.');
   process.exit(1);
@@ -49,6 +49,11 @@ const child = spawn(process.platform === 'win32' ? process.execPath : viteBin,
     ...process.env,
     OPS_DEV_PORT: String(port),
     OPS_DEV_INSTANCE: instance,
+    // Existing release/statistics tests intercept this fixture repository's
+    // HTTP responses. Enable that explicit test configuration without
+    // activating upstream services in a production Spanvision build.
+    VITE_SPANVISION_GITHUB_REPO: process.env.VITE_SPANVISION_GITHUB_REPO || 'OpenAEC-Foundation/open-planner-studio',
+    VITE_SPANVISION_UPDATES_ENABLED: 'true',
   },
 });
 

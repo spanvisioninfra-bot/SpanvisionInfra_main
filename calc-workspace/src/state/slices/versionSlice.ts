@@ -94,7 +94,7 @@ export const createVersionSlice: StateCreator<VersionSlice> = (set, get) => ({
     const defaultLabel = label || `Version ${fmtDate(now)}`;
 
     // Calculate total
-    const topChapters = state.items.filter((i: CostItem) => i.rowType === 'chapter' && i.depth === 0);
+    const topChapters = state.items.filter((i: CostItem) => i.rowType === "chapter" && i.depth === 0);
     const totaalExclBtw = topChapters.reduce((sum: number, i: CostItem) => sum + i.total, 0);
 
     const snapshot: ProjectSnapshot = {

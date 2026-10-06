@@ -123,12 +123,9 @@ fn chrono_simple() -> String {
     format!("{}", d.as_secs())
 }
 
-/// Helper: build CORS headers
+/// JSON response headers. The native bridge deliberately grants no web origin access.
 fn cors_headers() -> Vec<tiny_http::Header> {
     vec![
-        tiny_http::Header::from_bytes(&b"Access-Control-Allow-Origin"[..], &b"*"[..]).unwrap(),
-        tiny_http::Header::from_bytes(&b"Access-Control-Allow-Methods"[..], &b"GET, POST, OPTIONS"[..]).unwrap(),
-        tiny_http::Header::from_bytes(&b"Access-Control-Allow-Headers"[..], &b"Content-Type"[..]).unwrap(),
         tiny_http::Header::from_bytes(&b"Content-Type"[..], &b"application/json"[..]).unwrap(),
     ]
 }
@@ -144,13 +141,6 @@ fn respond_json(request: tiny_http::Request, status: u16, body: &str) {
 }
 
 /// Read request body as string
-fn read_body(request: &mut tiny_http::Request) -> String {
-    let len = request.body_length().unwrap_or(0);
-    let mut buf = vec![0u8; len];
-    let _ = std::io::Read::read_exact(&mut request.as_reader(), &mut buf);
-    String::from_utf8_lossy(&buf).to_string()
-}
-
 /// Start the API HTTP server in a background thread.
 /// Each request is handled in its own thread so callbacks can arrive
 /// while /eval is waiting for results.
@@ -192,6 +182,12 @@ fn handle_request(
     state: Arc<ApiServerState>,
     window: WebviewWindow,
 ) {
+    let host = request.headers().iter().find(|header| header.field.equiv("Host")).map(|header| header.value.as_str());
+    let origin = request.headers().iter().find(|header| header.field.equiv("Origin")).map(|header| header.value.as_str());
+    if !crate::api_request_policy::allows_request(host, origin, state.port) {
+        respond_json(request, 403, r#"{"success":false,"error":"The automation bridge accepts native loopback clients only"}"#);
+        return;
+    }
     let url = request.url().to_string();
     let method = request.method().as_str().to_string();
 
@@ -217,7 +213,14 @@ fn handle_request(
         }
 
         ("POST", "/eval") => {
-            let body = read_body(&mut request);
+            let body = match crate::api_request_policy::read_script_body(request.as_reader()) {
+                Ok(body) => body,
+                Err((status, error)) => {
+                    let result = serde_json::json!({"success":false,"error":error}).to_string();
+                    respond_json(request, status, &result);
+                    return;
+                }
+            };
 
             // Parse JSON: { "script": "..." }
             let parsed: Result<serde_json::Value, _> = serde_json::from_str(&body);
@@ -259,7 +262,7 @@ fn handle_request(
                         }});
                     }}
                 }})()"#,
-                script = script.replace('\\', "\\\\"),
+                script = script,
                 eval_id = eval_id,
             );
 

@@ -453,6 +453,7 @@ export function parseDXF(
           position: { x, y: -y },
           text: textContent,
           fontSize: height,
+          isModelText: true, // DXF group 40 is model-space height, not paper height.
           fontFamily: CAD_DEFAULT_FONT,
           rotation: (-rotation * Math.PI) / 180,
           alignment: 'left',
@@ -517,6 +518,7 @@ export function parseDXF(
           position: { x, y: -y },
           text: textContent.trim(),
           fontSize: height,
+          isModelText: true,
           fontFamily: CAD_DEFAULT_FONT,
           rotation: (-rotation * Math.PI) / 180,
           alignment: 'left',
@@ -719,6 +721,14 @@ export function parseDXF(
     }
   }
 
+  const invalidNumber = (value: unknown): boolean => {
+    if (typeof value === 'number') return !Number.isFinite(value);
+    if (Array.isArray(value)) return value.some(invalidNumber);
+    if (value && typeof value === 'object') return Object.values(value).some(invalidNumber);
+    return false;
+  };
+  if (shapes.some(invalidNumber)) throw new Error('DXF contains invalid or non-finite geometry.');
+  if (shapes.length > 100_000) throw new Error('DXF exceeds the 100,000 editable entity limit.');
   if (shapes.length > 0) {
     logger.info(`DXF parsed: ${shapes.length} entities imported`, 'DXF');
   }

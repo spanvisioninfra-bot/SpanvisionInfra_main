@@ -1,229 +1,115 @@
-/**
- * Tests for bcfSlice — BCF issue CRUD, filtering, sorting, stats.
- */
-
-import { describe, it, expect, beforeEach } from "vitest";
-
-import { useStore } from "../../../store";
-import type { BcfIssue, BcfComment, BcfViewpoint } from "../../../types/bcf";
-
-/** Create a minimal test viewpoint */
-function createTestViewpoint(guid?: string): BcfViewpoint {
-  return {
-    guid: guid ?? crypto.randomUUID(),
-    camera: {
-      position: { x: 0, y: 0, z: 10 },
-      direction: { x: 0, y: 0, z: -1 },
-      up: { x: 0, y: 1, z: 0 },
-      type: "perspective",
-      fieldOfView: 60,
-    },
-    screenshotDataUrl: "",
-    components: {
-      selection: [],
-      visibility: { defaultVisibility: true, exceptions: [] },
-      coloring: [],
-    },
-  };
+/** Tests target the current BCF issue queue and real ZIP output. */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { create } from 'zustand';
+import JSZip from 'jszip';
+import { createBcfSlice, type BcfSlice } from '../../../store/slices/bcfSlice';
+import { createBcfIssue } from '../../../types/bcfIssue';
+import { generateBcfZip } from '../../../lib/bcfZipGenerator';
+import { initOidc, isOidcConfigured, signinRedirect } from '../../../lib/oidcManager';
+vi.mock('../../../lib/oidcManager', () => ({
+  isOidcConfigured: vi.fn(() => false), initOidc: vi.fn(),
+  signinRedirect: vi.fn(async () => {}), processOidcCallback: vi.fn(async () => null),
+  getSignedInUser: vi.fn(async () => null), signout: vi.fn(async () => {}),
+  onTokenRenewed: vi.fn(() => () => {}),
+}));
+const issue = (title = 'Missing fire rating') => createBcfIssue(title,
+  { specificationName: 'Fire safety', elementGlobalId: 'wall-guid' }, {
+    topic: { title, description: 'Rating < 60 & requires review', topic_status: 'Open' },
+    viewpoint: { components: { selection: [{ ifc_guid: 'wall-guid' }] } },
+    comment: { comment: 'Check wall properties' },
+  });
+function blobBytes(blob: Blob): Promise<ArrayBuffer> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as ArrayBuffer);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsArrayBuffer(blob);
+  });
 }
-
-/** Create a minimal test issue */
-function createTestIssue(overrides: Partial<BcfIssue> = {}): BcfIssue {
-  const now = new Date().toISOString();
-  return {
-    guid: crypto.randomUUID(),
-    title: "Test Issue",
-    description: "Test description",
-    type: "Error",
-    status: "Open",
-    priority: "Normal",
-    assignedTo: "",
-    creationDate: now,
-    modifiedDate: now,
-    creationAuthor: "Test",
-    labels: [],
-    viewpoint: createTestViewpoint(),
-    comments: [],
-    failedGlobalIds: [],
-    index: 0,
-    ...overrides,
-  };
-}
-
-describe("bcfSlice", () => {
+describe('BCF issue queue and exports', () => {
+  let store: ReturnType<typeof create<BcfSlice>>;
   beforeEach(() => {
-    // Reset store state fully
-    useStore.setState({
-      bcfIssues: [],
-      activeBcfIssueId: null,
-      bcfFilter: "all",
-      bcfSortBy: "date",
-      bcfSortDirection: "desc",
-    });
+    localStorage.clear(); vi.clearAllMocks();
+    vi.mocked(isOidcConfigured).mockReturnValue(false);
+    store = create<BcfSlice>(createBcfSlice);
   });
-
-  describe("CRUD", () => {
-    it("adds an issue", () => {
-      const issue = createTestIssue();
-      useStore.getState().addBcfIssue(issue);
-
-      expect(useStore.getState().bcfIssues).toHaveLength(1);
-      expect(useStore.getState().bcfIssues[0]?.guid).toBe(issue.guid);
-    });
-
-    it("updates an issue", () => {
-      const issue = createTestIssue();
-      // Set a past date so modifiedDate will differ after update
-      issue.modifiedDate = "2026-01-01T00:00:00.000Z";
-      useStore.getState().addBcfIssue(issue);
-
-      useStore.getState().updateBcfIssue(issue.guid, { status: "Closed" });
-
-      const updated = useStore.getState().bcfIssues[0];
-      expect(updated?.status).toBe("Closed");
-      expect(updated?.modifiedDate).not.toBe("2026-01-01T00:00:00.000Z");
-    });
-
-    it("deletes an issue", () => {
-      const issue = createTestIssue();
-      useStore.getState().addBcfIssue(issue);
-      useStore.getState().deleteBcfIssue(issue.guid);
-
-      expect(useStore.getState().bcfIssues).toHaveLength(0);
-    });
-
-    it("clears active issue when deleting it", () => {
-      const issue = createTestIssue();
-      useStore.getState().addBcfIssue(issue);
-      useStore.getState().setActiveBcfIssue(issue.guid);
-
-      useStore.getState().deleteBcfIssue(issue.guid);
-      expect(useStore.getState().activeBcfIssueId).toBeNull();
-    });
-
-    it("keeps active issue when deleting a different one", () => {
-      const issue1 = createTestIssue();
-      const issue2 = createTestIssue({ title: "Other" });
-      useStore.getState().addBcfIssue(issue1);
-      useStore.getState().addBcfIssue(issue2);
-      useStore.getState().setActiveBcfIssue(issue1.guid);
-
-      useStore.getState().deleteBcfIssue(issue2.guid);
-      expect(useStore.getState().activeBcfIssueId).toBe(issue1.guid);
-    });
-
-    it("adds a comment to an issue", () => {
-      const issue = createTestIssue();
-      useStore.getState().addBcfIssue(issue);
-
-      const comment: BcfComment = {
-        guid: crypto.randomUUID(),
-        author: "Tester",
-        date: new Date().toISOString(),
-        comment: "Test comment",
-      };
-
-      useStore.getState().addBcfComment(issue.guid, comment);
-
-      const updated = useStore.getState().bcfIssues[0];
-      expect(updated?.comments).toHaveLength(1);
-      expect(updated?.comments[0]?.comment).toBe("Test comment");
-    });
-
-    it("clears all issues", () => {
-      useStore.getState().addBcfIssue(createTestIssue());
-      useStore.getState().addBcfIssue(createTestIssue());
-      useStore.getState().setActiveBcfIssue(
-        useStore.getState().bcfIssues[0]?.guid ?? null
-      );
-
-      useStore.getState().clearAllBcfIssues();
-
-      expect(useStore.getState().bcfIssues).toHaveLength(0);
-      expect(useStore.getState().activeBcfIssueId).toBeNull();
-    });
+  it('starts empty and disconnected', () => {
+    expect(store.getState().bcfIssues).toEqual([]);
+    expect(store.getState().bcfPhase).toBe('disconnected');
   });
-
-  describe("filtering", () => {
-    it("returns all issues when filter is 'all'", () => {
-      useStore.getState().addBcfIssue(createTestIssue({ status: "Open" }));
-      useStore.getState().addBcfIssue(createTestIssue({ status: "Closed" }));
-      useStore.setState({ bcfFilter: "all" });
-
-      const filtered = useStore.getState().getFilteredBcfIssues();
-      expect(filtered).toHaveLength(2);
-    });
-
-    it("filters by status", () => {
-      useStore.getState().addBcfIssue(createTestIssue({ status: "Open" }));
-      useStore.getState().addBcfIssue(createTestIssue({ status: "Closed" }));
-      useStore.getState().addBcfIssue(createTestIssue({ status: "Open" }));
-      useStore.setState({ bcfFilter: "Open" });
-
-      const filtered = useStore.getState().getFilteredBcfIssues();
-      expect(filtered).toHaveLength(2);
-      expect(filtered.every((i) => i.status === "Open")).toBe(true);
-    });
+  it('adds a complete issue with its viewpoint', () => {
+    const entry = issue(); store.getState().bcfAddIssue(entry);
+    expect(store.getState().bcfIssues).toEqual([entry]);
+    expect(entry.pushState).toBe('queued');
   });
-
-  describe("sorting", () => {
-    it("sorts by priority", () => {
-      useStore.getState().addBcfIssue(createTestIssue({ priority: "Low" }));
-      useStore.getState().addBcfIssue(createTestIssue({ priority: "Critical" }));
-      useStore.getState().addBcfIssue(createTestIssue({ priority: "High" }));
-      useStore.setState({ bcfSortBy: "priority", bcfSortDirection: "asc" });
-
-      const sorted = useStore.getState().getFilteredBcfIssues();
-      expect(sorted[0]?.priority).toBe("Critical");
-      expect(sorted[1]?.priority).toBe("High");
-      expect(sorted[2]?.priority).toBe("Low");
-    });
-
-    it("sorts by status ascending", () => {
-      useStore.getState().addBcfIssue(createTestIssue({ status: "Closed" }));
-      useStore.getState().addBcfIssue(createTestIssue({ status: "Open" }));
-      useStore.getState().addBcfIssue(createTestIssue({ status: "In Progress" }));
-      useStore.getState().setBcfSortBy("status");
-      useStore.setState({ bcfSortDirection: "asc" });
-
-      const sorted = useStore.getState().getFilteredBcfIssues();
-      expect(sorted[0]?.status).toBe("Open");
-      expect(sorted[1]?.status).toBe("In Progress");
-      expect(sorted[2]?.status).toBe("Closed");
-    });
-
-    it("toggles sort direction", () => {
-      useStore.setState({ bcfSortDirection: "asc" });
-      useStore.getState().toggleBcfSortDirection();
-      expect(useStore.getState().bcfSortDirection).toBe("desc");
-
-      useStore.getState().toggleBcfSortDirection();
-      expect(useStore.getState().bcfSortDirection).toBe("asc");
-    });
+  it('adds multiple issues in order', () => {
+    const entries = [issue('First'), issue('Second')];
+    store.getState().bcfAddIssues(entries);
+    expect(store.getState().bcfIssues).toEqual(entries);
   });
-
-  describe("stats", () => {
-    it("returns correct stats", () => {
-      useStore.getState().addBcfIssue(createTestIssue({ status: "Open" }));
-      useStore.getState().addBcfIssue(createTestIssue({ status: "Open" }));
-      useStore
-        .getState()
-        .addBcfIssue(createTestIssue({ status: "In Progress" }));
-      useStore.getState().addBcfIssue(createTestIssue({ status: "Closed" }));
-
-      const stats = useStore.getState().getBcfStats();
-      expect(stats.open).toBe(2);
-      expect(stats.inProgress).toBe(1);
-      expect(stats.closed).toBe(1);
-      expect(stats.total).toBe(4);
-    });
-
-    it("returns zero stats when empty", () => {
-      const stats = useStore.getState().getBcfStats();
-      expect(stats.open).toBe(0);
-      expect(stats.inProgress).toBe(0);
-      expect(stats.closed).toBe(0);
-      expect(stats.total).toBe(0);
-    });
+  it('updates only the selected issue while preserving its source', () => {
+    const entries = [issue('First'), issue('Second')]; store.getState().bcfAddIssues(entries);
+    store.getState().bcfUpdateIssue(entries[0].id, { title: 'Reviewed', pushState: 'pushed' });
+    expect(store.getState().bcfIssues[0]).toMatchObject({ title: 'Reviewed', source: entries[0].source });
+    expect(store.getState().bcfIssues[1]).toEqual(entries[1]);
+  });
+  it('ignores updates for unknown IDs', () => {
+    const entry = issue(); store.getState().bcfAddIssue(entry);
+    store.getState().bcfUpdateIssue('unknown', { title: 'Incorrect' });
+    expect(store.getState().bcfIssues).toEqual([entry]);
+  });
+  it('removes only the specified issue', () => {
+    const entries = [issue(), issue()]; store.getState().bcfAddIssues(entries);
+    store.getState().bcfRemoveIssue(entries[0].id);
+    expect(store.getState().bcfIssues).toEqual([entries[1]]);
+  });
+  it('clears the queue', () => {
+    store.getState().bcfAddIssues([issue(), issue()]); store.getState().bcfClearIssues();
+    expect(store.getState().bcfIssues).toEqual([]);
+  });
+  it('retains remote push errors for retry', () => {
+    const entry = issue(); store.getState().bcfAddIssue(entry);
+    store.getState().bcfUpdateIssue(entry.id, { pushState: 'failed', pushError: 'Unavailable' });
+    expect(store.getState().bcfIssues[0]).toMatchObject({ pushState: 'failed', pushError: 'Unavailable' });
+  });
+  it('creates distinct IDs and valid timestamps', () => {
+    const first = issue(), second = issue(); expect(first.id).not.toBe(second.id);
+    expect(Number.isNaN(Date.parse(first.createdAt))).toBe(false);
+  });
+  it('exports escaped topic markup and selected IFC elements', async () => {
+    const zip = await JSZip.loadAsync(await blobBytes(await generateBcfZip([issue('Wall < A & B'), issue('Second')])));
+    expect(await zip.file('bcf.version')!.async('string')).toContain('VersionId="2.1"');
+    const markups = Object.keys(zip.files).filter(name => name.endsWith('markup.bcf'));
+    expect(markups).toHaveLength(2);
+    const markup = await zip.file(markups[0])!.async('string');
+    expect(markup).toContain('Wall &lt; A &amp; B');
+    expect(markup).toContain('Rating &lt; 60 &amp; requires review');
+    expect(await zip.file(markups[0].replace('markup.bcf', 'viewpoint.bcfv'))!.async('string')).toContain('wall-guid');
+  });
+  it('exports an empty queue without fabricated topics', async () => {
+    const zip = await JSZip.loadAsync(await blobBytes(await generateBcfZip([])));
+    expect(Object.keys(zip.files).filter(name => name.endsWith('markup.bcf'))).toEqual([]);
+  });
+  it('reports missing OIDC configuration', async () => {
+    await store.getState().bcfLoginOidc();
+    expect(store.getState().bcfError).toMatch(/not configured/i);
+    expect(signinRedirect).not.toHaveBeenCalled();
+  });
+  it('initializes the OIDC client before login', async () => {
+    vi.mocked(isOidcConfigured).mockReturnValue(true); store = create<BcfSlice>(createBcfSlice);
+    await store.getState().bcfLoginOidc();
+    expect(initOidc).toHaveBeenCalledOnce(); expect(signinRedirect).toHaveBeenCalledOnce();
+    expect(vi.mocked(initOidc).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(signinRedirect).mock.invocationCallOrder[0]);
+  });
+  it('clears credentials on logout and preserves local issues', async () => {
+    localStorage.setItem('bcf-platform-apikey', 'test-key');
+    localStorage.setItem('bcf-platform-url', 'https://example.test');
+    const entry = issue(); store.getState().bcfAddIssue(entry);
+    store.setState({ bcfAuth: { method: 'apikey', accessToken: 'test-key' }, bcfPhase: 'connected' });
+    await store.getState().bcfLogout();
+    expect(localStorage.getItem('bcf-platform-apikey')).toBeNull();
+    expect(store.getState().bcfAuth).toEqual({ method: 'none' });
+    expect(store.getState().bcfPhase).toBe('disconnected');
+    expect(store.getState().bcfIssues).toEqual([entry]);
   });
 });

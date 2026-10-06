@@ -24,7 +24,7 @@ try {
   await setSetting('iets', 1);
   await saveTheme('light');
   await saveLocale('nl');
-  ok('initTheme ⇒ standaardthema', (await initTheme()) === 'dark');
+  ok('initTheme ⇒ standaardthema', (await initTheme()) === 'spanvision-mono');
   const patch = await loadAllSettings();
   ok('loadAllSettings levert een patch met standaardwaarden', typeof patch === 'object' && patch !== null);
 } catch (e) {

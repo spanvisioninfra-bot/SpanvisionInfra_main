@@ -1,0 +1,9 @@
+{
+  "command": "node node_modules/typescript/bin/tsc -p apps/desktop/tsconfig.json",
+  "directory": "ifc-view",
+  "started": "2026-10-05T11:38:16.201Z",
+  "finished": "2026-10-05T11:38:18.214Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/ifc-types.log"
+}

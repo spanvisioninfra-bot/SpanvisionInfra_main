@@ -102,7 +102,7 @@ export function buildInschrijfstaatRows(
   }
 
   function isChapterLevel(item: CostItem): boolean {
-    return item.rowType === 'chapter';
+    return item.rowType === "chapter";
   }
 
   // Recursively output items
@@ -110,15 +110,15 @@ export function buildInschrijfstaatRows(
     if (item.rowType === 'witregel') return; // Skip blank lines
 
     const code = item.code || '';
-    const desc = item.rowType === 'chapter'
+    const desc = item.rowType === "chapter"
       ? spaceOutTitle(item.description.toUpperCase())
       : item.description;
-    const qty = (item.rowType === 'begrotingspost' || item.rowType === "calc ")
+    const qty = (item.rowType === 'begrotingspost' || item.rowType === "regel")
       ? (item.quantity ?? 0) : '';
-    const unit = (item.rowType === 'begrotingspost' || item.rowType === "calc ")
-      ? mapUnitToExport(item.unit || "pcs") : '';
-    const verr = item.rowType === 'chapter' ? (item.verrekenbaar || '') :
-                 (item.rowType === 'begrotingspost' || item.rowType === "calc ")
+    const unit = (item.rowType === 'begrotingspost' || item.rowType === "regel")
+      ? mapUnitToExport(item.unit || "st") : '';
+    const verr = item.rowType === "chapter" ? (item.verrekenbaar || '') :
+                 (item.rowType === 'begrotingspost' || item.rowType === "regel")
                   ? 'N' : '';
     const ehpr = item.unitPrice || 0;
     const bedr = item.total || 0;
@@ -129,7 +129,7 @@ export function buildInschrijfstaatRows(
     const children = getChildren(item.id);
     for (const child of children) {
       // Skip regels in inschrijfstaat view — they're internal calculation details
-      if (child.rowType === "calc " || child.rowType === 'bewakingspost') {
+      if (child.rowType === "regel" || child.rowType === 'bewakingspost') {
         // In inschrijfstaat, we don't show sub-breakdown
         continue;
       }

@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 const root = process.cwd();
-const esbuild = join(root, 'node_modules', '.bin', 'esbuild');
+const esbuild = join(root, 'node_modules', 'esbuild', 'bin', 'esbuild');
 const temporary = mkdtempSync(join(tmpdir(), 'ops-xer-cold-read-'));
 const writer = join(temporary, 'writer.mjs');
 const rawReader = join(temporary, 'reader-raw.mjs');
@@ -21,7 +21,7 @@ const expect = (label: string, condition: boolean): void => {
 };
 
 function bundle(source: string, output: string): void {
-  execFileSync(esbuild, [
+  execFileSync(process.execPath, [esbuild,
     source, '--log-level=error', '--bundle', '--platform=node', '--format=esm',
     `--alias:@=${join(root, 'src')}`,
     '--define:import.meta.env.DEV=false', '--define:import.meta.env.PROD=true',

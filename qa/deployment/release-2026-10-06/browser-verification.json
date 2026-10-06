@@ -1,0 +1,155 @@
+[
+  {
+    "id": "planner",
+    "url": "https://spanvision-planner.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 25.869916666666676,
+      "light": 243.29693750000084
+    }
+  },
+  {
+    "id": "cad2d",
+    "url": "https://spanvision-cad2d.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 16.698270833333336,
+      "light": 232.89720833336065
+    }
+  },
+  {
+    "id": "bim",
+    "url": "https://spanvision-bim.onrender.com/home",
+    "passed": true,
+    "brightness": {
+      "dark": 15.661083333333357,
+      "light": 237.22745833337268
+    }
+  },
+  {
+    "id": "pdf",
+    "url": "https://spanvision-pdf.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 25.868979166666662,
+      "light": 238.26191666666907
+    }
+  },
+  {
+    "id": "ifc",
+    "url": "https://spanvision-ifc.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 25.65695833333333,
+      "light": 242.78120833335987
+    }
+  },
+  {
+    "id": "calc",
+    "url": "https://spanvision-calc.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 28.0871041666666,
+      "light": 236.17483333333118
+    }
+  },
+  {
+    "id": "frame",
+    "url": "https://spanvision-frame.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 27.00147916666655,
+      "light": 244.65752083333436
+    }
+  },
+  {
+    "id": "calculation",
+    "url": "https://spanvision-calculation.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 23.01970833333335,
+      "light": 242.91627083329374
+    }
+  },
+  {
+    "id": "geo",
+    "url": "https://spanvision-geo.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 35.25979166666668,
+      "light": 243.92052083331888
+    }
+  },
+  {
+    "id": "speech",
+    "url": "https://spanvision-speech.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 18.59127083333336,
+      "light": 229.51587500001904
+    }
+  },
+  {
+    "id": "stl",
+    "url": "https://spanvision-stl.onrender.com/",
+    "passed": true,
+    "brightness": {
+      "dark": 144.71370833332045,
+      "light": 221.85283333334667
+    }
+  },
+  {
+    "id": "field",
+    "url": "https://spanvision-field.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 21.366333333333294,
+      "light": 229.5988750000027
+    }
+  },
+  {
+    "id": "pointcloud",
+    "url": "https://spanvision-pointcloud.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 25.07300000000001,
+      "light": 243.51889583337055
+    }
+  },
+  {
+    "id": "pile",
+    "url": "https://spanvision-pile.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 27.145520833333357,
+      "light": 241.59064583331897
+    }
+  },
+  {
+    "id": "cad",
+    "url": "https://spanvision-cad.vercel.app/app/",
+    "passed": true,
+    "brightness": {
+      "dark": 8.7840625,
+      "light": 239.13387500004544
+    }
+  },
+  {
+    "id": "fem",
+    "url": "https://spanvision-fem.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 33.42506249999991,
+      "light": 236.04218750001792
+    }
+  },
+  {
+    "id": "hub",
+    "url": "https://spanvision-infra.vercel.app/",
+    "passed": true,
+    "brightness": {
+      "dark": 15.933729166666662,
+      "light": 237.67681250002283
+    }
+  }
+]

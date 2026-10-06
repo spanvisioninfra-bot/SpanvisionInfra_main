@@ -745,7 +745,7 @@ eq('35 secundair: eigen scrollX', optsSecondary.view.scrollX, 400);
   const hits = execSync(
     `grep -rlE ${JSON.stringify(chain)} ${JSON.stringify(join(root, 'src'))} || true`,
     { encoding: 'utf8' },
-  ).split('\n').filter(Boolean).map(f => relative(root, f)).sort();
+  ).split('\n').filter(Boolean).map(f => relative(root, f).replace(/\\/g, '/')).sort();
   // Let op wat deze check WEL en NIET zegt. `grep -rl` geeft een BESTANDSlijst: hij bewaakt dat de
   // keten nergens buiten `ganttViewport.ts` opduikt, niet dat hij daarbinnen één keer voorkomt (dat
   // is hij ook niet — `computeFitToProject` heeft zijn eigen variant, zie de toelichting daar).

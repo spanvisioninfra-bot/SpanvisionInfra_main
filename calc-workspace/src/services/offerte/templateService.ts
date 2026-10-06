@@ -87,7 +87,7 @@ export function applyTemplate(
   template: OfferteTemplate,
   items: CostItem[],
 ): Partial<OfferteDocument> {
-  const chapters = items.filter(i => i.rowType === 'chapter' && (i.depth ?? 0) === 0);
+  const chapters = items.filter(i => i.rowType === "chapter" && (i.depth ?? 0) === 0);
 
   const secties: OfferteSection[] = template.sections.map((ts) => {
     const matchedChapter = ts.linkedChapterCodes.length > 0

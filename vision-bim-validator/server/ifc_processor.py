@@ -16,6 +16,8 @@ import math
 import os
 import tempfile
 import time
+import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -87,6 +89,29 @@ class IFCProcessor:
             "output_dir": str(self.output_dir),
         }
 
+    def process_isolated(self, ifc_path: str, output_name: str, preferred_format: str = 'auto', timeout: float = 300) -> ProcessingResult:
+        """Keep a native geometry crash or timeout from terminating the HTTP server."""
+        started = time.monotonic()
+        with tempfile.TemporaryDirectory(prefix='geometry-job-', dir=self.output_dir) as job_dir:
+            report = Path(job_dir) / 'result.json'
+            command = [sys.executable, '-m', 'server.geometry_worker', ifc_path,
+                       str(self.output_dir), output_name, preferred_format, str(report)]
+            try:
+                completed = subprocess.run(command, cwd=Path(__file__).resolve().parent.parent,
+                    capture_output=True, timeout=timeout, check=False,
+                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
+                if completed.returncode or not report.exists():
+                    raise RuntimeError('The geometry worker stopped unexpectedly. Try a smaller model or the desktop app.')
+                if report.stat().st_size > 64 * 1024 * 1024:
+                    raise RuntimeError('The processed model exceeds the cloud geometry limit. Split it or use the desktop app.')
+                return ProcessingResult(**json.loads(report.read_text(encoding='utf-8')))
+            except subprocess.TimeoutExpired:
+                error = 'Geometry processing exceeded five minutes. Try a smaller model or the desktop app.'
+            except (RuntimeError, ValueError, OSError) as exc:
+                error = str(exc)
+        return ProcessingResult(False, preferred_format, None, None,
+            (time.monotonic() - started) * 1000, 0, 0, 0, error, 0)
+
     def process_to_gltf(self, ifc_path: str, output_name: str) -> ProcessingResult:
         """
         Convert IFC to glTF format using ifcopenshell's built-in serializer.
@@ -123,18 +148,22 @@ class IFCProcessor:
             geom_settings = ifcopenshell.geom.settings()
             geom_settings.set("use-world-coords", True)
             geom_settings.set("weld-vertices", True)
+            geom_settings.set("apply-default-materials", True)
 
             # Configure serializer settings
-            serializer_settings = ifcopenshell.geom.serializer_settings()
-
-            # Create glTF serializer
-            serializer = ifcopenshell.geom.serializers.gltf(
-                str(output_path), geom_settings, serializer_settings
-            )
+            # IfcOpenShell 0.9 merges serializer options into geom.settings;
+            # 0.8 still requires its separate settings object.
+            settings_factory = getattr(ifcopenshell.geom, 'serializer_settings', None)
+            serializer = (ifcopenshell.geom.serializers.gltf(str(output_path), geom_settings, settings_factory())
+                          if settings_factory else ifcopenshell.geom.serializers.gltf(str(output_path), geom_settings))
+            # The Python serializer unwraps the IFC file itself.
+            serializer.setFile(ifc_file)
+            serializer.setUnitNameAndMagnitude('METER', 1.0)
+            serializer.writeHeader()
 
             # Create iterator
             iterator = ifcopenshell.geom.iterator(
-                geom_settings, ifc_file, num_threads=4
+                geom_settings, ifc_file, num_threads=1
             )
 
             element_count = 0
@@ -142,7 +171,6 @@ class IFCProcessor:
             face_count = 0
 
             if iterator.initialize():
-                serializer.setFile(ifc_file.wrapped_data)
                 while True:
                     shape = iterator.get()
                     serializer.write(shape)
@@ -218,7 +246,7 @@ class IFCProcessor:
 
             # Create iterator
             iterator = ifcopenshell.geom.iterator(
-                geom_settings, ifc_file, num_threads=4
+                geom_settings, ifc_file, num_threads=1
             )
 
             elements = []

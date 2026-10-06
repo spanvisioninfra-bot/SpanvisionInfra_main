@@ -109,7 +109,7 @@ export function makeCostItem(partial: Partial<CostItem> & { rowType: RowType }):
     resourceType: null,
     resourceLibraryId: null,
     tariefGroep: null,
-    verrekenbaar: rowType === 'chapter' ? 'V' : null,
+    verrekenbaar: rowType === "chapter" ? 'V' : null,
     ...partial,
   };
 }

@@ -24,5 +24,5 @@ export function isCatalogusVerwijzing(v) {
  */
 export function catalogusOpslagkeuze(jsonLengte, inTauri, drempel = CATALOGUS_BESTAND_DREMPEL) {
   if (!inTauri) return 'inline';
-  return jsonLengte > drempel ? "file" : 'inline';
+  return jsonLengte > drempel ? 'bestand' : 'inline';
 }

@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-10-05T12:19:45.351Z",
+  "status": "passed",
+  "assertions": 173,
+  "referenceCases": 8,
+  "methods": [
+    "IN-IS800-2007",
+    "US-AISC360-22-LRFD",
+    "US-AISC360-22-ASD",
+    "UK-EC3-2005-NA2014"
+  ],
+  "scope": "Two cross-section limit states only; external engineering review and current AISC errata review pending."
+}

@@ -13,7 +13,24 @@
  *   svg / image / select / gef-upload / input-prompt → skipped (out-of-scope for PDF)
  */
 
-import type { EvaluatedNode } from "@spanvision/calculations-core";
+import { steelTensionFromNumbers, type EvaluatedNode } from "@spanvision/calculations-core";
+
+/** Machine-readable engineering evidence accompanies the human report text. */
+function steelTensionReportCheck(nodes: EvaluatedNode[]): Record<string, unknown> | undefined {
+  const selected = nodes.find((n) => n.type === "select" && n.name === "tension_method");
+  if (!selected || selected.type !== "select") return undefined;
+  const value = (name: string): number => {
+    const prompt = nodes.find((n) => n.type === "input-prompt" && n.name === name);
+    if (!prompt || prompt.type !== "input-prompt") return NaN;
+    const raw = prompt.currentValue.trim();
+    return /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(raw) ? Number(raw) : NaN;
+  };
+  try {
+    return { ...steelTensionFromNumbers(Number(selected.selectedValue), value("tension_Ag"), value("tension_An"), value("tension_fy"), value("tension_fu"), value("tension_N")), reviewStatus: "unreleased-external-review-pending" };
+  } catch (error) {
+    return { schema: "spanvision.steel-tension.v1", valid: false, completeMemberVerification: false, error: (error as Error).message };
+  }
+}
 
 interface ContentBlock {
   type: string;
@@ -66,6 +83,7 @@ export function documentToReport(
     }
   };
   collect(nodes);
+  const steelTension = steelTensionReportCheck(flat);
 
   const ensureSection = (): Section => {
     if (!currentSection) {
@@ -141,6 +159,7 @@ export function documentToReport(
     version: "0.1",
     status: "CONCEPT",
     sections,
+    ...(steelTension ? { metadata: { engineering_checks: [steelTension] } } : {}),
   };
 }
 
@@ -166,6 +185,7 @@ export function projectToReport(
   options: { author?: string; tenant?: string } = {},
 ): ReportData {
   const sections: Section[] = [];
+  const engineeringChecks: Array<Record<string, unknown>> = [];
 
   // Voorblad — alleen de ingevulde velden, zodat een leeg project geen
   // pagina vol lege regels oplevert.
@@ -193,6 +213,8 @@ export function projectToReport(
 
   for (const blad of bladen) {
     const deel = documentToReport(blad.nodes, blad.naam, options);
+    const checks = deel.metadata?.engineering_checks;
+    if (Array.isArray(checks)) for (const check of checks) engineeringChecks.push({ sheet: blad.naam, ...check });
     const eigen = deel.sections;
     // De naam uit de projectboom wint van de titelregel in de bladtekst: bij
     // drie balklagen moet je in de PDF kunnen zien wélke je voor je hebt.
@@ -217,5 +239,6 @@ export function projectToReport(
     version: "0.1",
     status: "CONCEPT",
     sections,
+    ...(engineeringChecks.length ? { metadata: { engineering_checks: engineeringChecks } } : {}),
   };
 }

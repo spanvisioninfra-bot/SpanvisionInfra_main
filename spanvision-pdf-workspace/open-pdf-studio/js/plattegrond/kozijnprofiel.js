@@ -108,7 +108,7 @@ export function stijlContour(o = {}) {
   const d = maat(o.diepteMm, KOZIJN_STANDAARD.stijlDiepteMm);
   const h = b / 2;
   const uit = (kant, zijde) => {
-    const s = (o.sponningen || []).find((x) => x && x.kant === kant && (x.zijde === 'buiten' ? "outside" : 'binnen') === zijde);
+    const s = (o.sponningen || []).find((x) => x && x.kant === kant && (x.zijde === 'buiten' ? "buiten" : 'binnen') === zijde);
     if (!s) return null;
     // Nooit de hele stijl wegsnijden: er blijft minstens een derde staan.
     const sd = Math.min(Math.max(0, Number(s.diepteMm) || 0), (b * 2) / 3);
@@ -147,7 +147,7 @@ export function kozijnstijl(o = {}) {
   const sponningen = sw > 0 ? [{
     kant: o.dagkant === 'min' ? 'min' : 'plus',
     diepteMm: p.sponningDiepteMm, breedteMm: sw,
-    zijde: o.zijde === 'buiten' ? "outside" : 'binnen',
+    zijde: o.zijde === 'buiten' ? "buiten" : 'binnen',
   }] : [];
   return { breedteMm, diepteMm, contour: stijlContour({ breedteMm, diepteMm, sponningen }) };
 }
@@ -160,7 +160,7 @@ export function tussenstijl(o = {}) {
   const breedteMm = maat(o.breedteMm, KOZIJN_STANDAARD.stijlBreedteMm);
   const diepteMm = maat(o.diepteMm, KOZIJN_STANDAARD.stijlDiepteMm);
   const p = opties(o);
-  const zijde = o.zijde === 'buiten' ? "outside" : 'binnen';
+  const zijde = o.zijde === 'buiten' ? "buiten" : 'binnen';
   const sponningen = [];
   for (const kant of ['min', 'plus']) {
     const vulling = (kant === 'min' ? o.vullingMin : o.vullingPlus) || o.vulling || 'glas';

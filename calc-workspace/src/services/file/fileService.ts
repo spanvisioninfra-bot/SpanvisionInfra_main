@@ -54,7 +54,7 @@ function migrateItemV1toV2(item: any): CostItem {
   let rowType: RowType;
 
   if (item.isChapter) {
-    rowType = 'chapter';
+    rowType = "chapter";
   } else if (item.rowType === 'normal') {
     rowType = 'begrotingspost';
   } else {
@@ -68,7 +68,7 @@ function migrateItemV1toV2(item: any): CostItem {
     sortOrder: item.sortOrder,
     code: item.code ?? '',
     description: item.description ?? '',
-    unit: item.unit ?? "pcs",
+    unit: item.unit ?? "st",
     quantity: item.quantity ?? null,
     materialPrice: item.materialPrice ?? null,
     laborPrice: item.laborPrice ?? null,
@@ -87,7 +87,7 @@ function migrateItemV1toV2(item: any): CostItem {
     normUnitPrice: item.normUnitPrice ?? null,
     resourceType: item.resourceType ?? null,
     resourceLibraryId: item.resourceLibraryId ?? null,
-    verrekenbaar: rowType === 'chapter' ? (item.verrekenbaar ?? 'V') : null,
+    verrekenbaar: rowType === "chapter" ? (item.verrekenbaar ?? 'V') : null,
     tariefGroep: item.tariefGroep ?? null,
   };
 }

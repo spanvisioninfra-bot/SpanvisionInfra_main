@@ -1,0 +1,18 @@
+{
+  "organization": "Spanvision Infra",
+  "product": "FEM Vision Studio",
+  "mark": "SI",
+  "theme": "spanvision-mono",
+  "palette": {
+    "page": "#000000",
+    "surface": "#121212",
+    "canvas": "#1B1B1B",
+    "raised": "#202020",
+    "text": "#FFFFFF",
+    "textSoft": "#EEEEEE",
+    "muted": "#999999",
+    "border": "rgba(255,255,255,.16)",
+    "focus": "rgba(255,255,255,.58)"
+  },
+  "browserPreviewPort": 4270
+}

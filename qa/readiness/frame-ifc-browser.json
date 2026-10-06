@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-10-05T16:10:53.483Z",
+  "status": "passed",
+  "records": [
+    "A failed engine download shows a retry screen and cannot substitute fabricated model results",
+    "Invalid IFC is rejected and leaves the actual project unchanged",
+    "The real WASM parser reads IFC millimetres and previews exact window/door dimensions",
+    "Adding an imported window creates a real Rust project frame and prevents a duplicate click",
+    "Adding an imported door retains its dimensions and creates a door panel",
+    "LOD 200 exports an actual IFC door with correct metre units",
+    "LOD 300 exports an actual IFC door with correct metre units",
+    "LOD 400 exports an actual IFC door with correct metre units",
+    "DXF downloads a complete millimetre workshop drawing from the actual project",
+    "GLB downloads actual metre geometry and passes Khronos validation without errors or warnings",
+    "Downloaded IFC reimports without dimension/name drift; closing the review does not create another frame",
+    "Missing dimensions produce an actionable error and preserve existing edits",
+    "A valid retry works and the review remains usable in light mode and three viewport widths",
+    "Two actual IFC files produce a detailed comparison and downloaded full-precision change report",
+    "Project roundtrip matches original IFC Tags rather than unrelated new frame UUIDs or names",
+    "Ambiguous roundtrip Tags are rejected explicitly without modifying the project"
+  ],
+  "pageErrors": [],
+  "limits": [
+    "Imports explicit overall dimensions and frame identity; it does not reconstruct source geometry, fittings or placement.",
+    "Windows GUI/installer acceptance remains outstanding.",
+    "GLB uses simplified rectangular members; PDF, XLSX and other exports require separate acceptance."
+  ]
+}

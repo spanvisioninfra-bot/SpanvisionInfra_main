@@ -257,7 +257,7 @@ export function objectenNaUitsluiten(lagen, uitgesloten) {
 /** Bytes leesbaar: 1,2 MB. */
 export function grootteTekst(bytes, decimaal = ',') {
   const b = Number(bytes) || 0;
-  if (b < 1024) return `${b} W`;
+  if (b < 1024) return `${b} B`;
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(0)} kB`;
   return `${(b / 1024 / 1024).toFixed(1).replace('.', decimaal)} MB`;
 }

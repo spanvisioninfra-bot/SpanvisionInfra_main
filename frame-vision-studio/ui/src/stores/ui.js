@@ -5,6 +5,9 @@ export const activeRibbonTab = writable("home");
 export const activeWorkspaceView = writable("editor");
 export const showAppMenu = writable(false);
 export const showSettings = writable(false);
+export const ifcImportPreview = writable(null);
+export const ifcComparison = writable(null);
+export const unsavedChangesPrompt = writable(null);
 export const zoom = writable(0.35);
 export const editorPan = writable({ x: 40, y: 30 });
 

@@ -27,10 +27,43 @@ function allowedFsRoots(): string[] {
   }
 }
 // @ts-expect-error — dev-port.mjs is plain JS zonder types
-import { worktreeRoot, readRecordedPort } from './scripts/dev-port.mjs';
+import { projectRoot, readRecordedPort } from './scripts/dev-port.mjs';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), {
+    name: 'planner-dev-readiness',
+    configureServer(server) {
+      let ready: Promise<void> | undefined;
+      // A listening socket and an HTML response do not mean the cold entry
+      // graph is ready. Let browser runners observe actual transform readiness.
+      server.middlewares.use((request, response, next) => {
+        if (request.url !== '/__ops_dev_ready__') return next();
+        ready ??= (async () => {
+          const started = performance.now();
+          const client = server.environments.client;
+          await client.transformRequest('/src/main.tsx');
+          server.config.logger.info(`Planner entry transformed in ${Math.round(performance.now() - started)} ms`);
+          await client.waitForRequestsIdle();
+          // Static transforms can finish before the dependency scan's output
+          // is committed. Vite keeps imports/HTML waiting on those promises;
+          // a ready response must not start browser tests ahead of them.
+          await client.depsOptimizer?.scanProcessing;
+          const metadata = client.depsOptimizer?.metadata;
+          if (metadata) {
+            await Promise.all([...Object.values(metadata.discovered), ...Object.values(metadata.optimized)]
+              .map(dependency => dependency.processing));
+          }
+          server.config.logger.info(`Planner source graph ready in ${Math.round(performance.now() - started)} ms`);
+        })();
+        void ready.then(() => {
+          if (!response.destroyed) { response.statusCode = 200; response.end('ready'); }
+        }, error => {
+          if (!response.destroyed) { response.statusCode = 503; response.end('Entry transform failed'); }
+          server.config.logger.error(String(error));
+        });
+      });
+    },
+  }],
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
     // Per-worktree instance slug (set by scripts/tauri-dev.mjs); '' in a plain
@@ -46,13 +79,16 @@ export default defineConfig({
   // die engine-code met dynamische imports meeneemt ook in de productiebuild bundelt.
   worker: { format: 'es' },
   server: {
+    // Begin transforming the entry graph at startup, before the first browser
+    // navigation. This avoids cold source transforms blocking the initial page.
+    warmup: { clientFiles: ['./src/main.tsx'] },
     // Port comes from scripts/tauri-dev.mjs (OPS_DEV_PORT) so the desktop
     // window's devUrl always matches. strictPort makes a clash fail loudly
     // instead of silently drifting to another port — see scripts/tauri-dev.mjs.
     // Poort: launcher zet OPS_DEV_PORT; anders de vastgelegde opsDevPort van dit
     // worktree; anders 3007. readRecordedPort/worktreeRoot gooien nooit (CI: vite
     // build in een .claude-loze checkout). strictPort maakt een clash luid.
-    port: Number(process.env.OPS_DEV_PORT) || readRecordedPort(worktreeRoot()) || 3007,
+    port: Number(process.env.OPS_DEV_PORT) || readRecordedPort(projectRoot()) || 3007,
     strictPort: true,
     // Zie allowedFsRoots(): laat de dev-server door de node_modules-symlink van een worktree heen.
     fs: { allow: allowedFsRoots() },
@@ -74,6 +110,11 @@ export default defineConfig({
       ignored: [
         path.resolve(__dirname, '.claude/worktrees') + '/**',
         path.resolve(__dirname, 'dist') + '/**',
+        // An interrupted dependency install is kept for recovery, but its
+        // junction must not be crawled as application source on Windows.
+        path.resolve(__dirname, 'node_modules.audit-incomplete') + '/**',
+        path.resolve(__dirname, 'test-results') + '/**',
+        path.resolve(__dirname, 'playwright-report') + '/**',
       ],
     },
   },

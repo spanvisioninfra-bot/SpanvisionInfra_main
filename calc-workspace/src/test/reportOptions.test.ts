@@ -70,9 +70,9 @@ describe('rapportkop-logo in de HTML-print', () => {
     const post = items.find(i => i.rowType === 'begrotingspost')!;
     post.total = 640;
     const zonder = await generatePrintHtml(mkSchedule(), items, 'hoofdaanneming', true);
-    expect(zonder).toContain('640,00'); // regelbedrag zichtbaar zonder vinkje
+    expect(zonder).toContain('640.00'); // regelbedrag zichtbaar zonder vinkje
     const met = await generatePrintHtml(mkSchedule({ reportAmountsSubtotalsOnly: true }), items, 'hoofdaanneming', true);
-    expect(met).not.toContain('640,00'); // regelbedrag verborgen
-    expect(met).toContain('10,00'); // hoeveelheid (op de post) blijft staan
+    expect(met).not.toContain('640.00'); // regelbedrag verborgen
+    expect(met).toContain('10.00'); // quantity remains visible in English reports
   });
 });

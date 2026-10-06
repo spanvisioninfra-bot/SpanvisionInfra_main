@@ -1,0 +1,11 @@
+{
+  "verifiedAt": "2026-10-05T09:31:31.809Z",
+  "persistedAfterReload": true,
+  "blankNameRejected": true,
+  "legacySignInRedirect": true,
+  "credentialsRequested": false,
+  "themes": [
+    "light",
+    "dark"
+  ]
+}

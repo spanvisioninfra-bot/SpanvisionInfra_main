@@ -293,7 +293,7 @@ const PINNED: Record<Exclude<StageId, 'na-tut-7'>, Pinned> = {
 const PINNED_EXTRA = {
   /** Tutorial 3: einde na alleen de bouwvak (vóór constraint en deadline). */
   finishAfterBouwvak: '2027-08-27',
-  bouwvak: { name: 'Bouwvak (Midden)', startDate: '2027-08-02', endDate: '2027-08-20' },
+  bouwvak: { name: 'Bouwvak (Center)', startDate: '2027-08-02', endDate: '2027-08-20' },
   /** Tutorial 5: na toewijzen en werkregel, vóór nivelleren. */
   beforeLeveling: {
     finish: '2027-08-30',

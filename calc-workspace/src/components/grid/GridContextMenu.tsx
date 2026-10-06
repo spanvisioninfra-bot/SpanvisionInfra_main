@@ -81,7 +81,7 @@ export const GridContextMenu: React.FC<Props> = ({ x, y, rowIndex, itemId, onClo
   // If the item has a parentId, use that parent.
   // If the item is top-level non-chapter, find or create a suitable parent.
   const getInsertParentId = (): string => {
-    if (item.rowType === 'chapter') return item.id;
+    if (item.rowType === "chapter") return item.id;
     if (item.parentId) return item.parentId;
     // Top-level item without parent — shouldn't happen but fallback
     return item.id;
@@ -90,7 +90,7 @@ export const GridContextMenu: React.FC<Props> = ({ x, y, rowIndex, itemId, onClo
   const handleInsertAbove = () => {
     pushHistory(items, t('insertRowAbove'));
     const parentId = getInsertParentId();
-    if (item.rowType === 'chapter') {
+    if (item.rowType === "chapter") {
       // Insert as first child of this chapter
       addRegel(parentId);
     } else {
@@ -104,7 +104,7 @@ export const GridContextMenu: React.FC<Props> = ({ x, y, rowIndex, itemId, onClo
 
   const handleInsertBelow = () => {
     pushHistory(items, t('insertRowBelow'));
-    if (item.rowType === 'chapter') {
+    if (item.rowType === "chapter") {
       // Insert as last child of this chapter
       const children = items.filter(i => i.parentId === item.id);
       const lastChild = children[children.length - 1];
@@ -200,12 +200,12 @@ export const GridContextMenu: React.FC<Props> = ({ x, y, rowIndex, itemId, onClo
 
   // Btw-tarief per onderdeel: hoofdstukken, posten en regels. Kinderen erven
   // het tarief van hun ouder (default hoog).
-  const canSetBtw = ['chapter', 'begrotingspost', 'bewakingspost', 'regel'].includes(item.rowType);
+  const canSetBtw = ["chapter", 'begrotingspost', 'bewakingspost', 'regel'].includes(item.rowType);
   const handleSetBtwTarief = (tarief: 'hoog' | 'laag' | null) => {
     pushHistory(items, t('grid:undo.vatRate'));
     const targets = hasMultipleSelected ? selectedItems : [item];
     for (const it of targets) {
-      if (['chapter', 'begrotingspost', 'bewakingspost', 'regel'].includes(it.rowType)) {
+      if (["chapter", 'begrotingspost', 'bewakingspost', 'regel'].includes(it.rowType)) {
         updateItem(it.id, 'btwTarief', tarief);
       }
     }
@@ -215,11 +215,11 @@ export const GridContextMenu: React.FC<Props> = ({ x, y, rowIndex, itemId, onClo
 
   // Chapters for "Move to chapter" submenu
   const chapters = useMemo(() =>
-    items.filter(i => i.rowType === 'chapter' && i.parentId === null && i.id !== item.parentId),
+    items.filter(i => i.rowType === "chapter" && i.parentId === null && i.id !== item.parentId),
     [items, item.parentId]
   );
   const [showMoveSubmenu, setShowMoveSubmenu] = useState(false);
-  const canMove = item.rowType !== 'chapter' && chapters.length > 0;
+  const canMove = item.rowType !== "chapter" && chapters.length > 0;
 
   const handleMoveToChapter = (chapterId: string) => {
     pushHistory(items, t('grid:undo.moveToChapter'));

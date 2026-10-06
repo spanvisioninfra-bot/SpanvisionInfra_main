@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "checks": [
+    "Empty schedule export gives an actionable error and creates no blank file",
+    "browser-schedule.pdf: actual UI button creates a PDF download",
+    "browser-schedule.xlsx: actual UI button creates a XLSX download",
+    "browser-workshop.pdf: actual UI button creates a PDF download",
+    "browser-production.pdf: actual UI button creates a PDF download",
+    "browser-production.xlsx: actual UI button creates a XLSX download",
+    "browser-labels.pdf: actual UI button creates a PDF download",
+    "Quotation drafts use actual project prices, status changes persist, invalid revisions preserve data and valid revisions increment the version",
+    "browser-estimate.pdf: actual UI button creates a PDF download",
+    "All seven browser document formats complete without desktop prompts or unhandled errors"
+  ],
+  "errors": [],
+  "referenceEstimateTotal": 5282.681984195002
+}

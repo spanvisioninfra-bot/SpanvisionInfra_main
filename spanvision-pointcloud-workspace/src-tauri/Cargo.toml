@@ -1,8 +1,8 @@
 [package]
 name = "spanvision-pointcloud-workspace"
 version = "0.3.0"
-description = "Pointcloud Workspace by Spanvision infra"
-authors = ["Open Pointcloud Studio Contributors", "Spanvision infra"]
+description = "Pointcloud Workspace by Spanvision Infra"
+authors = ["Open Pointcloud Studio Contributors", "Spanvision Infra"]
 license = "LGPL-3.0-or-later"
 repository = ""
 edition = "2021"
@@ -27,6 +27,7 @@ tauri-plugin-process = "2"
 memmap2 = "0.9"
 rayon = "1.10"
 laz = "0.9"
+tempfile = "3.27"
 
 [features]
 default = ["custom-protocol"]

@@ -16,7 +16,7 @@ async function waitForFontsAndTwoQuietWindows(page: Page): Promise<void> {
     .toBe(afterFirst);
 }
 
-test('Gantt vertaalt weekdagen en duursuffix na een echte taalkeuze', async ({ page, ops: _ops }) => {
+test('Gantt toont Engelse weekdagen en duursuffix na een echte taalkeuze', async ({ page, ops: _ops }) => {
   const [taskId] = await seedProject(page, [{
     name: 'Lokalisatietaak',
     start: '2026-09-07',
@@ -47,8 +47,8 @@ test('Gantt vertaalt weekdagen en duursuffix na een echte taalkeuze', async ({ p
   const beforePaint = await paintCount(page);
 
   await page.getByRole('button', { name: /^(Language|Taal)$/, exact: true }).click();
-  await page.getByRole('option', { name: /Deutsch/ }).click();
-  await expect(page.locator('html')).toHaveAttribute('lang', 'de');
+  await page.getByRole('option', { name: /English/ }).click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   // De tekstknop in de voet; het kopkruisje heet hetzelfde maar heeft geen tekstinhoud.
   const closeName = /^(Close|Sluiten|Schließen)$/;
   await page.getByRole('dialog').getByRole('button', { name: closeName }).filter({ hasText: closeName }).click();
@@ -60,6 +60,6 @@ test('Gantt vertaalt weekdagen en duursuffix na een echte taalkeuze', async ({ p
   ));
   await expect(page.locator(
     `[data-task-grid-surface-id="gantt-task-grid"] [data-grid-row-key="${taskId}"][data-grid-column-id="task.time.scheduleDuration"]`,
-  )).toContainText('10T');
-  expect(drawnText.some(text => /^(Mo|Di|Mi|Do|Fr|Sa|So) \d+$/.test(text))).toBe(true);
+  )).toContainText('10d');
+  expect(drawnText.some(text => /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) \d+$/.test(text))).toBe(true);
 });

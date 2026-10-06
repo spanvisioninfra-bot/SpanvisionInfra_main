@@ -11,9 +11,10 @@ export default function SpeedControl() {
 
   return (
     <div class={styles.speedControl}>
-      <label>{t('speed.label')}</label>
+      <label for="ifc-playback-speed">{t('speed.label')}</label>
       <input
         type="range"
+        id="ifc-playback-speed"
         class={styles.speedSlider}
         min="200"
         max="3000"

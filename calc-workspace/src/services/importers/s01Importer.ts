@@ -46,7 +46,7 @@ export function importS01(text: string): ImportResult {
     ch = builder.add({
       parentId: null,
       depth: 0,
-      rowType: 'chapter',
+      rowType: "chapter",
       code: hfdst,
       description: `Chapter ${hfdst}`,
     });

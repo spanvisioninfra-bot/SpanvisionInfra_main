@@ -191,7 +191,7 @@ export function buildOnlv(schedule: CostSchedule, items: CostItem[], opts: OnlvB
   const chapterDepth = (parentId: string | null): number => {
     let deepest = 0;
     for (const c of byParent.get(parentId) ?? []) {
-      if (c.rowType === 'chapter') deepest = Math.max(deepest, 1 + chapterDepth(c.id));
+      if (c.rowType === "chapter") deepest = Math.max(deepest, 1 + chapterDepth(c.id));
     }
     return deepest;
   };
@@ -203,7 +203,7 @@ export function buildOnlv(schedule: CostSchedule, items: CostItem[], opts: OnlvB
   /** Alle rekenregels onder een post (ook via geneste bewakingsposten). */
   const regelsUnder = (id: string, out: CostItem[] = []): CostItem[] => {
     for (const c of byParent.get(id) ?? []) {
-      if (c.rowType === "calc ") out.push(c);
+      if (c.rowType === "regel") out.push(c);
       else if (c.rowType === 'begrotingspost' || c.rowType === 'bewakingspost') regelsUnder(c.id, out);
     }
     return out;
@@ -214,7 +214,7 @@ export function buildOnlv(schedule: CostSchedule, items: CostItem[], opts: OnlvB
     flattened++;
     out.push({ item: chapter, heading: chapter.description || chapter.code });
     for (const c of byParent.get(chapter.id) ?? []) {
-      if (c.rowType === 'chapter') flattenChapter(c, out);
+      if (c.rowType === "chapter") flattenChapter(c, out);
       else if (isPositionRow(c)) out.push({ item: c });
     }
   };
@@ -232,7 +232,7 @@ export function buildOnlv(schedule: CostSchedule, items: CostItem[], opts: OnlvB
     const own: Position[] = [];
     const used = new Set<string>();
     for (const c of byParent.get(chapter.id) ?? []) {
-      if (c.rowType === 'chapter') {
+      if (c.rowType === "chapter") {
         if (level < L) {
           const sub = buildGroup(c, level + 1);
           sub.nr = allocGroupNr(used, c.code);
@@ -261,7 +261,7 @@ export function buildOnlv(schedule: CostSchedule, items: CostItem[], opts: OnlvB
     const used = new Set<string>();
     const loose: Position[] = [];
     for (const c of byParent.get(null) ?? []) {
-      if (c.rowType === 'chapter') {
+      if (c.rowType === "chapter") {
         const g = buildGroup(c, 1);
         g.nr = allocGroupNr(used, c.code);
         roots.push(g);

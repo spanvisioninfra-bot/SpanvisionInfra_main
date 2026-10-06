@@ -4,6 +4,7 @@
   import { profileEditor } from "../../stores/profileEditor.js";
   import { toast } from "../../stores/toast.js";
   import ProfileCrossSection from "../panels/ProfileCrossSection.svelte";
+  import { confirmUnsavedChanges } from '../../lib/project-actions.js';
 
   let searchQuery = $state("");
   let expandedCategories = $state({});
@@ -20,19 +21,24 @@
     };
   }
 
-  function loadProfile(profile) {
+  async function loadProfile(profile) {
+    if (!(await confirmUnsavedChanges({profileOnly:true}))) return;
     profileEditor.loadProfile(profile);
   }
 
-  function copyProfile(profile, e) {
+  async function copyProfile(profile, e) {
     e.stopPropagation();
+    if (!(await confirmUnsavedChanges({profileOnly:true}))) return;
     const copy = {
       ...profile,
       id: null,
-      name: profile.name + " (kopie)",
+      name: profile.name + " (copy)",
     };
     profileEditor.loadProfile(copy);
     toast.info(($_("profileEditor.copied") || "Section copied. Edit it and save."));
+  }
+  async function newProfile() {
+    if (await confirmUnsavedChanges({profileOnly:true})) profileEditor.newProfile();
   }
 
   // Group filtered profiles by category
@@ -48,7 +54,7 @@
 <div class="profile-library">
   <div class="lib-header">
     <span class="lib-title">{$_("profileEditor.library") || "Profielen"}</span>
-    <button class="new-btn" onclick={() => profileEditor.newProfile()}
+    <button class="new-btn" onclick={newProfile}
       title={$_("profileEditor.newProfile") || "New section"}>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="12" y1="5" x2="12" y2="19"/>

@@ -207,11 +207,11 @@ export const createBcfSlice: StateCreator<BcfSlice> = (set, get) => ({
 
   bcfLoginOidc: async () => {
     if (!isOidcConfigured()) {
-      set({ bcfError: "OIDC niet geconfigureerd (VITE_OIDC_AUTHORITY / VITE_OIDC_CLIENT_ID ontbreken)" });
+      set({ bcfError: "OIDC not configured: set VITE_OIDC_AUTHORITY and VITE_OIDC_CLIENT_ID." });
       return;
     }
     try {
-      if (!getSignedInUser) initOidc();
+      initOidc();
       await signinRedirect();
       // Browser redirects away — no code after this runs
     } catch (err) {

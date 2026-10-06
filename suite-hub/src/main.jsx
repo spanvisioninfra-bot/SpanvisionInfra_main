@@ -1,7 +1,7 @@
 import { createSignal, onMount, onCleanup, For, Show } from 'solid-js';
 import { render } from 'solid-js/web';
 import brand from './brand.json';
-import Floorplan from './Floorplan';
+import { readLocalProfile, saveLocalProfile } from './local-profile';
 import Globe from './Globe';
 import { isLocalPreview, moduleUrl } from './module-url';
 import './preview.css';
@@ -18,6 +18,10 @@ function Mark() { return <a class="brand-lockup" href="#landing" aria-label={`${
 
 function currentScreen() {
   const requested=location.hash.slice(1)||'landing';
+  if(requested==='login'||requested==='signup') {
+    history.replaceState(history.state,'',location.pathname+location.search+'#account');
+    return 'account';
+  }
   if(requested==='suggestions') {
     history.replaceState(history.state,'',location.pathname+location.search+'#modules');
     return 'modules';
@@ -28,26 +32,43 @@ function App() {
   const [screen,setScreen]=createSignal(currentScreen());
   const [mode,setMode]=createSignal(document.documentElement.dataset.svMode || 'dark');
   const [status,setStatus]=createSignal({});
-  const [name,setName]=createSignal('Alex Morgan');
+  const [name,setName]=createSignal(readLocalProfile().name);
   const [error,setError]=createSignal('');
   const [success,setSuccess]=createSignal('');
   const [scanState,setScanState]=createSignal('ready');
   const [progress,setProgress]=createSignal(0);
-  const [filename,setFilename]=createSignal('Ground floor scan.pdf');
-  let modal, upload, scanTimer, previousFocus, requestController;
-  const validScreens=['landing','modules','login','signup','account'];
+  const [filename,setFilename]=createSignal('Choose a scanned PDF or image');
+  const [scanFile,setScanFile]=createSignal(null);
+  const [scanResult,setScanResult]=createSignal(null);
+  const [scanError,setScanError]=createSignal('');
+  const [scanPages,setScanPages]=createSignal('all');
+  let modal, upload, scanController, previousFocus, requestController;
+  const validScreens=['landing','modules','account'];
   const localPreview=isLocalPreview(location.hostname);
   const openUrl=module=>moduleUrl(module,status()[module.id],mode(),location.hostname);
   function exploreTools() { document.getElementById('tools-title')?.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'}); }
-  function clearScan() { clearInterval(scanTimer); scanTimer=undefined; }
+  function clearScan() { scanController?.abort(); scanController=undefined; }
   function closeScan() { clearScan(); modal.close(); previousFocus?.focus(); }
-  function openScan(event) { previousFocus=event.currentTarget;clearScan();setScanState('ready');setProgress(0);modal.showModal(); }
-  function startScan() {
-    clearScan();setProgress(0);setScanState('processing');
-    scanTimer=setInterval(()=>{
-      const next=Math.min(progress()+10,100);setProgress(next);
-      if(next===100){clearScan();setScanState('complete');}
-    },180);
+  function openScan(event) { previousFocus=event.currentTarget;clearScan();setScanState('ready');setScanError('');setProgress(0);modal.showModal(); }
+  async function startScan() {
+    clearScan();setScanError('');setScanResult(null);
+    if(!scanFile()){setScanError('Choose a scanned PDF or image first.');return;}
+    setProgress(0);setScanState('processing');
+    const controller = scanController = new AbortController();
+    try {
+      const {recognizeScan}=await import('./scan-ocr.js');
+      const result=await recognizeScan(scanFile(),{signal:controller.signal,pages:scanPages(),onProgress:setProgress});
+      if(controller.signal.aborted)return;
+      setScanResult(result);setScanState('complete');
+    } catch(error) {
+      if(controller.signal.aborted)return;
+      setScanError(error.message||'Recognition failed. Try a clearer scan.');setScanState('ready');
+    } finally { if(scanController===controller)scanController=undefined; }
+  }
+  async function saveScan(kind) {
+    const {downloadScan}=await import('./scan-ocr.js');
+    const base=filename().replace(/\.[^.]+$/,'');
+    downloadScan(kind==='pdf'?scanResult().pdf:new Blob([scanResult().text],{type:'text/plain;charset=utf-8'}),`${base}-searchable.${kind==='pdf'?'pdf':'txt'}`);
   }
   function trapScanFocus(event) {
     if(event.key!=='Tab')return;
@@ -114,13 +135,12 @@ function App() {
     const onFocus=()=>refreshStatus();window.addEventListener('focus',onFocus);
     onCleanup(()=>{window.removeEventListener('hashchange',changeScreen);window.removeEventListener('focus',onFocus);requestController?.abort();clearScan();});
   });
-  function submitAccount(event) {
-    event.preventDefault();const form=event.currentTarget;const data=new FormData(form);
-    setError('');
-    if(screen()==='signup'&&!String(data.get('name')||'').trim()){setError('Enter your name.');return;}
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(data.get('email')||''))){setError('Enter a valid email address.');return;}
-    if(String(data.get('password')||'').length<8){setError('Use at least 8 characters for the preview password.');return;}
-    setName(String(data.get('name')||name()).trim());form.reset();location.hash='account';
+  function submitProfile(event) {
+    event.preventDefault();setError('');setSuccess('');
+    try {
+      const profile=saveLocalProfile(new FormData(event.currentTarget).get('name'));
+      setName(profile.name);setSuccess('Profile saved in this browser.');
+    } catch(error) {setError(error.message);}
   }
   function ToolLink(props) {
     const state=()=>status()[props.module.id];
@@ -137,7 +157,7 @@ function App() {
   }
   return <>
     <a class="skip-link" href="#main-content">Skip to content</a>
-    <header class="preview-header" data-sv-reveal><Mark/><nav aria-label="Main navigation"><For each={['landing','modules','account']}>{route=><a href={`#${route}`} classList={{current:screen()===route}} aria-current={screen()===route?'page':undefined}>{({landing:'Overview',modules:'Tools',account:'Account'})[route]}</a>}</For></nav><a href="#modules" class="button button-light header-action" onClick={event=>{if(screen()==='landing'||screen()==='modules'){event.preventDefault();exploreTools();}}}>Open workspace<Arrow/></a></header>
+    <header class="preview-header" data-sv-reveal><Mark/><nav aria-label="Main navigation"><For each={['landing','modules','account']}>{route=><a href={`#${route}`} classList={{current:screen()===route}} aria-current={screen()===route?'page':undefined}>{({landing:'Overview',modules:'Tools',account:'Profile'})[route]}</a>}</For></nav><a href="#modules" class="button button-light header-action" onClick={event=>{if(screen()==='landing'||screen()==='modules'){event.preventDefault();exploreTools();}}}>Open workspace<Arrow/></a></header>
     <main id="main-content" tabindex="-1">
       <Show when={screen()==='landing'||screen()==='modules'}>
         <section class="company-tools-page">
@@ -157,18 +177,17 @@ function App() {
           </section>
         </section>
       </Show>
-      <Show when={screen()==='login'||screen()==='signup'}><section class="auth-layout"><div class="auth-story"><span class="eyebrow">YOUR WORK, IN FOCUS</span><h1>Make room<br/>for better work.</h1><p>Drawings. Documents. Details.</p><div class="auth-art"><Floorplan/></div><span class="auth-note">{organization}</span></div><div class="auth-form-wrap"><span class="preview-badge">ACCOUNT SCREEN PREVIEW</span><h2>{screen()==='signup'?'Create your workspace.':'Welcome back.'}</h2><p>{screen()==='signup'?'A clear start for your next project.':'Pick up where your work left off.'}</p><form novalidate onSubmit={submitAccount}><Show when={screen()==='signup'}><label>Full name<input name="name" autocomplete="off" placeholder="Alex Morgan" required/></label></Show><label>Email address<input name="email" type="email" autocomplete="off" placeholder="you@company.com" required/></label><label>Password<input name="password" type="password" autocomplete="off" placeholder="At least 8 characters" required/></label><Show when={error()}><p class="form-error" role="alert">{error()}</p></Show><button class="button button-light" type="submit">{screen()==='signup'?'Preview account':'Preview sign in'}<Arrow/></button></form><p class="auth-switch">{screen()==='signup'?'Already have an account?':'New to '+organization+'?'} <a href={screen()==='signup'?'#login':'#signup'}>{screen()==='signup'?'Sign in':'Create an account'}</a></p><div class="preview-disclosure">This is a local interface preview. No account is created and no credentials are transmitted or saved.</div><a href="#modules" class="quiet-link">Continue without an account<Arrow/></a></div></section></Show>
-      <Show when={screen()==='account'}><section class="account-page"><span class="preview-badge">SAMPLE ACCOUNT · PREVIEW</span><div class="account-heading"><div><span class="eyebrow">YOUR WORKSPACE</span><h1>A clear view of you.</h1><p>Explore the details that make this workspace yours.</p></div><a href="#modules" class="button button-light">Open workspace<Arrow/></a></div><div class="account-grid"><aside class="account-nav"><button class="selected" aria-current="page">Profile</button><a href="#login">Sign-in preview<Arrow/></a></aside><div class="account-card"><div class="profile-header"><span class="avatar">{name().split(' ').map(s=>s[0]).join('').slice(0,2)}</span><div><h2>{name()}</h2><p>Sample profile · {organization}</p></div></div><form onSubmit={event=>{event.preventDefault();const value=String(new FormData(event.currentTarget).get('name')||'').trim();setError('');setSuccess('');if(!value){setError('Enter your name.');return;}setName(value);setSuccess('Profile updated in this preview.');}}><label>Display name<input name="name" value={name()}/></label><label>Organization<input value={organization} readonly/></label><label>Interface theme<select aria-label="Interface theme" value={mode()} onChange={event=>window.SpanvisionAppearance.setMode(event.currentTarget.value)}><option value="light">Light</option><option value="dark">Dark</option></select></label><Show when={error()}><p role="alert" class="form-error">{error()}</p></Show><Show when={success()}><p role="status" class="form-success">{success()}</p></Show><button class="button button-light">Save preview changes<Arrow/></button></form></div><div class="account-details"><article><span class="eyebrow">LOCAL BY DESIGN</span><h3>Your files. Your control.</h3><p>Each editor works without a shared account. Profile changes here last only for this preview session.</p></article><article><span class="eyebrow">APPEARANCE</span><div class="palette"><i/><i/><i/><i/></div><p>{mode()==='light'?'Light':'Dark'} mode<br/>A clear space for detailed work.</p></article></div></div></section></Show>
+      <Show when={screen()==='account'}><section class="account-page"><span class="preview-badge">LOCAL PROFILE</span><div class="account-heading"><div><span class="eyebrow">YOUR WORKSPACE</span><h1>Your local profile.</h1><p>Set a display name and choose your preferred appearance.</p></div><a href="#modules" class="button button-light">Open workspace<Arrow/></a></div><div class="account-grid"><aside class="account-nav"><span class="selected" aria-current="page">Profile</span><a href="#modules">All tools<Arrow/></a></aside><div class="account-card"><div class="profile-header"><span class="avatar">{name().split(' ').filter(Boolean).map(s=>s[0]).join('').slice(0,2)||'SI'}</span><div><h2>{name()||'Your workspace'}</h2><p>Local profile · {organization}</p></div></div><form novalidate onSubmit={submitProfile}><label>Display name<input name="name" value={name()} maxlength="80" autocomplete="name" placeholder="Your name"/></label><label>Organization<input value={organization} readonly/></label><label>Interface theme<select aria-label="Interface theme" value={mode()} onChange={event=>window.SpanvisionAppearance.setMode(event.currentTarget.value)}><option value="light">Light</option><option value="dark">Dark</option></select></label><Show when={error()}><p role="alert" class="form-error">{error()}</p></Show><Show when={success()}><p role="status" class="form-success">{success()}</p></Show><button class="button button-light">Save profile<Arrow/></button></form></div><div class="account-details"><article><span class="eyebrow">LOCAL BY DESIGN</span><h3>Your files. Your control.</h3><p>Your profile saves in this browser. Tools open anonymously, and each workspace keeps its own drafts. Download project files to back them up or move them to another device.</p></article><article><span class="eyebrow">APPEARANCE</span><div class="palette"><i/><i/><i/><i/></div><p>{mode()==='light'?'Light':'Dark'} mode<br/>A clear space for detailed work.</p></article></div></div></section></Show>
       <Show when={!validScreens.includes(screen())}><section class="suggestions-page"><h1>Page not found.</h1><a href="#landing" class="button button-light">Back to overview<Arrow/></a></section></Show>
     </main>
-    <footer class="preview-footer"><Mark/><span>© 2026 {organization}</span><div><a href="#login">Sign in preview</a><a href="#signup">Sign up preview</a><a href="/notices.md" target="_blank" rel="noopener noreferrer">Open-source notices</a><a href="/bim-notices.md" target="_blank" rel="noopener noreferrer">BIM source notices</a><a href="/studio-notices.md" target="_blank" rel="noopener noreferrer">Studio source notices</a><a href="/globe-notices.txt" target="_blank" rel="noopener noreferrer">Globe credits</a></div></footer>
+    <footer class="preview-footer"><Mark/><span>© 2026 {organization}</span><div><a href="#account">Local profile</a><a href="/notices.md" target="_blank" rel="noopener noreferrer">Open-source notices</a><a href="/bim-notices.md" target="_blank" rel="noopener noreferrer">BIM source notices</a><a href="/studio-notices.md" target="_blank" rel="noopener noreferrer">Studio source notices</a><a href="/ocr-notices.txt" target="_blank" rel="noopener noreferrer">OCR credits</a><a href="/globe-notices.txt" target="_blank" rel="noopener noreferrer">Globe credits</a></div></footer>
     <dialog ref={modal} class="scan-dialog" aria-labelledby="scan-title" onKeyDown={trapScanFocus} onCancel={event=>{event.preventDefault();closeScan();}}>
-      <div class="scan-heading"><h2 id="scan-title">Scan & make searchable</h2><button class="scan-close" aria-label="Close scan preview" onClick={closeScan}>×</button></div><p class="scan-intro">Turn a scanned PDF into a document you can search.</p>
-      <input hidden ref={upload} type="file" accept="application/pdf,image/*" onChange={event=>{if(event.target.files?.[0])setFilename(event.target.files[0].name);}}/>
+      <div class="scan-heading"><h2 id="scan-title">Scan & make searchable</h2><button class="scan-close" aria-label="Close scan" onClick={closeScan}>×</button></div><p class="scan-intro">Turn a scanned PDF into a document you can search.</p>
+      <input hidden ref={upload} type="file" accept="application/pdf,image/*" onChange={event=>{const file=event.target.files?.[0];if(file){setScanFile(file);setFilename(file.name);setScanResult(null);setScanState('ready');setScanError('');}}}/>
       <button class="scan-upload" disabled={scanState()==='processing'} onClick={()=>upload.click()}><span class="file-glyph">PDF</span><span><b>{filename()}</b><small>Choose a scanned PDF or image</small></span><span>＋</span></button>
-      <div class="scan-options"><label>Pages<select disabled={scanState()==='processing'}><option>All pages</option><option>Current page</option></select></label><label>Document language<select disabled={scanState()==='processing'}><option>English</option></select></label></div>
-      <Show when={scanState()==='processing'}><div class="scan-progress" role="status"><span>Recognizing text… <b>{progress()}%</b></span><progress value={progress()} max="100"/></div></Show><Show when={scanState()==='complete'}><p role="status" class="form-success">Preview complete. A searchable text layer would be added to your PDF.</p></Show>
-      <div class="preview-disclosure">This browser screen simulates OCR. Real recognition runs locally in the PDF desktop app; your document is not uploaded.</div><div class="scan-actions"><span class="preview-badge">SCAN DEMONSTRATION</span><div><button class="button button-outline" onClick={closeScan}>Cancel</button><button class="button button-light" disabled={scanState()==='processing'} onClick={()=>scanState()==='complete'?closeScan():startScan()}>{scanState()==='complete'?'Done':'Preview OCR'}<Arrow/></button></div></div>
+      <div class="scan-options"><label>Pages<select value={scanPages()} onChange={event=>setScanPages(event.currentTarget.value)} disabled={scanState()==='processing'}><option value="all">All pages (up to 25)</option><option value="first">First page</option></select></label><label>Document language<select disabled={scanState()==='processing'}><option>English</option></select></label></div>
+      <Show when={scanState()==='processing'}><div class="scan-progress" role="status"><span>Recognizing text… <b>{progress()}%</b></span><progress value={progress()} max="100"/></div></Show><Show when={scanResult()}><p role="status" class="form-success">Recognition complete. Review the text before using it.</p><label>Recognized text<textarea class="scan-text" readonly value={scanResult().text||'No text was detected. Try a clearer image.'}/></label><div class="scan-downloads"><button class="button button-outline" onClick={()=>saveScan('pdf')}>Download searchable PDF</button><button class="button button-outline" onClick={()=>saveScan('txt')}>Download text</button></div></Show><Show when={scanError()}><p role="alert" class="form-error">{scanError()}</p></Show>
+      <div class="preview-disclosure">Recognition runs in your browser. The first run downloads the English OCR model; your document is not uploaded. Files up to 50 MB and 25 pages.</div><div class="scan-actions"><span class="preview-badge">LOCAL OCR</span><div><button class="button button-outline" onClick={closeScan}>Cancel</button><button class="button button-light" disabled={scanState()==='processing'} onClick={()=>scanState()==='complete'?closeScan():startScan()}>{scanState()==='complete'?'Done':'Recognize text'}<Arrow/></button></div></div>
     </dialog>
   </>;
 }

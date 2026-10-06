@@ -13,6 +13,12 @@ export function selectParameter(path: string): void {
 
   const param = allParameters.get(path);
   if (!param) {
+    playerStore.setSortedValues([]);
+    playerStore.setValueGroups(new Map());
+    ifcStore.setUniqueValuesCount('-');
+    ifcStore.setObjectsWithParamCount('-');
+    ifcStore.setCurrentParamLabel('');
+    ifcStore.setValuesHeaderText('');
     playerStore.setControlsEnabled(false);
     return;
   }

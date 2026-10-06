@@ -5,6 +5,8 @@
  * In browser: delegates to WASM module (ofs-wasm).
  * Falls back to sensible defaults if WASM isn't loaded yet.
  */
+import { webProjectCommand } from './webProjectCommands.js';
+import { createStoredZip, downloadBytes } from './browserDownload.js';
 export const isTauri = typeof window !== "undefined" && !!window.__TAURI_INTERNALS__;
 export const isWeb = !isTauri;
 
@@ -21,11 +23,12 @@ export async function initWasm() {
     const jsUrl = new URL("/wasm/ofs_wasm.js", window.location.origin).href;
     const wasmUrl = new URL("/wasm/ofs_wasm_bg.wasm", window.location.origin).href;
     const module = await import(/* @vite-ignore */ jsUrl);
-    await module.default(wasmUrl);
+    await module.default({ module_or_path: wasmUrl });
     wasm = module;
     console.log("[web] WASM module loaded");
   } catch (e) {
-    console.warn("[web] WASM not available, using fallback:", e);
+    console.error("[web] Calculation engine failed to load:", e);
+    throw new Error("Frame Studio could not load its calculation engine. Reload to retry.", { cause: e });
   }
 }
 
@@ -183,8 +186,32 @@ function deleteWebSjabloon(sjabloonId) {
 // values. Normalize entity-returning commands so both modes look identical.
 const J = (v) => (typeof v === "string" && (v.startsWith("{") || v.startsWith("[")) ? JSON.parse(v) : v);
 
+const coreCommands = new Set(['get_cost_estimate', 'get_cost_estimate_project',
+  'get_glass_library', 'get_cnc_parts', 'export_cnc_gcode', 'optimize_project_cut_list',
+  'get_production_plan', 'get_vliesgevel_production', 'validate_project_ids',
+  'auto_select_hardware', 'update_security_class', 'get_quotations', 'create_quotation',
+  'update_quotation_status', 'create_quotation_revision']);
+for (const command of ['get_all_vliesgevels', 'create_vliesgevel', 'create_vliesgevel_from_template',
+  'get_vliesgevel', 'get_vliesgevel_geometry', 'remove_vliesgevel', 'vliesgevel_add_mullion',
+  'vliesgevel_add_transom', 'vliesgevel_remove_mullion', 'vliesgevel_remove_transom', 'vliesgevel_update_panel']) coreCommands.add(command);
+
 function wasmCommand(cmd, args) {
   try {
+    if (cmd === 'export_document_bytes') {
+      if (!wasm.export_document_bytes) throw new Error('Reload Frame Studio to load the updated document engine.');
+      return wasm.export_document_bytes(args.kind, args.format, args.id ?? null);
+    }
+    if (coreCommands.has(cmd)) {
+      if (!wasm.execute_project_command) throw new Error('Reload Frame Studio to load the updated calculation engine.');
+      const result = J(wasm.execute_project_command(cmd, JSON.stringify(args ?? {})));
+      if (cmd === 'export_cnc_gcode') {
+        downloadBytes('frame-cnc.zip', createStoredZip(result), 'application/zip');
+        return result.map(([filename]) => filename);
+      }
+      return result;
+    }
+    const edited = webProjectCommand(wasm, cmd, args);
+    if (edited !== undefined) return edited.value;
     switch (cmd) {
       case "get_project": return J(wasm.get_project());
       case "new_project": return J(wasm.new_project(args?.name || "New", args?.number || ""));
@@ -263,24 +290,18 @@ function wasmCommand(cmd, args) {
               args?.profileId, args?.profileName, args?.profileWidth ?? null, args?.profileDepth ?? null))
           : (args?.id ? J(wasm.get_kozijn(args.id)) : null);
 
-      // Commands that return unchanged kozijn (updates not yet in WASM)
-      case "update_grid_sizes":
-      case "update_cell_hardware":
       case "auto_select_hardware":
       case "update_security_class":
-      case "update_cell_glazing":
-      case "update_frame_colors":
-      case "add_frame_extension":
-      case "remove_frame_extension":
-        return args?.id ? J(wasm.get_kozijn(args.id)) : null;
+        throw new Error('Automatic hardware selection requires the Windows app.');
 
       case "get_custom_profiles":
         return typeof wasm.get_custom_profiles === "function"
           ? J(wasm.get_custom_profiles())
           : [];
       case "load_profile_library":
-      case "add_custom_profile":
         return "[]";
+      case "add_custom_profile":
+        return wasm.add_custom_profile(args.profileJson);
       case "get_sjablonen": return loadWebSjablonen();
       case "save_custom_sjabloon": return saveWebSjabloon(args?.sjabloonJson);
       case "delete_custom_sjabloon": return deleteWebSjabloon(args?.sjabloonId);
@@ -304,8 +325,6 @@ function wasmCommand(cmd, args) {
         return null;
       case "get_cost_estimate": return emptyCostEstimate();
       case "get_cost_estimate_project": return [];
-      case "get_pricing_config": return defaultPricingConfig();
-      case "update_pricing_config": return null;
 
       case "get_platform": return "web";
       case "load_settings":
@@ -373,16 +392,23 @@ function wasmCommand(cmd, args) {
       case "get_glass_library": return [];
       // File exports/imports need the filesystem — desktop only.
       case "export_cnc_gcode": return null;
-      case "export_labels_pdf": return null;
-      case "export_quotation_pdf": return null;
-      case "import_ifc_file": return null;
+      case "export_labels_pdf":
+      case "export_quotation_pdf":
+      case "import_ifc_file":
+        throw new Error('This file workflow requires the Windows app. Browser support is not yet implemented.');
+      case "import_ifc_text": return J(wasm.import_ifc_text(args.content));
+      case "compare_ifc_text": return J(wasm.compare_ifc_text(args.oldContent, args.newContent));
+      case "compare_project_ifc_text": return J(wasm.compare_project_ifc_text(args.content));
+      case "export_ifc_text": return wasm.export_ifc_text(args.id, args.lod);
+      case "export_dxf_text": return wasm.export_dxf_text(args.id);
+      case "export_glb_bytes": return wasm.export_glb_bytes(args.id);
+      case "export_production_csv_files": return J(wasm.export_production_csv_files());
       case "compare_ifc_roundtrip":
       case "compare_ifc_files":
-        return emptyDiffJson();
+        throw new Error('IFC comparison requires the Windows app. Browser support is not yet implemented.');
 
       default:
-        console.warn(`[web] unhandled WASM command: ${cmd}`, args);
-        return null;
+        throw new Error(`The ${cmd} action is not available in this browser version.`);
     }
   } catch (e) {
     console.error(`[web] WASM command ${cmd} failed:`, e);
@@ -393,76 +419,13 @@ function wasmCommand(cmd, args) {
 // ── Browser fallback (no WASM) ──────────────────────────────
 
 function browserFallback(cmd, args) {
-  switch (cmd) {
-    case "get_project":
-      return {
-        formatVersion: "1.3",
-        projectInfo: { name: "Demo", number: "", client: "", address: "" },
-        kozijnen: [], vliesgevels: [], customProfiles: [],
-      };
-    case "new_project": return browserFallback("get_project");
-    case "get_all_kozijnen": return [];
-    case "get_all_vliesgevels": return [];
-    case "load_profile_library": return [];
-    case "get_custom_profiles": return [];
-    case "get_sjablonen": return loadWebSjablonen();
-    case "save_custom_sjabloon": return saveWebSjabloon(args?.sjabloonJson);
-    case "delete_custom_sjabloon": return deleteWebSjabloon(args?.sjabloonId);
-    case "get_quotations": return [];
-    case "create_quotation": return quotationStub(args);
-    case "update_quotation_status": return quotationStub(args);
-    case "create_quotation_revision": return quotationStub(args, 2);
-    case "get_production_plan": return { jobs: [], totalHours: 0, estimatedDays: 0, deliveryDate: "" };
-    case "get_project_energy": return energyStub(args);
-    case "get_project_circularity": return circularityStub();
-    case "get_project_plausibility": return plausibilityStub();
-    case "update_kozijn_layout": return null;
-    case "check_certification": return certStub();
-    case "generate_dop_for_kozijn": return dopStub();
-    case "get_bcf_topics": return [];
-    case "create_bcf_topic": return bcfTopicStub(args);
-    case "update_bcf_topic_status": return bcfTopicStub(args);
-    case "add_bcf_comment":
-      return bcfTopicStub(args, [{ guid: String(Date.now()), author: args?.author || "", date: new Date().toISOString(), comment: args?.comment || "" }]);
-    case "get_combinations": return [];
-    case "create_combination":
-      return { id: `demo-${Date.now()}`, name: args?.name || "", mark: args?.mark || "", members: [], couplings: [] };
-    case "add_to_combination":
-      return { id: args?.combinationId, name: "", mark: "", members: [{ kozijnId: args?.kozijnId, offsetX: args?.offsetX || 0, offsetY: args?.offsetY || 0 }], couplings: [] };
-    case "add_coupling":
-      return { id: args?.combinationId, name: "", mark: "", members: [], couplings: [{ memberAId: args?.memberAId, memberBId: args?.memberBId, couplingType: args?.couplingType, couplingWidth: args?.couplingWidth || 0 }] };
-    case "remove_combination": return null;
-    case "generate_purchase_proposals": return [];
-    case "generate_purchase_orders": return [];
-    case "get_cnc_parts": return [];
-    case "get_pricing_config": return defaultPricingConfig();
-    case "update_pricing_config": return null;
-    case "get_cost_estimate": return emptyCostEstimate();
-    case "get_cost_estimate_project": return [];
-    case "get_vliesgevel_production": return vgProductionStub();
-    case "optimize_project_cut_list": return { bars: [], totalBars: 0, wastePercent: 0, totalWasteMm: 0 };
-    case "validate_project_ids": return [];
-    case "get_glass_library": return [];
-    // File exports/imports need the filesystem — desktop only.
-    case "export_cnc_gcode": return null;
-    case "export_labels_pdf": return null;
-    case "export_quotation_pdf": return null;
-    case "import_ifc_file": return null;
-    case "compare_ifc_roundtrip":
-    case "compare_ifc_files":
-      return emptyDiffJson();
-    case "get_platform": return "web";
-    case "load_settings":
-      return localStorage.getItem("ofs-settings") || JSON.stringify({
-        theme: "spanvision-mono", locale: "en",
-        left_panel_width: 220, right_panel_width: 290,
-        left_panel_open: true, right_panel_open: true,
-      });
-    case "save_settings":
-      localStorage.setItem("ofs-settings", args?.settingsJson);
-      return "ok";
-    default:
-      console.warn(`[web] unhandled command (no WASM): ${cmd}`);
-      return null;
-  }
+  // Settings are needed before the engine loads. Model operations must never
+  // substitute demonstrations or report success without the actual engine.
+  if (cmd === 'get_platform') return 'web';
+  if (cmd === 'load_settings') return localStorage.getItem('ofs-settings') || JSON.stringify({
+    theme: 'spanvision-mono', locale: 'en', left_panel_width: 220, right_panel_width: 290,
+    left_panel_open: true, right_panel_open: true,
+  });
+  if (cmd === 'save_settings') { localStorage.setItem('ofs-settings', args?.settingsJson); return 'ok'; }
+  throw new Error('Frame Studio calculation engine is unavailable. Reload the page to retry.');
 }

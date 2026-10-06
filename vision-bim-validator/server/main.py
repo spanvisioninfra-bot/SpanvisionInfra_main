@@ -11,12 +11,15 @@ Or from server directory: uvicorn main:app --reload --port 8000
 """
 
 import json
+import io
 import logging
 import os
 import shutil
 import tempfile
 import time
 import uuid
+import zipfile
+from threading import BoundedSemaphore
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -138,6 +141,7 @@ PROCESSED_DIR.mkdir(exist_ok=True)
 
 # Initialize IFC processor
 ifc_processor = IFCProcessor(output_dir=PROCESSED_DIR)
+geometry_slots = BoundedSemaphore(1)
 
 # Initialize job manager for async validation tasks
 job_manager = JobManager()
@@ -154,10 +158,10 @@ VALIDATION_DIR.mkdir(exist_ok=True)
 
 
 @app.get("/")
-async def root():
+async def root(request: Request):
     """Serve frontend SPA at root, or API info if no frontend build exists."""
     index = Path(__file__).resolve().parent.parent / "viewer" / "dist" / "index.html"
-    if index.is_file():
+    if index.is_file() and 'application/json' not in request.headers.get('accept', ''):
         return FileResponse(
             index,
             headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
@@ -268,8 +272,7 @@ async def upload_ifc(
         raise HTTPException(status_code=400, detail="Empty file uploaded")
 
     # Save file to temp directory
-    basename = Path(ifc_file.filename.replace('\\', '/')).name
-    safe_filename = f"{file_id}_{basename.replace(' ', '_')}"
+    safe_filename = f"{file_id}.ifc"
     file_path = UPLOAD_DIR / safe_filename
 
     try:
@@ -431,11 +434,20 @@ async def process_ifc(
         )
 
     # Process the IFC file
-    result = ifc_processor.process(
-        ifc_path=ifc_path,
-        output_name=file_id,
-        preferred_format=output_format,
-    )
+    from starlette.concurrency import run_in_threadpool
+    process_geometry = ifc_processor.process_isolated if os.environ.get('SPANVISION_CLOUD') == '1' else ifc_processor.process
+    # Bound native workers across anonymous cloud sessions; reject excess work
+    # promptly instead of spawning enough processes to exhaust the host.
+    if not geometry_slots.acquire(blocking=False):
+        raise HTTPException(status_code=503, detail='Geometry processing is busy. Try again shortly.', headers={'Retry-After': '5'})
+    try:
+        result = await run_in_threadpool(process_geometry,
+            ifc_path=ifc_path,
+            output_name=file_id,
+            preferred_format=output_format,
+        )
+    finally:
+        geometry_slots.release()
 
     # Update file tracking with processing result
     file_info["processing_status"] = "completed" if result.success else "failed"
@@ -575,6 +587,13 @@ def transform_report_for_frontend(report: ValidationReport) -> dict:
         }
 
         specs.append({
+            "name": spec.name,
+            "description": spec.description,
+            "passed": spec.passed,
+            "applicable_count": spec.applicable_count,
+            "passed_count": spec.passed_count,
+            "failed_count": spec.failed_count,
+            "failures": [failure.__dict__ for failure in spec.failures],
             "specification_name": spec.name,
             "status": "pass" if spec.passed else "fail",
             "severity": "error",
@@ -584,6 +603,15 @@ def transform_report_for_frontend(report: ValidationReport) -> dict:
         })
 
     return {
+        "timestamp": report.timestamp,
+        "ifc_file": report.ifc_file,
+        "ifc_schema": report.ifc_schema,
+        "ifc_entity_count": report.ifc_entity_count,
+        "ids_file": report.ids_file,
+        "ids_title": report.ids_title,
+        "validation_time_seconds": report.validation_time_seconds,
+        "passed_specifications": report.passed_specifications,
+        "pass_rate_percent": report.pass_rate_percent,
         "success": report.failed_specifications == 0,
         "ifc_file_name": report.ifc_file,
         "ids_file_name": report.ids_file,
@@ -622,6 +650,10 @@ def run_validation_task(job_id: str, ifc_path: Path, ids_path: Path) -> None:
         # Run validation
         job_manager.update_progress(job_id, "Validating IFC against IDS specification...")
         report = ids_validator.validate(ifc_path, ids_path)
+        job = job_manager.get_job(job_id)
+        if job:
+            report.ifc_file = job.ifc_filename or report.ifc_file
+            report.ids_file = job.ids_filename or report.ids_file
 
         # Check if validation itself failed
         if not report.success:
@@ -730,6 +762,7 @@ def convert_report_to_result(
 
 @app.post("/api/v1/validate")
 async def validate_ifc_ids(
+    request: Request,
     ifc_file: UploadFile = File(..., description="IFC file to validate"),  # noqa: B008
     ids_file: Optional[UploadFile] = File(None, description="IDS file for validation"),  # noqa: B008
     ids_standard: Optional[str] = Form(None, description="IDS standard name (e.g., 'nl-bim', 'rvb')"),
@@ -743,11 +776,15 @@ async def validate_ifc_ids(
     Returns:
         Job ID for checking validation status via /api/v1/jobs/{job_id}
     """
+    # Preserve the older query parameter contract alongside multipart forms.
+    ids_standard = ids_standard or request.query_params.get('ids_standard')
+    if ids_standard:
+        ids_standard = ids_standard.strip().lower()
     # Validate IFC file
-    if not ifc_file.filename or not ifc_file.filename.lower().endswith('.ifc'):
+    if not ifc_file.filename or not ifc_file.filename.lower().endswith(('.ifc', '.ifczip')):
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid file type: {ifc_file.filename or 'unknown'}. Expected .ifc file"
+            detail=f"Invalid IFC file type: {ifc_file.filename or 'unknown'}. Expected .ifc or .ifczip file; IFC XML is not supported by this engine."
         )
 
     # Create job directory
@@ -762,8 +799,26 @@ async def validate_ifc_ids(
             raise HTTPException(status_code=400, detail="IFC file is empty")
         if len(ifc_content) > MAX_FILE_SIZE:
             raise HTTPException(status_code=413, detail="IFC file too large")
+        if ifc_file.filename.lower().endswith('.ifczip'):
+            try:
+                with zipfile.ZipFile(io.BytesIO(ifc_content)) as archive:
+                    models = [entry for entry in archive.infolist() if not entry.is_dir() and entry.filename.lower().endswith('.ifc')]
+                    if len(models) != 1:
+                        raise HTTPException(status_code=400, detail='IFC ZIP must contain exactly one .ifc model.')
+                    entry = models[0]
+                    if entry.file_size > MAX_FILE_SIZE:
+                        raise HTTPException(status_code=413, detail='Uncompressed IFC file too large.')
+                    # Read directly into a fixed job file; never extract visitor paths.
+                    with archive.open(entry) as compressed:
+                        ifc_content = compressed.read(MAX_FILE_SIZE + 1)
+                    if len(ifc_content) > MAX_FILE_SIZE:
+                        raise HTTPException(status_code=413, detail='Uncompressed IFC file too large.')
+            except (zipfile.BadZipFile, RuntimeError, OSError) as error:
+                raise HTTPException(status_code=400, detail='Invalid or encrypted IFC ZIP archive.') from error
 
-        ifc_path = job_dir / Path(ifc_file.filename.replace('\\', '/')).name
+        # Visitor filenames are metadata, never filesystem paths. Fixed names
+        # also avoid Windows MAX_PATH failures for long upload names.
+        ifc_path = job_dir / 'model.ifc'
         with open(ifc_path, "wb") as f:
             f.write(ifc_content)
 
@@ -773,10 +828,10 @@ async def validate_ifc_ids(
 
         if ids_file:
             # Use uploaded IDS file
-            if not ids_file.filename or not ids_file.filename.lower().endswith('.ids'):
+            if not ids_file.filename or not ids_file.filename.lower().endswith(('.ids', '.xml')):
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Invalid file type: {ids_file.filename or 'unknown'}. Expected .ids file"
+                    detail=f"Invalid IDS file type: {ids_file.filename or 'unknown'}. Expected .ids or .xml file"
                 )
 
             ids_content = await ids_file.read()
@@ -786,21 +841,24 @@ async def validate_ifc_ids(
                 raise HTTPException(status_code=413, detail="IDS file too large")
 
             ids_filename = Path(ids_file.filename.replace('\\', '/')).name
-            ids_path = job_dir / ids_filename
+            ids_path = job_dir / 'specification.ids'
             with open(ids_path, "wb") as f:
                 f.write(ids_content)
 
         elif ids_standard:
             # Use bundled standard IDS
-            ids_path = get_bundled_ids(ids_standard)
+            try:
+                ids_path = get_bundled_ids(ids_standard)
+            except ValueError as error:
+                raise HTTPException(status_code=400, detail=f'Invalid IDS standard: {ids_standard} (unknown standard)') from error
             if not ids_path:
-                raise HTTPException(status_code=400, detail=f"Unknown standard: {ids_standard}")
+                raise HTTPException(status_code=400, detail=f"Invalid IDS standard: {ids_standard} (unknown standard)")
             ids_filename = f"{ids_standard}.ids"
 
         else:
             raise HTTPException(
                 status_code=400,
-                detail="Either provide IDS file or specify a standard"
+                detail="Either ids_file or ids_standard must be provided"
             )
 
         # Check if we can accept more concurrent jobs
@@ -861,6 +919,7 @@ async def get_job_status(job_id: str) -> JobStatusResponse:
     Returns:
         Job status with results if completed
     """
+    job_manager.cleanup_expired()
     # Get job info
     job = job_manager.get_job(job_id)
     if not job:

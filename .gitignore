@@ -1,4 +1,5 @@
 node_modules/
+node_modules.audit-backup/
 spanvision-pointcloud-workspace/node_modules/
 spanvision-pointcloud-workspace/dist/
 spanvision-pointcloud-workspace/src-tauri/target/
@@ -106,6 +107,7 @@ Thumbs.db
 /spanvision-pdf-workspace/open-pdf-studio/src-tauri/test.res
 
 # Local-only implementation plans.
+node_modules.audit-incomplete/
 /spanvision-pile-plane-workspace/docs/plans/
 
 # Cloud CLI state and generated deployment packages.

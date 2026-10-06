@@ -1,0 +1,202 @@
+{
+  "checkedAt": "2026-10-06T07:30:18.035Z",
+  "sourceCommit": "36aa5c04e5cd6470095365ae72b86c903dbd6e11",
+  "passed": true,
+  "modules": [
+    {
+      "id": "cad",
+      "url": "https://spanvision-cad.vercel.app/app/",
+      "passed": true,
+      "entryAssets": [
+        "/app/appearance.css",
+        "/app/appearance.js",
+        "/app/SpanvisionCAD-123b54943ea89e57.js",
+        "/app/snippets/OpenCADStudio-37af28018e89eb13/web/clipboard.js",
+        "/app/snippets/SpanvisionCAD-14b2cdba5fe143fb/web/clipboard.js"
+      ]
+    },
+    {
+      "id": "cad2d",
+      "url": "https://spanvision-cad2d.vercel.app/",
+      "passed": true,
+      "entryAssets": [
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/index-zLkyzVOS.js",
+        "/assets/index-Br85xUij.css"
+      ]
+    },
+    {
+      "id": "bim",
+      "url": "https://spanvision-bim.onrender.com/home",
+      "passed": true,
+      "entryAssets": [
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/main-CbnACnmY.js",
+        "/assets/jszip.min-CuZwH4LE.js",
+        "/assets/main-87fglzkN.css"
+      ]
+    },
+    {
+      "id": "pdf",
+      "url": "https://spanvision-pdf.vercel.app/",
+      "passed": true,
+      "entryAssets": [
+        "/js/theme-init.js",
+        "/brand-palette.css",
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/workspace-C70dQUsX.js",
+        "/assets/web-CYgiP-wu.js",
+        "/assets/web-Djof_jjT.css"
+      ]
+    },
+    {
+      "id": "ifc",
+      "url": "https://spanvision-ifc.vercel.app/",
+      "passed": true,
+      "entryAssets": [
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/index-D-twoWiH.js",
+        "/assets/index-Efy5U2qx.css"
+      ]
+    },
+    {
+      "id": "calc",
+      "url": "https://spanvision-calc.vercel.app/",
+      "passed": true,
+      "entryAssets": [
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/index-B-4l2kf_.js",
+        "/assets/index-Dy8cyGVl.css"
+      ]
+    },
+    {
+      "id": "fem",
+      "url": "https://spanvision-fem.vercel.app/",
+      "passed": true,
+      "entryAssets": [
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/index-CGWwQeZP.js",
+        "/assets/index-lGXfllkS.css"
+      ]
+    },
+    {
+      "id": "frame",
+      "url": "https://spanvision-frame.vercel.app/",
+      "passed": true,
+      "entryAssets": [
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/index-B8OxxElD.js",
+        "/assets/index-DXZwPARF.css"
+      ]
+    },
+    {
+      "id": "calculation",
+      "url": "https://spanvision-calculation.vercel.app/",
+      "passed": true,
+      "entryAssets": [
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/index-CKT5-5p4.js",
+        "/assets/index-BklzCUtq.css"
+      ]
+    },
+    {
+      "id": "geo",
+      "url": "https://spanvision-geo.vercel.app/",
+      "passed": true,
+      "entryAssets": [
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/index-DDpOzL6b.js",
+        "/assets/index-CtAK7F1t.css"
+      ]
+    },
+    {
+      "id": "speech",
+      "url": "https://spanvision-speech.vercel.app/",
+      "passed": true,
+      "entryAssets": [
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/index-CsG_U7tD.js",
+        "/assets/index-DoMInCp5.css"
+      ]
+    },
+    {
+      "id": "stl",
+      "url": "https://spanvision-stl.onrender.com/",
+      "passed": true,
+      "entryAssets": [
+        "/static/vendor/leaflet/leaflet.css",
+        "/static/brand-palette.css",
+        "/static/style.css",
+        "/static/theme-init.js",
+        "/static/appearance.css",
+        "/static/appearance.js",
+        "/static/vendor/leaflet/leaflet.js",
+        "/static/app.js"
+      ]
+    },
+    {
+      "id": "field",
+      "url": "https://spanvision-field.vercel.app/",
+      "passed": true,
+      "entryAssets": [
+        "/theme-init.js",
+        "/styles.css",
+        "/titlebar.css",
+        "/themes.css",
+        "/brand-palette.css",
+        "/field-ui.css",
+        "/pdf.min.js",
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/index-vSAhV0h-.js",
+        "/app.js",
+        "/titlebar.js",
+        "/field-notices.js",
+        "/modal-accessibility.js"
+      ]
+    },
+    {
+      "id": "pointcloud",
+      "url": "https://spanvision-pointcloud.vercel.app/",
+      "passed": true,
+      "entryAssets": [
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/index-D7pIfXoB.js",
+        "/assets/index-DCOozH8w.css"
+      ]
+    },
+    {
+      "id": "pile",
+      "url": "https://spanvision-pile.vercel.app/",
+      "passed": true,
+      "entryAssets": [
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/index-BZH_A-zB.js",
+        "/assets/index-BduQ-DbQ.css"
+      ]
+    },
+    {
+      "id": "hub",
+      "url": "https://spanvision-infra.vercel.app/",
+      "passed": true,
+      "entryAssets": [
+        "/appearance.css",
+        "/appearance.js",
+        "/assets/index-0sXll73h.js",
+        "/assets/index-DxMT5Z9Q.css"
+      ]
+    }
+  ]
+}

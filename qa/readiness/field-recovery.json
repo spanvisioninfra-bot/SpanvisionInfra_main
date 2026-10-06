@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "checkedAt": "2026-10-06T06:52:11.517Z",
+  "checks": [
+    "Cancelled file selection preserves the active project",
+    "malformed.json: clear error and unchanged project",
+    "wrong-array.json: clear error and unchanged project",
+    "null-entry.json: clear error and unchanged project",
+    "wrong-root.json: clear error and unchanged project",
+    "Valid retry and reload retain the project and actual embedded media"
+  ],
+  "errors": []
+}

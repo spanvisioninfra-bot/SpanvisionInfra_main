@@ -39,7 +39,7 @@ export default function AppearanceMenu() {
         <div class={styles.popover} role="dialog" aria-label={t('appearance.title')}>
           <div class={styles.eyebrow}>{t('appearance.title')}</div>
           <div class={styles.themeRow}>
-            <span class={styles.themeMark}>GW</span>
+            <span class={styles.themeMark}>SI</span>
             <span>
               <strong>{interfaceTheme() === 'light' ? 'Light mode' : 'Dark mode'}</strong>
               <select aria-label="Interface theme" value={interfaceTheme()} onChange={event=>setTheme(event.currentTarget.value)}>

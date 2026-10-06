@@ -1,0 +1,9 @@
+{
+  "command": ".venv\\Scripts\\python.exe -m pytest test server/tests -q",
+  "directory": "vision-bim-validator",
+  "started": "2026-10-05T05:22:00.122Z",
+  "finished": "2026-10-05T05:31:27.013Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/bim-backend-tests.log"
+}

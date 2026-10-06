@@ -40,7 +40,7 @@ export const SYSTEEMRASTER_RANDCONDITIES = ['tonen', 'minmaat'];
 // opgeslagen); `edge.profiel` is het randprofiel langs de contour.
 
 /** Randprofielen (edge conditions) van een systeem. */
-export const SYSTEEM_EDGE_PROFIELEN = ["none", 'hoeklijn', 'schaduwvoeg'];
+export const SYSTEEM_EDGE_PROFIELEN = ["geen", 'hoeklijn', 'schaduwvoeg'];
 
 /** Ingebouwde render-stijlen voor panelen. Paneeltype-ID's zijn DATA op het
  *  systeemtype (typeDef.paneelTypen: {id,naam,renderStijl}); deze drie zijn
@@ -205,9 +205,9 @@ export function resolveSysteem(ann) {
     }
   }
   const profiel = SYSTEEM_EDGE_PROFIELEN.includes(layer0.edge && layer0.edge.profiel)
-    ? layer0.edge.profiel : "none";
+    ? layer0.edge.profiel : "geen";
   return {
-    type: sys.type === 'plafond' ? "ceiling" : 'raster',
+    type: sys.type === 'plafond' ? "plafond" : 'raster',
     layers: [{ panels, edges, edge: { profiel } }],
   };
 }
@@ -590,7 +590,7 @@ function _classifyCell(flatPts, x0, y0, w, h) {
     }
   }
   if (inside === 9) return 'vol';
-  return inside > 0 ? "edge" : null;
+  return inside > 0 ? "rand" : null;
 }
 
 /** Render-stijl van een paneeltype-id: eerst het assortiment van het

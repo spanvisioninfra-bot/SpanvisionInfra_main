@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-10-05T11:27:49.734Z",
+  "passed": true,
+  "checks": [
+    "LAS: real worker import, themes, export world coordinates/RGB/classes and PLY reimport",
+    "LAZ: real worker import, themes, export world coordinates/RGB/classes and PLY reimport",
+    "Malformed PLY reports a useful error and the worker accepts the next valid import"
+  ],
+  "errors": []
+}

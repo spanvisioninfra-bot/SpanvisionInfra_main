@@ -567,17 +567,17 @@ const genId = (prefix: string) => `${prefix}-gen-${++n}`;
   assert(resolveUniqueCompanyName('  nieuw bv  ', ['Nieuw BV']) === 'nieuw bv (2)', 'resolveUniqueCompanyName: case/witruimte-ongevoelige botsing ⇒ eigen schrijfwijze + " (2)"');
 
   // Lege/pure-witruimte naam ⇒ standaardlabel.
-  assert(resolveUniqueCompanyName('', []) === 'Nieuwe resourcebibliotheek', 'resolveUniqueCompanyName: lege naam ⇒ standaardlabel');
-  assert(resolveUniqueCompanyName('   ', []) === 'Nieuwe resourcebibliotheek', 'resolveUniqueCompanyName: pure ASCII-witruimte ⇒ standaardlabel');
+  assert(resolveUniqueCompanyName('', []) === 'New resource library', 'resolveUniqueCompanyName: lege naam ⇒ standaardlabel');
+  assert(resolveUniqueCompanyName('   ', []) === 'New resource library', 'resolveUniqueCompanyName: pure ASCII-witruimte ⇒ standaardlabel');
 
   // Critreview F4: een naam die UITSLUITEND uit onzichtbare tekens bestaat (zero-width spaces) is
   // met `.trim()` alleen NIET leeg (ASCII-trim raakt U+200B niet) — de fix gebruikt `normalizeName`
   // voor de leeg-check, die onzichtbare formatting-tekens WEL strript. Zonder de fix zou dit een
   // bibliotheek met een ogenschijnlijk lege naam opleveren i.p.v. het standaardlabel.
   const zeroWidthOnly = '​​​';
-  assert(resolveUniqueCompanyName(zeroWidthOnly, []) === 'Nieuwe resourcebibliotheek', 'resolveUniqueCompanyName [F4]: uitsluitend onzichtbare tekens ⇒ standaardlabel, niet een lege naam');
+  assert(resolveUniqueCompanyName(zeroWidthOnly, []) === 'New resource library', 'resolveUniqueCompanyName [F4]: uitsluitend onzichtbare tekens ⇒ standaardlabel, niet een lege naam');
   // Het standaardlabel zelf kan ook botsen (bv. een tweede onzichtbare-naam-import) ⇒ ook dan " (2)".
-  assert(resolveUniqueCompanyName(zeroWidthOnly, ['Nieuwe resourcebibliotheek']) === 'Nieuwe resourcebibliotheek (2)', 'resolveUniqueCompanyName [F4]: standaardlabel zelf kan ook botsen ⇒ " (2)"');
+  assert(resolveUniqueCompanyName(zeroWidthOnly, ['New resource library']) === 'New resource library (2)', 'resolveUniqueCompanyName [F4]: standaardlabel zelf kan ook botsen ⇒ " (2)"');
 }
 
 // --- isReservedCompanyId / isSafeFileCompanyId (issue #19, critreview F1/F2) ---

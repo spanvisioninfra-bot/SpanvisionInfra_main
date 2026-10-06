@@ -17,7 +17,7 @@ interface KeyboardActions {
 
 export function useKeyboardShortcuts(actions: KeyboardActions) {
   const handleKeyDown = (e: KeyboardEvent) => {
-    if ((e.target as HTMLElement).tagName === 'INPUT' || (e.target as HTMLElement).tagName === 'SELECT') return;
+    if (e.defaultPrevented || (e.target as HTMLElement).closest('input, select, textarea, button, [role="slider"], [contenteditable="true"]')) return;
 
     if (e.key === ' ') {
       e.preventDefault();

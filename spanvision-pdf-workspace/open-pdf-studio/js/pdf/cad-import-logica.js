@@ -974,7 +974,7 @@ export function mapVan(pad) {
 /** Bytes kort weergeven. */
 export function grootteTekst(bytes, decimaal = ',') {
   const n = Number(bytes) || 0;
-  if (n < 1024) return `${n} W`;
+  if (n < 1024) return `${n} B`;
   const kb = n / 1024;
   if (kb < 1024) return `${(Math.round(kb * 10) / 10).toString().replace('.', decimaal)} kB`;
   return `${(Math.round((kb / 1024) * 10) / 10).toString().replace('.', decimaal)} MB`;

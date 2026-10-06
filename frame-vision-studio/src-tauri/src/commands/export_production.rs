@@ -1,5 +1,4 @@
 use crate::state::AppState;
-use ofs_core::production::compute_production_data;
 use ofs_core::export::pdf_labels::LabelConfig;
 use tauri::State;
 
@@ -11,11 +10,7 @@ pub async fn export_production_lists(
 ) -> Result<String, String> {
     let production_data = {
         let project = state.project.lock().map_err(|e| e.to_string())?;
-        project
-            .kozijnen
-            .iter()
-            .map(|k| compute_production_data(k))
-            .collect::<Vec<_>>()
+        ofs_core::export::checked_project_production(&project)?
     };
 
     match format.as_str() {
@@ -31,12 +26,13 @@ pub async fn export_production_lists(
                 &output_path,
             )?;
         }
-        _ => {
+        "pdf" => {
             ofs_core::export::pdf::generate_production_pdf(
                 &production_data,
                 &output_path,
             )?;
         }
+        _ => return Err("Choose PDF, Excel or CSV for production lists.".into()),
     }
 
     Ok(output_path)
@@ -50,7 +46,6 @@ pub fn export_labels_pdf(
     let project = state.project.lock().map_err(|e| e.to_string())?;
     let config = LabelConfig::default();
     let bytes = ofs_core::export::pdf_labels::generate_labels_pdf(&project, &config)?;
-    std::fs::write(&output_path, bytes)
-        .map_err(|e| format!("Kan labels PDF niet opslaan: {}", e))?;
+    ofs_core::export::write_export_bytes(&output_path, &bytes)?;
     Ok(())
 }

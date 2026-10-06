@@ -72,7 +72,7 @@ export function recalculateItems(items: CostItem[], tarieven?: Record<string, nu
   // elke willekeurige bewerking elders in de begroting).
   if (tarieven) {
     for (const item of result) {
-      if (item.rowType === "calc " && item.tariefGroep && item.normQuantity != null) {
+      if (item.rowType === "regel" && item.tariefGroep && item.normQuantity != null) {
         const tarief = tarieven[item.tariefGroep] ?? 0;
         item.laborPrice = item.normQuantity * tarief;
       }
@@ -89,7 +89,7 @@ export function recalculateItems(items: CostItem[], tarieven?: Record<string, nu
 
   // First pass: calculate leaf items (begrotingspost without children, and regel rows)
   for (const item of result) {
-    if (item.rowType === "calc ") {
+    if (item.rowType === "regel") {
       // Hoeveelheid = Aantal × Productienorm / Productiecapaciteit
       const qty = item.quantity ?? 0;
       const norm = item.normQuantity ?? 0;
@@ -150,7 +150,7 @@ export function recalculateItems(items: CostItem[], tarieven?: Record<string, nu
     const children = childrenMap.get(item.id) ?? [];
     if (children.length === 0) return;
     const childSum = calcTotal(item.id);
-    const own = (item.rowType !== 'chapter' && childSum === 0) ? ownTotal(item) : 0;
+    const own = (item.rowType !== "chapter" && childSum === 0) ? ownTotal(item) : 0;
     if (own !== 0) {
       // Kinderen leveren (nog) niets op: de eigen post-prijs telt door.
       item.total = own;
@@ -177,7 +177,7 @@ export function recalculateItems(items: CostItem[], tarieven?: Record<string, nu
     const children = childrenMap.get(parentId) ?? [];
     let sum = 0;
     for (const child of children) {
-      if (child.rowType === 'chapter' || child.rowType === 'begrotingspost' || child.rowType === 'bewakingspost') {
+      if (child.rowType === "chapter" || child.rowType === 'begrotingspost' || child.rowType === 'bewakingspost') {
         rollup(child);
       }
       // Only include non-staart items in parent sums
@@ -202,7 +202,7 @@ export function recalculateItems(items: CostItem[], tarieven?: Record<string, nu
 
   // Sum of only the onderaanneming portion (regel rows with resourceType === 'onderaannemer')
   const oaPortie = result
-    .filter(item => item.rowType === "calc " && item.resourceType === 'onderaannemer')
+    .filter(item => item.rowType === "regel" && item.resourceType === 'onderaannemer')
     .reduce((sum, item) => sum + item.total, 0);
 
   // Track running totals for the Bouw 1 cascading staart model
@@ -336,14 +336,14 @@ export function recalculateItems(items: CostItem[], tarieven?: Record<string, nu
       counter++;
       // Top-level chapters: use their code as Nr when available (e.g. "60" instead of "19")
       let segment: string;
-      if (!parentId && item.rowType === 'chapter' && item.code) {
+      if (!parentId && item.rowType === "chapter" && item.code) {
         segment = item.code;
       } else {
         segment = String(counter).padStart(2, '0');
       }
       item.nr = parentNr ? `${parentNr}.${segment}` : segment;
       // Recurse into children if this is a container
-      if (item.rowType === 'chapter' || item.rowType === 'begrotingspost' || item.rowType === 'bewakingspost') {
+      if (item.rowType === "chapter" || item.rowType === 'begrotingspost' || item.rowType === 'bewakingspost') {
         assignNr(item.id, item.nr);
       }
     }
@@ -372,7 +372,7 @@ export function computeKostprijsBreakdown(items: CostItem[]): KostprijsBreakdown
     loon: 0, materiaal: 0, materieel: 0, stelpost: 0, onderaanneming: 0,
   };
   for (const item of items) {
-    if (item.rowType !== "calc ") continue;
+    if (item.rowType !== "regel") continue;
     const qty = item.quantity ?? 0;
     const lab = item.laborPrice ?? 0;
     const matPrice = item.normUnitPrice ?? 0;

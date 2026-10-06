@@ -1,0 +1,68 @@
+{
+  "checkedAt": "2026-10-05T16:11:57.671861+00:00",
+  "status": "passed",
+  "validator": "IfcOpenShell 0.9.0",
+  "records": [
+    {
+      "lod": 200,
+      "schemaIssues": 0,
+      "solids": 1,
+      "boundsMetres": [
+        [
+          0.0,
+          0.9
+        ],
+        [
+          -0.114,
+          0.0
+        ],
+        [
+          0.0,
+          2.1
+        ]
+      ],
+      "sha256": "3ea0c0b2646f2d67f074836c3e0eb12dd3f105c4a50bd766a91ddd5becccd8b3"
+    },
+    {
+      "lod": 300,
+      "schemaIssues": 0,
+      "solids": 2,
+      "boundsMetres": [
+        [
+          0.0,
+          0.9
+        ],
+        [
+          -0.114,
+          0.0
+        ],
+        [
+          0.0,
+          2.1
+        ]
+      ],
+      "sha256": "385341fbcf63998c775dd8a4fe4dc371831bd0fb6889541e6023e9591f484aa0"
+    },
+    {
+      "lod": 400,
+      "schemaIssues": 0,
+      "solids": 5,
+      "boundsMetres": [
+        [
+          0.0,
+          0.9
+        ],
+        [
+          -0.114,
+          0.0
+        ],
+        [
+          0.0,
+          2.1
+        ]
+      ],
+      "sha256": "cfb2c359abc6991751e1c15167461f3498c6fe70137a7d6e9a09c28113059347"
+    }
+  ],
+  "scope": "Three browser-exported rectangular door fixtures; not certification of fabrication or every frame shape."
+}

@@ -1,5 +1,19 @@
 services:
   - type: web
+    name: spanvision-fem-engine
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: main
+    dockerfilePath: ./deployment/Dockerfile.fem
+    dockerContext: .
+    healthCheckPath: /health
+    buildFilter:
+      paths:
+        - deployment/Dockerfile.fem
+        - deployment/fem_api.py
+        - fem-vision-studio/src-tauri/**
+  - type: web
     name: spanvision-bim
     runtime: docker
     plan: free

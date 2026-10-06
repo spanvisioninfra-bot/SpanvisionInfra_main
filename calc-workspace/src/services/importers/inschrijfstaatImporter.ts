@@ -54,7 +54,7 @@ interface ParsedRow {
  * - 6 digits (100010) → bestekspost (begrotingspost)
  * - "opm" → tekstregel
  */
-function getRowInfo(code: string): { rowType: 'chapter' | 'begrotingspost' | 'tekstregel'; depth: number } {
+function getRowInfo(code: string): { rowType: "chapter" | 'begrotingspost' | 'tekstregel'; depth: number } {
   const c = code.trim();
   if (c.toLowerCase() === 'opm' || c === '') {
     return { rowType: 'tekstregel', depth: 0 };
@@ -64,10 +64,10 @@ function getRowInfo(code: string): { rowType: 'chapter' | 'begrotingspost' | 'te
     return { rowType: 'tekstregel', depth: 0 };
   }
   if (c.length <= 2) {
-    return { rowType: 'chapter', depth: 0 };
+    return { rowType: "chapter", depth: 0 };
   }
   if (c.length <= 4) {
-    return { rowType: 'chapter', depth: 1 };
+    return { rowType: "chapter", depth: 1 };
   }
   return { rowType: 'begrotingspost', depth: 2 };
 }
@@ -145,7 +145,7 @@ export async function importInschrijfstaatFile(buffer: ArrayBuffer): Promise<{
 
     // Unspace chapter titles
     let desc = row.description;
-    if (info.rowType === 'chapter' && isSpacedTitle(desc)) {
+    if (info.rowType === "chapter" && isSpacedTitle(desc)) {
       desc = unspaceTitle(desc);
     }
 
@@ -153,12 +153,12 @@ export async function importInschrijfstaatFile(buffer: ArrayBuffer): Promise<{
       ? row.verrekenbaar.toUpperCase()
       : 'V') as Verrekenbaarheid;
 
-    if (info.rowType === 'chapter' && info.depth === 0) {
+    if (info.rowType === "chapter" && info.depth === 0) {
       // Top-level chapter
       currentChapter = makeCostItem({
         code: row.code,
         description: desc,
-        rowType: 'chapter',
+        rowType: "chapter",
         depth: 0,
         parentId: null,
         sortOrder: sortOrder++,
@@ -167,12 +167,12 @@ export async function importInschrijfstaatFile(buffer: ArrayBuffer): Promise<{
       });
       items.push(currentChapter);
       currentSubChapter = null;
-    } else if (info.rowType === 'chapter' && info.depth === 1) {
+    } else if (info.rowType === "chapter" && info.depth === 1) {
       // Sub-chapter
       currentSubChapter = makeCostItem({
         code: row.code,
         description: desc,
-        rowType: 'chapter',
+        rowType: "chapter",
         depth: 1,
         parentId: currentChapter?.id ?? null,
         sortOrder: sortOrder++,

@@ -12,10 +12,15 @@
   const patch = (name, values) => write(name, JSON.stringify({...json(name),...values}));
   const requested = new URL(location.href).searchParams.get('appearance');
   const saved = read(key);
+  // A native system/high-contrast choice must survive a reload. The explicit
+  // shared switch (or URL) can replace it; the shared default cannot.
+  let preservePlannerTheme = module === 'planner' && !['light','dark'].includes(requested)
+    && ['system','dark','light','spanvision-mono','high-contrast','highContrast'].includes(read('ops-theme'));
   // Apply the shared default before native preferences (including IndexedDB) load.
   root.dataset.svModeExplicit='true';
   const light = value => value === 'light' || value === 'Light';
   let mode = ['light','dark'].includes(requested) ? requested : ['light','dark'].includes(saved) ? saved : 'dark';
+  if (preservePlannerTheme) mode = light(root.dataset.theme) ? 'light' : 'dark';
   let control;
   function mirrorPreferences() {
     const theme = mode === 'light' ? 'light' : 'spanvision-mono';
@@ -26,7 +31,7 @@
       case 'pdf': patch('spanvision-pdf-workspace.preferences',{theme});patch('pdfEditorPreferences',{theme});break;
       case 'ifc': write('ifc-view.theme',theme);break;
       case 'calc': patch('ocs:settings',{theme});write('ocs-theme',theme);break;
-      case 'planner': write('ops-theme',theme);break;
+      case 'planner': if (!preservePlannerTheme) write('ops-theme',theme);break;
       case 'fem': write('fem2d-theme',theme);break;
       case 'frame': patch('ofs-settings',{theme});break;
       case 'calculation': patch('spanvision-calculation-preferences',{theme});break;
@@ -52,6 +57,7 @@
   }
   function setMode(next) {
     if(next!=='light'&&next!=='dark')return;
+    preservePlannerTheme=false;
     mode=next;remember();mirrorPreferences();paint();
     const theme=mode==='light'?'light':'spanvision-mono';
     if(root.dataset.theme!==theme)root.dataset.theme=theme;
@@ -60,7 +66,8 @@
   }
   window.SpanvisionAppearance={getMode:()=>mode,setMode};
   if(root.dataset.svModeExplicit==='true')write(key,mode);
-  mirrorPreferences();paint();root.dataset.theme=mode==='light'?'light':'spanvision-mono';
+  mirrorPreferences();paint();
+  if (!preservePlannerTheme) root.dataset.theme=mode==='light'?'light':'spanvision-mono';
   if(module==='cad')root.dataset.svPendingTheme=mode;
   // Native settings menus remain in sync with the quick switch.
   const themeObserver=new MutationObserver(()=>{
@@ -76,7 +83,12 @@
     const existing=document.getElementById('sv-color-mode');
     if(existing){if(existing.parentElement.parentElement!==host)host.append(existing.parentElement);return;}
     const label=document.createElement('label');label.className='sv-appearance-control';
-    const icon=document.createElement('span');icon.className='sv-appearance-icon';icon.textContent='◐';icon.setAttribute('aria-hidden','true');
+    const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    icon.classList.add('sv-appearance-icon');icon.setAttribute('viewBox','0 0 20 20');icon.setAttribute('aria-hidden','true');
+    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx','10');circle.setAttribute('cy','10');circle.setAttribute('r','7.5');circle.setAttribute('fill','none');circle.setAttribute('stroke','currentColor');
+    const half=document.createElementNS('http://www.w3.org/2000/svg','path');
+    half.setAttribute('d','M10 2.5a7.5 7.5 0 0 0 0 15Z');half.setAttribute('fill','currentColor');icon.append(circle,half);
     const select=document.createElement('select');select.id='sv-color-mode';select.setAttribute('aria-label','Color mode');select.title='Color mode (default: Dark)';
     for(const [value,text]of [['dark','Dark'],['light','Light']]){const option=document.createElement('option');option.value=value;option.textContent=text;select.append(option);}
     select.value=mode;select.addEventListener('change',()=>setMode(select.value));

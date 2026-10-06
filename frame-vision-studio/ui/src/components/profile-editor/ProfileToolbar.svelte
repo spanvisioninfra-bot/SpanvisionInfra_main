@@ -3,6 +3,7 @@
   import { profileEditor, editorTool, editorSnap, editorSelectedVertex, editorVertices, editorIsDirty } from "../../stores/profileEditor.js";
 
   function handleKeyDown(e) {
+    if (e.defaultPrevented || e.target.closest('input, textarea, select, [role="dialog"]')) return;
     if (e.key === "Delete" || e.key === "Backspace") {
       if ($editorSelectedVertex >= 0) {
         profileEditor.removeVertex($editorSelectedVertex);

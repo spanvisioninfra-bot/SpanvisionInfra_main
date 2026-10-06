@@ -5,15 +5,17 @@
  */
 import {
   DOWNLOAD_STATS_CACHE_MS,
-  DOWNLOAD_STATS_URL,
   isFresh,
-  loadDownloadStats,
+  loadDownloadStats as loadConfiguredDownloadStats,
   parseDownloadStats,
   readCachedStats,
   totalDownloads,
   userDownloads,
   type StatsStorage,
 } from '@/services/stats/downloadStats';
+
+const TEST_STATS_URL = 'https://example.invalid/downloads.json';
+const loadDownloadStats: typeof loadConfiguredDownloadStats = options => loadConfiguredDownloadStats({ ...options, url: TEST_STATS_URL });
 
 let failures = 0;
 let checks = 0;
@@ -42,6 +44,12 @@ const FIXTURE = {
   polls: 1061,
   unknown: [],
 };
+
+// No release-statistics endpoint is configured for this fork. This must be explicit.
+await loadConfiguredDownloadStats({ url: '', storage: null }).then(
+  () => check('unconfigured statistics are rejected', false),
+  error => check('unconfigured statistics are rejected', /not been configured/.test(error.message)),
+);
 
 // ── Parser ──
 {
@@ -83,7 +91,7 @@ await (async () => {
   const T0 = 1_000_000;
 
   const first = await loadDownloadStats({ storage, fetchImpl: fakeFetch(log, FIXTURE), now: T0 });
-  check('eerste load fetcht de vaste raw-URL', log.length === 1 && log[0] === DOWNLOAD_STATS_URL);
+  check('eerste load fetcht de vaste raw-URL', log.length === 1 && log[0] === TEST_STATS_URL);
   check('eerste load komt niet uit cache', !first.fromCache && first.fetchedAt === T0);
   check('cache is geschreven onder de ops-prefix', storage.map.has('ops-downloadStats'));
 

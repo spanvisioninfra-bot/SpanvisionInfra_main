@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "source": "Actual native ofs-core example and all seven browser document downloads",
+  "renderedPagesReviewed": 48,
+  "documents": {
+    "schedule-long.pdf": 5,
+    "production-long.pdf": 5,
+    "estimate-long.pdf": 4,
+    "labels.pdf": 4,
+    "workshop.pdf": 1,
+    "workshop-wide.pdf": 1,
+    "panel-production.pdf": 1,
+    "browser-schedule.pdf": 5,
+    "browser-production.pdf": 16,
+    "browser-labels.pdf": 4,
+    "browser-workshop.pdf": 1,
+    "browser-estimate.pdf": 1
+  },
+  "review": "Reviewed all rendered pages and the full-resolution first schedule/panel pages. Tables repeat headings across page breaks, Unicode renders legibly, labels retain actual piece identifiers, the wide workshop dimension labels fit, populated panel/bead/hardware/gasket/BOM sections appear, and estimate terms continue through TERM-070. No clipped or overlapping text observed. These are QA fixtures, not manufacturing approvals. Reviewed all 27 browser pages and the full-resolution estimate. No clipping/overlap observed; project totals, fractional dimensions and real piece identifiers agree with independent extraction. Workshop remains a front-view schematic. The PDF uses current project prices rather than a manually revised history total.",
+  "reviewedAt": "2026-10-06T04:28:15.125Z"
+}

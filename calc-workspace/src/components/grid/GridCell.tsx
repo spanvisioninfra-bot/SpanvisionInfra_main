@@ -32,7 +32,7 @@ export const GridCell: React.FC<Props> = React.memo(({ item, column, colWidth, r
 
   const getRowTypeAbbr = (): string => {
     switch (item.rowType) {
-      case 'chapter':
+      case "chapter":
       case 'begrotingspost':
       case 'bewakingspost':
       case 'regel':
@@ -53,7 +53,7 @@ export const GridCell: React.FC<Props> = React.memo(({ item, column, colWidth, r
   const isBwk = rt === 'bewakingspost';
 
   // In UI-2 (wpcalc), chapter rows show NO values in any numeric column
-  const isChapterInWpcalc = rt === 'chapter' && gridView === 'wpcalc';
+  const isChapterInWpcalc = rt === "chapter" && gridView === 'wpcalc';
 
   const getValue = (): string => {
     // Chapter footer rows: show aggregated totals
@@ -156,7 +156,7 @@ export const GridCell: React.FC<Props> = React.memo(({ item, column, colWidth, r
         // Opslag blijft de code ('uur', 'st', …); alleen de weergave is vertaald.
         return (isBgr || isBwk || isRegel || rt === 'tekstregel') ? formatUnit(item.unit, t) : '';
       case 'verrekenbaar':
-        return rt === 'chapter' ? (item.verrekenbaar ?? '') : '';
+        return rt === "chapter" ? (item.verrekenbaar ?? '') : '';
       case 'normUnitPrice': {
         if (isRegel) return formatCurrency(item.normUnitPrice);
         if (isBgr || isBwk) {
@@ -180,7 +180,7 @@ export const GridCell: React.FC<Props> = React.memo(({ item, column, colWidth, r
         // Walk up to find top-level chapter
         let current: CostItem | undefined = item;
         while (current) {
-          if (current.rowType === 'chapter' && !current.parentId) return current.code || '';
+          if (current.rowType === "chapter" && !current.parentId) return current.code || '';
           current = items.find((i) => i.id === current!.parentId);
         }
         return '';
@@ -189,7 +189,7 @@ export const GridCell: React.FC<Props> = React.memo(({ item, column, colWidth, r
         // Walk up to find depth-1 chapter (paragraaf)
         let current: CostItem | undefined = item;
         while (current) {
-          if (current.rowType === 'chapter' && current.depth === 1) return current.code || '';
+          if (current.rowType === "chapter" && current.depth === 1) return current.code || '';
           current = items.find((i) => i.id === current!.parentId);
         }
         return '';
@@ -303,7 +303,7 @@ export const GridCell: React.FC<Props> = React.memo(({ item, column, colWidth, r
         }
         if (isBwk) return t('common:tooltip.totalSumRules', { result: fmtC(item.total) });
         if (isBgr) return t('common:tooltip.totalSumMonitorPosts', { result: fmtC(item.total) });
-        if (rt === 'chapter') return t('common:tooltip.totalSumChildren', { result: fmtC(item.total) });
+        if (rt === "chapter") return t('common:tooltip.totalSumChildren', { result: fmtC(item.total) });
         return '';
       default:
         return column.tooltip ?? '';
@@ -312,7 +312,7 @@ export const GridCell: React.FC<Props> = React.memo(({ item, column, colWidth, r
 
   const editable = isCellEditable(column.key, rt, gridView);
   const alignClass = column.align === 'right' ? ' align-right' : column.align === 'center' ? ' align-center' : '';
-  const isChapterBold = item.rowType === 'chapter';
+  const isChapterBold = item.rowType === "chapter";
   const canCollapse = isContainerRowType(item.rowType);
 
   const isWitregel = item.rowType === 'witregel';
@@ -334,7 +334,7 @@ export const GridCell: React.FC<Props> = React.memo(({ item, column, colWidth, r
         width: colWidth,
         minHeight: 24,
         paddingLeft: isDescCol ? (gridView === 'wpcalc'
-          ? (item.rowType === 'chapter' && item.depth === 0 ? 4 : 4 + item.depth * 16) // UI-2: top chapters flush, rest indented by depth
+          ? (item.rowType === "chapter" && item.depth === 0 ? 4 : 4 + item.depth * 16) // UI-2: top chapters flush, rest indented by depth
           : item.depth * 16 + 4
         ) : undefined,
       }}

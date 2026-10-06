@@ -53,7 +53,7 @@ test('update-highlights volgen de app-ready route en houden externe link open', 
   await expect(dialog.locator('article').nth(3).getByRole('button')).toHaveCount(0);
   await expect(dialog.locator('article').nth(4).getByRole('button')).toHaveCount(0);
   await page.getByText('See full release notes').click({ noWaitAfter: true });
-  await expect.poll(() => page.evaluate(() => window.openedReleaseUrls ?? [])).toEqual(['https://github.com/OpenAEC-Foundation/open-planner-studio/wiki/Changelog']);
+  await expect.poll(() => page.evaluate(() => window.openedReleaseUrls ?? [])).toEqual(['https://github.com/OpenAEC-Foundation/open-planner-studio/releases']);
   await expect(dialog).toBeVisible();
   await page.evaluate(() => { window.open = (() => null) as typeof window.open; });
   await page.getByText('See full release notes').click({ noWaitAfter: true });
@@ -62,23 +62,23 @@ test('update-highlights volgen de app-ready route en houden externe link open', 
   await expect(dialog).toHaveCount(0);
 });
 
-test('update-highlights werken smal, licht/donker en RTL', async ({ page, ops: _ops }) => {
+test('update-highlights werken smal, licht/donker en Engels', async ({ page, ops: _ops }) => {
   await stubReleasesApi(page);
   await page.setViewportSize({ width: 390, height: 420 });
-  await selectLocale(page, 'NL — Nederlands', 'nl');
+  await selectLocale(page, 'EN — English', 'en');
   await page.evaluate(() => window.__OPS__!.store.getState().setUI({ uiTheme: 'light', justUpdated: { from: null, to: '2026.8.1' } }));
   const dialog = page.locator('[data-ops-just-updated-dialog]');
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByText('Importeer met de datums uit je planning')).toBeVisible();
-  await expect(dialog.getByText('RESOURCEBIBLIOTHEKEN', { exact: true })).toBeVisible();
+  await expect(dialog.getByText('Import with the dates from your plan')).toBeVisible();
+  await expect(dialog.getByText('RESOURCES', { exact: true })).toBeVisible();
   await expect(dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).resolves.toBe(true);
   await page.evaluate(() => window.__OPS__!.store.getState().setUI({ justUpdated: null }));
   await expect(dialog).toHaveCount(0);
-  await selectLocale(page, 'AR — العربية', 'ar');
+  await selectLocale(page, 'EN — English', 'en');
   await page.evaluate(() => window.__OPS__!.store.getState().setUI({ uiTheme: 'dark', justUpdated: { from: null, to: '2026.8.1' } }));
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByText('إشغال مكتبة الموارد')).toBeVisible();
-  await expect(dialog.getByText('الموارد', { exact: true })).toBeVisible();
-  await expect.poll(() => page.evaluate(() => document.documentElement.dir)).toBe('rtl');
+  await expect(dialog.getByText('Resource library occupancy')).toBeVisible();
+  await expect(dialog.getByText('RESOURCES', { exact: true })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => document.documentElement.dir)).toBe('ltr');
   await expect(dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).resolves.toBe(true);
 });

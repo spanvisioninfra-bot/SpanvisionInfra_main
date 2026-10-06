@@ -39,7 +39,7 @@ function importSimpleRsx(doc: Document): ImportResult {
       parentId: null,
       sortOrder: items.length,
       depth: 0,
-      rowType: 'chapter',
+      rowType: "chapter",
       code: d.getAttribute('code') ?? '',
       description: d.getAttribute('omschrijving') ?? '',
     });
@@ -151,7 +151,7 @@ function importRealRaw(doc: Document): ImportResult {
         const parentId = chapterStack.length > 0 ? chapterStack[chapterStack.length - 1].id : null;
         const item = makeCostItem({
           parentId, sortOrder: sortOrder++, code: nr, description, depth,
-          rowType: 'chapter', unit: 'st', verrekenbaar: 'V',
+          rowType: "chapter", unit: 'st', verrekenbaar: 'V',
         });
         items.push(item);
         chapterStack.push({ id: item.id, depth, nr });
@@ -169,7 +169,7 @@ function importRealRaw(doc: Document): ImportResult {
 
             const unitEl = bpost.getElementsByTagName('dl22.eenheid.res.verpl')[0];
             const unitText = unitEl?.textContent?.trim() ?? '';
-            const unit = unitText ? normalizeUnit(unitText) : "pcs";
+            const unit = unitText ? normalizeUnit(unitText) : "st";
 
             const qtyRes = rawNum(bpost, 'dl22.hoev.res.verpl');
             const qtyInl = rawNum(bpost, 'dl22.hoev.ter.inl');

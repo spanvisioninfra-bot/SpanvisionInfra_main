@@ -1,0 +1,9 @@
+{
+  "command": "npm test -- --maxWorkers=2",
+  "directory": "spanvision-geptechniek-workspace/apps/desktop",
+  "started": "2026-10-05T09:58:05.810Z",
+  "finished": "2026-10-05T09:59:20.476Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/geo-tests.log"
+}

@@ -15,6 +15,32 @@ pub fn pointcloud_open(
     state.inner().open(&file_path)
 }
 
+/// Export the complete native cloud without limiting it to currently visible octree nodes.
+#[tauri::command]
+pub async fn pointcloud_export(
+    id: String,
+    format: String,
+    file_path: String,
+    state: State<'_, Arc<PointcloudManager>>,
+) -> Result<u64, String> {
+    let metadata = state.get_metadata(&id).ok_or_else(|| "Pointcloud not found".to_string())?;
+    tauri::async_runtime::spawn_blocking(move || {
+        super::export::export_pointcloud(std::path::Path::new(&metadata.file_path), std::path::Path::new(&file_path), &format)
+    }).await.map_err(|e| format!("Pointcloud export task failed: {}", e))?
+}
+
+#[tauri::command]
+pub async fn pointcloud_read_editable_source(
+    id: String,
+    state: State<'_, Arc<PointcloudManager>>,
+) -> Result<Response, String> {
+    let metadata = state.get_metadata(&id).ok_or_else(|| "Pointcloud not found".to_string())?;
+    let bytes = tauri::async_runtime::spawn_blocking(move || {
+        super::export::read_editable_source(std::path::Path::new(&metadata.file_path), metadata.total_points)
+    }).await.map_err(|e| format!("Pointcloud read task failed: {}", e))??;
+    Ok(Response::new(bytes))
+}
+
 /// Get octree construction progress (0.0 - 1.0)
 #[tauri::command]
 pub fn pointcloud_get_progress(

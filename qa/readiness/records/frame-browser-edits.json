@@ -1,0 +1,9 @@
+{
+  "command": "node --test src/lib/webProjectCommands.test.mjs",
+  "directory": "frame-vision-studio/ui",
+  "started": "2026-10-05T18:01:42.616Z",
+  "finished": "2026-10-05T18:01:42.857Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/frame-browser-edits.log"
+}

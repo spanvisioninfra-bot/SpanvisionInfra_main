@@ -584,6 +584,22 @@ function applyCellEdits(
     validatedEdits.push({ ...edit, value });
   }
 
+  // Automatic WBS numbering is a project setting: no cell write can make
+  // this cell writable. Preserve validation and error ordering, but
+  // avoid constructing calendars and projected task maps for a rejected row.
+  const firstBlocked = !skipReadOnlyCells && runtime.context.wbsAutoNumber === true
+    ? validatedEdits.find(edit => {
+    const descriptor = runtime.descriptors.get(String(edit.columnId));
+    return typeof descriptor?.readOnly === 'function' && descriptor.readOnly(task, runtime.context);
+    }) : undefined;
+  if (!skipReadOnlyCells && runtime.context.wbsAutoNumber === true
+    && firstBlocked && String(firstBlocked.columnId) === 'task.wbsCode') {
+    const descriptor = runtime.descriptors.get(String(firstBlocked.columnId))!;
+    return { ok: false, errors: [validationError(
+      readOnlyValidationCode(descriptor, task, runtime.context), firstBlocked, firstBlocked.value,
+    )] };
+  }
+
   const calendarEdit = validatedEdits.find(edit => String(edit.columnId) === 'task.calendarId');
   const taskForCalendar = calendarEdit
     ? { ...task, calendarId: calendarEdit.value as string | undefined }

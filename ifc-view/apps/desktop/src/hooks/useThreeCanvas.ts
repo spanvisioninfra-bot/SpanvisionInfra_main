@@ -170,6 +170,7 @@ export function useThreeCanvas(
     const curIdx = currentIndex();
     const sorted = sortedValues();
     const groups = valueGroups();
+    const lightCanvas = parseInt(canvasColor().slice(1, 3), 16) > 128;
 
     if (viewer.meshes.size === 0) return;
 
@@ -180,6 +181,7 @@ export function useThreeCanvas(
       currentIndex: curIdx,
       sortedValues: sorted,
       valueGroups: groups,
+      lightCanvas,
     });
   });
 

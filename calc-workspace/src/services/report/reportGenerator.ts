@@ -24,7 +24,7 @@ export function generateReport(schedule: CostSchedule, items: CostItem[], ctx: R
   const grandTotal = topLevelItems.reduce((sum, item) => sum + item.total, 0);
 
   // Build chapter summary
-  const chapters = items.filter(i => i.rowType === 'chapter' && i.depth === 0);
+  const chapters = items.filter(i => i.rowType === "chapter" && i.depth === 0);
 
   let chapterRows = '';
   chapters.forEach((chapter, idx) => {
@@ -41,7 +41,7 @@ export function generateReport(schedule: CostSchedule, items: CostItem[], ctx: R
   let detailRows = '';
   items.filter(i => i.rowType !== 'witregel').forEach((item, idx) => {
     const indent = item.depth * 20;
-    const isChapter = item.rowType === 'chapter';
+    const isChapter = item.rowType === "chapter";
     const rowClass = isChapter ? 'chapter-row' : '';
 
     detailRows += `

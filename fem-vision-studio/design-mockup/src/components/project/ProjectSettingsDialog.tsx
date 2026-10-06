@@ -456,6 +456,9 @@ export default function ProjectSettingsDialog({ open, onClose }: ProjectSettings
               komen als uitgangspunten in het rekenrapport. */}
           <div className="proj-section">
             <div className="proj-section-title">{t("projectSettingsDialog.basisOfDesign")}</div>
+            <p style={{ margin: '8px 0', color: 'var(--theme-text-secondary)' }}>
+              This edition checks Eurocodes with the Netherlands national annex. Indian, US and UK design checks are not yet available. Analysis results do not establish compliance with those standards.
+            </p>
             <div className="proj-fields">
               <div className="proj-field">
                 {/* Geen <label>: zonder eigen veld zou een klik op de kop de

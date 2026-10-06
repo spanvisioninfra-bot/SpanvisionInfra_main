@@ -22,5 +22,5 @@ pub fn optimize_project_cut_list(
         }
     }
 
-    Ok(ofs_core::optimization::optimize_cut_list(pieces, stock, 4.0))
+    ofs_core::optimization::optimize_cut_list(pieces, stock, 4.0)
 }

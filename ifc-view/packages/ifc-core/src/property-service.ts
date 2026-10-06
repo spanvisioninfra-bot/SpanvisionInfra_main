@@ -108,7 +108,7 @@ export function getElementProperties(modelId: number, expressId: number): Record
                 try {
                   const q = getLine(modelId, qRef.value);
                   const qName = q.Name?.value;
-                  const qValue = q.LengthValue?.value || q.AreaValue?.value || q.VolumeValue?.value || q.CountValue?.value || q.WeightValue?.value;
+                  const qValue = q.LengthValue?.value ?? q.AreaValue?.value ?? q.VolumeValue?.value ?? q.CountValue?.value ?? q.WeightValue?.value;
                   if (qName && qValue !== undefined) props[`${psetName} → ${qName}`] = qValue;
                 } catch (_) {}
               }
@@ -180,7 +180,7 @@ export function sortParameters(
   allParameters: Map<string, ParameterInfo>,
 ): [string, ParameterInfo][] {
   return [...allParameters.entries()]
-    .filter(([, info]) => info.values.size > 1 && info.values.size < 100)
+    .filter(([name, info]) => name !== 'expressId' && info.values.size > 0)
     .sort((a, b) => {
       const aName = a[0].toLowerCase();
       const bName = b[0].toLowerCase();

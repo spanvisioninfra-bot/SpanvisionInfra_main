@@ -238,7 +238,7 @@ export function buildXtbImport(db: SqlJsDatabase): XtbImportResult {
           sortOrder: sortStart.v++,
           code: r.CalculatieCode || '',
           description: r.Omschrijving || "(no description)",
-          rowType: 'chapter',
+          rowType: "chapter",
           depth,
           unit: 'st',
           quantity: r.Multipliciteit,
@@ -278,7 +278,7 @@ export function buildXtbImport(db: SqlJsDatabase): XtbImportResult {
         const comps: Array<[ResourceType, number, string]> = [
           ['arbeid', kp?.NettoArbeid ?? 0, "Labor"],
           ['materiaal', kp?.NettoMateriaal ?? 0, "Material"],
-          ["equipment", kp?.NettoMaterieel ?? 0, "Equipment"],
+          ["materieel", kp?.NettoMaterieel ?? 0, "Equipment"],
           ['onderaannemer', kp?.NettoOnderaanneming ?? 0, "Subcontract"],
         ];
         const active = comps.filter(([, v]) => v !== 0);

@@ -121,7 +121,7 @@ export default function Ribbon({ onFileTabClick }: RibbonProps) {
       case "offerte": return <OfferteTab />;
       case "spreadsheet": return <SpreadsheetTab />;
       case "viewer3d": return <div className="ribbon-content"><div style={{ padding: 12, fontSize: 12, color: 'var(--theme-text-muted)' }}>{t('placeholders.viewer3d')}</div></div>;
-      case "pdf": return <div className="ribbon-content"><div style={{ padding: 12, fontSize: 12, color: 'var(--theme-text-muted)' }}>{t('placeholders.pdf')}</div></div>;
+      case "pdf": return <div className="ribbon-content"><div style={{ padding: 12, fontSize: 12, color: 'var(--theme-text-muted)' }}><button type="button" onClick={() => useAppStore.getState().setActiveContentTab('pdf')}>Open PDF workspace</button><p>{t('placeholders.pdf')}</p></div></div>;
       case "ifc": return <IfcTab />;
       case "tekstopmaak": return <TekstopmaakTab />;
     }

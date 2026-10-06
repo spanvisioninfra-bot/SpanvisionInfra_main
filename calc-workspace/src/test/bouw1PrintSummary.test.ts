@@ -25,7 +25,7 @@ describe('Bouw 1 print-samenvatting', () => {
     // dit model verder nergens voor, dus uniek bewijs dat de ABK-regel de juiste
     // staart-waarde oppikt.
     const html = buildBouw1Html(namedSchedule(), recalculateItems(createDefaultItems()), false);
-    expect(html).toContain('Algemene bedrijfskosten');
+    expect(html).toContain('General overhead');
     expect(html).toContain('6 %');
   });
 

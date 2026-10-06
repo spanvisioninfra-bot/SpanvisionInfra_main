@@ -1,0 +1,9 @@
+{
+  "command": "cargo check --manifest-path src-tauri/Cargo.toml --locked --jobs 1",
+  "directory": "spanvision-pointcloud-workspace",
+  "started": "2026-10-05T11:23:29.733Z",
+  "finished": "2026-10-05T11:23:32.733Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/pointcloud-desktop-check.log"
+}

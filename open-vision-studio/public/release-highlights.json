@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "product": "open-planner-studio",
-  "generated": "2026-09-12T13:22:33.168Z",
+  "generated": "2026-10-05T11:13:45.780Z",
   "releases": [
     {
       "version": "2026.9.0",
@@ -16,7 +16,7 @@
           "primary": {
             "category": "TAAKRASTER",
             "title": "Bewerk sneller in één gedeeld taakraster",
-            "description": "Gebruik hetzelfde toegankelijke, instelbare raster in de Gantt- en volledige Tabelweergave.",
+            "description": "Use the same accessible, configurable grid in Gantt and full table views.",
             "icon": "tasks",
             "docsId": "gids-plannen-wbs"
           },
@@ -24,25 +24,25 @@
             {
               "category": "PLANNING",
               "title": "Plan in dagen of uren",
-              "description": "Persoonlijke taaktypen en kalenderbewuste uurduur geven grip op detailplanning.",
+              "description": "Custom task types and calendar-aware durations support detailed planning.",
               "icon": "tasks"
             },
             {
               "category": "RAPPORTEN",
               "title": "Scherpere rapporten en preview",
-              "description": "Gebruik A2, baselines, werkdagen, balkkleuren en een snellere preview.",
+              "description": "Use A2, baselines, working days, bar colors and a faster preview.",
               "icon": "examples"
             },
             {
               "category": "AUTOSAVE",
               "title": "Echte AutoSave per document",
-              "description": "Gekoppelde bestanden worden automatisch en documentgebonden opgeslagen.",
+              "description": "Linked files are saved automatically with each document.",
               "icon": "import"
             },
             {
               "category": "GANTT",
               "title": "Navigeer de planning directer",
-              "description": "Gebruik pijltjestoetsen, verticaal verplaatsen en Passend op project.",
+              "description": "Use arrow keys, vertical movement and Fit to project.",
               "icon": "relations"
             }
           ]
@@ -516,7 +516,7 @@
         "nl": {
           "primary": {
             "category": "MS PROJECT",
-            "title": "Importeer met de datums uit je planning",
+            "title": "Import using the dates from your schedule",
             "description": "Open MS Project-planningen met behoud van de vastgelegde datums.",
             "icon": "import",
             "docsId": "gids-msproject-import"
@@ -524,20 +524,20 @@
           "secondary": [
             {
               "category": "RESOURCEBIBLIOTHEKEN",
-              "title": "Bezetting van resourcebibliotheken",
+              "title": "Resource library occupancy",
               "description": "Zie boekingen in alle geopende projecten.",
               "icon": "library"
             },
             {
               "category": "RELATIES",
               "title": "Duidelijkere mijlpaalrelaties",
-              "description": "Bekijk relaties met bruikbare terugkoppeling.",
+              "description": "Review relationships with useful feedback.",
               "icon": "relations"
             },
             {
               "category": "TAKEN",
               "title": "Consistente taaktypen",
-              "description": "Nieuwe subtaken nemen het type van hun ouder over.",
+              "description": "New subtasks inherit their parent's type.",
               "icon": "tasks"
             },
             {

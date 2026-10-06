@@ -4,16 +4,22 @@
  */
 import { get } from "svelte/store";
 import { _ } from "svelte-i18n";
-import { newProject, openProject, saveProject, projectPath, isDirty } from "../stores/project.js";
+import { newProject, openProject, saveProject, projectPath, isDirty, project } from "../stores/project.js";
 import { clearHistory } from "../stores/history.js";
 import { isTauri } from "./tauri.js";
 import { toast } from "../stores/toast.js";
+import { chooseBrowserFile } from './browserFile.js';
+import { unsavedChangesPrompt } from '../stores/ui.js';
+import { currentKozijn, currentGeometry, selectedCellIndex, selectedMember, selectedLayoutLeafId, selectKozijn } from '../stores/kozijn.js';
+import { currentVliesgevel } from '../stores/vliesgevel.js';
+import { profileEditor } from '../stores/profileEditor.js';
+import { hasUnsavedProfile, saveEditorProfile } from './profile-actions.js';
 
 async function getDialogs() {
   if (isTauri) return await import("@tauri-apps/plugin-dialog");
   return {
-    open: async () => prompt("File path:"),
-    save: async () => prompt("Save path:", "project.ofs"),
+    open: async () => chooseBrowserFile('.ofs'),
+    save: async () => prompt("Project filename:", get(projectPath) || 'project.ofs'),
   };
 }
 
@@ -21,41 +27,24 @@ async function getDialogs() {
  * Check for unsaved changes and prompt user.
  * Returns true if it's safe to proceed, false if user cancelled.
  */
-export async function confirmUnsavedChanges() {
-  if (!get(isDirty)) return true;
+export async function confirmUnsavedChanges({profileOnly = false} = {}) {
+  if (!hasUnsavedProfile() && (profileOnly || !get(isDirty))) return true;
 
-  if (isTauri) {
-    try {
-      const { ask } = await import("@tauri-apps/plugin-dialog");
-      const save = await ask(
-        get(_)("dialog.unsavedMessage"),
-        {
-          title: get(_)("dialog.unsavedTitle"),
-          kind: "warning",
-          okLabel: get(_)("dialog.save"),
-          cancelLabel: get(_)("dialog.discard"),
-        }
-      );
-      if (save) {
-        return await fileSave();
-      }
-      return true; // user chose discard
-    } catch {
-      // fallback to confirm
-    }
-  }
+  if (get(unsavedChangesPrompt)) return false;
+  return new Promise(resolve => unsavedChangesPrompt.set({ resolve, profileOnly }));
+}
 
-  const save = confirm(get(_)("dialog.unsavedMessage"));
-  if (save) {
-    return await fileSave();
-  }
-  return true;
+async function activateProject(p) {
+  currentKozijn.set(null); currentGeometry.set(null); selectedCellIndex.set(null);
+  selectedMember.set(null); selectedLayoutLeafId.set(null); currentVliesgevel.set(null);
+  profileEditor.newProfile();
+  clearHistory();
+  if (p.kozijnen[0]) await selectKozijn(p.kozijnen[0].id);
 }
 
 export async function fileNew() {
   if (!(await confirmUnsavedChanges())) return false;
-  await newProject("New", "");
-  clearHistory();
+  await activateProject(await newProject("New", ""));
   return true;
 }
 
@@ -67,9 +56,10 @@ export async function fileOpen() {
     multiple: false,
   });
   if (path) {
-    await openProject(path);
-    clearHistory();
-    return true;
+    try {
+      await activateProject(await openProject(path));
+      return true;
+    } catch (error) { toast.error(String(error)); return false; }
   }
   return false;
 }
@@ -78,15 +68,18 @@ export async function fileSave() {
   let path = get(projectPath);
   if (!path) {
     const { save } = await getDialogs();
-    path = await save({
+    path = isTauri ? await save({
       filters: [{ name: "Frame Vision Studio", extensions: ["ofs"] }],
       defaultPath: "project.ofs",
-    });
+    }) : (get(project)?.projectInfo?.name || 'project') + '.ofs';
   }
   if (path) {
-    await saveProject(path);
-    toast.success(get(_)("alert.saved"));
-    return true;
+    try {
+      if (hasUnsavedProfile()) await saveEditorProfile();
+      await saveProject(path);
+      toast.success(isTauri ? get(_)("alert.saved") : 'Project download created.');
+      return true;
+    } catch (error) { toast.error(String(error)); return false; }
   }
   return false;
 }
@@ -98,9 +91,12 @@ export async function fileSaveAs() {
     defaultPath: "project.ofs",
   });
   if (path) {
-    await saveProject(path);
-    toast.success(get(_)("alert.saved"));
-    return true;
+    try {
+      if (hasUnsavedProfile()) await saveEditorProfile();
+      await saveProject(path);
+      toast.success(isTauri ? get(_)("alert.saved") : 'Project download created.');
+      return true;
+    } catch (error) { toast.error(String(error)); return false; }
   }
   return false;
 }

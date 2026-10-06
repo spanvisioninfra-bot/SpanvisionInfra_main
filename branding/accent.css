@@ -25,6 +25,22 @@
   --accent:var(--sv-accent);--accent-hover:var(--sv-text-soft);--accent-color:var(--sv-accent);
 }
 :root[data-sv-tool="cad2d"][data-sv-mode] {--theme-canvas:var(--sv-canvas);--theme-grid:var(--sv-border);}
+:root[data-sv-tool="fem"][data-sv-mode] {
+  --theme-bg:var(--sv-canvas);--theme-bg-lighter:var(--sv-surface);--theme-surface:var(--sv-surface);
+  --theme-docbar-bg:var(--sv-raised);--theme-content-bg:var(--sv-canvas);
+  --theme-border:var(--sv-border);--theme-border-subtle:var(--sv-border);
+  --theme-text:var(--sv-text);--theme-text-secondary:var(--sv-text-soft);--theme-text-muted:var(--sv-muted);--theme-text-faint:var(--sv-muted);
+  --theme-placeholder-heading:var(--sv-text-soft);--theme-placeholder-text:var(--sv-muted);
+  --theme-ribbon-group-separator:var(--sv-border);
+  --theme-status-bg:var(--sv-surface);--theme-status-border:var(--sv-border);--theme-status-text:var(--sv-text-soft);--theme-status-text-label:var(--sv-muted);--theme-status-hover:var(--sv-raised);--theme-status-separator:var(--sv-border);
+  --theme-dialog-bg:var(--sv-surface);--theme-dialog-border:var(--sv-border);--theme-dialog-header-bg:var(--sv-raised);
+  --theme-dialog-sidebar-bg:var(--sv-raised);--theme-dialog-sidebar-border:var(--sv-border);--theme-dialog-tab-text:var(--sv-text);
+  --theme-dialog-content-bg:var(--sv-surface);--theme-dialog-content-text:var(--sv-text);--theme-dialog-content-secondary:var(--sv-muted);
+  --theme-dialog-input-bg:var(--sv-canvas);--theme-dialog-input-border:var(--sv-border);--theme-dialog-input-text:var(--sv-text);--theme-dialog-section-border:var(--sv-border);
+  --theme-btn-secondary-bg:var(--sv-raised);--theme-btn-secondary-text:var(--sv-text);--theme-btn-secondary-hover-border:var(--sv-border);
+}
+:root[data-sv-tool="fem"][data-sv-mode] .fem-grid-minor {stroke:var(--sv-border);opacity:.4;}
+:root[data-sv-tool="fem"][data-sv-mode] .fem-grid-major {stroke:var(--sv-border);opacity:.8;}
 :root[data-sv-tool="cad2d"][data-sv-mode] [class~="bg-blue-500"],
 :root[data-sv-tool="cad2d"][data-sv-mode] [class~="bg-blue-600"] {background-color:var(--sv-accent);color:var(--sv-on-accent);}
 :root[data-sv-tool="cad2d"][data-sv-mode] [class~="text-blue-400"],

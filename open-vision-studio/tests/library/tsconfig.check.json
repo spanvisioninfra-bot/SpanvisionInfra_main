@@ -19,6 +19,7 @@
   // map-glob oppikt.
   "include": [
     "check-*.ts",
+    "../../src/vite-env.d.ts",
     "../../src/types/file-system-access.d.ts"
   ]
 }

@@ -115,15 +115,14 @@ export async function roepKern<T>(opdracht: string, inputs?: unknown): Promise<T
   }
   if (!isJson) {
     throw new Error(
-      `De rekenkern is hier niet bereikbaar: /api/toetsing gaf geen JSON terug ` +
-        `(status ${antwoord.status}). Buiten de desktop-app loopt de toetsing via de ` +
-        `dev-brug van de ontwikkelserver; in een gebouwde webversie bestaat die niet.`,
+      `The calculation service did not return JSON (HTTP ${antwoord.status}). ` +
+        `The browser requires a running calculation API. Try again or use the Windows app.`,
     );
   }
   if (!antwoord.ok || (data && typeof data === "object" && "fout" in data)) {
     throw new Error(
-      (data as { fout?: string })?.fout ??
-        `De rekenkern antwoordde met status ${antwoord.status}.`,
+      (data as { fout?: string; detail?: string })?.fout ?? (data as { detail?: string })?.detail ??
+        `The calculation engine returned HTTP ${antwoord.status}.`,
     );
   }
   return data as T;

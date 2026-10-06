@@ -60,7 +60,7 @@ test('de instructions bevatten de kernregels die een agent anders fout doet', ()
     'planner_run_cpm',      // niet om te verversen, wél voor het resultaat
     'assumed',              // meld je aannames
     'planner_get_planning_guide',
-    'https://open-planner-studio.open-aec.com/docs/en/gids-goed-plannen.md',
+    'https://spanvision-planner.vercel.app/docs/en/gids-goed-plannen.md',
   ];
   for (const n of needles) {
     assert(text.includes(n), `instructions missen "${n}"`);
@@ -90,8 +90,8 @@ test('zonder argumenten: taal en, beide delen, met installatie-instructie', asyn
   assertEq(data.skill, SKILL_BODY, 'skilltekst doorgegeven');
   assertEq(data.install.skillPathProject, '.claude/skills/goed-plannen/SKILL.md', 'projectpad');
   assertEq(data.install.skillPathGlobal, '~/.claude/skills/goed-plannen/SKILL.md', 'globaal pad');
-  assertEq(data.install.skillUrl, 'https://open-planner-studio.open-aec.com/skills/goed-plannen/SKILL.md', 'skill-URL');
-  assertEq(data.install.guideUrl, 'https://open-planner-studio.open-aec.com/docs/en/gids-goed-plannen.md', 'gids-URL');
+  assertEq(data.install.skillUrl, 'https://spanvision-planner.vercel.app/skills/goed-plannen/SKILL.md', 'skill-URL');
+  assertEq(data.install.guideUrl, 'https://spanvision-planner.vercel.app/docs/en/gids-goed-plannen.md', 'gids-URL');
   assert(fetched.some((u) => u.endsWith('docs/en/gids-goed-plannen.md')), `gids-asset niet opgehaald: ${fetched.join(', ')}`);
   assert(fetched.some((u) => u.endsWith('skills/goed-plannen/SKILL.md')), `skill-asset niet opgehaald: ${fetched.join(', ')}`);
 });
@@ -103,7 +103,7 @@ test('part=guide haalt alleen de gids op, part=skill alleen de skill', async () 
   assertEq(onlyGuide.structuredContent.data.guide, GUIDE_BODY, 'gids aanwezig');
   assertEq(onlyGuide.structuredContent.data.skill, undefined, 'skill mag ontbreken bij part=guide');
   assert(fetched.every((u) => !u.includes('/skills/')), 'skill-asset had niet opgehaald mogen worden');
-  assert(fetched.some((u) => u.endsWith('docs/nl/gids-goed-plannen.md')), `nl-pad verwacht, kreeg ${fetched.join(', ')}`);
+  assert(fetched.some((u) => u.endsWith('docs/en/gids-goed-plannen.md')), `nl-pad verwacht, kreeg ${fetched.join(', ')}`);
 
   fetched.length = 0;
   const onlySkill = await call(makeMcpContext(), { part: 'skill' });
@@ -138,7 +138,7 @@ test('een onbereikbare asset geeft NOT_FOUND met de publieke download-URL erbij'
   assertEq(res.isError, true, 'ontbrekende asset ⇒ fout');
   assertEq(res.structuredContent.code, 'NOT_FOUND', 'nette code i.p.v. INTERNAL');
   assert(
-    res.structuredContent.error.includes('https://open-planner-studio.open-aec.com/docs/nl/gids-goed-plannen.md'),
+    res.structuredContent.error.includes('https://spanvision-planner.vercel.app/docs/en/gids-goed-plannen.md'),
     `foutmelding noemt het alternatief niet: ${res.structuredContent.error}`,
   );
 });

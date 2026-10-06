@@ -24,6 +24,14 @@ pub struct QuotationPrice {
 }
 
 impl PricingConfig {
+    pub fn validate(&self) -> Result<(), String> {
+        if !(0.0..=100.0).contains(&self.discount_percentage) || !(0.0..=100.0).contains(&self.btw_percentage) ||
+            [self.transport_cost, self.montage_cost_per_hour, self.montage_hours].iter().any(|v| !v.is_finite() || *v < 0.0) {
+            return Err("Set finite non-negative pricing values, with discount and tax between 0 and 100 percent.".into());
+        }
+        Ok(())
+    }
+
     pub fn calculate(&self, material_subtotal: f64) -> QuotationPrice {
         let discount_amount = material_subtotal * self.discount_percentage / 100.0;
         let after_discount = material_subtotal - discount_amount;
@@ -42,4 +50,21 @@ impl PricingConfig {
             total_incl_btw: total,
         }
     }
+}
+
+/// Reference prices in EUR, shared by saved drafts and PDF estimates.
+pub fn project_reference_estimate(project: &crate::kozijn::Project) -> Result<(Vec<(String, f64)>, QuotationPrice), String> {
+    crate::export::checked_project_production(project)?;
+    let table = crate::calculation::PriceTable::default();
+    let prices = project.kozijnen.iter().map(|frame| (frame.mark.clone(),
+        crate::calculation::estimate_cost(frame, &table).total_cost)).collect::<Vec<_>>();
+    let config = project.pricing_config.clone().unwrap_or(PricingConfig { btw_percentage: 21.0, ..Default::default() });
+    config.validate()?;
+    let result = config.calculate(prices.iter().map(|(_, total)| total).sum());
+    if prices.iter().any(|(_,total)| !total.is_finite() || *total < 0.0) ||
+        [result.subtotal, result.discount_amount, result.transport, result.montage,
+            result.subtotal_after_extras, result.btw_amount, result.total_incl_btw].iter().any(|v| !v.is_finite() || *v < 0.0) {
+        return Err("The reference estimate exceeds the supported amount range.".into());
+    }
+    Ok((prices, result))
 }

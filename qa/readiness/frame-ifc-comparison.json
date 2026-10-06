@@ -1,0 +1,24 @@
+{
+  "scope": "Window/door identities and explicit overall dimensions only. File comparison matches GlobalIds; project roundtrip matches unique Tags, then GlobalIds.",
+  "added": [],
+  "removed": [],
+  "modified": [
+    {
+      "guid": "1e2Q_KeE19mOCq5dRQGCbb",
+      "name": "Renamed window",
+      "changes": [
+        {
+          "property": "Name",
+          "oldValue": "Window A",
+          "newValue": "Renamed window"
+        },
+        {
+          "property": "Height",
+          "oldValue": "1800 mm",
+          "newValue": "1800.25 mm"
+        }
+      ]
+    }
+  ],
+  "unchanged": 1
+}

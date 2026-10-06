@@ -1,0 +1,1 @@
+{"name":"alasql","version":"4.17.0","private":true,"license":"MIT","main":"alasql.cjs","types":"alasql.d.ts","description":"Unmodified upstream AlaSQL browser distribution; excludes React Native filesystem adapters."}

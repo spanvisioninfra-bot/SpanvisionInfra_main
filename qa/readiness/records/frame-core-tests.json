@@ -1,0 +1,9 @@
+{
+  "command": "cargo test --locked -p ofs-core --jobs 1",
+  "directory": "frame-vision-studio",
+  "started": "2026-10-05T17:41:37.202Z",
+  "finished": "2026-10-05T17:42:04.615Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/frame-core-tests.log"
+}

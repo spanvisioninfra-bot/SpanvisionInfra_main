@@ -1,305 +1,133 @@
-//! GLB (binary glTF 2.0) export for kozijnen.
-//!
-//! Generates a simple 3D representation with frame members as extruded
-//! rectangles, glass panels as thin transparent slabs, and dividers.
-
-use std::io::Write;
-
+//! Simplified rectangular frame GLB, with separate opaque/glazing primitives.
+//! Internal dimensions are millimetres; glTF coordinates are metres, Y-up.
 use crate::kozijn::{Kozijn, PanelType};
 
-/// Generate a GLB file from a kozijn definition.
 pub fn generate_glb(kozijn: &Kozijn, output_path: &str) -> Result<(), String> {
-    let frame = &kozijn.frame;
-    let grid = &kozijn.grid;
-    let cells = &kozijn.cells;
-
-    let ow = frame.outer_width;
-    let oh = frame.outer_height;
-    let fw = frame.frame_width;
-    let fd = frame.frame_depth;
-
-    let scale: f64 = 0.001; // mm to meters
-
-    let mut positions: Vec<f32> = Vec::new();
-    let mut indices: Vec<u32> = Vec::new();
-
-    let mut add_box = |x: f64, y: f64, z: f64, w: f64, h: f64, d: f64| {
-        let base_idx = (positions.len() / 3) as u32;
-
-        // 8 vertices
-        let verts: [(f64, f64, f64); 8] = [
-            (x, y, z),
-            (x + w, y, z),
-            (x + w, y + h, z),
-            (x, y + h, z),
-            (x, y, z + d),
-            (x + w, y, z + d),
-            (x + w, y + h, z + d),
-            (x, y + h, z + d),
-        ];
-        for (vx, vy, vz) in &verts {
-            positions.push(*vx as f32);
-            positions.push(*vy as f32);
-            positions.push(*vz as f32);
-        }
-
-        // 12 triangles (6 faces x 2)
-        let faces: [u32; 36] = [
-            0, 1, 2, 0, 2, 3, // front
-            4, 6, 5, 4, 7, 6, // back
-            0, 4, 5, 0, 5, 1, // bottom
-            2, 6, 7, 2, 7, 3, // top
-            0, 3, 7, 0, 7, 4, // left
-            1, 5, 6, 1, 6, 2, // right
-        ];
-        for f in &faces {
-            indices.push(f + base_idx);
-        }
-    };
-
-    // Frame members
-    // Left stile
-    add_box(0.0, 0.0, 0.0, fw * scale, oh * scale, fd * scale);
-    // Right stile
-    add_box((ow - fw) * scale, 0.0, 0.0, fw * scale, oh * scale, fd * scale);
-    // Top rail
-    add_box(
-        fw * scale,
-        (oh - fw) * scale,
-        0.0,
-        (ow - 2.0 * fw) * scale,
-        fw * scale,
-        fd * scale,
-    );
-    // Bottom rail
-    add_box(
-        fw * scale,
-        0.0,
-        0.0,
-        (ow - 2.0 * fw) * scale,
-        fw * scale,
-        fd * scale,
-    );
-
-    // Vertical dividers
-    let mut x_acc = fw;
-    for col in &grid.columns {
-        if col.divider_profile.is_some() {
-            add_box(
-                x_acc * scale,
-                fw * scale,
-                0.0,
-                fw * scale,
-                (oh - 2.0 * fw) * scale,
-                fd * scale,
-            );
-            x_acc += fw;
-        }
-        x_acc += col.size;
-    }
-
-    // Horizontal dividers
-    let mut y_acc = fw;
-    for row in &grid.rows {
-        if row.divider_profile.is_some() {
-            add_box(
-                fw * scale,
-                y_acc * scale,
-                0.0,
-                (ow - 2.0 * fw) * scale,
-                fw * scale,
-                fd * scale,
-            );
-            y_acc += fw;
-        }
-        y_acc += row.size;
-    }
-
-    // Glass panels per cell
-    let num_cols = grid.columns.len();
-    let glass_depth = 4.0 * scale;
-    let glass_z = (fd / 2.0 - 2.0) * scale;
-    let clearance = 4.0; // mm
-
-    let mut y_acc = fw;
-    for (row_idx, row) in grid.rows.iter().enumerate() {
-        let mut x_acc = fw;
-        for (col_idx, col) in grid.columns.iter().enumerate() {
-            let cell_idx = row_idx * num_cols + col_idx;
-            let panel_type = cells
-                .get(cell_idx)
-                .map(|c| c.panel_type)
-                .unwrap_or(PanelType::FixedGlass);
-
-            if panel_type != PanelType::Ventilation {
-                let gw = (col.size - 2.0 * clearance) * scale;
-                let gh = (row.size - 2.0 * clearance) * scale;
-                let gx = (x_acc + clearance) * scale;
-                let gy = (y_acc + clearance) * scale;
-                add_box(gx, gy, glass_z, gw, gh, glass_depth);
-            }
-
-            if col.divider_profile.is_some() {
-                x_acc += fw;
-            }
-            x_acc += col.size;
-        }
-        if row.divider_profile.is_some() {
-            y_acc += fw;
-        }
-        y_acc += row.size;
-    }
-
-    // Materials
-    let materials = serde_json::json!([
-        {
-            "name": "Frame",
-            "pbrMetallicRoughness": {
-                "baseColorFactor": [0.55, 0.35, 0.2, 1.0],
-                "metallicFactor": 0.0,
-                "roughnessFactor": 0.8
-            }
-        },
-        {
-            "name": "Glass",
-            "pbrMetallicRoughness": {
-                "baseColorFactor": [0.7, 0.85, 0.95, 0.3],
-                "metallicFactor": 0.0,
-                "roughnessFactor": 0.1
-            },
-            "alphaMode": "BLEND"
-        }
-    ]);
-
-    write_glb(output_path, &positions, &indices, &materials)
+    super::write_export_bytes(output_path, &generate_glb_bytes(kozijn)?)
 }
 
-fn write_glb(
-    output_path: &str,
-    positions: &[f32],
-    indices: &[u32],
-    materials: &serde_json::Value,
-) -> Result<(), String> {
-    // Pack binary buffer
-    let pos_bytes: Vec<u8> = positions
-        .iter()
-        .flat_map(|f| f.to_le_bytes())
-        .collect();
-    let idx_bytes: Vec<u8> = indices
-        .iter()
-        .flat_map(|i| i.to_le_bytes())
-        .collect();
+pub fn generate_glb_bytes(kozijn: &Kozijn) -> Result<Vec<u8>, String> {
+    super::ifc::validate_ifc_export(kozijn, super::ifc::LodLevel::Lod300)?;
+    let geometry = crate::geometry::compute_2d_geometry(kozijn);
+    let height = kozijn.frame.outer_height / 1000.0;
+    let depth = kozijn.frame.frame_depth / 1000.0;
+    let mut positions: Vec<f32> = Vec::new();
+    let mut normals: Vec<f32> = Vec::new();
+    let mut indices: Vec<u32> = Vec::new();
+    let mut groups = Vec::new();
+    let mut add_box = |r: &crate::geometry::Rect2D, thickness: f64, offset: f64, material: usize| {
+        let x = r.x / 1000.0; let y = height - (r.y + r.height) / 1000.0;
+        let w = r.width / 1000.0; let h = r.height / 1000.0;
+        let z = offset;
+        let vertices = [[x,y,z], [x+w,y,z], [x+w,y+h,z], [x,y+h,z],
+            [x,y,z+thickness], [x+w,y,z+thickness], [x+w,y+h,z+thickness], [x,y+h,z+thickness]];
+        let first = indices.len();
+        // Outward CCW winding and distinct face vertices preserve sharp normals.
+        for (corners, normal) in [([0,3,2,1],[0.,0.,-1.]), ([4,5,6,7],[0.,0.,1.]),
+            ([0,1,5,4],[0.,-1.,0.]), ([3,7,6,2],[0.,1.,0.]),
+            ([0,4,7,3],[-1.,0.,0.]), ([1,2,6,5],[1.,0.,0.])] {
+            let base = (positions.len() / 3) as u32;
+            for corner in corners { positions.extend(vertices[corner].map(|v| v as f32)); normals.extend(normal); }
+            indices.extend([base, base+1, base+2, base, base+2, base+3]);
+        }
+        groups.push((first, indices.len() - first, material));
+    };
+    for r in geometry.frame_rects.iter().chain(geometry.h_dividers.iter()).chain(geometry.v_dividers.iter()) {
+        if r.width > 0.0 && r.height > 0.0 { add_box(r, depth, 0.0, 0); }
+    }
+    for area in &geometry.cell_rects {
+        let cell = kozijn.cells.get(area.cell_index);
+        let (glass, fill) = match area.vulling.as_ref() {
+            Some(crate::layout::Vakvulling::Buiten) => continue,
+            Some(crate::layout::Vakvulling::Paneel { filling }) => (false, filling.as_ref()),
+            Some(crate::layout::Vakvulling::Deur { .. } | crate::layout::Vakvulling::Rooster) => (false, None),
+            Some(_) => (true, None),
+            None => (!matches!(cell.map(|c| c.panel_type), Some(PanelType::Panel | PanelType::Door | PanelType::Ventilation)), cell.and_then(|c| c.panel_filling.as_ref())),
+        };
+        let thickness = if glass { cell.map(|c| c.glazing.thickness_mm / 1000.0).unwrap_or(0.024) }
+            else { fill.map(|p| p.thickness_mm / 1000.0).unwrap_or(depth) };
+        let offset = fill.and_then(|p| p.setback_mm).map(|s| s / 1000.0).unwrap_or((depth-thickness)/2.0);
+        add_box(&area.rect, thickness, offset, if glass {1} else {2});
+    }
+    let position_bytes: Vec<u8> = positions.iter().flat_map(|v| v.to_le_bytes()).collect();
+    let normal_bytes: Vec<u8> = normals.iter().flat_map(|v| v.to_le_bytes()).collect();
+    let index_bytes: Vec<u8> = indices.iter().flat_map(|v| v.to_le_bytes()).collect();
+    let normal_offset = position_bytes.len(); let index_offset = normal_offset + normal_bytes.len();
+    let mut binary = position_bytes; binary.extend(normal_bytes); binary.extend(index_bytes);
+    let min: Vec<f32> = (0..3).map(|a| positions.iter().skip(a).step_by(3).copied().fold(f32::INFINITY, f32::min)).collect();
+    let max: Vec<f32> = (0..3).map(|a| positions.iter().skip(a).step_by(3).copied().fold(f32::NEG_INFINITY, f32::max)).collect();
+    let mut accessors = vec![serde_json::json!({"bufferView":0,"componentType":5126,"count":positions.len()/3,"type":"VEC3","min":min,"max":max}),
+        serde_json::json!({"bufferView":1,"componentType":5126,"count":normals.len()/3,"type":"VEC3"})];
+    let mut primitives = Vec::new();
+    for (first, count, material) in groups {
+        let accessor = accessors.len();
+        accessors.push(serde_json::json!({"bufferView":2,"byteOffset":first*4,"componentType":5125,"count":count,"type":"SCALAR"}));
+        primitives.push(serde_json::json!({"attributes":{"POSITION":0,"NORMAL":1},"indices":accessor,"material":material}));
+    }
+    let document = serde_json::json!({
+        "asset":{"version":"2.0","generator":"Spanvision Infra / Frame Vision Studio"},
+        "scene":0,"scenes":[{"nodes":[0]}],"nodes":[{"mesh":0,"name":kozijn.name}],
+        "meshes":[{"primitives":primitives}],
+        "extras":{"geometryScope":"Simplified modeled rectangular members and infills; excludes machining and fittings."},
+        "materials":[
+            {"name":"Frame","pbrMetallicRoughness":{"baseColorFactor":[0.55,0.35,0.2,1.0],"metallicFactor":0.,"roughnessFactor":0.8}},
+            {"name":"Glazing","pbrMetallicRoughness":{"baseColorFactor":[0.7,0.85,0.95,0.3],"metallicFactor":0.,"roughnessFactor":0.1},"alphaMode":"BLEND","doubleSided":true},
+            {"name":"Infill","pbrMetallicRoughness":{"baseColorFactor":[0.75,0.75,0.75,1.0],"metallicFactor":0.,"roughnessFactor":0.8}}
+        ],
+        "accessors":accessors,
+        "bufferViews":[{"buffer":0,"byteOffset":0,"byteLength":normal_offset,"target":34962},
+            {"buffer":0,"byteOffset":normal_offset,"byteLength":index_offset-normal_offset,"target":34962},
+            {"buffer":0,"byteOffset":index_offset,"byteLength":binary.len()-index_offset,"target":34963}],
+        "buffers":[{"byteLength":binary.len()}]
+    });
+    let mut json = serde_json::to_vec(&document).map_err(|e| e.to_string())?;
+    while json.len() % 4 != 0 { json.push(b' '); }
+    let mut bytes = Vec::new();
+    bytes.extend(0x46546C67u32.to_le_bytes()); bytes.extend(2u32.to_le_bytes());
+    bytes.extend(((12+8+json.len()+8+binary.len()) as u32).to_le_bytes());
+    bytes.extend((json.len() as u32).to_le_bytes()); bytes.extend(0x4E4F534Au32.to_le_bytes()); bytes.extend(json);
+    bytes.extend((binary.len() as u32).to_le_bytes()); bytes.extend(0x004E4942u32.to_le_bytes()); bytes.extend(binary);
+    Ok(bytes)
+}
 
-    let pos_byte_length = pos_bytes.len();
-    let idx_byte_length = idx_bytes.len();
-
-    let pos_padding = (4 - pos_byte_length % 4) % 4;
-    let idx_padding = (4 - idx_byte_length % 4) % 4;
-
-    let mut buffer_data = Vec::new();
-    buffer_data.extend_from_slice(&pos_bytes);
-    buffer_data.extend(std::iter::repeat(0u8).take(pos_padding));
-    buffer_data.extend_from_slice(&idx_bytes);
-    buffer_data.extend(std::iter::repeat(0u8).take(idx_padding));
-
-    let total_buffer_length = buffer_data.len();
-    let idx_offset = pos_byte_length + pos_padding;
-
-    // Calculate bounds
-    let num_verts = positions.len() / 3;
-    let mut min_pos = [f32::INFINITY; 3];
-    let mut max_pos = [f32::NEG_INFINITY; 3];
-    for i in 0..num_verts {
-        for j in 0..3 {
-            let v = positions[i * 3 + j];
-            min_pos[j] = min_pos[j].min(v);
-            max_pos[j] = max_pos[j].max(v);
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn exported_triangles_face_outwards_and_glazing_uses_its_material() {
+        let frame = Kozijn::new("Mesh verification", "MESH", 900.0, 2100.0);
+        let bytes = generate_glb_bytes(&frame).unwrap();
+        let json_size = u32::from_le_bytes(bytes[12..16].try_into().unwrap()) as usize;
+        let json: serde_json::Value = serde_json::from_slice(&bytes[20..20+json_size]).unwrap();
+        assert_eq!(u32::from_le_bytes(bytes[8..12].try_into().unwrap()) as usize, bytes.len());
+        assert_eq!(json["meshes"][0]["primitives"].as_array().unwrap().len(), 5);
+        assert_eq!(json["meshes"][0]["primitives"][4]["material"], 1);
+        let binary = &bytes[20+json_size+8..];
+        let offsets: Vec<usize> = json["bufferViews"].as_array().unwrap().iter().map(|v| v["byteOffset"].as_u64().unwrap() as usize).collect();
+        let point = |index: usize, offset: usize| -> [f32;3] {
+            std::array::from_fn(|axis| {
+                let start = offset + (index*3+axis)*4;
+                f32::from_le_bytes(binary[start..start+4].try_into().unwrap())
+            })
+        };
+        let count = json["bufferViews"][2]["byteLength"].as_u64().unwrap() as usize / 4;
+        for triangle in (0..count).step_by(3) {
+            let ids: [usize;3] = std::array::from_fn(|axis| {
+                let start = offsets[2]+(triangle+axis)*4;
+                u32::from_le_bytes(binary[start..start+4].try_into().unwrap()) as usize
+            });
+            let a = point(ids[0],0); let b = point(ids[1],0); let c = point(ids[2],0);
+            let u: [f32;3] = std::array::from_fn(|i| b[i]-a[i]);
+            let v: [f32;3] = std::array::from_fn(|i| c[i]-a[i]);
+            let cross = [u[1]*v[2]-u[2]*v[1], u[2]*v[0]-u[0]*v[2], u[0]*v[1]-u[1]*v[0]];
+            let normal = point(ids[0], offsets[1]);
+            assert!((0..3).map(|i| cross[i]*normal[i]).sum::<f32>() > 0.0, "reversed or degenerate triangle");
+            assert!(normal.iter().all(|v| v.is_finite()));
+        }
+        assert_eq!(json["accessors"][0]["min"], serde_json::json!([0.,0.,0.]));
+        let max = json["accessors"][0]["max"].as_array().unwrap();
+        for (actual, expected) in max.iter().zip([0.9,2.1,0.114]) {
+            assert!((actual.as_f64().unwrap()-expected).abs() < 1e-6);
         }
     }
-
-    // Build glTF JSON
-    let gltf = serde_json::json!({
-        "asset": {"version": "2.0", "generator": "Frame Vision Studio"},
-        "scene": 0,
-        "scenes": [{"nodes": [0]}],
-        "nodes": [{"mesh": 0, "name": "Kozijn"}],
-        "meshes": [{
-            "primitives": [{
-                "attributes": {"POSITION": 0},
-                "indices": 1,
-                "material": 0
-            }]
-        }],
-        "materials": materials,
-        "accessors": [
-            {
-                "bufferView": 0,
-                "componentType": 5126,
-                "count": num_verts,
-                "type": "VEC3",
-                "min": [min_pos[0], min_pos[1], min_pos[2]],
-                "max": [max_pos[0], max_pos[1], max_pos[2]]
-            },
-            {
-                "bufferView": 1,
-                "componentType": 5125,
-                "count": indices.len(),
-                "type": "SCALAR",
-                "min": [0],
-                "max": [if num_verts > 0 { num_verts - 1 } else { 0 }]
-            }
-        ],
-        "bufferViews": [
-            {
-                "buffer": 0,
-                "byteOffset": 0,
-                "byteLength": pos_byte_length,
-                "target": 34962
-            },
-            {
-                "buffer": 0,
-                "byteOffset": idx_offset,
-                "byteLength": idx_byte_length,
-                "target": 34963
-            }
-        ],
-        "buffers": [{
-            "byteLength": total_buffer_length
-        }]
-    });
-
-    let json_str = serde_json::to_string(&gltf).map_err(|e| e.to_string())?;
-    let json_bytes = json_str.as_bytes();
-    let json_padding = (4 - json_bytes.len() % 4) % 4;
-    let json_padded_len = json_bytes.len() + json_padding;
-
-    let total_length: u32 =
-        (12 + 8 + json_padded_len + 8 + total_buffer_length) as u32;
-
-    let mut file =
-        std::fs::File::create(output_path).map_err(|e| format!("Kan bestand niet aanmaken: {}", e))?;
-
-    // Header
-    file.write_all(&0x46546C67u32.to_le_bytes()).map_err(|e| e.to_string())?; // magic: glTF
-    file.write_all(&2u32.to_le_bytes()).map_err(|e| e.to_string())?; // version
-    file.write_all(&total_length.to_le_bytes()).map_err(|e| e.to_string())?;
-
-    // JSON chunk
-    file.write_all(&(json_padded_len as u32).to_le_bytes())
-        .map_err(|e| e.to_string())?;
-    file.write_all(&0x4E4F534Au32.to_le_bytes())
-        .map_err(|e| e.to_string())?; // JSON
-    file.write_all(json_bytes).map_err(|e| e.to_string())?;
-    for _ in 0..json_padding {
-        file.write_all(b" ").map_err(|e| e.to_string())?;
-    }
-
-    // BIN chunk
-    file.write_all(&(total_buffer_length as u32).to_le_bytes())
-        .map_err(|e| e.to_string())?;
-    file.write_all(&0x004E4942u32.to_le_bytes())
-        .map_err(|e| e.to_string())?; // BIN
-    file.write_all(&buffer_data).map_err(|e| e.to_string())?;
-
-    Ok(())
 }

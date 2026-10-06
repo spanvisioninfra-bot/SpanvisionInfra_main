@@ -18,7 +18,7 @@ import type { CostItem } from '@/types/costModel';
 
 const CODE_ATTRS = ['code', 'kode', 'nr', 'nummer', 'stabucode', 'besteknr'];
 const TITLE_TAGS = ['titel', 'title', 'omschrijving', "descr", 'naam', 'kort'];
-const TEXT_TAGS = ["text ", 'text', 'bestekstekst', 'alinea'];
+const TEXT_TAGS = ['tekst', 'text', 'bestekstekst', 'alinea'];
 
 function extractCode(el: Element): string {
   for (const a of CODE_ATTRS) {
@@ -73,7 +73,7 @@ export function importSufx(xml: string): ImportResult {
     const existing = chapterByHfdst.get(hfdst);
     if (existing) return existing;
     const ch = builder.add({
-      parentId: null, depth: 0, rowType: 'chapter', code: hfdst, description: `Chapter ${hfdst}`,
+      parentId: null, depth: 0, rowType: "chapter", code: hfdst, description: `Chapter ${hfdst}`,
     });
     chapterByHfdst.set(hfdst, ch);
     return ch;

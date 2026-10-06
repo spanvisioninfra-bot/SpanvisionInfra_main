@@ -1,7 +1,7 @@
 //! CSV production list generation.
 //!
 //! Generates semicolon-delimited CSV files (UTF-8 BOM) for:
-//! kortlijst, glaslijst, beslaglijst, rubberlijst, stuklijst.
+//! cutting, glazing, hardware, gaskets, bill of materials and panels.
 
 use std::io::Write;
 
@@ -12,54 +12,47 @@ pub fn generate_production_csv(
     production_data: &[ProductionData],
     output_dir: &str,
 ) -> Result<(), String> {
-    std::fs::create_dir_all(output_dir)
-        .map_err(|e| format!("Kan directory niet aanmaken: {}", e))?;
-
-    write_kortlijst(production_data, output_dir)?;
-    write_glaslijst(production_data, output_dir)?;
-    write_beslaglijst(production_data, output_dir)?;
-    write_rubberlijst(production_data, output_dir)?;
-    write_stuklijst(production_data, output_dir)?;
-
-    // Panel list only if any panels exist
-    let has_panels = production_data.iter().any(|p| !p.panel_list.is_empty());
-    if has_panels {
-        write_paneellijst(production_data, output_dir)?;
+    let files = production_csv_files(production_data)?;
+    std::fs::create_dir_all(output_dir).map_err(|e| format!("Cannot create export directory: {e}"))?;
+    for (name, bytes) in files {
+        let path = std::path::Path::new(output_dir).join(name);
+        super::write_export_bytes(path.to_str().ok_or("Export path is not UTF-8")?, &bytes)?;
     }
 
     Ok(())
 }
 
-fn create_csv(dir: &str, name: &str) -> Result<std::io::BufWriter<std::fs::File>, String> {
-    let path = std::path::Path::new(dir).join(name);
-    let file = std::fs::File::create(&path)
-        .map_err(|e| format!("Kan {} niet aanmaken: {}", name, e))?;
-    let mut writer = std::io::BufWriter::new(file);
-    // UTF-8 BOM for Excel compatibility
-    writer.write_all(b"\xEF\xBB\xBF").map_err(|e| e.to_string())?;
-    Ok(writer)
+/// The same byte generators serve browser downloads and native files.
+pub fn production_csv_files(data: &[ProductionData]) -> Result<Vec<(String, Vec<u8>)>, String> {
+    let mut files = vec![("cut-list.csv".into(), write_kortlijst(data)?),
+        ("glass-list.csv".into(), write_glaslijst(data)?),
+        ("hardware-list.csv".into(), write_beslaglijst(data)?),
+        ("gasket-list.csv".into(), write_rubberlijst(data)?),
+        ("bill-of-materials.csv".into(), write_stuklijst(data)?)];
+    if data.iter().any(|p| !p.panel_list.is_empty()) { files.push(("panel-list.csv".into(), write_paneellijst(data)?)); }
+    if data.iter().any(|p| !p.glaslat_list.is_empty()) { files.push(("glazing-bead-list.csv".into(), write_glaslatlijst(data)?)); }
+    Ok(files)
 }
 
 fn write_row(w: &mut impl Write, fields: &[&str]) -> Result<(), String> {
-    let line = fields.join(";");
+    let line = fields.iter().map(|field| {
+        let trimmed = field.trim_start();
+        let safe = if trimmed.starts_with(['=', '+', '-', '@']) && trimmed.parse::<f64>().is_err() {
+            format!("'{field}")
+        } else { field.to_string() };
+        // Delimiters, line breaks and quotes must remain inside one CSV cell.
+        format!("\"{}\"", safe.replace('"', "\"\""))
+    }).collect::<Vec<_>>().join(";");
     writeln!(w, "{}", line).map_err(|e| e.to_string())
 }
 
-fn write_kortlijst(data: &[ProductionData], dir: &str) -> Result<(), String> {
-    let mut w = create_csv(dir, "kortlijst.csv")?;
+fn write_kortlijst(data: &[ProductionData]) -> Result<Vec<u8>, String> {
+    let mut w = b"\xEF\xBB\xBF".to_vec();
     write_row(
         &mut w,
         &[
-            "Kozijn",
-            "Pos",
-            "Onderdeel",
-            "Profiel",
-            "Materiaal",
-            "Netto_mm",
-            "Bruto_mm",
-            "Hoek_L",
-            "Hoek_R",
-            "Aantal",
+            "Frame", "Position", "Member", "Profile", "Material",
+            "Net_mm", "Gross_mm", "Angle_left_deg", "Angle_right_deg", "Quantity",
         ],
     )?;
     for prod in data {
@@ -69,35 +62,28 @@ fn write_kortlijst(data: &[ProductionData], dir: &str) -> Result<(), String> {
                 &[
                     &prod.kozijn_mark,
                     &item.piece_id,
-                    item.member_type.label_nl(),
+                    item.member_type.label_en(),
                     &item.profile_name,
                     &item.material,
-                    &format!("{}", item.net_length_mm.round() as i64),
-                    &format!("{}", item.gross_length_mm.round() as i64),
-                    &format!("{}", item.miter_left_deg.round() as i64),
-                    &format!("{}", item.miter_right_deg.round() as i64),
+                    &format!("{}", item.net_length_mm),
+                    &format!("{}", item.gross_length_mm),
+                    &format!("{}", item.miter_left_deg),
+                    &format!("{}", item.miter_right_deg),
                     &format!("{}", item.quantity),
                 ],
             )?;
         }
     }
-    Ok(())
+    Ok(w)
 }
 
-fn write_glaslijst(data: &[ProductionData], dir: &str) -> Result<(), String> {
-    let mut w = create_csv(dir, "glaslijst.csv")?;
+fn write_glaslijst(data: &[ProductionData]) -> Result<Vec<u8>, String> {
+    let mut w = b"\xEF\xBB\xBF".to_vec();
     write_row(
         &mut w,
         &[
-            "Kozijn",
-            "Pos",
-            "Glastype",
-            "Breedte_mm",
-            "Hoogte_mm",
-            "Dikte_mm",
-            "Ug",
-            "Opp_m2",
-            "Aantal",
+            "Frame", "Position", "Glass_type", "Width_mm", "Height_mm",
+            "Thickness_mm", "Ug_W_m2K", "Area_m2", "Quantity",
         ],
     )?;
     for prod in data {
@@ -108,22 +94,22 @@ fn write_glaslijst(data: &[ProductionData], dir: &str) -> Result<(), String> {
                     &prod.kozijn_mark,
                     &item.piece_id,
                     &item.glass_type,
-                    &format!("{}", item.width_mm.round() as i64),
-                    &format!("{}", item.height_mm.round() as i64),
-                    &format!("{}", item.thickness_mm.round() as i64),
-                    &format!("{:.1}", item.ug_value),
-                    &format!("{:.2}", item.area_m2),
+                    &format!("{}", item.width_mm),
+                    &format!("{}", item.height_mm),
+                    &format!("{}", item.thickness_mm),
+                    &item.ug_value.to_string(),
+                    &item.area_m2.to_string(),
                     &format!("{}", item.quantity),
                 ],
             )?;
         }
     }
-    Ok(())
+    Ok(w)
 }
 
-fn write_beslaglijst(data: &[ProductionData], dir: &str) -> Result<(), String> {
-    let mut w = create_csv(dir, "beslaglijst.csv")?;
-    write_row(&mut w, &["Kozijn", "Cel", "Component", "Omschrijving", "Aantal"])?;
+fn write_beslaglijst(data: &[ProductionData]) -> Result<Vec<u8>, String> {
+    let mut w = b"\xEF\xBB\xBF".to_vec();
+    write_row(&mut w, &["Frame", "Cell", "Component", "Description", "Quantity"])?;
     for prod in data {
         for item in &prod.hardware_list {
             write_row(
@@ -138,33 +124,33 @@ fn write_beslaglijst(data: &[ProductionData], dir: &str) -> Result<(), String> {
             )?;
         }
     }
-    Ok(())
+    Ok(w)
 }
 
-fn write_rubberlijst(data: &[ProductionData], dir: &str) -> Result<(), String> {
-    let mut w = create_csv(dir, "rubberlijst.csv")?;
-    write_row(&mut w, &["Kozijn", "Type", "Lengte_mm", "Aantal"])?;
+fn write_rubberlijst(data: &[ProductionData]) -> Result<Vec<u8>, String> {
+    let mut w = b"\xEF\xBB\xBF".to_vec();
+    write_row(&mut w, &["Frame", "Type", "Length_mm", "Quantity"])?;
     for prod in data {
         for item in &prod.gasket_list {
             write_row(
                 &mut w,
                 &[
                     &prod.kozijn_mark,
-                    item.gasket_type.label_nl(),
-                    &format!("{}", item.length_mm.round() as i64),
+                    item.gasket_type.label_en(),
+                    &format!("{}", item.length_mm),
                     &format!("{}", item.quantity),
                 ],
             )?;
         }
     }
-    Ok(())
+    Ok(w)
 }
 
-fn write_stuklijst(data: &[ProductionData], dir: &str) -> Result<(), String> {
-    let mut w = create_csv(dir, "stuklijst.csv")?;
+fn write_stuklijst(data: &[ProductionData]) -> Result<Vec<u8>, String> {
+    let mut w = b"\xEF\xBB\xBF".to_vec();
     write_row(
         &mut w,
-        &["Kozijn", "Categorie", "Omschrijving", "Eenheid", "Hoeveelheid"],
+        &["Frame", "Category", "Description", "Unit", "Quantity"],
     )?;
     for prod in data {
         for item in &prod.bom {
@@ -175,19 +161,19 @@ fn write_stuklijst(data: &[ProductionData], dir: &str) -> Result<(), String> {
                     &item.category,
                     &item.description,
                     &item.unit,
-                    &format!("{:.2}", item.quantity),
+                    &item.quantity.to_string(),
                 ],
             )?;
         }
     }
-    Ok(())
+    Ok(w)
 }
 
-fn write_paneellijst(data: &[ProductionData], dir: &str) -> Result<(), String> {
-    let mut w = create_csv(dir, "paneellijst.csv")?;
+fn write_paneellijst(data: &[ProductionData]) -> Result<Vec<u8>, String> {
+    let mut w = b"\xEF\xBB\xBF".to_vec();
     write_row(
         &mut w,
-        &["Kozijn", "Pos", "Breedte_mm", "Hoogte_mm", "Type", "Aantal"],
+        &["Frame", "Position", "Width_mm", "Height_mm", "Type", "Quantity"],
     )?;
     for prod in data {
         for item in &prod.panel_list {
@@ -196,13 +182,61 @@ fn write_paneellijst(data: &[ProductionData], dir: &str) -> Result<(), String> {
                 &[
                     &prod.kozijn_mark,
                     &item.piece_id,
-                    &format!("{}", item.width_mm.round() as i64),
-                    &format!("{}", item.height_mm.round() as i64),
+                    &format!("{}", item.width_mm),
+                    &format!("{}", item.height_mm),
                     &item.panel_type,
                     &format!("{}", item.quantity),
                 ],
             )?;
         }
     }
-    Ok(())
+    Ok(w)
+}
+
+fn write_glaslatlijst(data: &[ProductionData]) -> Result<Vec<u8>, String> {
+    let mut w = b"\xEF\xBB\xBF".to_vec();
+    write_row(&mut w, &["Frame","Position","Cell","Side","Material","Width_mm","Height_mm","Cut_length_mm","Mitred","Quantity"])?;
+    for prod in data {
+        for item in &prod.glaslat_list {
+            write_row(&mut w, &[&prod.kozijn_mark,&item.piece_id,&(item.cell_index+1).to_string(),
+                &item.position,&item.material,&item.width_mm.to_string(),&item.height_mm.to_string(),
+                &item.total_length_mm.to_string(),if item.mitered {"Yes"}else{"No"},&item.quantity.to_string()])?;
+        }
+    }
+    Ok(w)
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn fields_keep_quotes_delimiters_and_newlines_and_neutralize_formulas() {
+        let mut bytes = Vec::new();
+        super::write_row(&mut bytes, &["frame;one", "A\"B\nC", "=1+1", "-45", " +SUM(A1)"]).unwrap();
+        assert_eq!(String::from_utf8(bytes).unwrap(), "\"frame;one\";\"A\"\"B\nC\";\"'=1+1\";\"-45\";\"' +SUM(A1)\"\n");
+    }
+    #[test]
+    fn production_files_include_real_cut_lengths_and_utf8_headers() {
+        let frame = crate::kozijn::Kozijn::new("CSV check", "CSV-01", 900.0, 2100.0);
+        let data = crate::production::compute_production_data(&frame);
+        let files = super::production_csv_files(&[data]).unwrap();
+        assert_eq!(files.len(), 5);
+        let cut = String::from_utf8(files[0].1.clone()).unwrap();
+        assert!(cut.starts_with("\u{feff}\"Frame\";\"Position\""));
+        assert!(cut.contains("\"Frame top\""));
+        assert!(cut.contains("\"CSV-01\""));
+        // Default timber rails run through; the jambs fit between 67 mm rails.
+        assert!(cut.contains("\"1966\""));
+        assert!(cut.contains("\"900\""));
+    }
+    #[test]
+    fn fractional_cut_lengths_and_bead_pieces_survive_csv_export() {
+        let mut frame = crate::kozijn::Kozijn::new("Fractional dimensions", "FRAC", 900.25, 2100.5);
+        frame.cells[0].glaslat = Some(Default::default());
+        let files = super::production_csv_files(&[crate::production::compute_production_data(&frame)]).unwrap();
+        let cut = String::from_utf8(files[0].1.clone()).unwrap();
+        assert!(cut.contains("\"900.25\""));
+        assert!(cut.contains("\"1966.5\""));
+        let beads = files.iter().find(|(name,_)|name=="glazing-bead-list.csv").unwrap();
+        assert!(String::from_utf8(beads.1.clone()).unwrap().contains("\"Inside\""));
+    }
 }

@@ -1,0 +1,9 @@
+{
+  "command": "node node_modules/vitest/vitest.mjs run --maxWorkers=2",
+  "directory": "ifc-view",
+  "started": "2026-10-05T11:38:14.749Z",
+  "finished": "2026-10-05T11:38:16.198Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/ifc-tests.log"
+}

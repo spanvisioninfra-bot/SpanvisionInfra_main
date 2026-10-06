@@ -169,7 +169,7 @@ Staartkosten: ${staartItems.map(s => `${s.description} ${s.staartPercentage ?? '
     const docId = activeDocId;
     const store = useAppStore.getState();
     const contextBlock = buildContextBlock();
-    const chapters = store.items.filter(i => i.rowType === 'chapter' && i.depth === 0)
+    const chapters = store.items.filter(i => i.rowType === "chapter" && i.depth === 0)
       .map(c => ({ code: c.code, description: c.description, total: c.total }));
     const bvo = store.schedule?.projectProperties?.find((p: any) => p.name === 'BVO')?.value ?? undefined;
     const priorMessages = store.chats[docId] ?? [];

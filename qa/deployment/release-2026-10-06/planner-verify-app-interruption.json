@@ -1,0 +1,17 @@
+{
+  "status": "interrupted",
+  "passed": false,
+  "started": "2026-10-06T07:18:53.485Z",
+  "interrupted": "2026-10-06T07:55:47Z",
+  "cause": "Windows Application event 1000: codex.exe crash, exception 0xc0000409. Verification child processes ended before browser test 212 reported a result.",
+  "sourceCommit": "36aa5c04e5cd6470095365ae72b86c903dbd6e11",
+  "completedSuites": [
+    "planning",
+    "library",
+    "mcp",
+    "dev-server"
+  ],
+  "browserCompleted": 211,
+  "browserTotal": 332,
+  "exitCode": null
+}

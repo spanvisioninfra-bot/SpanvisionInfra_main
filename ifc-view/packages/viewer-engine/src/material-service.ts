@@ -34,6 +34,7 @@ export interface VisibilityState {
   currentIndex: number;
   sortedValues: string[];
   valueGroups: Map<string, number[]>;
+  lightCanvas?: boolean;
 }
 
 export function updateMeshVisibility(
@@ -41,6 +42,10 @@ export function updateMeshVisibility(
   state: VisibilityState,
 ): void {
   const { hiddenExpressIds, selectedExpressIds, isolatedExpressIds, currentIndex, sortedValues, valueGroups } = state;
+  const currentColor = state.lightCanvas ? 0x17202B : CURRENT_COLOR;
+  const completedColor = state.lightCanvas ? 0x59636F : COMPLETED_COLOR;
+  const contextColor = state.lightCanvas ? 0x59636F : CONTEXT_COLOR;
+  const futureColor = state.lightCanvas ? 0x59636F : FUTURE_COLOR;
 
   const hasIsolation = isolatedExpressIds.size > 0;
 
@@ -78,35 +83,35 @@ export function updateMeshVisibility(
 
       if (hasIsolation) {
         if (isIsolated) {
-          mat.color.setHex(isSelected ? SELECTED_COLOR : visibleColors[matType]);
+          mat.color.setHex(isSelected ? currentColor : visibleColors[matType]);
           mat.transparent = matType === 'glass';
           mat.opacity = matType === 'glass' ? 0.6 : 1;
         } else {
-          mat.color.setHex(CONTEXT_COLOR);
+          mat.color.setHex(contextColor);
           mat.transparent = true;
           mat.opacity = 0.07;
         }
       } else if (isSelected) {
-        mat.color.setHex(SELECTED_COLOR);
+        mat.color.setHex(currentColor);
         mat.emissive?.setHex(0x303030);
         mat.transparent = false;
         mat.opacity = 1;
       } else if (currentIndex >= 0) {
         if (!isInParameter) {
-          mat.color.setHex(CONTEXT_COLOR);
+          mat.color.setHex(contextColor);
           mat.transparent = true;
           mat.opacity = 0.08;
         } else if (isCurrent) {
-          mat.color.setHex(CURRENT_COLOR);
+          mat.color.setHex(currentColor);
           mat.emissive?.setHex(0x242424);
           mat.transparent = false;
           mat.opacity = 1;
         } else if (isCompleted) {
-          mat.color.setHex(COMPLETED_COLOR);
+          mat.color.setHex(completedColor);
           mat.transparent = matType === 'glass';
           mat.opacity = matType === 'glass' ? 0.58 : 0.92;
         } else {
-          mat.color.setHex(FUTURE_COLOR);
+          mat.color.setHex(futureColor);
           mat.transparent = true;
           mat.opacity = 0.14;
         }

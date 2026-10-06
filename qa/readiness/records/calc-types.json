@@ -1,0 +1,9 @@
+{
+  "command": "npm run typecheck",
+  "directory": "calc-workspace",
+  "started": "2026-10-05T08:10:01.892Z",
+  "finished": "2026-10-05T08:10:24.481Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/calc-types.log"
+}

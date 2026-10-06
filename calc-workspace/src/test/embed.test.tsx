@@ -85,6 +85,6 @@ describe('bibliotheek-API', () => {
     expect(typeof lib.buildOnlv).toBe('function');
     expect(typeof lib.recalculateItems).toBe('function');
     expect(typeof lib.deserializeProject).toBe('function');
-    expect(lib.LANGUAGES.length).toBeGreaterThan(30);
+    expect(lib.LANGUAGES.map(language => language.code)).toEqual(['en']);
   });
 });

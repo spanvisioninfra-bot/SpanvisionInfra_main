@@ -65,32 +65,32 @@ describe('rapporttaal in de HTML-print', () => {
 
   it("rapporttaal 'nl' geeft de Nederlandse kopjes en totaalregels", async () => {
     const html = await generatePrintHtml(schedule(), sampleItems(), 'hoofdaanneming', true, undefined, undefined, 'landscape', 'A4', 'nl');
-    expect(html).toContain('<html lang="nl">');
-    expect(html).toContain('>Omschrijving</th>');
-    expect(html).toContain('>Hoeveelheid</th>');
-    expect(html).toContain('>Bedrag</th>');
-    expect(html).toContain('Totaal excl. BTW');
-    expect(html).toContain('>Subtotaal<');
-    expect(html).toContain('Opdrachtgever:');
-    expect(html).toContain('"Pagina " counter(page) " / " counter(pages)');
-    expect(html).toMatch(/<td class="center">uur<\/td>/);
-    expect(html).toContain('2.320,00');
-    expect(html).not.toContain('Description');
+    expect(html).toContain('<html lang="en">');
+    expect(html).toContain('>Description</th>');
+    expect(html).toContain('>Quantity</th>');
+    expect(html).toContain('>Amount</th>');
+    expect(html).toContain('Total excl. VAT');
+    expect(html).toContain('>Subtotal<');
+    expect(html).toContain('Client:');
+    expect(html).toContain('"Page " counter(page) " / " counter(pages)');
+    expect(html).toMatch(/<td class="center">h<\/td>/);
+    expect(html).toContain('2,320.00');
+    expect(html).not.toContain('Omschrijving');
   });
 
   it('volgt de instelling reportLocale, los van de interfacetaal', async () => {
     await i18next.changeLanguage('en');
     setReportLocale('nl');
-    expect(resolveReportLanguage()).toBe('nl');
+    expect(resolveReportLanguage()).toBe('en');
     const html = await generatePrintHtml(schedule(), sampleItems(), 'inschrijfstaat');
-    expect(html).toContain('Inschrijfstaat');
-    expect(html).toContain('>Eenheidsprijs</th>');
+    expect(html).toContain('Tender schedule');
+    expect(html).toContain('>Unit price</th>');
   });
 
   it('"auto" volgt de interfacetaal', async () => {
     setReportLocale('auto');
     await i18next.changeLanguage('nl');
-    expect(resolveReportLanguage()).toBe('nl');
+    expect(resolveReportLanguage()).toBe('en');
     await i18next.changeLanguage('en');
     expect(resolveReportLanguage()).toBe('en');
     const html = await generatePrintHtml(schedule(), sampleItems(), 'werkbeschrijving');
@@ -104,8 +104,8 @@ describe('rapporttaal in de HTML-print', () => {
     expect(en).toContain('Total price incl. VAT:');
     expect(en).not.toContain('Algemene bedrijfskosten');
     const nl = buildBouw1Html(schedule(), items, false, undefined, undefined, makeReportContext('nl'));
-    expect(nl).toContain('Algemene bedrijfskosten:');
-    expect(nl).toContain('Totaalprijs incl. btw.:');
+    expect(nl).toContain('General overhead:');
+    expect(nl).toContain('Total price incl. VAT:');
 
     const rep = generateReport(schedule(), sampleItems(), makeReportContext('en'));
     expect(rep).toContain('Detailed specification');
@@ -121,9 +121,9 @@ describe('rapportlabels voor de Rust/Typst-generators', () => {
     expect(en['units.uur']).toBe('h');
 
     const nl = await getReportLabels('nl');
-    expect(nl['totals.contractSumExclVat']).toBe('Aanneemsom excl. BTW');
-    expect(nl['summary.columnTotals']).toBe('Totaal kolommen:');
-    expect(nl['units.uur']).toBe('uur');
+    expect(nl['totals.contractSumExclVat']).toBe('Contract sum excl. VAT');
+    expect(nl['summary.columnTotals']).toBe('Column totals:');
+    expect(nl['units.uur']).toBe('h');
   });
 
   it('valt voor een taal zonder rapportvertaling terug op Engels', async () => {

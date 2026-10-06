@@ -1,0 +1,57 @@
+{
+  "data": {
+    "autoDeploy": "yes",
+    "autoDeployTrigger": "commit",
+    "branch": "version/V.1.0",
+    "createdAt": "2026-10-04T16:26:30.164946Z",
+    "dashboardUrl": "https://dashboard.render.com/web/srv-db17sdfavr4c73amedbg",
+    "id": "srv-db17sdfavr4c73amedbg",
+    "name": "spanvision-bim",
+    "notifyOnFail": "default",
+    "ownerId": "tea-davr4ru7bikc73f55ph0",
+    "repo": "https://github.com/spanvisioninfra-bot/SpanvisionInfra_main",
+    "rootDir": "",
+    "serviceDetails": {
+      "buildPlan": "starter",
+      "cache": {
+        "profile": "no-cache"
+      },
+      "env": "docker",
+      "envSpecificDetails": {
+        "dockerCommand": "",
+        "dockerContext": ".",
+        "dockerfilePath": "./Dockerfile"
+      },
+      "healthCheckPath": "/health",
+      "ipAllowList": [
+        {
+          "cidrBlock": "0.0.0.0/0",
+          "description": "everywhere"
+        }
+      ],
+      "maintenanceMode": {
+        "enabled": false,
+        "uri": ""
+      },
+      "numInstances": 1,
+      "openPorts": [],
+      "plan": "free",
+      "previews": {
+        "generation": "off"
+      },
+      "pullRequestPreviewsEnabled": "no",
+      "region": "singapore",
+      "renderSubdomainPolicy": "enabled",
+      "runtime": "docker",
+      "sshAddress": "srv-db17sdfavr4c73amedbg@ssh.singapore.render.com",
+      "url": "https://spanvision-bim.onrender.com"
+    },
+    "slug": "spanvision-bim",
+    "suspended": "not_suspended",
+    "suspenders": [],
+    "type": "web_service",
+    "updatedAt": "2026-10-06T06:36:10.355792Z",
+    "environmentId": null,
+    "projectId": null
+  }
+}

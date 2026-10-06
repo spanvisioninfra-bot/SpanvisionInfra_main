@@ -43,7 +43,7 @@ const edit = (fn: (loc: string, obj: JsonObject) => JsonObject, ns = 'common') =
 const unmerged = () => git('diff', '--name-only', '--diff-filter=U').out.trim().split('\n').filter(Boolean);
 
 try {
-  const esbuild = spawnSync(join(root, 'node_modules', '.bin', 'esbuild'), [join(root, 'scripts', 'i18n-resolve.ts'),
+  const esbuild = spawnSync(process.execPath, [join(root, 'node_modules', 'esbuild', 'bin', 'esbuild'), join(root, 'scripts', 'i18n-resolve.ts'),
     '--bundle', '--platform=node', '--format=esm', '--log-level=error', `--outfile=${bundle}`], { encoding: 'utf8' });
   if (esbuild.status !== 0) throw new Error(`bundelen van i18n-resolve.ts mislukt: ${esbuild.stderr}`);
 

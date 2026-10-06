@@ -15,13 +15,14 @@ test('welkomstdialoog past taal, thema en automatisch berekenen live toe en bewa
   expect(await page.evaluate(() => localStorage.getItem('ops-autoCalcCPM'))).toBe(String(!before));
 
   await dialog.getByRole('button', { name: /^(Theme|Thema)$/ }).click();
-  await page.getByRole('option', { name: /^(Light|Licht)$/ }).click();
+  await page.getByRole('listbox').getByRole('option', { name: /^(Light|Licht)$/ }).click();
   expect(await page.evaluate(() => window.__OPS__!.store.getState().ui.uiTheme)).toBe('light');
   expect(await page.evaluate(() => localStorage.getItem('ops-theme'))).toBe('light');
 
   await dialog.getByRole('button', { name: /^(Language|Taal)$/ }).click();
-  await page.getByRole('option', { name: /Nederlands/ }).click();
-  await expect(page.locator('html')).toHaveAttribute('lang', 'nl');
-  expect(await page.evaluate(() => localStorage.getItem('ops-locale'))).toBe('nl');
-  await expect(dialog.getByRole('button', { name: 'Taal', exact: true })).toBeVisible();
+  await expect(page.getByRole('listbox').getByRole('option')).toHaveCount(1);
+  await page.getByRole('listbox').getByRole('option', { name: /English/ }).click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  expect(await page.evaluate(() => localStorage.getItem('ops-locale'))).toBe('en');
+  await expect(dialog.getByRole('button', { name: 'Language', exact: true })).toBeVisible();
 });

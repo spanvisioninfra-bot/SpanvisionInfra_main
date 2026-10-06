@@ -3,7 +3,7 @@
   <metadaten>
     <erstelltam>2026-01-15T12:00:00</erstelltam>
     <dateiname>lb-schoko-lv.onlv</dateiname>
-    <programmsystem>geptechniek workspace · Calc</programmsystem>
+    <programmsystem>Spanvision Infra · Calc</programmsystem>
     <programmversion>0.13.0</programmversion>
   </metadaten>
   <leistungsteiltabelle>
@@ -48,7 +48,7 @@
         <bezeichnung>Frei formulierte Positionen</bezeichnung>
         <herausgeber>
           <firma>
-            <name>geptechniek workspace · Calc</name>
+            <name>Spanvision Infra · Calc</name>
           </firma>
         </herausgeber>
         <lbkennung>OCS</lbkennung>

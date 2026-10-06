@@ -3,12 +3,18 @@
 //! Writes DXF R2013 text format directly — no external crate needed.
 
 use std::fmt::Write as FmtWrite;
-use std::io::Write;
 
 use crate::kozijn::{Kozijn, PanelType, OpeningDirection};
 
 /// Generate a DXF workshop drawing from a kozijn definition.
 pub fn generate_dxf(kozijn: &Kozijn, output_path: &str) -> Result<(), String> {
+    let text = generate_dxf_text(kozijn)?;
+    super::write_export_bytes(output_path, text.as_bytes())
+}
+
+pub fn generate_dxf_text(kozijn: &Kozijn) -> Result<String, String> {
+    super::ifc::validate_ifc_export(kozijn, super::ifc::LodLevel::Lod300)?;
+    if kozijn.layout.is_some() { return Err("Workshop DXF for free-subdivision layouts is not yet supported. Export the frame IFC instead.".into()); }
     let mut dxf = String::with_capacity(64 * 1024);
 
     let frame = &kozijn.frame;
@@ -179,20 +185,29 @@ pub fn generate_dxf(kozijn: &Kozijn, output_path: &str) -> Result<(), String> {
     // === EOF ===
     w_group(&mut dxf, 0, "EOF");
 
-    // Write file
-    let mut file = std::fs::File::create(output_path)
-        .map_err(|e| format!("Kan DXF bestand niet aanmaken: {}", e))?;
-    file.write_all(dxf.as_bytes())
-        .map_err(|e| format!("Kan DXF niet schrijven: {}", e))?;
-
-    Ok(())
+    Ok(dxf)
 }
 
 // ── DXF writing helpers ───────────────────────────────────────────
 
 fn w_group(dxf: &mut String, code: i32, value: &str) {
     let _ = writeln!(dxf, "{:>3}", code);
-    let _ = writeln!(dxf, "{}", value);
+    let safe: String = value.chars().map(|c| if c.is_control() { ' ' } else { c }).collect();
+    let _ = writeln!(dxf, "{}", safe);
+}
+
+#[cfg(test)]
+mod text_tests {
+    #[test]
+    fn control_characters_in_frame_names_cannot_create_dxf_records() {
+        let frame = crate::kozijn::Kozijn::new("Name\n0\nEOF", "SAFE", 900.0, 2100.0);
+        let text = super::generate_dxf_text(&frame).unwrap();
+        let lines: Vec<_> = text.lines().collect();
+        assert_eq!(lines.len() % 2, 0);
+        assert_eq!(lines.chunks_exact(2).filter(|p| p[0].trim() == "0" && p[1] == "EOF").count(), 1);
+        assert!(lines.chunks_exact(2).all(|p| p[0].trim().parse::<i32>().is_ok()));
+        assert!(text.contains("AC1027"));
+    }
 }
 
 fn w_group_f(dxf: &mut String, code: i32, value: f64) {

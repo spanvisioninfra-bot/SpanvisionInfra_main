@@ -1,0 +1,6 @@
+*.sh text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.mjs text eol=lf
+*.json text eol=lf
+open-vision-studio/docs/superpowers/evidence/tabel-overhaul-tauri-refresh-*.ifc text eol=lf

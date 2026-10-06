@@ -25,7 +25,7 @@ function getRowType(code: string): RowType {
 function mapResourceType(sColumn: string): ResourceType {
   const s = sColumn.toLowerCase();
   if (s === 'm') return 'arbeid'; // mankracht = arbeid
-  if (s === 'h') return "equipment"; // hulpmiddel = materieel
+  if (s === 'h') return "materieel"; // hulpmiddel = materieel
   return 'overig';
 }
 
@@ -230,7 +230,7 @@ export function importBasCalcFile(arrayBuffer: ArrayBuffer): { schedule: CostSch
       const unitPrice = (materialPrice ?? 0) + (laborPrice ?? 0);
       const total = bedrag ?? (quantity !== null ? quantity * unitPrice : 0);
 
-      const itemRowType: RowType = isChapter ? 'chapter' : rowType;
+      const itemRowType: RowType = isChapter ? "chapter" : rowType;
       inStaartBlock = !isChapter && rowType !== 'begrotingspost';
 
       // Bron-getrouw: als een kale post (zonder middelen) bij herberekening
@@ -258,7 +258,7 @@ export function importBasCalcFile(arrayBuffer: ArrayBuffer): { schedule: CostSch
         sortOrder: sortOrder++,
         code,
         description,
-        unit: isChapter ? "pcs" : unit,
+        unit: isChapter ? "st" : unit,
         quantity: isChapter ? null : pinQuantity,
         materialPrice: isChapter ? null : pinMaterial,
         laborPrice: isChapter ? null : pinLabor,

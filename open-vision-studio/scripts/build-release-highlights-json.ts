@@ -8,7 +8,7 @@
 //
 //   node scripts/run-ts.mjs scripts/build-release-highlights-json.ts            # schrijven
 //   node scripts/run-ts.mjs scripts/build-release-highlights-json.ts --check    # poort (exit 1)
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, renameSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   RELEASE_HIGHLIGHT_CATALOG,
@@ -108,6 +108,8 @@ if (check) {
   }
   console.log('OK public/release-highlights.json is gelijk aan de catalogus');
 } else {
-  writeFileSync(OUTPUT, serialize(new Date().toISOString()));
+  const temporary = `${OUTPUT}.tmp-${process.pid}`;
+  writeFileSync(temporary, serialize(new Date().toISOString()));
+  renameSync(temporary, OUTPUT);
   console.log(`OK geschreven: public/release-highlights.json (${Object.keys(RELEASE_HIGHLIGHT_CATALOG).length} releases)`);
 }

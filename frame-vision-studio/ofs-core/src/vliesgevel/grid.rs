@@ -10,7 +10,13 @@ pub fn create_regular_grid(
     height: f64,
     mullion_spacing: f64,
     transom_spacing: f64,
-) -> Vliesgevel {
+) -> Result<Vliesgevel, String> {
+    if ![width, height, mullion_spacing, transom_spacing].iter().all(|v| v.is_finite() && *v > 0.0) || width < 100.0 || height < 100.0 {
+        return Err("Use finite curtain wall dimensions of at least 100 mm and positive member spacing.".into());
+    }
+    if (width / mullion_spacing).ceil() * (height / transom_spacing).ceil() > 10000.0 {
+        return Err("A curtain wall may contain at most 10000 panels. Increase member spacing.".into());
+    }
     let mullion_width = 50.0;
     let transom_width = 50.0;
 
@@ -55,26 +61,26 @@ pub fn create_regular_grid(
         thermal_break_width: None,
     };
     vg.rebuild_panels();
-    vg
+    Ok(vg)
 }
 
 /// Standard stick system: 1500mm mullion spacing, 1200mm transom spacing.
-pub fn template_stick_system(width: f64, height: f64) -> Vliesgevel {
-    let mut vg = create_regular_grid(width, height, 1500.0, 1200.0);
+pub fn template_stick_system(width: f64, height: f64) -> Result<Vliesgevel, String> {
+    let mut vg = create_regular_grid(width, height, 1500.0, 1200.0)?;
     vg.name = "Stijl-regel vliesgevel".into();
-    vg
+    Ok(vg)
 }
 
 /// Unitized system: 1200mm wide, floor-to-floor (typically 3600mm).
-pub fn template_unitized(width: f64, height: f64) -> Vliesgevel {
-    let mut vg = create_regular_grid(width, height, 1200.0, height);
+pub fn template_unitized(width: f64, height: f64) -> Result<Vliesgevel, String> {
+    let mut vg = create_regular_grid(width, height, 1200.0, height)?;
     vg.name = "Elementgevel".into();
-    vg
+    Ok(vg)
 }
 
 /// Shopfront: wide spacing with a door zone at the bottom.
-pub fn template_shopfront(width: f64, height: f64) -> Vliesgevel {
-    let mut vg = create_regular_grid(width, height, 2000.0, 2400.0);
+pub fn template_shopfront(width: f64, height: f64) -> Result<Vliesgevel, String> {
+    let mut vg = create_regular_grid(width, height, 2000.0, 2400.0)?;
     vg.name = "Winkelpui".into();
 
     // Set bottom-left panel as door
@@ -92,7 +98,7 @@ pub fn template_shopfront(width: f64, height: f64) -> Vliesgevel {
         }
     }
 
-    vg
+    Ok(vg)
 }
 
 #[cfg(test)]
@@ -100,8 +106,16 @@ mod tests {
     use super::*;
 
     #[test]
+    fn invalid_grid_cannot_loop_or_allocate_unbounded_panels() {
+        for spacing in [0.0, -1.0, f64::NAN, f64::INFINITY, 0.0001] {
+            assert!(create_regular_grid(6000.0, 3600.0, spacing, 1200.0).is_err());
+        }
+        assert!(template_unitized(6000.0, 0.0).is_err());
+    }
+
+    #[test]
     fn test_regular_grid() {
-        let vg = create_regular_grid(6000.0, 3600.0, 1500.0, 1200.0);
+        let vg = create_regular_grid(6000.0, 3600.0, 1500.0, 1200.0).unwrap();
         assert_eq!(vg.mullions.len(), 3); // at 1500, 3000, 4500
         assert_eq!(vg.transoms.len(), 2); // at 1200, 2400
         assert_eq!(vg.panels.len(), 12);  // 4 x 3
@@ -109,7 +123,7 @@ mod tests {
 
     #[test]
     fn test_stick_system_template() {
-        let vg = template_stick_system(9000.0, 3600.0);
+        let vg = template_stick_system(9000.0, 3600.0).unwrap();
         assert_eq!(vg.mullions.len(), 5); // at 1500, 3000, 4500, 6000, 7500
         assert_eq!(vg.transoms.len(), 2); // at 1200, 2400
         assert_eq!(vg.panels.len(), 18);  // 6 x 3
@@ -117,7 +131,7 @@ mod tests {
 
     #[test]
     fn test_unitized_template() {
-        let vg = template_unitized(6000.0, 3600.0);
+        let vg = template_unitized(6000.0, 3600.0).unwrap();
         assert_eq!(vg.mullions.len(), 4); // at 1200, 2400, 3600, 4800
         assert_eq!(vg.transoms.len(), 0); // no transoms (floor-to-floor)
         assert_eq!(vg.panels.len(), 5);   // 5 x 1

@@ -4,7 +4,7 @@ import { showLoading, hideLoading } from '../ui/chrome/dialogs.js';
 import { updateAllStatus } from '../ui/chrome/status-bar.js';
 import { setViewMode, fitPage } from './renderer.js';
 import { generateThumbnails, refreshActiveTab } from '../ui/panels/left-panel.js';
-import { createTab, updateWindowTitle, markDocumentModified } from '../ui/chrome/tabs.js';
+import { createTab, closeTab, switchToTab, updateWindowTitle, markDocumentModified } from '../ui/chrome/tabs.js';
 import * as pdfjsLib from 'pdfjs-dist';
 import { isTauri, readBinaryFile, openFileDialog, lockFile, invoke } from '../core/platform.js';
 import { PDFDocument } from 'pdf-lib';
@@ -236,6 +236,7 @@ export async function loadPDF(filePath, docIndex, preloadedData = null) {
   const isActive = () => state.documents[state.activeDocumentIndex] === doc;
   // Helper: check if document was closed during async operations
   const isClosed = () => !state.documents.includes(doc);
+  let loadingTask;
 
   try {
     const _t0 = performance.now();
@@ -354,14 +355,15 @@ export async function loadPDF(filePath, docIndex, preloadedData = null) {
     console.log(`[PERF] File read done: ${(performance.now() - _t0).toFixed(0)}ms, size: ${typedArray.length} bytes`);
 
     // Load PDF using pdf.js (this transfers the buffer to a worker)
-    doc.pdfDoc = await pdfjsLib.getDocument({
+    loadingTask = pdfjsLib.getDocument({
       data: typedArray,
       cMapUrl: '/pdfjs/web/cmaps/',
       cMapPacked: true,
       standardFontDataUrl: '/pdfjs/web/standard_fonts/',
       isEvalSupported: false,
       verbosity: 0,
-    }).promise;
+    });
+    doc.pdfDoc = await loadingTask.promise;
     if (isClosed()) return;
     console.log(`[PERF] PDF.js getDocument done: ${(performance.now() - _t0).toFixed(0)}ms, pages: ${doc.pdfDoc.numPages}`);
 
@@ -734,11 +736,26 @@ export async function loadPDF(filePath, docIndex, preloadedData = null) {
     // Suppress errors from document being closed during background loading
     if (isClosed()) return;
     console.error('Error loading PDF:', error);
-    if (isActive()) {
+    const failedWasActive = isActive();
+    if (failedWasActive) {
       showMessage(i18next.t('failedToLoadPdf', { error: error.message }));
+    }
+    // An invalid first load must not leave a blank active tab or retain its
+    // file lock/byte caches. Keep partially loaded or edited documents intact.
+    if (!doc.pdfDoc && !doc.modified) {
+      const previousId = doc._openFallbackDocumentId;
+      if (failedWasActive) hideLoading();
+      if (loadingTask) await loadingTask.destroy().catch(() => {});
+      const failedIndex = state.documents.indexOf(doc);
+      if (failedIndex !== -1) await closeTab(failedIndex, true);
+      if (failedWasActive && previousId != null) {
+        const previousIndex = state.documents.findIndex(item => item.id === previousId);
+        if (previousIndex !== -1) switchToTab(previousIndex);
+      }
     }
   } finally {
     doc._isLoading = false;
+    delete doc._openFallbackDocumentId;
     if (isActive()) hideLoading();
   }
 }

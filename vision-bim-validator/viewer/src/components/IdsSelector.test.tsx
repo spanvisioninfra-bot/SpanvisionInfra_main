@@ -22,8 +22,10 @@ function createMockFile(
   sizeInBytes: number = 1024,
   type: string = 'application/octet-stream'
 ): File {
-  const content = new Array(sizeInBytes).fill('a').join('');
-  return new File([content], name, { type });
+  // Test the declared size without allocating a 500 MB fixture.
+  const file = new File(['test'], name, { type });
+  Object.defineProperty(file, 'size', { value: sizeInBytes });
+  return file;
 }
 
 describe('IdsSelector', () => {
@@ -104,7 +106,7 @@ describe('IdsSelector', () => {
 
   describe('Selection Changes', () => {
     it('should call onSelectionChange with nl-bim when nl-bim is selected', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // First select a different option
@@ -122,7 +124,7 @@ describe('IdsSelector', () => {
     });
 
     it('should call onSelectionChange with rvb when rvb is selected', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       const rvbRadio = screen.getByRole('radio', { name: /rvb bim norm/i });
@@ -135,7 +137,7 @@ describe('IdsSelector', () => {
     });
 
     it('should call onSelectionChange with null when custom is selected without file', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       const customRadio = screen.getByRole('radio', { name: /custom ids/i });
@@ -146,7 +148,7 @@ describe('IdsSelector', () => {
     });
 
     it('should update radio button checked state on selection', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       const nlBimRadio = screen.getByRole('radio', { name: /nl bim basis ils/i });
@@ -164,7 +166,7 @@ describe('IdsSelector', () => {
 
   describe('Custom IDS Upload', () => {
     it('should show upload zone when custom is selected', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       const customRadio = screen.getByRole('radio', { name: /custom ids/i });
@@ -174,7 +176,7 @@ describe('IdsSelector', () => {
     });
 
     it('should hide upload zone when switching from custom to standard', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // Select custom first
@@ -191,7 +193,7 @@ describe('IdsSelector', () => {
     });
 
     it('should accept valid .ids file', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // Select custom
@@ -213,7 +215,7 @@ describe('IdsSelector', () => {
     });
 
     it('should reject non-.ids file', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // Select custom
@@ -241,7 +243,7 @@ describe('IdsSelector', () => {
     });
 
     it('should reject files larger than 10MB', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // Select custom
@@ -263,7 +265,7 @@ describe('IdsSelector', () => {
     });
 
     it('should display max size hint for custom upload', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       const customRadio = screen.getByRole('radio', { name: /custom ids/i });
@@ -273,7 +275,7 @@ describe('IdsSelector', () => {
     });
 
     it('should display selected file name and size', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // Select custom
@@ -293,7 +295,7 @@ describe('IdsSelector', () => {
     });
 
     it('should allow clearing selected custom file', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // Select custom
@@ -321,7 +323,7 @@ describe('IdsSelector', () => {
     });
 
     it('should retain custom file selection when switching away and back', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // Select custom and upload file
@@ -353,7 +355,7 @@ describe('IdsSelector', () => {
 
   describe('Drag and Drop for Custom IDS', () => {
     it('should accept file via drag and drop', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // Select custom
@@ -378,7 +380,7 @@ describe('IdsSelector', () => {
     });
 
     it('should handle drag over state visually', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // Select custom
@@ -411,7 +413,7 @@ describe('IdsSelector', () => {
     });
 
     it('should not call onSelectionChange when disabled', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(
         <IdsSelector onSelectionChange={mockOnSelectionChange} disabled={true} />
       );
@@ -437,7 +439,7 @@ describe('IdsSelector', () => {
     });
 
     it('should disable custom upload zone when disabled', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       const { rerender } = render(
         <IdsSelector onSelectionChange={mockOnSelectionChange} />
       );
@@ -460,7 +462,7 @@ describe('IdsSelector', () => {
     });
 
     it('should not show clear button when disabled with custom file', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       const { rerender } = render(
         <IdsSelector onSelectionChange={mockOnSelectionChange} />
       );
@@ -495,7 +497,7 @@ describe('IdsSelector', () => {
 
   describe('Error Handling', () => {
     it('should display error message with alert role', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // Select custom
@@ -516,7 +518,7 @@ describe('IdsSelector', () => {
     });
 
     it('should clear error when valid file is selected', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // Select custom
@@ -541,7 +543,7 @@ describe('IdsSelector', () => {
     });
 
     it('should clear error when switching to standard option', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // Select custom
@@ -569,7 +571,7 @@ describe('IdsSelector', () => {
 
   describe('Selection Type Validation', () => {
     it('should emit standard selection with correct type', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       const rvbRadio = screen.getByRole('radio', { name: /rvb bim norm/i });
@@ -586,7 +588,7 @@ describe('IdsSelector', () => {
     });
 
     it('should emit custom selection with correct type and file', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ applyAccept: false });
       render(<IdsSelector onSelectionChange={mockOnSelectionChange} />);
 
       // Select custom

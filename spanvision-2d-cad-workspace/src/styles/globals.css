@@ -1,6 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../../tailwind.config.js";
+
+/* Preserve v3 utility semantics in existing editor and extension layouts. */
+@utility flex-shrink-0 { flex-shrink: 0; }
+@utility flex-grow { flex-grow: 1; }
+@utility outline-none { outline: 2px solid transparent; outline-offset: 2px; }
 
 /* ISO 3098 compliant CAD font */
 @font-face {
@@ -257,10 +261,12 @@
   color: #000000;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 }
 
 html,

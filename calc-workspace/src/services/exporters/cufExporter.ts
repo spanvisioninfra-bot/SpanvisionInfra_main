@@ -5,7 +5,7 @@ import { buildXml, formatDutch, denormalizeUnit, type XmlNode } from './xmlBuild
 export function exportCuf(input: ExportInput): ExportResult {
   const warnings: string[] = [];
   const { schedule, items } = input;
-  const chapters = items.filter((it) => it.rowType === 'chapter' && !it.parentId);
+  const chapters = items.filter((it) => it.rowType === "chapter" && !it.parentId);
 
   const children: (XmlNode | string)[] = [
     { tag: 'Naam', children: [schedule.name ?? ''] },
@@ -34,7 +34,7 @@ export function exportCuf(input: ExportInput): ExportResult {
 function renderChapter(chapter: CostItem, all: CostItem[], warnings: string[]): XmlNode {
   const kids = all.filter((it) => it.parentId === chapter.id);
   const posts = kids.filter((it) => it.rowType === 'begrotingspost' || it.rowType === 'bewakingspost');
-  const subs  = kids.filter((it) => it.rowType === 'chapter');
+  const subs  = kids.filter((it) => it.rowType === "chapter");
 
   return {
     tag: 'Hoofdstuk',
@@ -47,10 +47,10 @@ function renderChapter(chapter: CostItem, all: CostItem[], warnings: string[]): 
 }
 
 function renderPost(post: CostItem, all: CostItem[], _warnings: string[]): XmlNode {
-  const regels = all.filter((it) => it.parentId === post.id && it.rowType === "calc ");
+  const regels = all.filter((it) => it.parentId === post.id && it.rowType === "regel");
   const children: (XmlNode | string)[] = [
     { tag: 'Hoeveelheid', children: [formatDutch(post.quantity ?? 0, 2)] },
-    { tag: 'Eenheid',     children: [denormalizeUnit(post.unit ?? "pcs")] },
+    { tag: 'Eenheid',     children: [denormalizeUnit(post.unit ?? "st")] },
     { tag: 'Prijs',       children: [formatDutch(post.unitPrice ?? 0, 2)] },
     ...regels.map((r) => renderRegel(r)),
   ];
@@ -63,7 +63,7 @@ function renderRegel(regel: CostItem): XmlNode {
     attrs: { code: regel.code, omschrijving: regel.description },
     children: [
       { tag: 'Hoeveelheid', children: [formatDutch(regel.quantity ?? 0, 2)] },
-      { tag: 'Eenheid',     children: [denormalizeUnit(regel.unit ?? "pcs")] },
+      { tag: 'Eenheid',     children: [denormalizeUnit(regel.unit ?? "st")] },
       { tag: 'Prijs',       children: [formatDutch(regel.unitPrice ?? 0, 2)] },
     ],
   };

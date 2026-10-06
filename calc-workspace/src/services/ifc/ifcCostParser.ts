@@ -185,7 +185,7 @@ export function parseIfcCostFile(content: string): { schedule: CostSchedule; ite
     const parentItem = itemMap.get(relatingRef);
     if (parentItem) {
       // Parent is a cost item - set children's parentId, mark parent as chapter
-      parentItem.rowType = 'chapter';
+      parentItem.rowType = "chapter";
       parentItem.verrekenbaar = 'V';
       for (let i = 0; i < relatedRefs.length; i++) {
         const childItem = itemMap.get(relatedRefs[i]);
@@ -212,7 +212,7 @@ export function parseIfcCostFile(content: string): { schedule: CostSchedule; ite
     for (const item of items) {
       if (item.parentId === parentId) {
         item.depth = depth;
-        if (item.rowType === 'chapter') setDepth(item.id, depth + 1);
+        if (item.rowType === "chapter") setDepth(item.id, depth + 1);
       }
     }
   }

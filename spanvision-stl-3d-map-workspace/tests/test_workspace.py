@@ -30,7 +30,7 @@ def test_identity_and_no_upstream_update():
     with TestClient(main.app) as client, patch('requests.get',side_effect=AssertionError('Unexpected network request')):
         assert client.get('/api/ping').json()['app']==INSTANCE_MARKER
         info=client.get('/api/appinfo').json()
-        assert info['name']==APP_NAME and info['organization']=='Spanvision infra' and info['mark']=='STL'
+        assert info['name']==APP_NAME and info['organization']=='Spanvision Infra' and info['mark']=='STL'
         assert info['feedback_url'] is None
         assert client.get('/api/update-check').json()['enabled'] is False
         assert 'MIT License' in client.get('/api/notices').text
@@ -62,7 +62,7 @@ def test_geometry_colors_slots_and_support(area,project,tmp_path):
     with zipfile.ZipFile(tmp_path/'fixture.3mf') as archive:
         root=ET.fromstring(archive.read('3D/3dmodel.model'))
         application=root.find("{*}metadata[@name='Application']").text
-        assert application=='STL-3D map workspace — Spanvision infra'
+        assert application=='STL-3D map workspace — Spanvision Infra'
         assert 'Metadata/model_settings.config' in archive.namelist()
         for name in archive.namelist():
             if name.endswith('.model'):ET.fromstring(archive.read(name))

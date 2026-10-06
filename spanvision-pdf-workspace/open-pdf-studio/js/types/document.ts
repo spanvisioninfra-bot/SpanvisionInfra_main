@@ -125,4 +125,6 @@ export interface DocumentState {
   _pagesNeedingColorUpdate: Set<number>;
   _annotationLoadId: number;
   _isLoading: boolean;
+  /** Previously active tab to restore if a new file fails its first load. */
+  _openFallbackDocumentId?: string | number;
 }

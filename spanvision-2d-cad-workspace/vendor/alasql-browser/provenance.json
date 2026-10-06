@@ -1,0 +1,20 @@
+{
+  "files": [
+    {
+      "file": "alasql.cjs",
+      "Hash": "4EB003D860ADBE3871E04A40959FCE9C10D25FAECA3E8E5CE2DC274333F1AEB1"
+    },
+    {
+      "file": "alasql.d.ts",
+      "Hash": "4E14F8D7E2032AD5E727740D3A9C640FE90D851BA128F37594CB9DDA4E07C5DD"
+    },
+    {
+      "file": "LICENSE",
+      "Hash": "48F0D722A7B35A9D92DE38FE6B949C9477DA90E84E8F763C6FCA58457732E33E"
+    }
+  ],
+  "version": "4.17.0",
+  "upstream": "https://github.com/AlaSQL/alasql",
+  "changes": "Package manifest selects the unmodified browser bundle. Library, declarations and license are unchanged.",
+  "source": "https://registry.npmjs.org/alasql/-/alasql-4.17.0.tgz"
+}

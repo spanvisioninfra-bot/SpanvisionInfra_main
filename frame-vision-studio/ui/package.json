@@ -20,6 +20,7 @@
     "svelte-i18n": "^4.0.1",
     "three": "^0.183.2"
   },
+  "overrides": { "svelte-i18n": { "esbuild": "^0.28.1" } },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "svelte": "^5.0.0",

@@ -521,6 +521,14 @@ pub enum PanelType {
 }
 
 impl PanelType {
+    pub fn label_en(&self) -> &'static str {
+        match self {
+            Self::FixedGlass => "Fixed glass", Self::TurnTilt => "Tilt and turn", Self::Turn => "Casement",
+            Self::Tilt => "Tilt", Self::Sliding => "Sliding", Self::Door => "Door", Self::Panel => "Panel",
+            Self::Ventilation => "Ventilation", Self::TopHung => "Top hung", Self::BottomHung => "Bottom hung",
+            Self::LiftSlide => "Lift and slide", Self::Pivot => "Pivot",
+        }
+    }
     pub fn label_nl(&self) -> &'static str {
         match self {
             Self::FixedGlass => "Vast glas",
@@ -675,6 +683,21 @@ pub struct Project {
 }
 
 impl Project {
+    pub fn from_document_json(json: &str) -> Result<Self, String> {
+        if json.len() > 64 * 1024 * 1024 { return Err("Frame projects are limited to 64 MB.".into()); }
+        let project: Self = serde_json::from_str(json).map_err(|e| format!("Invalid Frame project: {e}"))?;
+        if !["1.0", "1.1", "1.2", "1.3"].contains(&project.format_version.as_str()) {
+            return Err(format!("Unsupported Frame project version {}. Update the application before opening this file.", project.format_version));
+        }
+        let mut ids = std::collections::HashSet::new();
+        for frame in &project.kozijnen {
+            if !ids.insert(frame.id) { return Err("The project contains duplicate frame identities.".into()); }
+            if ![frame.frame.outer_width, frame.frame.outer_height, frame.frame.frame_width, frame.frame.frame_depth].iter().all(|v| v.is_finite() && *v > 0.0) {
+                return Err(format!("Frame {} has invalid dimensions.", frame.mark));
+            }
+        }
+        Ok(project)
+    }
     pub fn new(name: &str, number: &str) -> Self {
         Self {
             format_version: "1.3".into(),
@@ -723,6 +746,19 @@ pub struct Series {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn project_reader_rejects_future_versions_and_duplicate_frames() {
+        let mut project = Project::new("File verification", "");
+        project.kozijnen.push(Kozijn::new("One", "ONE", 900., 2100.));
+        let json = serde_json::to_string(&project).unwrap();
+        assert_eq!(Project::from_document_json(&json).unwrap().kozijnen.len(), 1);
+        project.format_version = "99.0".into();
+        assert!(Project::from_document_json(&serde_json::to_string(&project).unwrap()).unwrap_err().contains("Unsupported"));
+        project.format_version = "1.3".into();
+        project.kozijnen.push(project.kozijnen[0].clone());
+        assert!(Project::from_document_json(&serde_json::to_string(&project).unwrap()).is_err());
+    }
 
     #[test]
     fn add_column_reserves_divider_space() {

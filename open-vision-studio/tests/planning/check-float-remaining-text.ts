@@ -79,7 +79,7 @@ eq('1c raster Interfererende speling A', gridCell(A, 'task.time.interferingFloat
 // rekenartefact uit issue #80 wordt "2,29 dagen", niet "2.2916666666666665" en niet "2".
 eq('1d gedeelde opmaak voor het paneel', formatWorkDaysText(2.2916666666666665, { locale: 'nl', suffixes: { day: ' dagen', hour: 'h', minute: 'm' } }), '2,29 dagen');
 const tip = text(renderToStaticMarkup(createElement(TaskTooltipContent, { task: taskOf(A) })));
-eq('1e tooltip Totale speling A', /Totale speling:\|([^|]*)\|/.exec(tip)?.[1], '0,44d');
+eq('1e tooltip Totale speling A', /Total float:\|([^|]*)\|/.exec(tip)?.[1], '0.44d');
 
 // 2. Restduur van een urentaak op 40%: 3 uur, niet "0".
 S().setStatusDate('2026-06-01T10:00');

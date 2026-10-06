@@ -61,7 +61,7 @@ export const GridRow: React.FC<Props> = React.memo(
     const rowWidth = columnWidths.reduce((s, w, i) => s + (w ?? columns[i]?.width ?? 0), 0);
     let className = 'grid-row';
     if (isChapterFooter) className += ' chapter-footer';
-    else if (item.rowType === 'chapter') className += ' chapter';
+    else if (item.rowType === "chapter") className += ' chapter';
     else if (item.rowType === 'bewakingspost') className += ' bewakingspost';
     else if (item.rowType === 'regel') className += ' regel';
     else if (item.rowType === 'tekstregel') className += ' tekstregel';
@@ -89,7 +89,7 @@ export const GridRow: React.FC<Props> = React.memo(
             onClick={(e) => { e.stopPropagation(); onCellClick(rowIndex, 0, e.shiftKey); }}
             title={t('grid:row.dragHandleTitle')}
           >
-            {(item.rowType === 'chapter' || item.rowType === 'begrotingspost' || item.rowType === 'bewakingspost') && (
+            {(item.rowType === "chapter" || item.rowType === 'begrotingspost' || item.rowType === 'bewakingspost') && (
               <span
                 className="grid-row-collapse-left"
                 title={item.isCollapsed ? t('grid:expand') : t('grid:collapse')}

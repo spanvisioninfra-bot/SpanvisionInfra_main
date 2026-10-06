@@ -345,7 +345,7 @@ function expectedOrphanLevelRows(scan: RawXerScheduleScan, fallbacks: XerSchedul
   for (const listRow of scan.tables.get('RSRCLEVELLIST')?.rows ?? []) {
     const id = listRow.cells.schedoptions_id?.trim() ?? '';
     if (id !== '' && known.has(id)) continue;
-    fallbacks.push({ field: 'RSRCLEVELLIST.schedoptions_id', token: id || '(leeg)', fallback: 'weggelaten (geen SCHEDOPTIONS-rij)', line: listRow.line });
+    fallbacks.push({ field: 'RSRCLEVELLIST.schedoptions_id', token: id || '(empty)', fallback: 'weggelaten (geen SCHEDOPTIONS-rij)', line: listRow.line });
   }
 }
 

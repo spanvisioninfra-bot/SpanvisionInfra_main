@@ -4,6 +4,7 @@
 mod brand;
 mod commands;
 mod api_server;
+mod api_request_policy;
 mod pointcloud;
 
 use commands::{save_file, load_file, execute_shell};
@@ -12,6 +13,7 @@ use pointcloud::commands::{
     pointcloud_open, pointcloud_get_progress, pointcloud_get_nodes,
     pointcloud_get_nodes_binary, pointcloud_get_visible_nodes,
     pointcloud_close, pointcloud_list,
+    pointcloud_export, pointcloud_read_editable_source,
 };
 use pointcloud::manager::PointcloudManager;
 use std::sync::Arc;
@@ -65,7 +67,9 @@ fn main() {
             pointcloud_get_nodes_binary,
             pointcloud_get_visible_nodes,
             pointcloud_close,
-            pointcloud_list
+            pointcloud_list,
+            pointcloud_export,
+            pointcloud_read_editable_source
         ])
         .setup(move |app| {
             // Get the main window

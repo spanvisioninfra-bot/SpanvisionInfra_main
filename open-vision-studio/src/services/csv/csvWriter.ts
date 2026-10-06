@@ -113,7 +113,7 @@ export function writeCSV(
     // kolom kan MS Project's CSV-import (veld "Outline Level") én `readCSV` de boom exact herbouwen.
     // Rijvolgorde is daarom diepte-eerst (`flattenOrder`), zoals het taakraster hem toont.
     'WBS', 'Outline Level', 'Name', 'Duration (days)', 'Start', 'Finish',
-    'Predecessors', 'Task Type', 'OPS Custom Task Type ID', "State", 'Completion (%)',
+    'Predecessors', 'Task Type', 'OPS Custom Task Type ID', 'Status', 'Completion (%)',
     // Actuals: achter Completion. Kolomkoppen altijd aanwezig (CSV-conventie);
     // een taak zonder actuals levert lege cellen. Geen baselines/statusdatum in CSV (bewust).
     'Actual Start', 'Actual Finish',

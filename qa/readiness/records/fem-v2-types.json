@@ -1,0 +1,9 @@
+{
+  "command": "node node_modules/typescript/bin/tsc --noEmit",
+  "directory": "fem-vision-studio/design-mockup",
+  "started": "2026-10-05T09:43:41.098Z",
+  "finished": "2026-10-05T09:44:50.422Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/fem-v2-types.log"
+}

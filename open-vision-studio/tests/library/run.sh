@@ -13,7 +13,7 @@ set -euo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$DIR/../.." && pwd)"
 ESBUILD="$ROOT/node_modules/.bin/esbuild"
-TSC="$ROOT/node_modules/.bin/tsc"
+TSC="$ROOT/node_modules/typescript/bin/tsc"
 STATUS=0
 
 # Compile-afdwinging (fixture-/type-volledigheid) — dedicated tsconfig, want de hoofd-tsconfig

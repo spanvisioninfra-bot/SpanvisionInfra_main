@@ -1,0 +1,1581 @@
+{
+  "version": 3,
+  "name": "Untitled",
+  "createdAt": "2026-10-06T06:52:22.514Z",
+  "modifiedAt": "2026-10-06T06:52:22.515Z",
+  "drawings": [
+    {
+      "id": "drawing-1",
+      "name": "Drawing 1",
+      "boundary": {
+        "x": -5000,
+        "y": -5000,
+        "width": 10000,
+        "height": 10000
+      },
+      "scale": 0.01,
+      "drawingType": "standalone",
+      "createdAt": "2026-10-06T06:52:19.612Z",
+      "modifiedAt": "2026-10-06T06:52:19.612Z"
+    }
+  ],
+  "sheets": [
+    {
+      "id": "sheet-1",
+      "name": "Sheet 1",
+      "paperSize": "A3",
+      "orientation": "landscape",
+      "viewports": [],
+      "queryTables": [],
+      "titleBlock": {
+        "visible": true,
+        "x": 10,
+        "y": 10,
+        "width": 170,
+        "height": 36,
+        "fields": [
+          {
+            "id": "title",
+            "label": "Drawing Title",
+            "value": "",
+            "x": 3,
+            "y": 2,
+            "width": 117,
+            "height": 12,
+            "fontSize": 14,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "number",
+            "label": "Drawing No.",
+            "value": "",
+            "x": 126,
+            "y": 1,
+            "width": 41,
+            "height": 7,
+            "fontSize": 10,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "revision",
+            "label": "Rev",
+            "value": "-",
+            "x": 126,
+            "y": 8,
+            "width": 41,
+            "height": 5,
+            "fontSize": 9,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "project",
+            "label": "Project",
+            "value": "",
+            "x": 3,
+            "y": 16,
+            "width": 57,
+            "height": 9,
+            "fontSize": 10,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "client",
+            "label": "Client",
+            "value": "",
+            "x": 66,
+            "y": 16,
+            "width": 54,
+            "height": 9,
+            "fontSize": 10,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "scale",
+            "label": "Scale",
+            "value": "1:100",
+            "x": 126,
+            "y": 16,
+            "width": 19,
+            "height": 9,
+            "fontSize": 10,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "sheet",
+            "label": "Sheet",
+            "value": "1 of 1",
+            "x": 151,
+            "y": 16,
+            "width": 16,
+            "height": 9,
+            "fontSize": 10,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "drawn",
+            "label": "Drawn",
+            "value": "",
+            "x": 3,
+            "y": 27,
+            "width": 32,
+            "height": 7,
+            "fontSize": 9,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "date",
+            "label": "Date",
+            "value": "",
+            "x": 41,
+            "y": 27,
+            "width": 24,
+            "height": 7,
+            "fontSize": 9,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "checked",
+            "label": "Checked",
+            "value": "",
+            "x": 71,
+            "y": 27,
+            "width": 29,
+            "height": 7,
+            "fontSize": 9,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "approved",
+            "label": "Approved",
+            "value": "",
+            "x": 106,
+            "y": 27,
+            "width": 29,
+            "height": 7,
+            "fontSize": 9,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "status",
+            "label": "Status",
+            "value": "DRAFT",
+            "x": 141,
+            "y": 27,
+            "width": 26,
+            "height": 7,
+            "fontSize": 9,
+            "fontFamily": "Osifont",
+            "align": "left"
+          }
+        ]
+      },
+      "annotations": [],
+      "createdAt": "2026-10-06T06:52:19.613Z",
+      "modifiedAt": "2026-10-06T06:52:19.613Z"
+    },
+    {
+      "id": "sheet-2",
+      "name": "Sheet 2",
+      "paperSize": "A3",
+      "orientation": "portrait",
+      "viewports": [],
+      "queryTables": [],
+      "titleBlock": {
+        "visible": true,
+        "x": 10,
+        "y": 10,
+        "width": 170,
+        "height": 36,
+        "fields": [
+          {
+            "id": "title",
+            "label": "Drawing Title",
+            "value": "",
+            "x": 3,
+            "y": 2,
+            "width": 117,
+            "height": 12,
+            "fontSize": 14,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "number",
+            "label": "Drawing No.",
+            "value": "",
+            "x": 126,
+            "y": 1,
+            "width": 41,
+            "height": 7,
+            "fontSize": 10,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "revision",
+            "label": "Rev",
+            "value": "-",
+            "x": 126,
+            "y": 8,
+            "width": 41,
+            "height": 5,
+            "fontSize": 9,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "project",
+            "label": "Project",
+            "value": "",
+            "x": 3,
+            "y": 16,
+            "width": 57,
+            "height": 9,
+            "fontSize": 10,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "client",
+            "label": "Client",
+            "value": "",
+            "x": 66,
+            "y": 16,
+            "width": 54,
+            "height": 9,
+            "fontSize": 10,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "scale",
+            "label": "Scale",
+            "value": "1:100",
+            "x": 126,
+            "y": 16,
+            "width": 19,
+            "height": 9,
+            "fontSize": 10,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "sheet",
+            "label": "Sheet",
+            "value": "1 of 1",
+            "x": 151,
+            "y": 16,
+            "width": 16,
+            "height": 9,
+            "fontSize": 10,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "drawn",
+            "label": "Drawn",
+            "value": "",
+            "x": 3,
+            "y": 27,
+            "width": 32,
+            "height": 7,
+            "fontSize": 9,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "date",
+            "label": "Date",
+            "value": "",
+            "x": 41,
+            "y": 27,
+            "width": 24,
+            "height": 7,
+            "fontSize": 9,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "checked",
+            "label": "Checked",
+            "value": "",
+            "x": 71,
+            "y": 27,
+            "width": 29,
+            "height": 7,
+            "fontSize": 9,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "approved",
+            "label": "Approved",
+            "value": "",
+            "x": 106,
+            "y": 27,
+            "width": 29,
+            "height": 7,
+            "fontSize": 9,
+            "fontFamily": "Osifont",
+            "align": "left"
+          },
+          {
+            "id": "status",
+            "label": "Status",
+            "value": "DRAFT",
+            "x": 141,
+            "y": 27,
+            "width": 26,
+            "height": 7,
+            "fontSize": 9,
+            "fontFamily": "Osifont",
+            "align": "left"
+          }
+        ]
+      },
+      "annotations": [],
+      "createdAt": "2026-10-06T06:52:19.613Z",
+      "modifiedAt": "2026-10-06T06:52:19.613Z"
+    }
+  ],
+  "activeDrawingId": "drawing-1",
+  "activeSheetId": null,
+  "drawingViewports": {
+    "drawing-1": {
+      "zoom": 0.072,
+      "offsetX": 600,
+      "offsetY": 400
+    }
+  },
+  "sheetViewports": {
+    "sheet-1": {
+      "zoom": 0.6413339746673081,
+      "offsetX": 90.90909090909082,
+      "offsetY": 40
+    },
+    "sheet-2": {
+      "zoom": 0.45351473922902497,
+      "offsetX": 345.42857142857144,
+      "offsetY": 40
+    }
+  },
+  "shapes": [
+    {
+      "id": "1791269540895-4",
+      "type": "rectangle",
+      "layerId": "layer-0",
+      "drawingId": "drawing-1",
+      "style": {
+        "strokeColor": "#ffffff",
+        "strokeWidth": 1,
+        "lineStyle": "solid"
+      },
+      "visible": true,
+      "locked": false,
+      "topLeft": {
+        "x": -5277.777777777778,
+        "y": -3055.5555555555557
+      },
+      "width": 3750.0000000000005,
+      "height": 2361.1111111111113,
+      "rotation": 0
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer-0",
+      "name": "Layer 0",
+      "drawingId": "drawing-1",
+      "visible": true,
+      "locked": false,
+      "color": "#ffffff",
+      "lineStyle": "solid",
+      "lineWidth": 1
+    }
+  ],
+  "activeLayerId": "layer-0",
+  "settings": {
+    "gridSize": 10,
+    "gridVisible": true,
+    "snapEnabled": true
+  },
+  "projectInfo": {
+    "projectName": "",
+    "projectNumber": "",
+    "client": "",
+    "address": "",
+    "author": "",
+    "architect": "",
+    "contractor": "",
+    "phase": "",
+    "status": "",
+    "discipline": "",
+    "description": "",
+    "startDate": "",
+    "endDate": "",
+    "customFields": {},
+    "erpnext": {
+      "enabled": false,
+      "url": "",
+      "apiKey": "",
+      "apiSecret": ""
+    }
+  },
+  "unitSettings": {
+    "lengthUnit": "mm",
+    "lengthPrecision": 0,
+    "anglePrecision": 1,
+    "numberFormat": "period",
+    "showUnitSuffix": false
+  },
+  "textStyles": [
+    {
+      "id": "annotation-small",
+      "name": "2.5mm Annotation",
+      "fontFamily": "Osifont",
+      "fontSize": 2.5,
+      "bold": false,
+      "italic": false,
+      "underline": false,
+      "color": "#ffffff",
+      "alignment": "left",
+      "verticalAlignment": "top",
+      "lineHeight": 1.4,
+      "isModelText": false,
+      "backgroundMask": false,
+      "backgroundColor": "#1a1a2e",
+      "backgroundPadding": 0.5,
+      "isBuiltIn": true
+    },
+    {
+      "id": "annotation-medium",
+      "name": "3.5mm Annotation",
+      "fontFamily": "Osifont",
+      "fontSize": 3.5,
+      "bold": false,
+      "italic": false,
+      "underline": false,
+      "color": "#ffffff",
+      "alignment": "left",
+      "verticalAlignment": "top",
+      "lineHeight": 1.4,
+      "isModelText": false,
+      "backgroundMask": false,
+      "backgroundColor": "#1a1a2e",
+      "backgroundPadding": 0.5,
+      "isBuiltIn": true
+    },
+    {
+      "id": "annotation-large",
+      "name": "5mm Annotation",
+      "fontFamily": "Osifont",
+      "fontSize": 5,
+      "bold": false,
+      "italic": false,
+      "underline": false,
+      "color": "#ffffff",
+      "alignment": "left",
+      "verticalAlignment": "top",
+      "lineHeight": 1.4,
+      "isModelText": false,
+      "backgroundMask": false,
+      "backgroundColor": "#1a1a2e",
+      "backgroundPadding": 0.5,
+      "isBuiltIn": true
+    },
+    {
+      "id": "title-text",
+      "name": "Title (7mm Bold)",
+      "fontFamily": "Osifont",
+      "fontSize": 7,
+      "bold": true,
+      "italic": false,
+      "underline": false,
+      "color": "#ffffff",
+      "alignment": "left",
+      "verticalAlignment": "top",
+      "lineHeight": 1.4,
+      "isModelText": false,
+      "backgroundMask": false,
+      "backgroundColor": "#1a1a2e",
+      "backgroundPadding": 0.5,
+      "isBuiltIn": true
+    },
+    {
+      "id": "model-text-small",
+      "name": "Model Text (100mm)",
+      "fontFamily": "Osifont",
+      "fontSize": 100,
+      "bold": false,
+      "italic": false,
+      "underline": false,
+      "color": "#ffffff",
+      "alignment": "left",
+      "verticalAlignment": "top",
+      "lineHeight": 1.4,
+      "isModelText": true,
+      "backgroundMask": false,
+      "backgroundColor": "#1a1a2e",
+      "backgroundPadding": 5,
+      "isBuiltIn": true
+    },
+    {
+      "id": "model-text-large",
+      "name": "Model Text (500mm)",
+      "fontFamily": "Osifont",
+      "fontSize": 500,
+      "bold": false,
+      "italic": false,
+      "underline": false,
+      "color": "#ffffff",
+      "alignment": "left",
+      "verticalAlignment": "top",
+      "lineHeight": 1.4,
+      "isModelText": true,
+      "backgroundMask": false,
+      "backgroundColor": "#1a1a2e",
+      "backgroundPadding": 25,
+      "isBuiltIn": true
+    }
+  ],
+  "wallTypes": [
+    {
+      "id": "beton-150",
+      "name": "Concrete",
+      "thickness": 150,
+      "material": "concrete"
+    },
+    {
+      "id": "beton-200",
+      "name": "Concrete",
+      "thickness": 200,
+      "material": "concrete"
+    },
+    {
+      "id": "beton-250",
+      "name": "Concrete",
+      "thickness": 250,
+      "material": "concrete"
+    },
+    {
+      "id": "beton-300",
+      "name": "Concrete",
+      "thickness": 300,
+      "material": "concrete"
+    },
+    {
+      "id": "kzst-100",
+      "name": "Calcium silicate brick",
+      "thickness": 100,
+      "material": "calcium-silicate"
+    },
+    {
+      "id": "kzst-150",
+      "name": "Calcium silicate brick",
+      "thickness": 150,
+      "material": "calcium-silicate"
+    },
+    {
+      "id": "kzst-214",
+      "name": "Calcium silicate brick",
+      "thickness": 214,
+      "material": "calcium-silicate"
+    },
+    {
+      "id": "metselwerk-100",
+      "name": "Masonry",
+      "thickness": 100,
+      "material": "masonry"
+    },
+    {
+      "id": "metselwerk-210",
+      "name": "Masonry",
+      "thickness": 210,
+      "material": "masonry"
+    },
+    {
+      "id": "hsb-120",
+      "name": "Timber",
+      "thickness": 120,
+      "material": "timber"
+    },
+    {
+      "id": "hsb-170",
+      "name": "Timber",
+      "thickness": 170,
+      "material": "timber"
+    },
+    {
+      "id": "staal-10",
+      "name": "Steel",
+      "thickness": 10,
+      "material": "steel"
+    },
+    {
+      "id": "isolatie-184",
+      "name": "Insulation",
+      "thickness": 184,
+      "material": "insulation"
+    },
+    {
+      "id": "gevelbekleding-20",
+      "name": "Gevelbekleding",
+      "thickness": 20,
+      "material": "timber"
+    },
+    {
+      "id": "osb-12",
+      "name": "OSB",
+      "thickness": 12,
+      "material": "timber"
+    },
+    {
+      "id": "hsb-stijl-140",
+      "name": "HSB stijl+isolatie",
+      "thickness": 140,
+      "material": "timber"
+    },
+    {
+      "id": "gipsplaat-12",
+      "name": "Gipsplaat",
+      "thickness": 12.5,
+      "material": "generic"
+    },
+    {
+      "id": "metalstud-75",
+      "name": "Metal stud CW75+isolatie",
+      "thickness": 75,
+      "material": "steel"
+    }
+  ],
+  "wallSystemTypes": [
+    {
+      "id": "ws-hsb-140",
+      "name": "HSB 140mm",
+      "category": "timber-frame",
+      "totalThickness": 184.7,
+      "layers": [
+        {
+          "id": "layer-2",
+          "name": "Outer board (multiplex)",
+          "material": "timber",
+          "thickness": 12,
+          "offset": 0,
+          "function": "substrate",
+          "color": "#a08050"
+        },
+        {
+          "id": "layer-3",
+          "name": "Air cavity",
+          "material": "air",
+          "thickness": 20,
+          "offset": 0,
+          "function": "air-gap",
+          "color": "#e0e8f0"
+        },
+        {
+          "id": "layer-1",
+          "name": "Insulation + studs 38x140",
+          "material": "insulation",
+          "thickness": 140,
+          "offset": 0,
+          "function": "structure",
+          "color": "#ffe066"
+        },
+        {
+          "id": "layer-4",
+          "name": "Vapor barrier (PE foil)",
+          "material": "membrane",
+          "thickness": 0.2,
+          "offset": 0,
+          "function": "membrane",
+          "color": "#4080ff"
+        },
+        {
+          "id": "layer-5",
+          "name": "Inner board (gypsum)",
+          "material": "gypsum",
+          "thickness": 12.5,
+          "offset": 0,
+          "function": "finish",
+          "color": "#e8e0d0"
+        }
+      ],
+      "defaultStud": {
+        "id": "stud-6",
+        "name": "Timber stud 38x140",
+        "width": 38,
+        "depth": 140,
+        "material": "timber",
+        "profile": "rectangular",
+        "color": "#c4a66a",
+        "layerIds": [
+          "layer-1"
+        ]
+      },
+      "alternateStuds": [
+        {
+          "id": "stud-8",
+          "name": "Timber stud 45x140",
+          "width": 45,
+          "depth": 140,
+          "material": "timber",
+          "profile": "rectangular",
+          "color": "#c4a66a",
+          "layerIds": [
+            "layer-1"
+          ]
+        },
+        {
+          "id": "stud-10",
+          "name": "Timber stud 38x120",
+          "width": 38,
+          "depth": 120,
+          "material": "timber",
+          "profile": "rectangular",
+          "color": "#c4a66a",
+          "layerIds": [
+            "layer-1"
+          ]
+        }
+      ],
+      "defaultPanel": {
+        "id": "panel-insulation",
+        "name": "Insulation",
+        "material": "insulation",
+        "thickness": 0,
+        "color": "#ffe066",
+        "opacity": 1,
+        "hatchPattern": "insulation"
+      },
+      "alternatePanels": [
+        {
+          "id": "panel-plasterboard",
+          "name": "Plasterboard",
+          "material": "gypsum",
+          "thickness": 12.5,
+          "color": "#e8e0d0",
+          "opacity": 1
+        }
+      ],
+      "grid": {
+        "verticalSpacing": 600,
+        "verticalJustification": "center",
+        "horizontalSpacing": 0,
+        "horizontalJustification": "center",
+        "customVerticalLines": [],
+        "customHorizontalLines": []
+      },
+      "studOverrides": {},
+      "panelOverrides": {}
+    },
+    {
+      "id": "ws-hsb-184",
+      "name": "HSB 184mm",
+      "category": "timber-frame",
+      "totalThickness": 236.7,
+      "layers": [
+        {
+          "id": "layer-2",
+          "name": "Outer board (multiplex)",
+          "material": "timber",
+          "thickness": 15,
+          "offset": 0,
+          "function": "substrate",
+          "color": "#a08050"
+        },
+        {
+          "id": "layer-3",
+          "name": "Air cavity",
+          "material": "air",
+          "thickness": 25,
+          "offset": 0,
+          "function": "air-gap",
+          "color": "#e0e8f0"
+        },
+        {
+          "id": "layer-1",
+          "name": "Insulation + studs 38x184",
+          "material": "insulation",
+          "thickness": 184,
+          "offset": 0,
+          "function": "structure",
+          "color": "#ffe066"
+        },
+        {
+          "id": "layer-4",
+          "name": "Vapor barrier (PE foil)",
+          "material": "membrane",
+          "thickness": 0.2,
+          "offset": 0,
+          "function": "membrane",
+          "color": "#4080ff"
+        },
+        {
+          "id": "layer-5",
+          "name": "Inner board (gypsum)",
+          "material": "gypsum",
+          "thickness": 12.5,
+          "offset": 0,
+          "function": "finish",
+          "color": "#e8e0d0"
+        }
+      ],
+      "defaultStud": {
+        "id": "stud-6",
+        "name": "Timber stud 38x184",
+        "width": 38,
+        "depth": 184,
+        "material": "timber",
+        "profile": "rectangular",
+        "color": "#c4a66a",
+        "layerIds": [
+          "layer-1"
+        ]
+      },
+      "alternateStuds": [
+        {
+          "id": "stud-8",
+          "name": "Timber stud 45x184",
+          "width": 45,
+          "depth": 184,
+          "material": "timber",
+          "profile": "rectangular",
+          "color": "#c4a66a",
+          "layerIds": [
+            "layer-1"
+          ]
+        }
+      ],
+      "defaultPanel": {
+        "id": "panel-insulation",
+        "name": "Insulation",
+        "material": "insulation",
+        "thickness": 0,
+        "color": "#ffe066",
+        "opacity": 1,
+        "hatchPattern": "insulation"
+      },
+      "alternatePanels": [
+        {
+          "id": "panel-plasterboard",
+          "name": "Plasterboard",
+          "material": "gypsum",
+          "thickness": 12.5,
+          "color": "#e8e0d0",
+          "opacity": 1
+        }
+      ],
+      "grid": {
+        "verticalSpacing": 600,
+        "verticalJustification": "center",
+        "horizontalSpacing": 0,
+        "horizontalJustification": "center",
+        "customVerticalLines": [],
+        "customHorizontalLines": []
+      },
+      "studOverrides": {},
+      "panelOverrides": {}
+    },
+    {
+      "id": "ws-metal-cw75",
+      "name": "Metal Stud CW75",
+      "category": "metal-stud",
+      "totalThickness": 112.5,
+      "layers": [
+        {
+          "id": "layer-2",
+          "name": "Plasterboard (outer)",
+          "material": "gypsum",
+          "thickness": 12.5,
+          "offset": 0,
+          "function": "finish",
+          "color": "#e8e0d0"
+        },
+        {
+          "id": "layer-3",
+          "name": "Plasterboard (outer 2)",
+          "material": "gypsum",
+          "thickness": 12.5,
+          "offset": 0,
+          "function": "finish",
+          "color": "#e0d8c8"
+        },
+        {
+          "id": "layer-1",
+          "name": "CW75 studs + insulation",
+          "material": "insulation",
+          "thickness": 75,
+          "offset": 0,
+          "function": "structure",
+          "color": "#ffe066"
+        },
+        {
+          "id": "layer-4",
+          "name": "Plasterboard (inner)",
+          "material": "gypsum",
+          "thickness": 12.5,
+          "offset": 0,
+          "function": "finish",
+          "color": "#e8e0d0"
+        }
+      ],
+      "defaultStud": {
+        "id": "stud-5",
+        "name": "CW75 metal stud",
+        "width": 50,
+        "depth": 75,
+        "material": "steel",
+        "profile": "c-channel",
+        "color": "#a0a0a0",
+        "layerIds": [
+          "layer-1"
+        ]
+      },
+      "alternateStuds": [
+        {
+          "id": "stud-7",
+          "name": "CW75 UA stud (reinforced)",
+          "width": 50,
+          "depth": 75,
+          "material": "steel",
+          "profile": "c-channel",
+          "color": "#a0a0a0",
+          "layerIds": [
+            "layer-1"
+          ]
+        }
+      ],
+      "defaultPanel": {
+        "id": "panel-insulation",
+        "name": "Insulation",
+        "material": "insulation",
+        "thickness": 0,
+        "color": "#ffe066",
+        "opacity": 1,
+        "hatchPattern": "insulation"
+      },
+      "alternatePanels": [
+        {
+          "id": "panel-plasterboard",
+          "name": "Plasterboard",
+          "material": "gypsum",
+          "thickness": 12.5,
+          "color": "#e8e0d0",
+          "opacity": 1
+        }
+      ],
+      "grid": {
+        "verticalSpacing": 600,
+        "verticalJustification": "center",
+        "horizontalSpacing": 0,
+        "horizontalJustification": "center",
+        "customVerticalLines": [],
+        "customHorizontalLines": []
+      },
+      "studOverrides": {},
+      "panelOverrides": {}
+    },
+    {
+      "id": "ws-metal-cw100",
+      "name": "Metal Stud CW100",
+      "category": "metal-stud",
+      "totalThickness": 137.5,
+      "layers": [
+        {
+          "id": "layer-2",
+          "name": "Plasterboard (outer)",
+          "material": "gypsum",
+          "thickness": 12.5,
+          "offset": 0,
+          "function": "finish",
+          "color": "#e8e0d0"
+        },
+        {
+          "id": "layer-3",
+          "name": "Plasterboard (outer 2)",
+          "material": "gypsum",
+          "thickness": 12.5,
+          "offset": 0,
+          "function": "finish",
+          "color": "#e0d8c8"
+        },
+        {
+          "id": "layer-1",
+          "name": "CW100 studs + insulation",
+          "material": "insulation",
+          "thickness": 100,
+          "offset": 0,
+          "function": "structure",
+          "color": "#ffe066"
+        },
+        {
+          "id": "layer-4",
+          "name": "Plasterboard (inner)",
+          "material": "gypsum",
+          "thickness": 12.5,
+          "offset": 0,
+          "function": "finish",
+          "color": "#e8e0d0"
+        }
+      ],
+      "defaultStud": {
+        "id": "stud-5",
+        "name": "CW100 metal stud",
+        "width": 50,
+        "depth": 100,
+        "material": "steel",
+        "profile": "c-channel",
+        "color": "#a0a0a0",
+        "layerIds": [
+          "layer-1"
+        ]
+      },
+      "alternateStuds": [
+        {
+          "id": "stud-7",
+          "name": "CW100 UA stud (reinforced)",
+          "width": 50,
+          "depth": 100,
+          "material": "steel",
+          "profile": "c-channel",
+          "color": "#a0a0a0",
+          "layerIds": [
+            "layer-1"
+          ]
+        }
+      ],
+      "defaultPanel": {
+        "id": "panel-insulation",
+        "name": "Insulation",
+        "material": "insulation",
+        "thickness": 0,
+        "color": "#ffe066",
+        "opacity": 1,
+        "hatchPattern": "insulation"
+      },
+      "alternatePanels": [
+        {
+          "id": "panel-plasterboard",
+          "name": "Plasterboard",
+          "material": "gypsum",
+          "thickness": 12.5,
+          "color": "#e8e0d0",
+          "opacity": 1
+        }
+      ],
+      "grid": {
+        "verticalSpacing": 600,
+        "verticalJustification": "center",
+        "horizontalSpacing": 0,
+        "horizontalJustification": "center",
+        "customVerticalLines": [],
+        "customHorizontalLines": []
+      },
+      "studOverrides": {},
+      "panelOverrides": {}
+    },
+    {
+      "id": "ws-curtain-wall",
+      "name": "Curtain Wall",
+      "category": "curtain-wall",
+      "totalThickness": 60,
+      "layers": [
+        {
+          "id": "layer-1",
+          "name": "Mullion frame + glass",
+          "material": "aluminum",
+          "thickness": 60,
+          "offset": 0,
+          "function": "structure",
+          "color": "#b0b0b0"
+        }
+      ],
+      "defaultStud": {
+        "id": "stud-2",
+        "name": "Aluminum mullion 50x60",
+        "width": 50,
+        "depth": 60,
+        "material": "aluminum",
+        "profile": "rectangular",
+        "color": "#b0b0b0",
+        "layerIds": [
+          "layer-1"
+        ]
+      },
+      "alternateStuds": [
+        {
+          "id": "stud-4",
+          "name": "Aluminum mullion 60x80 (heavy)",
+          "width": 60,
+          "depth": 80,
+          "material": "aluminum",
+          "profile": "rectangular",
+          "color": "#b0b0b0",
+          "layerIds": [
+            "layer-1"
+          ]
+        }
+      ],
+      "defaultPanel": {
+        "id": "panel-glass",
+        "name": "Glass panel",
+        "material": "glass",
+        "thickness": 24,
+        "color": "#a8d8ea",
+        "opacity": 0.3
+      },
+      "alternatePanels": [
+        {
+          "id": "panel-spandrel",
+          "name": "Spandrel panel",
+          "material": "aluminum",
+          "thickness": 6,
+          "color": "#606060",
+          "opacity": 1
+        },
+        {
+          "id": "panel-insulation",
+          "name": "Insulation",
+          "material": "insulation",
+          "thickness": 0,
+          "color": "#ffe066",
+          "opacity": 1,
+          "hatchPattern": "insulation"
+        }
+      ],
+      "grid": {
+        "verticalSpacing": 1200,
+        "verticalJustification": "center",
+        "horizontalSpacing": 3000,
+        "horizontalJustification": "center",
+        "customVerticalLines": [],
+        "customHorizontalLines": []
+      },
+      "studOverrides": {},
+      "panelOverrides": {}
+    },
+    {
+      "id": "ws-masonry-cavity",
+      "name": "Masonry Cavity Wall",
+      "category": "masonry",
+      "totalThickness": 350,
+      "layers": [
+        {
+          "id": "layer-1",
+          "name": "Brick outer leaf",
+          "material": "masonry",
+          "thickness": 100,
+          "offset": 0,
+          "function": "finish",
+          "color": "#c87040"
+        },
+        {
+          "id": "layer-3",
+          "name": "Cavity (air)",
+          "material": "air",
+          "thickness": 50,
+          "offset": 0,
+          "function": "air-gap",
+          "color": "#e0e8f0"
+        },
+        {
+          "id": "layer-4",
+          "name": "Insulation",
+          "material": "insulation",
+          "thickness": 100,
+          "offset": 0,
+          "function": "insulation",
+          "color": "#ffe066"
+        },
+        {
+          "id": "layer-2",
+          "name": "Inner leaf (calc. silicate)",
+          "material": "calcium-silicate",
+          "thickness": 100,
+          "offset": 0,
+          "function": "structure",
+          "color": "#d0d0d0"
+        }
+      ],
+      "defaultStud": {
+        "id": "stud-5",
+        "name": "Wall tie (spouwanker)",
+        "width": 4,
+        "depth": 250,
+        "material": "steel",
+        "profile": "rectangular",
+        "color": "#808080",
+        "layerIds": [
+          "layer-1",
+          "layer-2"
+        ]
+      },
+      "alternateStuds": [],
+      "defaultPanel": {
+        "id": "panel-6",
+        "name": "Brick infill",
+        "material": "masonry",
+        "thickness": 100,
+        "color": "#c87040",
+        "opacity": 1,
+        "hatchPattern": "diagonal"
+      },
+      "alternatePanels": [
+        {
+          "id": "panel-insulation",
+          "name": "Insulation",
+          "material": "insulation",
+          "thickness": 0,
+          "color": "#ffe066",
+          "opacity": 1,
+          "hatchPattern": "insulation"
+        }
+      ],
+      "grid": {
+        "verticalSpacing": 600,
+        "verticalJustification": "center",
+        "horizontalSpacing": 0,
+        "horizontalJustification": "center",
+        "customVerticalLines": [],
+        "customHorizontalLines": []
+      },
+      "studOverrides": {},
+      "panelOverrides": {}
+    }
+  ],
+  "projectStructure": {
+    "siteName": "My Site",
+    "buildings": [
+      {
+        "id": "building-1",
+        "name": "My Building",
+        "storeys": [
+          {
+            "id": "storey-tf",
+            "name": "Top Foundation",
+            "elevation": -400
+          },
+          {
+            "id": "storey-gf",
+            "name": "Ground Floor",
+            "elevation": 0
+          },
+          {
+            "id": "storey-ff",
+            "name": "First Floor",
+            "elevation": 3100
+          }
+        ]
+      }
+    ],
+    "seaLevelDatum": 0
+  },
+  "slabTypes": [
+    {
+      "id": "vloer-beton-150",
+      "name": "Concrete",
+      "thickness": 150,
+      "material": "concrete"
+    },
+    {
+      "id": "vloer-beton-200",
+      "name": "Concrete",
+      "thickness": 200,
+      "material": "concrete"
+    },
+    {
+      "id": "vloer-beton-250",
+      "name": "Concrete",
+      "thickness": 250,
+      "material": "concrete"
+    },
+    {
+      "id": "vloer-beton-300",
+      "name": "Concrete",
+      "thickness": 300,
+      "material": "concrete"
+    },
+    {
+      "id": "vloer-kanaalplaat-200",
+      "name": "Kanaalplaat",
+      "thickness": 200,
+      "material": "concrete"
+    },
+    {
+      "id": "vloer-kanaalplaat-260",
+      "name": "Kanaalplaat",
+      "thickness": 260,
+      "material": "concrete"
+    },
+    {
+      "id": "vloer-kanaalplaat-320",
+      "name": "Kanaalplaat",
+      "thickness": 320,
+      "material": "concrete"
+    },
+    {
+      "id": "vloer-hout-200",
+      "name": "Timber",
+      "thickness": 200,
+      "material": "timber"
+    }
+  ],
+  "pileTypes": [
+    {
+      "id": "prefab-beton-180x180",
+      "name": "Precast concrete 180x180",
+      "shape": "square",
+      "method": "driven",
+      "defaultDiameter": 180,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Vierkante geprefabriceerde betonpaal 180x180, geheid"
+    },
+    {
+      "id": "prefab-beton-220x220",
+      "name": "Precast concrete 220x220",
+      "shape": "square",
+      "method": "driven",
+      "defaultDiameter": 220,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Vierkante geprefabriceerde betonpaal 220x220, geheid"
+    },
+    {
+      "id": "prefab-beton-250x250",
+      "name": "Precast concrete 250x250",
+      "shape": "square",
+      "method": "driven",
+      "defaultDiameter": 250,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Vierkante geprefabriceerde betonpaal 250x250, geheid"
+    },
+    {
+      "id": "prefab-beton-320x320",
+      "name": "Precast concrete 320x320",
+      "shape": "square",
+      "method": "driven",
+      "defaultDiameter": 320,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Vierkante geprefabriceerde betonpaal 320x320, geheid"
+    },
+    {
+      "id": "prefab-beton-400x400",
+      "name": "Precast concrete 400x400",
+      "shape": "square",
+      "method": "driven",
+      "defaultDiameter": 400,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Vierkante geprefabriceerde betonpaal 400x400, geheid"
+    },
+    {
+      "id": "prefab-beton-450x450",
+      "name": "Precast concrete 450x450",
+      "shape": "square",
+      "method": "driven",
+      "defaultDiameter": 450,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Vierkante geprefabriceerde betonpaal 450x450, geheid"
+    },
+    {
+      "id": "prefab-beton-500x500",
+      "name": "Precast concrete 500x500",
+      "shape": "square",
+      "method": "driven",
+      "defaultDiameter": 500,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Vierkante geprefabriceerde betonpaal 500x500, geheid"
+    },
+    {
+      "id": "stalen-buispaal-168",
+      "name": "Stalen buispaal Ø168",
+      "shape": "round",
+      "method": "driven",
+      "defaultDiameter": 168,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Stalen buispaal betongevuld Ø168, geheid"
+    },
+    {
+      "id": "stalen-buispaal-219",
+      "name": "Stalen buispaal Ø219",
+      "shape": "round",
+      "method": "driven",
+      "defaultDiameter": 219,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Stalen buispaal betongevuld Ø219, geheid"
+    },
+    {
+      "id": "stalen-buispaal-273",
+      "name": "Stalen buispaal Ø273",
+      "shape": "round",
+      "method": "driven",
+      "defaultDiameter": 273,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Stalen buispaal betongevuld Ø273, geheid"
+    },
+    {
+      "id": "vibropaal",
+      "name": "Vibropaal",
+      "shape": "round",
+      "method": "Vibro",
+      "defaultDiameter": 380,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Vibration-installed cast-in-place concrete pile"
+    },
+    {
+      "id": "schroefpaal-cfa",
+      "name": "Schroefpaal (CFA)",
+      "shape": "round",
+      "method": "Schroefpaal",
+      "defaultDiameter": 400,
+      "ifcPredefinedType": "BORED",
+      "description": "Continuous Flight Auger schroefpaal"
+    },
+    {
+      "id": "grondverdringende-schroefpaal",
+      "name": "Grondverdringende schroefpaal",
+      "shape": "round",
+      "method": "Schroefpaal",
+      "defaultDiameter": 450,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Grondverdringende schroefpaal (FDP)"
+    },
+    {
+      "id": "atlas-paal",
+      "name": "Atlas pile",
+      "shape": "round",
+      "method": "Schroefpaal",
+      "defaultDiameter": 410,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Atlas grondverdringende schroefpaal"
+    },
+    {
+      "id": "omega-paal",
+      "name": "Omega pile",
+      "shape": "round",
+      "method": "Schroefpaal",
+      "defaultDiameter": 410,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Omega grondverdringende schroefpaal"
+    },
+    {
+      "id": "fundex-paal",
+      "name": "Fundex pile",
+      "shape": "round",
+      "method": "Schroefpaal",
+      "defaultDiameter": 380,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Fundex grondverdringende schroefpaal"
+    },
+    {
+      "id": "boorpaal",
+      "name": "Boorpaal",
+      "shape": "round",
+      "method": "Boorpaal",
+      "defaultDiameter": 600,
+      "ifcPredefinedType": "BORED",
+      "description": "Geboorde betonpaal in onverbuisde boring"
+    },
+    {
+      "id": "boorpaal-verbuisd",
+      "name": "Boorpaal verbuisd",
+      "shape": "round",
+      "method": "Boorpaal",
+      "defaultDiameter": 900,
+      "ifcPredefinedType": "BORED",
+      "description": "Geboorde betonpaal in verbuisde boring"
+    },
+    {
+      "id": "franki-paal",
+      "name": "Franki pile",
+      "shape": "round",
+      "method": "Franki",
+      "defaultDiameter": 520,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Franki cast-in-place pile with enlarged base"
+    },
+    {
+      "id": "mv-paal",
+      "name": "MV pile (Muller Verpress)",
+      "shape": "round",
+      "method": "MV-paal",
+      "defaultDiameter": 180,
+      "ifcPredefinedType": "BORED",
+      "description": "Muller Verpress anker-/trekpaal"
+    },
+    {
+      "id": "jet-grouting",
+      "name": "Jet grouting pile",
+      "shape": "round",
+      "method": "Jet-grouting",
+      "defaultDiameter": 800,
+      "ifcPredefinedType": "JETGROUTING",
+      "description": "Jet grouting column/pile"
+    },
+    {
+      "id": "micropaal",
+      "name": "Micropaal",
+      "shape": "round",
+      "method": "Micropaal",
+      "defaultDiameter": 200,
+      "ifcPredefinedType": "BORED",
+      "description": "Micropaal (kleine diameter boorpaal)"
+    },
+    {
+      "id": "houten-heipaal",
+      "name": "Houten heipaal",
+      "shape": "round",
+      "method": "Hout",
+      "defaultDiameter": 200,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Houten heipaal (grenen/vuren)"
+    },
+    {
+      "id": "gewapende-grondpaal",
+      "name": "Gewapende grondpaal",
+      "shape": "round",
+      "method": "Grondpaal",
+      "defaultDiameter": 150,
+      "ifcPredefinedType": "COHESION",
+      "description": "Gewapende grondpaal (mixed-in-place)"
+    },
+    {
+      "id": "hsp-paal",
+      "name": "HSP pile",
+      "shape": "round",
+      "method": "HSP",
+      "defaultDiameter": 150,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "High Speed Piling steel buispaal"
+    },
+    {
+      "id": "vibro-injectiepaal",
+      "name": "Vibro-injectiepaal",
+      "shape": "round",
+      "method": "Vibro-injectie",
+      "defaultDiameter": 350,
+      "ifcPredefinedType": "DRIVEN",
+      "description": "Vibro injection pile with follow-up casing"
+    }
+  ],
+  "queries": [
+    {
+      "name": "Query 1",
+      "sql": "SELECT COUNT(*) AS [total] FROM shapes",
+      "category": "analysis",
+      "id": "58630a32-7977-4e89-be82-d705c896edf3",
+      "createdAt": "2026-10-06T06:52:22.042Z",
+      "modifiedAt": "2026-10-06T06:52:22.277Z"
+    }
+  ]
+}

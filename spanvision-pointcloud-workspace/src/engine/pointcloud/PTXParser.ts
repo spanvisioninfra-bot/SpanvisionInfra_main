@@ -24,46 +24,31 @@ interface ScanHeader {
 
 function parseScanHeader(lines: string[], startIdx: number): { header: ScanHeader; nextLine: number } {
   let i = startIdx;
-
-  // Skip empty lines
-  while (i < lines.length && lines[i].trim() === '') i++;
-  const columns = parseInt(lines[i++].trim(), 10);
-  while (i < lines.length && lines[i].trim() === '') i++;
-  const rows = parseInt(lines[i++].trim(), 10);
-
-  if (isNaN(columns) || isNaN(rows) || columns <= 0 || rows <= 0) {
-    throw new Error(`Invalid PTX scan header at line ${startIdx + 1}`);
-  }
-
-  // Scanner position (skip)
-  while (i < lines.length && lines[i].trim() === '') i++;
-  i++; // scanner x y z
-
-  // 3x3 rotation matrix (skip — we use the 4x4 below)
-  for (let r = 0; r < 3; r++) {
+  const read = (count: number): number[] => {
     while (i < lines.length && lines[i].trim() === '') i++;
-    i++;
+    if (i >= lines.length) throw new Error(`Truncated PTX scan header at line ${i + 1}`);
+    const values = lines[i++].trim().split(/\s+/).map(Number);
+    if (values.length !== count || !values.every(Number.isFinite)) throw new Error(`Invalid PTX scan header at line ${i}`);
+    return values;
+  };
+  const columns = read(1)[0], rows = read(1)[0];
+  if (!Number.isSafeInteger(columns) || !Number.isSafeInteger(rows) || columns <= 0 || rows <= 0 || !Number.isSafeInteger(columns * rows)) {
+    throw new Error(`Invalid PTX scan dimensions at line ${startIdx + 1}`);
   }
-
-  // 4x4 transformation matrix (row-major in file, store as flat array row-major)
-  const transform: number[] = [];
-  for (let r = 0; r < 4; r++) {
-    while (i < lines.length && lines[i].trim() === '') i++;
-    const parts = lines[i++].trim().split(/\s+/);
-    for (let c = 0; c < 4; c++) {
-      transform.push(parseFloat(parts[c]));
-    }
+  for (let row = 0; row < 4; row++) read(3); // registered scanner position and axes
+  const transform = Array.from({ length: 4 }, () => read(4)).flat();
+  if (transform[3] !== 0 || transform[7] !== 0 || transform[11] !== 0 || transform[15] !== 1) {
+    throw new Error('PTX requires an affine registration matrix.');
   }
-
   return { header: { columns, rows, transform }, nextLine: i };
 }
 
-/** Apply 4x4 transform (row-major) to a point */
+/** Cyclone PTX stores translation in the fourth matrix row (Hexagon KB 105). */
 function transformPoint(t: number[], x: number, y: number, z: number): [number, number, number] {
   return [
-    t[0] * x + t[1] * y + t[2] * z + t[3],
-    t[4] * x + t[5] * y + t[6] * z + t[7],
-    t[8] * x + t[9] * y + t[10] * z + t[11],
+    t[0] * x + t[4] * y + t[8] * z + t[12],
+    t[1] * x + t[5] * y + t[9] * z + t[13],
+    t[2] * x + t[6] * y + t[10] * z + t[14],
   ];
 }
 
@@ -75,11 +60,9 @@ function isIdentity(t: number[]): boolean {
          t[12] === 0 && t[13] === 0 && t[14] === 0 && t[15] === 1;
 }
 
-/** Normalize PTS-style intensity: can be 0–1, 0–255, or -2048..2047 */
+/** PTX intensity is 0..1; RGB channels are integer 0..255. */
 function normalizeIntensity(raw: number): number {
-  if (raw < 0) return (raw + 2048) / 4095;
-  if (raw > 1) return raw / 255;
-  return raw;
+  return Number.isFinite(raw) ? Math.min(1, Math.max(0, raw)) : 0;
 }
 
 export function parsePTX(buffer: ArrayBuffer): ParsedPointcloud {
@@ -108,6 +91,7 @@ export function parsePTX(buffer: ArrayBuffer): ParsedPointcloud {
     const { header, nextLine } = parseScanHeader(lines, lineIdx);
     const pointCount = header.columns * header.rows;
     const dataStart = nextLine;
+    if (pointCount > lines.length - dataStart) throw new Error('PTX scan point data is truncated.');
 
     // Detect color from first data line
     let hasColor = false;
@@ -138,16 +122,15 @@ export function parsePTX(buffer: ArrayBuffer): ParsedPointcloud {
   let anyColor = false;
   let anyIntensity = false;
 
-  // First pass: bounds (sample across all scans)
+  // Bounds include every valid point across all scans.
   let minX = Infinity, minY = Infinity, minZ = Infinity;
   let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
 
   for (const scan of scans) {
     const pointCount = scan.header.columns * scan.header.rows;
-    const sampleStep = Math.max(1, Math.floor(pointCount / 5000));
     const identity = isIdentity(scan.header.transform);
 
-    for (let i = 0; i < pointCount; i += sampleStep) {
+    for (let i = 0; i < pointCount; i++) {
       const li = scan.dataStart + i;
       if (li >= lines.length) break;
       const parts = lines[li].trim().split(/\s+/);
@@ -156,7 +139,7 @@ export function parsePTX(buffer: ArrayBuffer): ParsedPointcloud {
       let x = parseFloat(parts[0]);
       let y = parseFloat(parts[1]);
       let z = parseFloat(parts[2]);
-      if (isNaN(x) || isNaN(y) || isNaN(z)) continue;
+      if (![x, y, z].every(Number.isFinite)) continue;
 
       // Skip invalid points (origin)
       if (x === 0 && y === 0 && z === 0) continue;
@@ -165,12 +148,14 @@ export function parsePTX(buffer: ArrayBuffer): ParsedPointcloud {
         [x, y, z] = transformPoint(scan.header.transform, x, y, z);
       }
 
+      if (![x, y, z].every(Number.isFinite)) continue;
       minX = Math.min(minX, x); maxX = Math.max(maxX, x);
       minY = Math.min(minY, y); maxY = Math.max(maxY, y);
       minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
     }
   }
 
+  if (!Number.isFinite(minX)) throw new Error('PTX file contains no finite nonzero point coordinates');
   const cx = (minX + maxX) / 2;
   const cy = (minY + maxY) / 2;
   const cz = (minZ + maxZ) / 2;
@@ -195,7 +180,7 @@ export function parsePTX(buffer: ArrayBuffer): ParsedPointcloud {
       let x = parseFloat(parts[0]);
       let y = parseFloat(parts[1]);
       let z = parseFloat(parts[2]);
-      if (isNaN(x) || isNaN(y) || isNaN(z)) { globalPointIdx++; continue; }
+      if (![x, y, z].every(Number.isFinite)) { globalPointIdx++; continue; }
 
       // Skip invalid points
       if (x === 0 && y === 0 && z === 0) { globalPointIdx++; continue; }
@@ -203,6 +188,8 @@ export function parsePTX(buffer: ArrayBuffer): ParsedPointcloud {
       if (!identity) {
         [x, y, z] = transformPoint(scan.header.transform, x, y, z);
       }
+
+      if (![x, y, z].every(Number.isFinite)) { globalPointIdx++; continue; }
 
       // Z-up to Y-up
       positions[outIdx * 3] = x - cx;
@@ -212,7 +199,7 @@ export function parsePTX(buffer: ArrayBuffer): ParsedPointcloud {
       // Intensity (column 3)
       if (parts.length >= 4) {
         const rawI = parseFloat(parts[3]);
-        if (!isNaN(rawI)) {
+        if (Number.isFinite(rawI)) {
           intensities[outIdx] = normalizeIntensity(rawI);
           anyIntensity = true;
         }
@@ -223,9 +210,9 @@ export function parsePTX(buffer: ArrayBuffer): ParsedPointcloud {
         const r = parseFloat(parts[4]);
         const g = parseFloat(parts[5]);
         const b = parseFloat(parts[6]);
-        colors[outIdx * 3] = r > 1 ? r / 255 : r;
-        colors[outIdx * 3 + 1] = g > 1 ? g / 255 : g;
-        colors[outIdx * 3 + 2] = b > 1 ? b / 255 : b;
+        colors[outIdx * 3] = Number.isFinite(r) ? Math.min(1, Math.max(0, r / 255)) : 0;
+        colors[outIdx * 3 + 1] = Number.isFinite(g) ? Math.min(1, Math.max(0, g / 255)) : 0;
+        colors[outIdx * 3 + 2] = Number.isFinite(b) ? Math.min(1, Math.max(0, b / 255)) : 0;
         anyColor = true;
       } else {
         colors[outIdx * 3] = 0.8;

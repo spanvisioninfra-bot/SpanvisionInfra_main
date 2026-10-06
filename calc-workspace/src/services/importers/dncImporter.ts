@@ -242,7 +242,7 @@ export function buildDncImport(
     chapterIdByCode.set(chapter, id);
     items.push(makeCostItem({
       id, parentId: null, sortOrder: sort++, code: chapter, description: title,
-      rowType: 'chapter', depth: 0, unit: 'st',
+      rowType: "chapter", depth: 0, unit: 'st',
     }));
     return id;
   };

@@ -1,6 +1,7 @@
 import { load, type Store } from "@tauri-apps/plugin-store";
 
 let _store: Store | null = null;
+const browserMode = () => typeof window !== 'undefined' && !('__TAURI_INTERNALS__' in window);
 
 async function getStore(): Promise<Store> {
   if (!_store) {
@@ -10,6 +11,15 @@ async function getStore(): Promise<Store> {
 }
 
 export async function getSetting<T>(key: string, fallback: T): Promise<T> {
+  if (key === 'theme' && typeof document !== 'undefined' && document.documentElement.dataset.svModeExplicit === 'true') {
+    return (document.documentElement.dataset.svMode === 'light' ? 'light' : 'spanvision-mono') as T;
+  }
+  if (browserMode()) {
+    try {
+      const value = localStorage.getItem(`spanvision.fem.setting.${key}`);
+      return value === null ? fallback : JSON.parse(value) as T;
+    } catch { return fallback; }
+  }
   try {
     const store = await getStore();
     const value = await store.get<T>(key);
@@ -20,6 +30,10 @@ export async function getSetting<T>(key: string, fallback: T): Promise<T> {
 }
 
 export async function setSetting<T>(key: string, value: T): Promise<void> {
+  if (browserMode()) {
+    localStorage.setItem(`spanvision.fem.setting.${key}`, JSON.stringify(value));
+    return;
+  }
   try {
     const store = await getStore();
     await store.set(key, value);

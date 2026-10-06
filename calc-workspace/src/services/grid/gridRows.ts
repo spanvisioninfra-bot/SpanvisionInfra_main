@@ -97,7 +97,7 @@ export function buildGridRows(
   const result: CostItem[] = [];
   let currentChapterId: string | null = null;
   for (const item of visible) {
-    if (item.rowType === 'chapter' && !item.parentId) {
+    if (item.rowType === "chapter" && !item.parentId) {
       if (currentChapterId) result.push(makeChapterFooter(currentChapterId));
       currentChapterId = item.id;
     }

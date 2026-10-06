@@ -14,6 +14,7 @@ import { spuwer } from "./spuwer";
 import { kruipfactor } from "./kruipfactor";
 import { boutberekening } from "./boutberekening";
 import { permanenteVuurlast } from "./permanenteVuurlast";
+import { steelTensionInternational } from "./steelTensionInternational";
 // Visuele modules — invoer en parametrisch beeld, toetsing volgt nog.
 import { lasberekening } from "./lasberekening";
 import { schoorverbinding } from "./schoorverbinding";
@@ -58,6 +59,7 @@ import {
 } from "./en1992";
 
 export const templates: Record<string, string> = {
+  "steel-tension-international": steelTensionInternational,
   "stalen-gevelkolom": stalenGevelkolom,
   "verticaal-windverband": verticaalWindverband,
   "voetplaatverbinding": voetplaatverbinding,

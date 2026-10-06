@@ -24,15 +24,7 @@ import {
 } from '../js/solid/data/nenIfcMap.js';
 import { ifcCategoryForSymbol, ifcCategoryForAnnotation } from '../js/solid/data/ifcCategoryMap.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const libSrc = readFileSync(path.join(__dirname, '../js/solid/data/nen1414Library.js'), 'utf8');
-
-// Extraheer het NAMES-object uit de bibliotheek: regels als 'Tb1.003': 'Rookmelder',
-const LIB_NAMES = {};
-const namesBlock = libSrc.slice(libSrc.indexOf('const NAMES = {'), libSrc.indexOf('};', libSrc.indexOf('const NAMES = {')));
-for (const m of namesBlock.matchAll(/'([^']+)':\s*'([^']*)'/g)) {
-  LIB_NAMES[m[1]] = m[2];
-}
+import { NEN_NAMES as LIB_NAMES } from '../js/solid/data/nen1414Names.js';
 
 test('bibliotheek geparsed: ~100 NEN-symbolen gevonden', () => {
   const n = Object.keys(LIB_NAMES).length;

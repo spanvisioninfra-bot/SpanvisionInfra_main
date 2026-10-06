@@ -1,0 +1,9 @@
+{
+  "command": "cargo test --manifest-path core-tests/Cargo.toml --locked --jobs 1",
+  "directory": "spanvision-pointcloud-workspace",
+  "started": "2026-10-05T11:23:25.537Z",
+  "finished": "2026-10-05T11:23:29.729Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/pointcloud-native-tests.log"
+}

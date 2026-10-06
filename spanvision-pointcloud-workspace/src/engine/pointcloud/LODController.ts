@@ -8,6 +8,7 @@
 
 import * as THREE from 'three';
 import { invoke } from '@tauri-apps/api/core';
+import { surveyToViewer, viewerToSurvey, rotateSurveyPositions } from './SurveyCoordinates';
 import { createPointcloudMaterial, updatePointcloudMaterial, type PointcloudMaterialOptions } from './PointcloudMaterial';
 interface OctreeNodeInfo {
   node_id: string;
@@ -115,11 +116,7 @@ export class LODController {
 
     try {
       const cameraState = {
-        position: [
-          camera.position.x + this.worldOffset[0],
-          camera.position.z + this.worldOffset[1],
-          camera.position.y + this.worldOffset[2],
-        ],
+        position: viewerToSurvey([camera.position.x, camera.position.y, camera.position.z], this.worldOffset),
         target: [0, 0, 0],
         fov: camera.fov,
         aspect: camera.aspect,
@@ -193,14 +190,9 @@ export class LODController {
   private createPointsObject(chunk: DecodedChunk): void {
     const geometry = new THREE.BufferGeometry();
 
-    // Positions — swap Y/Z to convert from Z-up (LAS) to Y-up (Three.js)
+    // Apply the same right-handed Z-up rotation as browser parsing.
     const positions = chunk.positions;
-    for (let i = 0; i < chunk.point_count; i++) {
-      const base = i * 3;
-      const tmp = positions[base + 1];
-      positions[base + 1] = positions[base + 2];
-      positions[base + 2] = tmp;
-    }
+    rotateSurveyPositions(positions);
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
     // Colors (0-255 → 0-1)
@@ -227,12 +219,7 @@ export class LODController {
     const points = new THREE.Points(geometry, this.material);
 
     // Position the chunk at its world center, offset by worldOffset for precision
-    // Swap Y/Z to convert from Z-up (LAS) to Y-up (Three.js)
-    points.position.set(
-      chunk.center[0] - this.worldOffset[0],
-      chunk.center[2] - this.worldOffset[2],
-      chunk.center[1] - this.worldOffset[1],
-    );
+    points.position.set(...surveyToViewer(chunk.center, this.worldOffset));
 
     this.scene.add(points);
     this.loadedNodes.set(chunk.node_id, {

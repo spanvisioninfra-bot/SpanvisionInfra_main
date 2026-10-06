@@ -1,0 +1,64 @@
+{
+  "deployId": "dep-db29i7e7bikc73cvrm8g",
+  "service": {
+    "autoDeploy": "yes",
+    "autoDeployTrigger": "commit",
+    "branch": "version/V.1.0",
+    "buildFilter": {
+      "ignoredPaths": [],
+      "paths": [
+        "deployment/Dockerfile.fem",
+        "deployment/fem_api.py",
+        "fem-vision-studio/src-tauri/**"
+      ]
+    },
+    "createdAt": "2026-10-06T06:45:48.268316Z",
+    "dashboardUrl": "https://dashboard.render.com/web/srv-db29i6m7bikc73cvri0g",
+    "id": "srv-db29i6m7bikc73cvri0g",
+    "name": "spanvision-fem-engine",
+    "notifyOnFail": "default",
+    "ownerId": "tea-davr4ru7bikc73f55ph0",
+    "repo": "https://github.com/spanvisioninfra-bot/SpanvisionInfra_main",
+    "rootDir": "",
+    "serviceDetails": {
+      "buildPlan": "starter",
+      "cache": {
+        "profile": "no-cache"
+      },
+      "env": "docker",
+      "envSpecificDetails": {
+        "dockerCommand": "",
+        "dockerContext": ".",
+        "dockerfilePath": "./deployment/Dockerfile.fem"
+      },
+      "healthCheckPath": "/health",
+      "ipAllowList": [
+        {
+          "cidrBlock": "0.0.0.0/0",
+          "description": "everywhere"
+        }
+      ],
+      "maintenanceMode": {
+        "enabled": false,
+        "uri": ""
+      },
+      "numInstances": 1,
+      "openPorts": [],
+      "plan": "free",
+      "previews": {
+        "generation": "off"
+      },
+      "pullRequestPreviewsEnabled": "no",
+      "region": "singapore",
+      "renderSubdomainPolicy": "enabled",
+      "runtime": "docker",
+      "sshAddress": "srv-db29i6m7bikc73cvri0g@ssh.singapore.render.com",
+      "url": "https://spanvision-fem-engine.onrender.com"
+    },
+    "slug": "spanvision-fem-engine",
+    "suspended": "not_suspended",
+    "suspenders": [],
+    "type": "web_service",
+    "updatedAt": "2026-10-06T06:45:48.27687Z"
+  }
+}

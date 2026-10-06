@@ -100,12 +100,12 @@ const nextBlock: VersionedReleaseHighlights = {
   ...currentBlock,
   copy: {
     ...currentBlock.copy,
-    nl: [
-      { ...currentBlock.copy.nl[0], title: 'Denkbeeldige volgende release' },
-      currentBlock.copy.nl[1],
-      currentBlock.copy.nl[2],
-      currentBlock.copy.nl[3],
-      currentBlock.copy.nl[4],
+    en: [
+      { ...currentBlock.copy.en[0], title: 'Hypothetical next release' },
+      currentBlock.copy.en[1],
+      currentBlock.copy.en[2],
+      currentBlock.copy.en[3],
+      currentBlock.copy.en[4],
     ],
   },
 };
@@ -113,7 +113,7 @@ const twoVersionCatalog = defineReleaseHighlightCatalog({
   ...RELEASE_HIGHLIGHT_CATALOG,
   '2099.1.1': nextBlock,
 });
-check('highlights: volgende versie overschrijft 2026.8.1-copy niet', getReleaseHighlightsFromCatalog(twoVersionCatalog, '2026.8.1', 'nl')?.primary.title === 'Importeer met de datums uit je planning' && getReleaseHighlightsFromCatalog(twoVersionCatalog, '2099.1.1', 'nl')?.primary.title === 'Denkbeeldige volgende release');
+check('highlights: next release preserves previous English copy', getReleaseHighlightsFromCatalog(twoVersionCatalog, '2026.8.1', 'en')?.primary.title === 'Import with the dates from your plan' && getReleaseHighlightsFromCatalog(twoVersionCatalog, '2099.1.1', 'en')?.primary.title === 'Hypothetical next release');
 
 type MutableCatalog = Record<string, {
   [key: string]: unknown;

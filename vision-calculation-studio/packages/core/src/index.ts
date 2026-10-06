@@ -18,6 +18,8 @@ export {
   type IfcxEntry,
 } from './ifc-generator.js';
 export type * from './types.js';
+export { calculateSteelTension, STEEL_TENSION_METHODS, STEEL_TENSION_METHOD_IDS, steelTensionFromNumbers } from './steel-tension.js';
+export type { SteelTensionMethod, SteelTensionInput, SteelTensionResult } from './steel-tension.js';
 
 import { parse, type ParseOptions } from './parser.js';
 import { evaluate, type SelectValues, type Scope } from './evaluator.js';

@@ -24,6 +24,8 @@ export function parsePTS(buffer: ArrayBuffer): ParsedPointcloud {
     startLine = 1;
   }
 
+  if (startLine === lines.length) throw new Error('PTS file contains no point coordinates');
+
   // Detect format from first data line
   const sampleParts = lines[startLine].trim().split(/\s+/);
   const numCols = sampleParts.length;
@@ -49,20 +51,20 @@ export function parsePTS(buffer: ArrayBuffer): ParsedPointcloud {
   let minX = Infinity, minY = Infinity, minZ = Infinity;
   let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
 
-  // First pass: find bounds (sample)
-  const sampleStep = Math.max(1, Math.floor(totalLines / 10000));
-  for (let i = startLine; i < lines.length; i += sampleStep) {
+  // Include every valid point in the bounds, even if rendering downsamples.
+  for (let i = startLine; i < lines.length; i++) {
     const parts = lines[i].trim().split(/\s+/);
     if (parts.length < 3) continue;
     const x = parseFloat(parts[0]);
     const y = parseFloat(parts[1]);
     const z = parseFloat(parts[2]);
-    if (isNaN(x) || isNaN(y) || isNaN(z)) continue;
+    if (![x, y, z].every(Number.isFinite)) continue;
     minX = Math.min(minX, x); maxX = Math.max(maxX, x);
     minY = Math.min(minY, y); maxY = Math.max(maxY, y);
     minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
   }
 
+  if (!Number.isFinite(minX)) throw new Error('PTS file contains no finite point coordinates');
   const cx = (minX + maxX) / 2;
   const cy = (minY + maxY) / 2;
   const cz = (minZ + maxZ) / 2;
@@ -76,7 +78,7 @@ export function parsePTS(buffer: ArrayBuffer): ParsedPointcloud {
     const x = parseFloat(parts[0]);
     const y = parseFloat(parts[1]);
     const z = parseFloat(parts[2]);
-    if (isNaN(x) || isNaN(y) || isNaN(z)) continue;
+    if (![x, y, z].every(Number.isFinite)) continue;
 
     // Z-up to Y-up
     positions[outIdx * 3] = x - cx;
@@ -86,7 +88,7 @@ export function parsePTS(buffer: ArrayBuffer): ParsedPointcloud {
     if (hasIntensity) {
       const rawI = parseFloat(parts[3]);
       // PTS intensity can be -2048..2047 or 0..1 or 0..255
-      intensities[outIdx] = rawI < 0 ? (rawI + 2048) / 4095 : rawI > 1 ? rawI / 255 : rawI;
+      intensities[outIdx] = Number.isFinite(rawI) ? Math.min(1, Math.max(0, (rawI + 2048) / 4096)) : 0;
     }
 
     if (hasColor) {
@@ -94,9 +96,9 @@ export function parsePTS(buffer: ArrayBuffer): ParsedPointcloud {
       const r = parseFloat(parts[rIdx]);
       const g = parseFloat(parts[rIdx + 1]);
       const b = parseFloat(parts[rIdx + 2]);
-      colors[outIdx * 3] = r / 255;
-      colors[outIdx * 3 + 1] = g / 255;
-      colors[outIdx * 3 + 2] = b / 255;
+      colors[outIdx * 3] = Number.isFinite(r) ? Math.min(1, Math.max(0, r / 255)) : 0;
+      colors[outIdx * 3 + 1] = Number.isFinite(g) ? Math.min(1, Math.max(0, g / 255)) : 0;
+      colors[outIdx * 3 + 2] = Number.isFinite(b) ? Math.min(1, Math.max(0, b / 255)) : 0;
     } else {
       colors[outIdx * 3] = 0.8;
       colors[outIdx * 3 + 1] = 0.8;

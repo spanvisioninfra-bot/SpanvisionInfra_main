@@ -25,7 +25,7 @@ export default function PlayerControls(props: Props) {
         class={`${styles.playerBtn} ${styles.playBtn} ${isPlaying() ? styles.playing : ''}`}
         disabled={disabled()}
         onClick={props.onTogglePlay}
-        title={t('player.play')}
+        title={isPlaying() ? 'Pause (Space)' : t('player.play')}
       >
         {isPlaying() ? (
           <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">

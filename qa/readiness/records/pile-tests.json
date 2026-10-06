@@ -1,0 +1,9 @@
+{
+  "command": "npm test",
+  "directory": "spanvision-pile-plane-workspace/apps/pile-plan-studio",
+  "started": "2026-10-04T18:05:29.584Z",
+  "finished": "2026-10-04T18:05:59.664Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/pile-tests.log"
+}

@@ -45,6 +45,15 @@ pub enum MemberType {
 }
 
 impl MemberType {
+    pub fn label_en(&self) -> &'static str {
+        match self {
+            Self::FrameTop => "Frame top", Self::FrameBottom => "Frame bottom",
+            Self::FrameLeft => "Frame left", Self::FrameRight => "Frame right",
+            Self::DividerH => "Horizontal divider", Self::DividerV => "Vertical divider",
+            Self::SashTop => "Sash top", Self::SashBottom => "Sash bottom",
+            Self::SashLeft => "Sash left", Self::SashRight => "Sash right",
+        }
+    }
     pub fn label_nl(&self) -> &'static str {
         match self {
             Self::FrameTop => "Bovendorpel",
@@ -108,6 +117,12 @@ pub enum GasketType {
 }
 
 impl GasketType {
+    pub fn label_en(&self) -> &'static str {
+        match self {
+            Self::GlazingInner => "Inner glazing gasket", Self::GlazingOuter => "Outer glazing gasket",
+            Self::SashSeal => "Sash seal", Self::FrameSeal => "Frame seal",
+        }
+    }
     pub fn label_nl(&self) -> &'static str {
         match self {
             Self::GlazingInner => "Binnenrubber beglazing",
@@ -578,12 +593,12 @@ fn material_name(material: &Material) -> &'static str {
         Material::Wood(w) => match w {
             crate::kozijn::WoodType::Meranti => "Meranti",
             crate::kozijn::WoodType::Accoya => "Accoya",
-            crate::kozijn::WoodType::Vuren => "Vuren",
-            crate::kozijn::WoodType::Eiken => "Eiken",
+            crate::kozijn::WoodType::Vuren => "Spruce",
+            crate::kozijn::WoodType::Eiken => "Oak",
         },
         Material::Aluminum => "Aluminium",
-        Material::Pvc => "Kunststof",
-        Material::WoodAluminum => "Hout-aluminium",
+        Material::Pvc => "PVC",
+        Material::WoodAluminum => "Wood-aluminium",
     }
 }
 
@@ -687,7 +702,7 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
 
     // Bottom rail / sill
     let sill_profile = if kozijn.frame.sill_profile.is_some() {
-        format!("Dorpel {}", profile_name)
+        format!("Sill {}", profile_name)
     } else {
         profile_name.clone()
     };
@@ -860,9 +875,9 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
                     if let Some(sw) = sash_w {
                         let (id_prefix, fallback_profile) =
                             if matches!(&l.vulling, Vakvulling::Deur { .. }) {
-                                ("D", format!("Deurhout {}", profile_name))
+                                ("D", format!("Door sash {}", profile_name))
                             } else {
-                                ("R", format!("Raamhout {}", profile_name))
+                                ("R", format!("Sash {}", profile_name))
                             };
                         let sash_profile_name = cell
                             .and_then(|c| c.sash_profile.as_ref())
@@ -954,7 +969,7 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
                         glaslat_list.push(GlaslatListItem {
                             piece_id: cell_id.clone(),
                             cell_index: l.leaf_index,
-                            position: gl.position.label_nl().to_string(),
+                            position: gl.position.label_en().to_string(),
                             material: gl.material.clone(),
                             width_mm: gl.width_mm,
                             height_mm: gl.height_mm,
@@ -976,10 +991,10 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
                             if let Some(ref hinges) = hw.hinges {
                                 hardware_list.push(HardwareListItem {
                                     cell_index: l.leaf_index,
-                                    component: "Scharnier".into(),
+                                    component: "Hinge".into(),
                                     description: format!(
-                                        "{:?} - draagkracht {:.0} kg",
-                                        hinges.hinge_type, hinges.load_capacity_kg
+                                        "{} - load capacity {} kg",
+                                        hinges.hinge_type.label_en(), hinges.load_capacity_kg
                                     ),
                                     quantity: hinges.count as u32,
                                 });
@@ -987,10 +1002,10 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
                             if let Some(ref handle) = hw.handle {
                                 hardware_list.push(HardwareListItem {
                                     cell_index: l.leaf_index,
-                                    component: "Greep".into(),
+                                    component: "Handle".into(),
                                     description: format!(
-                                        "{:?} - hoogte {} mm",
-                                        handle.handle_type, handle.height_mm
+                                        "{} - height {} mm",
+                                        handle.handle_type.label_en(), handle.height_mm
                                     ),
                                     quantity: 1,
                                 });
@@ -998,10 +1013,10 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
                             if let Some(ref locking) = hw.locking {
                                 hardware_list.push(HardwareListItem {
                                     cell_index: l.leaf_index,
-                                    component: "Sluiting".into(),
+                                    component: "Lock".into(),
                                     description: format!(
-                                        "{:?} - {} sluitpunten",
-                                        locking.lock_type, locking.locking_points
+                                        "{} - {} locking points",
+                                        locking.lock_type.label_en(), locking.locking_points
                                     ),
                                     quantity: 1,
                                 });
@@ -1015,8 +1030,8 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
                     let panel_label = filling
                         .as_ref()
                         .or(cell.and_then(|c| c.panel_filling.as_ref()))
-                        .map(|f| f.filling_type.label_nl().to_string())
-                        .unwrap_or_else(|| "Sandwichpaneel".to_string());
+                        .map(|f| f.filling_type.label_en().to_string())
+                        .unwrap_or_else(|| "Sandwich panel".to_string());
                     panel_list.push(PanelListItem {
                         piece_id: cell_id.clone(),
                         cell_index: l.leaf_index,
@@ -1035,7 +1050,7 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
                             cell_index: l.leaf_index,
                             width_mm: vak_w - 2.0 * GLASS_CLEARANCE_MM,
                             height_mm: vak_h - 2.0 * GLASS_CLEARANCE_MM,
-                            panel_type: filling.filling_type.label_nl().to_string(),
+                            panel_type: filling.filling_type.label_en().to_string(),
                             quantity: 1,
                         });
                     }
@@ -1158,8 +1173,8 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
                     let panel_label = cell
                         .panel_filling
                         .as_ref()
-                        .map(|f| f.filling_type.label_nl().to_string())
-                        .unwrap_or_else(|| "Sandwichpaneel".to_string());
+                        .map(|f| f.filling_type.label_en().to_string())
+                        .unwrap_or_else(|| "Sandwich panel".to_string());
                     panel_list.push(PanelListItem {
                         piece_id: cell_id.clone(),
                         cell_index: i,
@@ -1177,7 +1192,7 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
                             cell_index: i,
                             width_mm: cell_w - 2.0 * GLASS_CLEARANCE_MM,
                             height_mm: cell_h - 2.0 * GLASS_CLEARANCE_MM,
-                            panel_type: filling.filling_type.label_nl().to_string(),
+                            panel_type: filling.filling_type.label_en().to_string(),
                             quantity: 1,
                         });
                     }
@@ -1210,7 +1225,7 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
                 glaslat_list.push(GlaslatListItem {
                     piece_id: cell_id.clone(),
                     cell_index: i,
-                    position: gl.position.label_nl().to_string(),
+                    position: gl.position.label_en().to_string(),
                     material: gl.material.clone(),
                     width_mm: gl.width_mm,
                     height_mm: gl.height_mm,
@@ -1246,7 +1261,7 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
 
                 let sash_profile_name = cell.sash_profile.as_ref()
                     .map(|p| p.name.clone())
-                    .unwrap_or_else(|| format!("Raamhout {}", profile_name));
+                    .unwrap_or_else(|| format!("Sash {}", profile_name));
 
                 // Sash stiles (left + right)
                 cut_list.push(CutListItem {
@@ -1310,24 +1325,24 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
                 if let Some(ref hinges) = hw.hinges {
                     hardware_list.push(HardwareListItem {
                         cell_index: i,
-                        component: "Scharnier".into(),
-                        description: format!("{:?} - draagkracht {:.0} kg", hinges.hinge_type, hinges.load_capacity_kg),
+                        component: "Hinge".into(),
+                        description: format!("{} - load capacity {} kg", hinges.hinge_type.label_en(), hinges.load_capacity_kg),
                         quantity: hinges.count as u32,
                     });
                 }
                 if let Some(ref handle) = hw.handle {
                     hardware_list.push(HardwareListItem {
                         cell_index: i,
-                        component: "Greep".into(),
-                        description: format!("{:?} - hoogte {} mm", handle.handle_type, handle.height_mm),
+                        component: "Handle".into(),
+                        description: format!("{} - height {} mm", handle.handle_type.label_en(), handle.height_mm),
                         quantity: 1,
                     });
                 }
                 if let Some(ref locking) = hw.locking {
                     hardware_list.push(HardwareListItem {
                         cell_index: i,
-                        component: "Sluiting".into(),
-                        description: format!("{:?} - {} sluitpunten", locking.lock_type, locking.locking_points),
+                        component: "Lock".into(),
+                        description: format!("{} - {} locking points", locking.lock_type.label_en(), locking.locking_points),
                         quantity: 1,
                     });
                 }
@@ -1350,7 +1365,7 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
     // Total profile length
     let total_profile_mm: f64 = cut_list.iter().map(|c| c.gross_length_mm * c.quantity as f64).sum();
     bom.push(BomItem {
-        category: "Profiel".into(),
+        category: "Profile".into(),
         description: format!("{} {} mm", mat_name, profile_name),
         unit: "m".into(),
         quantity: total_profile_mm / 1000.0,
@@ -1360,7 +1375,7 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
     let total_glass_m2: f64 = glass_list.iter().map(|g| g.area_m2 * g.quantity as f64).sum();
     if total_glass_m2 > 0.0 {
         bom.push(BomItem {
-            category: "Glas".into(),
+            category: "Glass".into(),
             description: glass_list.first().map(|g| g.glass_type.clone()).unwrap_or_default(),
             unit: "m2".into(),
             quantity: total_glass_m2,
@@ -1370,8 +1385,8 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
     // Total gasket length
     let total_gasket_mm: f64 = gasket_list.iter().map(|g| g.length_mm * g.quantity as f64).sum();
     bom.push(BomItem {
-        category: "Rubber".into(),
-        description: "EPDM afdichting".into(),
+        category: "Gasket".into(),
+        description: "EPDM seal".into(),
         unit: "m".into(),
         quantity: total_gasket_mm / 1000.0,
     });
@@ -1380,9 +1395,9 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
     let total_hw: u32 = hardware_list.iter().map(|h| h.quantity).sum();
     if total_hw > 0 {
         bom.push(BomItem {
-            category: "Beslag".into(),
-            description: "Hang- en sluitwerk (diverse)".into(),
-            unit: "stuks".into(),
+            category: "Hardware".into(),
+            description: "Hinges and locks (various)".into(),
+            unit: "pieces".into(),
             quantity: total_hw as f64,
         });
     }
@@ -1391,9 +1406,9 @@ pub fn compute_production_data(kozijn: &Kozijn) -> ProductionData {
     if !panel_list.is_empty() {
         let total_panels: u32 = panel_list.iter().map(|p| p.quantity).sum();
         bom.push(BomItem {
-            category: "Paneel".into(),
-            description: "Sandwichpaneel".into(),
-            unit: "stuks".into(),
+            category: "Panel".into(),
+            description: "Sandwich panel".into(),
+            unit: "pieces".into(),
             quantity: total_panels as f64,
         });
     }
@@ -1946,14 +1961,14 @@ mod tests {
 
         // Raamhout members for the raam vak (leaf 0).
         let raamhout: Vec<_> = prod.cut_list.iter()
-            .filter(|c| c.profile_name.starts_with("Raamhout"))
+            .filter(|c| c.profile_name.starts_with("Sash "))
             .collect();
         assert_eq!(raamhout.len(), 4, "raam vak yields 4 raamhout members");
         assert!(raamhout.iter().any(|c| c.piece_id.ends_with("-RSL")));
 
         // Deurhout members for the deur vak (leaf 1) — the deur-item.
         let deurhout: Vec<_> = prod.cut_list.iter()
-            .filter(|c| c.profile_name.starts_with("Deurhout"))
+            .filter(|c| c.profile_name.starts_with("Door sash "))
             .collect();
         assert_eq!(deurhout.len(), 4, "deur vak yields 4 deurhout members");
         assert!(deurhout.iter().any(|c| c.piece_id.ends_with("-DSL")));
@@ -1966,7 +1981,7 @@ mod tests {
         assert_eq!(prod.glass_list.len(), 2);
         assert_eq!(prod.panel_list.len(), 1);
         assert_eq!(prod.panel_list[0].cell_index, 2);
-        assert_eq!(prod.panel_list[0].panel_type, "Sandwichpaneel");
+        assert_eq!(prod.panel_list[0].panel_type, "Sandwich panel");
         // cell_index follows the stable depth-first leaf index.
         let glass_cells: Vec<usize> = prod.glass_list.iter().map(|g| g.cell_index).collect();
         assert_eq!(glass_cells, vec![0, 1]);
@@ -2065,7 +2080,7 @@ mod tests {
         let prod = compute_production_data(&k);
         assert_eq!(prod.glaslat_list.len(), 1);
         let item = &prod.glaslat_list[0];
-        assert_eq!(item.position, "Buiten");
+        assert_eq!(item.position, "Outside");
         assert!((item.width_mm - 15.0).abs() < 1e-9);
         assert!((item.height_mm - 17.0).abs() < 1e-9);
         assert_eq!(item.quantity, 4);

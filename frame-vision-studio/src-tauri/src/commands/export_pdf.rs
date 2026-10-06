@@ -16,9 +16,10 @@ pub async fn export_kozijnstaat(
         "xlsx" => {
             ofs_core::export::xlsx::generate_kozijnstaat_xlsx(&project, &output_path)?;
         }
-        _ => {
+        "pdf" => {
             ofs_core::export::pdf::generate_kozijnstaat_pdf(&project, &output_path)?;
         }
+        _ => return Err("Choose PDF or Excel for the frame schedule.".into()),
     }
 
     Ok(output_path)
@@ -34,50 +35,8 @@ pub async fn export_quotation_pdf(
         project.clone()
     };
 
-    // Per-kozijn subtotals from the standard cost estimate.
-    let price_table = ofs_core::calculation::PriceTable::default();
-    let prices: Vec<(String, f64)> = project
-        .kozijnen
-        .iter()
-        .map(|k| {
-            (
-                k.mark.clone(),
-                ofs_core::calculation::estimate_cost(k, &price_table).total_cost,
-            )
-        })
-        .collect();
-    let subtotal: f64 = prices.iter().map(|(_, total)| *total).sum();
-
-    // Use the project pricing config when set; otherwise plain 21% BTW.
-    let pricing_config = project.pricing_config.clone().unwrap_or(
-        ofs_core::pricing::PricingConfig {
-            btw_percentage: 21.0,
-            ..Default::default()
-        },
-    );
-    let quotation_price = pricing_config.calculate(subtotal);
-
-    // The project has no company settings (yet) — use neutral defaults.
-    let company = ofs_core::export::pdf_quotation::CompanyInfo {
-        name: "Frame Vision Studio".to_string(),
-        address: "-".to_string(),
-        phone: "-".to_string(),
-        email: "-".to_string(),
-        kvk: "-".to_string(),
-        btw_id: "-".to_string(),
-    };
-    let terms = "Geldigheid: 30 dagen na offertedatum.\n\
-        Levering conform KVT-richtlijnen.\n\
-        Prijzen in euro, inclusief BTW tenzij anders vermeld.";
-
-    let bytes = ofs_core::export::pdf_quotation::generate_quotation_pdf(
-        &project,
-        &company,
-        &prices,
-        &quotation_price,
-        terms,
-    )?;
-    std::fs::write(&output_path, bytes).map_err(|e| e.to_string())?;
+    let bytes = ofs_core::export::pdf_quotation::project_quotation_pdf_bytes(&project)?;
+    ofs_core::export::write_export_bytes(&output_path, &bytes)?;
 
     Ok(output_path)
 }

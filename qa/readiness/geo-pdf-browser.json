@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-10-05T11:20:20.342Z",
+  "passed": true,
+  "checks": [
+    "Actual two-page PDF thumbnails, second-page selection, pointer crop resize and independently decoded output PNG",
+    "Imported overlay is displayed in both color modes",
+    "Cancel and invalid PDF preserve the current overlay; a valid retry and page reselection succeed"
+  ],
+  "errors": []
+}

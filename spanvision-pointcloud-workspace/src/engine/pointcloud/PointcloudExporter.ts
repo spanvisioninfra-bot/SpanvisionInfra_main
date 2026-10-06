@@ -7,6 +7,17 @@
 
 import type { ParsedPointcloud } from './LASParser';
 
+/** Undo the renderer's centering and Z-up to Y-up rotation before writing survey data. */
+function surveyPosition(parsed: ParsedPointcloud, index: number): [number, number, number] {
+  const point: [number, number, number] = [
+    parsed.center[0] + parsed.positions[index * 3],
+    parsed.center[1] - parsed.positions[index * 3 + 2],
+    parsed.center[2] + parsed.positions[index * 3 + 1],
+  ];
+  if (!point.every(Number.isFinite)) throw new Error('Cannot export non-finite point coordinates');
+  return point;
+}
+
 // ============================================================================
 // PLY Export
 // ============================================================================
@@ -29,9 +40,9 @@ export function exportToPLY(parsed: ParsedPointcloud, binary = true): Blob {
     binary ? 'format binary_little_endian 1.0' : 'format ascii 1.0',
     'comment Exported from Pointcloud Workspace',
     `element vertex ${numVerts}`,
-    'property float x',
-    'property float y',
-    'property float z',
+    'property double x',
+    'property double y',
+    'property double z',
     'property uchar red',
     'property uchar green',
     'property uchar blue',
@@ -52,9 +63,7 @@ export function exportToPLY(parsed: ParsedPointcloud, binary = true): Blob {
     const lines: string[] = [headerStr.trimEnd()];
 
     for (let i = 0; i < numVerts; i++) {
-      const x = parsed.positions[i * 3];
-      const y = parsed.positions[i * 3 + 1];
-      const z = parsed.positions[i * 3 + 2];
+      const [x, y, z] = surveyPosition(parsed, i);
       const r = Math.round(parsed.colors[i * 3] * 255);
       const g = Math.round(parsed.colors[i * 3 + 1] * 255);
       const b = Math.round(parsed.colors[i * 3 + 2] * 255);
@@ -80,8 +89,9 @@ export function exportToPLY(parsed: ParsedPointcloud, binary = true): Blob {
   // Binary little-endian format
   const headerBytes = new TextEncoder().encode(headerStr);
 
-  // Each vertex: 3 floats (12) + 3 uchars (3) + 1 float (4) + 1 uchar (1) = 20 bytes
-  const vertexSize = 20;
+  // Double survey coordinates retain small distances at large geographic offsets.
+  // Each vertex: 3 doubles (24) + RGB (3) + intensity (4) + classification (1).
+  const vertexSize = 32;
   // Each face: 1 uchar (count=3) + 3 ints (12) = 13 bytes
   const faceSize = 13;
 
@@ -94,18 +104,18 @@ export function exportToPLY(parsed: ParsedPointcloud, binary = true): Blob {
   let offset = headerBytes.length;
 
   for (let i = 0; i < numVerts; i++) {
-    // Position (3 x float32 LE)
-    view.setFloat32(offset, parsed.positions[i * 3], true);
-    view.setFloat32(offset + 4, parsed.positions[i * 3 + 1], true);
-    view.setFloat32(offset + 8, parsed.positions[i * 3 + 2], true);
+    const [x, y, z] = surveyPosition(parsed, i);
+    view.setFloat64(offset, x, true);
+    view.setFloat64(offset + 8, y, true);
+    view.setFloat64(offset + 16, z, true);
     // Color (3 x uint8)
-    uint8[offset + 12] = Math.round(parsed.colors[i * 3] * 255);
-    uint8[offset + 13] = Math.round(parsed.colors[i * 3 + 1] * 255);
-    uint8[offset + 14] = Math.round(parsed.colors[i * 3 + 2] * 255);
+    uint8[offset + 24] = Math.round(parsed.colors[i * 3] * 255);
+    uint8[offset + 25] = Math.round(parsed.colors[i * 3 + 1] * 255);
+    uint8[offset + 26] = Math.round(parsed.colors[i * 3 + 2] * 255);
     // Intensity (float32 LE)
-    view.setFloat32(offset + 15, parsed.intensities[i], true);
+    view.setFloat32(offset + 27, parsed.intensities[i], true);
     // Classification (uint8)
-    uint8[offset + 19] = Math.round(parsed.classifications[i]);
+    uint8[offset + 31] = Math.round(parsed.classifications[i]);
     offset += vertexSize;
   }
 
@@ -139,9 +149,7 @@ export function exportToXYZ(parsed: ParsedPointcloud): string {
   const lines: string[] = [];
 
   for (let i = 0; i < numVerts; i++) {
-    const x = parsed.positions[i * 3];
-    const y = parsed.positions[i * 3 + 1];
-    const z = parsed.positions[i * 3 + 2];
+    const [x, y, z] = surveyPosition(parsed, i);
     const r = Math.round(parsed.colors[i * 3] * 255);
     const g = Math.round(parsed.colors[i * 3 + 1] * 255);
     const b = Math.round(parsed.colors[i * 3 + 2] * 255);
@@ -169,10 +177,9 @@ export function exportToPTS(parsed: ParsedPointcloud): string {
   const lines: string[] = [String(numVerts)];
 
   for (let i = 0; i < numVerts; i++) {
-    const x = parsed.positions[i * 3];
-    const y = parsed.positions[i * 3 + 1];
-    const z = parsed.positions[i * 3 + 2];
-    const intensity = parsed.intensities[i];
+    const [x, y, z] = surveyPosition(parsed, i);
+    // Leica PTS stores signed intensity; parsing maps -2048..2047 to 0..1.
+    const intensity = Math.min(2047, Math.max(-2048, Math.round(parsed.intensities[i] * 4096 - 2048)));
     const r = Math.round(parsed.colors[i * 3] * 255);
     const g = Math.round(parsed.colors[i * 3 + 1] * 255);
     const b = Math.round(parsed.colors[i * 3 + 2] * 255);
@@ -199,9 +206,7 @@ export function exportToCSV(parsed: ParsedPointcloud): string {
   const lines: string[] = ['x,y,z,r,g,b,intensity,classification'];
 
   for (let i = 0; i < numVerts; i++) {
-    const x = parsed.positions[i * 3];
-    const y = parsed.positions[i * 3 + 1];
-    const z = parsed.positions[i * 3 + 2];
+    const [x, y, z] = surveyPosition(parsed, i);
     const r = Math.round(parsed.colors[i * 3] * 255);
     const g = Math.round(parsed.colors[i * 3 + 1] * 255);
     const b = Math.round(parsed.colors[i * 3 + 2] * 255);

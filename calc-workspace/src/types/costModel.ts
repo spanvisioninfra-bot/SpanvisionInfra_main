@@ -1,7 +1,7 @@
 export type CostUnit = 'st' | 'm' | 'm²' | 'm³' | 'kg' | 'ton' | 'uur' | 'dgn' | 'km' | 'keer' | 'ls' | 'week' | 'mnd' | 'post' | '%' | 'pm';
 
 export type RowType =
-  | 'chapter'           // Hoofdstuk/Paragraaf (groen)
+  | "chapter"           // Hoofdstuk/Paragraaf (groen)
   | 'begrotingspost'    // Bestekspost (ih)
   | 'bewakingspost'     // Bewakingspost (cb) - bruin
   | 'regel'             // Middel/resource (cn) - geel
@@ -566,5 +566,5 @@ export function isStagartRowType(rowType: RowType): boolean {
 
 /** Helper: check if a row type can have children */
 export function isContainerRowType(rowType: RowType): boolean {
-  return rowType === 'chapter' || rowType === 'begrotingspost' || rowType === 'bewakingspost';
+  return rowType === "chapter" || rowType === 'begrotingspost' || rowType === 'bewakingspost';
 }

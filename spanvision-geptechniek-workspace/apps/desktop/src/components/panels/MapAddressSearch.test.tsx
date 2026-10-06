@@ -9,7 +9,7 @@ import { useCptStore } from "../../store/useCptStore";
  * Stond de zoekterm alleen in component-state, dan was het veld na de
  * wissel weer leeg terwijl de kaart nog op dat adres stond.
  */
-const LABEL = "Adres of coordinaat zoeken";
+const LABEL = "Search address or coordinates";
 
 describe("MapAddressSearch", () => {
   beforeEach(() => {
@@ -67,7 +67,7 @@ describe("MapAddressSearch", () => {
     render(<MapAddressSearch />);
     expect(screen.getByLabelText(LABEL)).toHaveValue("Tiel");
 
-    fireEvent.click(screen.getByTitle("Wissen"));
+    fireEvent.click(screen.getByTitle("Clear"));
 
     expect(useCptStore.getState().lastAddressQuery).toBe("");
     expect(screen.getByLabelText(LABEL)).toHaveValue("");

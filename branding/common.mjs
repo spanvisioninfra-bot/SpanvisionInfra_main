@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { studioInputs } from './studios.mjs';
 export const root = path.resolve(import.meta.dirname, '..');
 export const brand = JSON.parse(fs.readFileSync(path.join(root, 'branding/brand.json'), 'utf8'));
@@ -13,7 +13,13 @@ export const digest = module => createHash('sha256').update(JSON.stringify(!modu
 export function write(file, content) {
   const absolute = path.join(root, file);
   fs.mkdirSync(path.dirname(absolute), { recursive: true });
-  if (!fs.existsSync(absolute) || fs.readFileSync(absolute, 'utf8') !== content) fs.writeFileSync(absolute, content);
+  if (!fs.existsSync(absolute) || fs.readFileSync(absolute, 'utf8') !== content) {
+    const temporary = path.join(path.dirname(absolute), `.${path.basename(absolute)}.${randomUUID()}.tmp`);
+    try {
+      fs.writeFileSync(temporary, content, { flag: 'wx' });
+      fs.renameSync(temporary, absolute);
+    } finally { fs.rmSync(temporary, { force: true }); }
+  }
 }
 export function files(directory) {
   const absolute = path.resolve(root, directory);
@@ -26,6 +32,12 @@ export function files(directory) {
 }
 export function fingerprint(module, brandingDigest=digest(module)) {
   const hash = createHash('sha256').update(brandingDigest);
+  if (['hub', 'speech', 'pdf'].includes(module.id)) {
+    for (const name of ['local-profile.js', 'local-profile.d.ts']) hash.update(name).update(fs.readFileSync(path.join(root, 'branding', name)));
+  }
+  if (module.id === 'hub' || module.id === 'speech') {
+    for (const file of files(path.join(root, module.directory, 'legal')).sort()) hash.update(path.relative(root, file)).update(fs.readFileSync(file));
+  }
   const base = path.join(root, module.directory);
   if(module.kind==='studio') {
     for(const file of studioInputs(root,module,files))hash.update(path.relative(base,file).replaceAll('\\','/')).update(fs.readFileSync(file));

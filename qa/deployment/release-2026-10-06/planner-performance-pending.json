@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-06T08:11:35.0503115Z",
+  "fullRunPassed": false,
+  "failedCheck": "task-grid-performance relationIndex median",
+  "budgetMs": 500,
+  "fullRunMedianMs": 754.04,
+  "isolatedPassed": true,
+  "isolatedMedianMs": 363.92,
+  "isolatedChecks": 27,
+  "thresholdsChanged": false,
+  "plannerDeployment": "previous release retained"
+}

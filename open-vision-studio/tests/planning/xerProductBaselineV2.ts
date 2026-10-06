@@ -210,7 +210,11 @@ export function productSha256(value: string | Uint8Array): string {
 }
 
 function canonicalGzip(value: string): Buffer {
-  return gzipSync(Buffer.from(value, 'utf8'), { level: 9 });
+  const compressed = gzipSync(Buffer.from(value, 'utf8'), { level: 9 });
+  // RFC 1952 OS byte varies by host (Unix=3, Windows=10). The pinned
+  // baseline uses Unix; keep the header deterministic across platforms.
+  compressed[9] = 3;
+  return compressed;
 }
 
 function clone<T>(value: T): T {

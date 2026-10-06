@@ -89,7 +89,7 @@ function TitleBar({
       <div className="titlebar-drag" data-tauri-drag-region />
 
       <div className="titlebar-left">
-        <div className="titlebar-icon" title="Open FEM2D Studio">
+        <div className="titlebar-icon" title="FEM Vision Studio — Spanvision Infra">
           {/* Logo — gestyleerd portaal-frame met scharnier-opleggingen, FE-knopen
               en een doorbuigingscurve. Accent-tile + wit lijnwerk. */}
           <svg
@@ -98,7 +98,7 @@ function TitleBar({
             viewBox="0 0 64 64"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            aria-label="Open FEM2D Studio"
+            aria-label="FEM Vision Studio"
           >
             <rect x="0" y="0" width="64" height="64" rx="12" fill="var(--theme-accent)" />
             {/* Portaal-frame: kolommen + bovenligger */}
@@ -206,7 +206,7 @@ function TitleBar({
         {appVersion && <span className="titlebar-version">v{appVersion}</span>}
       </span>
 
-      <div className="titlebar-controls">
+      <div className="titlebar-controls" style={{ marginLeft: 'auto', marginRight: 96 }}>
         <button
           className="send-feedback-btn"
           onClick={onFeedbackClick}
@@ -214,7 +214,7 @@ function TitleBar({
         >
           {t("sendFeedback")}
         </button>
-        <button
+        {desktop && <button
           className="titlebar-button titlebar-minimize"
           onClick={() => { void windowAction("minimize"); }}
           disabled={!desktop}
@@ -225,9 +225,9 @@ function TitleBar({
           <svg width="10" height="1" viewBox="0 0 10 1">
             <rect width="10" height="1" fill="currentColor" />
           </svg>
-        </button>
+        </button>}
 
-        <button
+        {desktop && <button
           className="titlebar-button titlebar-maximize"
           onClick={() => { void windowAction("toggleMaximize"); }}
           disabled={!desktop}
@@ -245,9 +245,9 @@ function TitleBar({
               <rect x="0.5" y="0.5" width="9" height="9" fill="none" stroke="currentColor" strokeWidth="1.2" />
             </svg>
           )}
-        </button>
+        </button>}
 
-        <button
+        {desktop && <button
           className="titlebar-button titlebar-close"
           onClick={() => { void windowAction("close"); }}
           aria-label={t("close")}
@@ -257,7 +257,7 @@ function TitleBar({
             <line x1="0" y1="0" x2="10" y2="10" stroke="currentColor" strokeWidth="1.2" />
             <line x1="10" y1="0" x2="0" y2="10" stroke="currentColor" strokeWidth="1.2" />
           </svg>
-        </button>
+        </button>}
       </div>
     </div>
   );

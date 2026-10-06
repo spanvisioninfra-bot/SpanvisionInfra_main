@@ -1,3 +1,4 @@
+import { NEN_NAMES } from './nen1414Names.js';
 // IFC-mapping voor de statische NEN 1414-stempelsymbolen op het toolpalette.
 //
 // Elke entry: NEN-symbool-id (zonder 'nen1414-'-prefix) →
@@ -132,6 +133,12 @@ export const NEN_IFC_MAP = {
   'Tw28': { name: 'Watermotor gong', ifcCategory: 'IfcAlarm', ifcPredefinedType: 'BELL' },
 };
 
+// Preserve legacy PDF stamp names while sharing the current English catalog.
+for (const [id, entry] of Object.entries(NEN_IFC_MAP)) {
+  entry.legacyName = entry.name;
+  entry.name = NEN_NAMES[id] || entry.name;
+}
+
 // Toegestane IFC4-entiteiten voor deze mapping (validatie in de unittest en
 // vangnet bij het uitlezen van oudere/bewerkte PDF's).
 export const NEN_IFC_ALLOWED_CLASSES = Object.freeze([
@@ -165,6 +172,7 @@ const NAME_TO_ID = (() => {
   const m = new Map();
   for (const [id, entry] of Object.entries(NEN_IFC_MAP)) {
     if (!m.has(entry.name)) m.set(entry.name, id);
+    if (!m.has(entry.legacyName)) m.set(entry.legacyName, id);
   }
   return m;
 })();

@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-10-05T08:05:33.647Z",
+  "passed": true,
+  "checks": [
+    "actual PDF rendering",
+    "measurement in PDF points",
+    "zoom stability",
+    "page navigation",
+    "invalid file rejection"
+  ]
+}

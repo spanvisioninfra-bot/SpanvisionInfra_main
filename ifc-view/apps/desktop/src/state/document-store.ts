@@ -1,7 +1,8 @@
 import { createSignal } from 'solid-js';
 import * as THREE from 'three';
 import type { IFCElement, ParameterInfo } from '@spanvision-infra/ifc-core';
-import type { SphericalCoords } from '@spanvision-infra/viewer-engine';
+import { updateMeshVisibility, type SphericalCoords } from '@spanvision-infra/viewer-engine';
+import { canvasColor } from './appearance-store';
 
 import * as ifcStore from './ifc-store';
 import * as viewer from './viewer-store';
@@ -92,7 +93,7 @@ function captureSnapshot(): DocumentSnapshot {
     lastClickedIndex: selection.lastClickedIndex(),
     // player-store
     currentIndex: player.currentIndex(),
-    isPlaying: player.isPlaying(),
+    isPlaying: false,
     speed: player.speed(),
     sortedValues: player.sortedValues(),
     valueGroups: player.valueGroups(),
@@ -136,16 +137,30 @@ function restoreSnapshot(snap: DocumentSnapshot): void {
   selection.setLastClickedIndex(snap.lastClickedIndex);
   // player-store
   player.setCurrentIndex(snap.currentIndex);
-  player.setIsPlaying(snap.isPlaying);
+  player.setIsPlaying(false);
   player.setSpeed(snap.speed);
   player.setSortedValues(snap.sortedValues);
   player.setValueGroups(snap.valueGroups);
   player.setControlsEnabled(snap.controlsEnabled);
+  uiStore.setPropertyPanelOpen(false);
+  uiStore.setPropertyPanelData(null);
+  uiStore.setContextMenuVisible(false);
 }
 
 function setMeshesVisible(snap: DocumentSnapshot, visible: boolean): void {
   for (const mesh of snap.allMeshes) {
     mesh.visible = visible;
+  }
+  if (visible) {
+    updateMeshVisibility(snap.meshes, {
+      selectedExpressIds: snap.selectedExpressIds,
+      hiddenExpressIds: snap.hiddenExpressIds,
+      isolatedExpressIds: snap.isolatedExpressIds,
+      currentIndex: snap.currentIndex,
+      sortedValues: snap.sortedValues,
+      valueGroups: snap.valueGroups,
+      lightCanvas: parseInt(canvasColor().slice(1, 3), 16) > 128,
+    });
   }
 }
 

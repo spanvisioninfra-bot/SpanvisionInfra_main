@@ -34,7 +34,7 @@ function getCellValue(item: CostItem, key: string): string {
  */
 export function getGridCellDisplayValue(item: CostItem, colKey: string): string {
   const rt = item.rowType;
-  const isRegel = rt === "calc ";
+  const isRegel = rt === "regel";
   const isBgr = rt === 'begrotingspost';
   const isBwk = rt === 'bewakingspost';
 
@@ -43,10 +43,10 @@ export function getGridCellDisplayValue(item: CostItem, colKey: string): string 
       return '';
     case 'rowType': {
       switch (rt) {
-        case 'chapter': return "chapt";
+        case "chapter": return "chapt";
         case 'begrotingspost': return "est  ";
         case 'bewakingspost': return "mon  ";
-        case 'regel': return "calc ";
+        case 'regel': return "regel";
         case 'tekstregel': return "text ";
         case 'witregel': return "blank";
         default: return '';
@@ -79,7 +79,7 @@ export function getGridCellDisplayValue(item: CostItem, colKey: string): string 
     case 'unit':
       return (isBgr || isBwk || isRegel || rt === 'tekstregel') ? String(item.unit ?? '') : '';
     case 'verrekenbaar':
-      return rt === 'chapter' ? (item.verrekenbaar ?? '') : '';
+      return rt === "chapter" ? (item.verrekenbaar ?? '') : '';
     case 'normUnitPrice':
       return isRegel ? formatCurrency(item.normUnitPrice) : '';
     case 'unitPrice':

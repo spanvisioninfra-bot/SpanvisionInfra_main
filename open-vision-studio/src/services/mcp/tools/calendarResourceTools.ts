@@ -165,7 +165,7 @@ const CAL_READONLY_KEYS: string[] = [
 
 /** Het ECHTE domein van `generate.country` (holidays.ts + generateCalendarHolidays.ts). */
 const GEN_COUNTRIES: GeneratorCountry[] = ['NL', 'DE', 'BE', 'FR', 'UK', 'AT', 'CH', 'none'];
-const BOUWVAK_CHOICES = ["none", 'noord', 'midden', 'zuid'];
+const BOUWVAK_CHOICES = ['geen', 'noord', 'midden', 'zuid'];
 
 // ── DE KALENDER MOET ÉCHT OVERZETBAAR ZIJN ────────────────────────────────────────────────────────
 //
@@ -1114,7 +1114,7 @@ const updateCalendar: BatchStepTool = {
                     "`none` = geen feestdagenset: dat WIST de gegenereerde dagen (en de herkomst).",
                 },
                 region: { type: 'string', description: 'Bundesland/landsdeel/kanton; weglaten = landelijk.' },
-                bouwvak: { type: 'string', enum: ["none", 'noord', 'midden', 'zuid'], description: 'Alleen NL; default `geen`.' },
+                bouwvak: { type: 'string', enum: ['geen', 'noord', 'midden', 'zuid'], description: 'Dutch construction holiday break; `geen` means no break and is the default.' },
               },
             },
             holidaysMode: {

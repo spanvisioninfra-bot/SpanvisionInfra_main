@@ -1,0 +1,9 @@
+{
+  "command": "npm run check",
+  "directory": "vision-calculation-studio",
+  "started": "2026-10-05T12:19:28.466Z",
+  "finished": "2026-10-05T12:19:46.224Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/calculation-tests.log"
+}

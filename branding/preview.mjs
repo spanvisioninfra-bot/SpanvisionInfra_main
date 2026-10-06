@@ -13,6 +13,21 @@ export function serve(directory,port,hub=false,cad=false) {
    res.setHeader('Cache-Control','no-store');
    if(cad){res.setHeader('Cross-Origin-Opener-Policy','same-origin');res.setHeader('Cross-Origin-Embedder-Policy','require-corp');}
    if(hub&&req.url==='/__suite/status'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({modules:status}));return;}
+   if(port===brand.modules.find(item=>item.id==='fem')?.port && /^\/api\/(toetsing|doorsnede)$/.test(req.url)) {
+     if(req.method!=='POST'){res.writeHead(405,{'Allow':'POST'}).end();return;}
+     const upstream=http.request({hostname:'127.0.0.1',port:10000,path:req.url,method:'POST',headers:{'Content-Type':'application/json'}},reply=>{
+       res.writeHead(reply.statusCode||502,{'Content-Type':reply.headers['content-type']||'application/json'});
+       reply.pipe(res);
+     });
+     upstream.setTimeout(35000,()=>upstream.destroy(new Error('Calculation service timed out.')));
+     upstream.on('error',()=>{
+       if(res.headersSent){res.destroy();return;}
+       res.writeHead(503,{'Content-Type':'application/json'});
+       res.end(JSON.stringify({detail:'Start the FEM calculation API on port 10000 to run this check.'}));
+     });
+     req.on('aborted',()=>upstream.destroy());
+     req.pipe(upstream);return;
+   }
    if(req.url==='/__pointcloud/status'&&port===brand.modules.find(item=>item.id==='pointcloud')?.port){
      if([`http://127.0.0.1:${brand.hub.port}`,`http://localhost:${brand.hub.port}`].includes(req.headers.origin))res.setHeader('Access-Control-Allow-Origin',req.headers.origin);
      res.setHeader('Content-Type','application/json');res.end(JSON.stringify(status.find(item=>item.id==='pointcloud')));return;

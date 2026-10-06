@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-10-06T06:52:25.555Z",
+  "passed": true,
+  "checks": [
+    "Rectangle drawn through canvas mouse input",
+    "Light and dark canvas layout, dimensions and no page overflow",
+    "Browser SQL reads actual geometry and recovers after an invalid query",
+    "Downloaded project contains drawn geometry and saved SQL",
+    "Browser draft and selected theme survive reload",
+    "Downloaded .o2d reopens in a fresh page and queries restored geometry"
+  ],
+  "errors": []
+}

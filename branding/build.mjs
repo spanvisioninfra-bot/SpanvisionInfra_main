@@ -23,7 +23,6 @@ async function build(module) {
  console.log(`Building ${module.label}…`);
  if(module.kind==='studio') {
    const app=appDirectory(module);
-   if(module.id==='fem')await run(process.execPath,[path.join(cwd,'vendor/openaec-style-book/packages/tokens/build.js')],cwd,'fem-tokens');
    if(module.id==='calculation') {
      await run(process.execPath,[path.join(cwd,'node_modules/typescript/bin/tsc'),'-p','packages/core/tsconfig.json'],cwd,'calculation-core');
      const tsc=fs.existsSync(path.join(cwd,'packages/desktop/node_modules/typescript/bin/tsc'))?path.join(cwd,'packages/desktop/node_modules/typescript/bin/tsc'):path.join(cwd,'node_modules/typescript/bin/tsc');

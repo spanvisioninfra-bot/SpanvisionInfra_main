@@ -70,6 +70,7 @@ pass "browserlane isoleert twee worktrees en behoudt hun devmarkers (A=$BA, B=$B
 # De bewaakte browser-testserver houdt zijn eigen guard vast, stuurt SIGTERM
 # door naar de child, retourneert diens echte exitcode en maakt de guard vrij.
 mkdir -p "$TMP/wt-a/node_modules/.bin"
+mkdir -p "$TMP/wt-a/node_modules/vite/bin"
 node --input-type=module -e '
   import { writeFileSync } from "node:fs";
   writeFileSync(process.argv[1], `#!/usr/bin/env node
@@ -79,12 +80,18 @@ writeFileSync(
   process.env.OPS_DEV_PORT + ":" + process.env.OPS_DEV_INSTANCE + ":" + process.argv.slice(2).join(","),
 );
 process.on("SIGTERM", () => process.exit(23));
+if (process.env.OPS_FAKE_CHILD_STOP) {
+  const { existsSync } = await import("node:fs");
+  setInterval(() => { if (existsSync(process.env.OPS_FAKE_CHILD_STOP)) process.exit(23); }, 50);
+}
 setInterval(() => {}, 1000);
 `, { mode: 0o755 });
 ' "$TMP/wt-a/node_modules/.bin/vite" || fail "kon fake Vite-child niet maken"
+cp "$TMP/wt-a/node_modules/.bin/vite" "$TMP/wt-a/node_modules/vite/bin/vite.js"
+printf '{"type":"module"}\n' > "$TMP/wt-a/node_modules/vite/package.json"
 (
   cd "$TMP/wt-a" || exit 1
-  exec env OPS_BROWSER_TEST_PORT="$BA" OPS_FAKE_CHILD_READY="$TMP/browser-child-ready.txt" node scripts/browser-test-server.mjs
+  exec env OPS_BROWSER_TEST_PORT="$BA" OPS_FAKE_CHILD_READY="$TMP/browser-child-ready.txt" OPS_FAKE_CHILD_STOP="$TMP/browser-child-stop.txt" node scripts/browser-test-server.mjs
 ) >"$TMP/browser-server.txt" 2>&1 &
 BROWSER_SERVER_PID=$!
 for _ in $(seq 1 100); do
@@ -95,35 +102,41 @@ done
 [ -f "$TMP/browser-child-ready.txt" ] || fail "fake Vite-child werd niet gereed: $(cat "$TMP/browser-server.txt")"
 [ "$(cat "$TMP/browser-child-ready.txt")" = "$BA:wt-a-browser-test:--host,127.0.0.1" ] || fail "browser-server gaf verkeerde child-env/host door: $(cat "$TMP/browser-child-ready.txt")"
 node --input-type=module -e '
-  const locks = await import(process.argv[1]);
-  const ports = await import(process.argv[2]);
+  const { pathToFileURL } = await import("node:url");
+  const locks = await import(pathToFileURL(process.argv[1]).href);
+  const ports = await import(pathToFileURL(process.argv[2]).href);
   const root = ports.worktreeRoot(process.argv[3]);
   try { locks.acquireNamedGuardLock(root, Number(process.argv[4]), "browser"); process.exit(2); }
   catch { process.exit(0); }
-' "file://$TMP/wt-a/scripts/dev-lock.mjs" "file://$TMP/wt-a/scripts/dev-port.mjs" "$TMP/wt-a" "$BA" || fail "tweede browserguard werd niet geweigerd"
-kill -TERM "$BROWSER_SERVER_PID" || fail "kon browser-testserver niet stoppen"
+' "$TMP/wt-a/scripts/dev-lock.mjs" "$TMP/wt-a/scripts/dev-port.mjs" "$TMP/wt-a" "$BA" || fail "tweede browserguard werd niet geweigerd"
+if [ "$(node -p 'process.platform')" = win32 ]; then
+  touch "$TMP/browser-child-stop.txt"
+else
+  kill -TERM "$BROWSER_SERVER_PID" || fail "kon browser-testserver niet stoppen"
+fi
 wait "$BROWSER_SERVER_PID"
 BROWSER_SERVER_RC=$?
 [ "$BROWSER_SERVER_RC" -eq 23 ] || fail "browser-testserver verloor child-exitcode 23 (kreeg $BROWSER_SERVER_RC): $(cat "$TMP/browser-server.txt")"
 node --input-type=module -e '
-  const locks = await import(process.argv[1]);
-  const ports = await import(process.argv[2]);
+  const { pathToFileURL } = await import("node:url");
+  const locks = await import(pathToFileURL(process.argv[1]).href);
+  const ports = await import(pathToFileURL(process.argv[2]).href);
   const root = ports.worktreeRoot(process.argv[3]);
   const release = locks.acquireNamedGuardLock(root, Number(process.argv[4]), "browser");
   release();
-' "file://$TMP/wt-a/scripts/dev-lock.mjs" "file://$TMP/wt-a/scripts/dev-port.mjs" "$TMP/wt-a" "$BA" || fail "browserguard was na child-exit niet opnieuw claimbaar"
+' "$TMP/wt-a/scripts/dev-lock.mjs" "$TMP/wt-a/scripts/dev-port.mjs" "$TMP/wt-a" "$BA" || fail "browserguard was na child-exit niet opnieuw claimbaar"
 pass "browser-testserver bewaakt dubbelstart en ruimt child plus guard op"
 
 # Deel 3: dubbelstart-weigering (levend guard-slot → tweede claim gooit)
-node -e '
-import("'"$TMP"'/wt-a/scripts/dev-lock.mjs").then(async (m) => {
-  const p = await import("'"$TMP"'/wt-a/scripts/dev-port.mjs");
-  const root = p.worktreeRoot("'"$TMP"'/wt-a");
+node --input-type=module -e '
+import { pathToFileURL } from "node:url";
+const m = await import(pathToFileURL(process.argv[1]).href);
+  const p = await import(pathToFileURL(process.argv[2]).href);
+  const root = p.worktreeRoot(process.argv[3]);
   const rel = m.acquireGuardLock(root, 3099);
   try { m.acquireGuardLock(root, 3099); console.log("GEEN-WEIGERING"); process.exit(2); }
   catch { console.log("WEIGERING-OK"); rel(); process.exit(0); }
-});
-' >"$TMP/dbl.txt" 2>&1
+' "$TMP/wt-a/scripts/dev-lock.mjs" "$TMP/wt-a/scripts/dev-port.mjs" "$TMP/wt-a" >"$TMP/dbl.txt" 2>&1
 grep -q "WEIGERING-OK" "$TMP/dbl.txt" || fail "tweede bewaker werd niet geweigerd: $(cat "$TMP/dbl.txt")"
 pass "dubbelstart in hetzelfde worktree wordt geweigerd"
 

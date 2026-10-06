@@ -52,7 +52,7 @@ C().recordSessionHistoryEvent('G1', [{
 }]);
 
 eq('A1/B1/G1 leveren drie sessie-events', C().historyEvents.map(event => event.label),
-  ['Wijziging', 'Wijziging', 'G1']);
+  ['Change', 'Change', 'G1']);
 eq('De globale teller loopt onafhankelijk van documentwissels op', C().nextHistorySequence, 4);
 eq('Met B actief zijn B1 en G1 toepasbaar', historyDepthsForActiveScope(C()), { undoDepth: 2, redoDepth: 0 });
 C().undo();

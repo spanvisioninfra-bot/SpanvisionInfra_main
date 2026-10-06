@@ -134,17 +134,17 @@ function filterItems(items: CostItem[], view: ReportView): CostItem[] {
   if (view === 'werkbeschrijving') {
     // Hoofdstukken, posten én tekstregels (opmerkingen bij de posten)
     filtered = filtered.filter(item =>
-      item.rowType === 'chapter' || item.rowType === 'begrotingspost' || item.rowType === 'tekstregel'
+      item.rowType === "chapter" || item.rowType === 'begrotingspost' || item.rowType === 'tekstregel'
     );
   } else if (view === 'hoofdaanneming') {
     // Chapters, begrotingsposten en tekstregel (geen bewakingsposten/regels)
     filtered = filtered.filter(item =>
-      item.rowType === 'chapter' || item.rowType === 'begrotingspost' || item.rowType === 'tekstregel'
+      item.rowType === "chapter" || item.rowType === 'begrotingspost' || item.rowType === 'tekstregel'
     );
-  } else if (view === "subcontracting") {
+  } else if (view === "onderaanneming") {
     // Only chapters and begrotingsposten (subtotals only)
     filtered = filtered.filter(item =>
-      item.rowType === 'chapter' || item.rowType === 'begrotingspost'
+      item.rowType === "chapter" || item.rowType === 'begrotingspost'
     );
   }
 
@@ -175,7 +175,7 @@ function getCellValue(item: CostItem, key: string, ctx: ReportContext, fmt: Repo
  */
 export function itemsForReport(schedule: CostSchedule, items: CostItem[]): CostItem[] {
   if (!schedule.reportChapterTotalsOnly) return items;
-  return items.filter(i => i.rowType === 'chapter' || i.rowType.startsWith('staart_'));
+  return items.filter(i => i.rowType === "chapter" || i.rowType.startsWith('staart_'));
 }
 
 function buildHtml(
@@ -278,11 +278,11 @@ function buildHtml(
   for (let idx = 0; idx < normalItems.length; idx++) {
     const item = normalItems[idx];
 
-    if (item.rowType === 'chapter') {
+    if (item.rowType === "chapter") {
       const flushed = flushSubtotal();
       tableRows += flushed;
       // Witregel tussen groepen (als het subtotaal er niet al één gaf)
-      if (!flushed && cleanView && idx > 0 && normalItems[idx - 1].rowType !== 'chapter') {
+      if (!flushed && cleanView && idx > 0 && normalItems[idx - 1].rowType !== "chapter") {
         tableRows += `<tr class="spacer-row"><td colspan="${colCount}">&nbsp;</td></tr>`;
       }
     } else if (item.rowType === 'begrotingspost') {
@@ -294,7 +294,7 @@ function buildHtml(
     const indentStyle = indentPx > 0 ? ` style="padding-left:${indentPx}px"` : '';
     const zebraClass = rowNum % 2 === 0 ? 'even' : '';
 
-    if (item.rowType === 'chapter') {
+    if (item.rowType === "chapter") {
       const cells = columns.map(c => {
         if (c.key === 'description') return `<td class="desc"${indentStyle}>${escapeHtml(item.description)}</td>`;
         // Bij hoofdaanneming: geen totaal naast hoofdstuknaam

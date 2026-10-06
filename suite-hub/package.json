@@ -9,7 +9,10 @@
   },
   "dependencies": {
     "cobe": "2.0.1",
-    "solid-js": "^1.9.11"
+    "pdf-lib": "1.17.1",
+    "pdfjs-dist": "6.4.299",
+    "solid-js": "^1.9.11",
+    "tesseract.js": "7.0.0"
   },
   "devDependencies": {
     "vite": "^7.3.1",

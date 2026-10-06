@@ -28,7 +28,7 @@ import type { McpContext, McpToolDef, McpToolResult } from '../contracts';
 import { READ_ANNOTATIONS } from './helpers';
 
 /** Publieke basis-URL van de webbuild — de plek waar een agent gids en skill zelf kan downloaden. */
-export const GUIDE_PUBLIC_BASE = BRAND_SERVICES.publicBaseUrl;
+export const GUIDE_PUBLIC_BASE = BRAND_SERVICES.publicBaseUrl || 'https://spanvision-planner.vercel.app';
 
 /** De twee brontalen van de gids (zoals `SOURCE_LANGS` in `scripts/verify-docs.ts`). */
 export type GuideLanguage = 'nl' | 'en';
@@ -115,7 +115,7 @@ export const guideTools: McpToolDef[] = [
         language: {
           type: 'string',
           enum: ['nl', 'en'],
-          description: 'Language of the guide text. Default "en".',
+          description: 'English guide. Legacy "nl" requests also receive English.',
         },
         part: {
           type: 'string',
@@ -127,7 +127,7 @@ export const guideTools: McpToolDef[] = [
     annotations: READ_ANNOTATIONS,
     handler: async (args, ctx: McpContext): Promise<McpToolResult> => {
       const a = (args ?? {}) as { language?: GuideLanguage; part?: 'guide' | 'skill' | 'both' };
-      const language: GuideLanguage = a.language ?? 'en';
+      const language: GuideLanguage = 'en';
       const part = a.part ?? 'both';
       try {
         const data = await loadPlanningGuide(language, part);
@@ -139,8 +139,8 @@ export const guideTools: McpToolDef[] = [
         return toolError(
           ctx,
           'NOT_FOUND',
-          `De planningsgids kon niet uit de app-assets worden gelezen (${e instanceof Error ? e.message : String(e)}). ` +
-            `Download hem in plaats daarvan van ${info.guideUrl} (skill: ${info.skillUrl}).`,
+          `The planning guide could not be loaded (${e instanceof Error ? e.message : String(e)}). ` +
+            `Download it from ${info.guideUrl} (skill: ${info.skillUrl}).`,
         );
       }
     },

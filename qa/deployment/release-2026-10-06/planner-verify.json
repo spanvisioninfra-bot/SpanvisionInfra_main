@@ -1,0 +1,16 @@
+{
+  "command": "npm run verify",
+  "directory": "open-vision-studio",
+  "sourceCommit": "36aa5c04e5cd6470095365ae72b86c903dbd6e11",
+  "started": "2026-10-06T06:57:19.737Z",
+  "finished": "2026-10-06T07:16:12.845Z",
+  "passed": false,
+  "exitCode": 1,
+  "log": "qa/deployment/release-2026-10-06/planner-verify.log.gz",
+  "resourceConfiguration": {
+    "nodeOptions": "--max-old-space-size=1536",
+    "goMemoryLimit": "256MiB",
+    "goMaxProcs": "2",
+    "temporaryDirectory": "D:\\SpanvisionToolchain\\readiness\\browser-temp"
+  }
+}

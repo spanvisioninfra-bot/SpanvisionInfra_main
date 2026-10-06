@@ -91,7 +91,7 @@ export const GridCellEditor: React.FC<Props> = ({ item, colIndex, style, onCommi
   const descPaddingLeft = (() => {
     if (col.key !== 'description') return undefined;
     const base = gridView === 'wpcalc'
-      ? (item.rowType === 'chapter' && item.depth === 0 ? 4 : 4 + item.depth * 16)
+      ? (item.rowType === "chapter" && item.depth === 0 ? 4 : 4 + item.depth * 16)
       : item.depth * 16 + 4;
     return base + (isContainerRowType(item.rowType) ? 16 : 0);
   })();

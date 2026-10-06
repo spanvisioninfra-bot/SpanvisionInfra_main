@@ -12,7 +12,7 @@ export function importTradxml(xml: string): ImportResult {
   const warnings: string[] = [];
   const items: CostItem[] = [];
 
-  const kop = Array.from(root.children).find((c) => c.tagName === "Heading") as Element | undefined;
+  const kop = Array.from(root.children).find((c) => c.tagName === 'Kop') as Element | undefined;
   const name = getText(kop, 'Projectnaam') || 'IBIS import';
 
   const addChapter = (el: Element, parentId: string | null, depth: number): string => {
@@ -20,7 +20,7 @@ export function importTradxml(xml: string): ImportResult {
       parentId,
       sortOrder: items.length,
       depth,
-      rowType: 'chapter',
+      rowType: "chapter",
       code: el.getAttribute('code') ?? '',
       description: el.getAttribute('omschrijving') ?? '',
     });

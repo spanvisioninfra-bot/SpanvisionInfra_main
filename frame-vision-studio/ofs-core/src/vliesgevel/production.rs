@@ -200,7 +200,7 @@ mod tests {
 
     #[test]
     fn test_production_regular_grid() {
-        let vg = create_regular_grid(6000.0, 3600.0, 1500.0, 1200.0);
+        let vg = create_regular_grid(6000.0, 3600.0, 1500.0, 1200.0).unwrap();
         let prod = compute_vliesgevel_production(&vg);
 
         // 3 inner mullions + 2 edge mullions = 5

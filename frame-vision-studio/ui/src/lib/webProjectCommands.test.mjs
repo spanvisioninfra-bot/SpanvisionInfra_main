@@ -1,0 +1,134 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import * as wasm from '../../public/wasm/ofs_wasm.js';
+import { webProjectCommand } from './webProjectCommands.js';
+
+globalThis.window = globalThis;
+await wasm.default({ module_or_path: fs.readFileSync(new URL('../../public/wasm/ofs_wasm_bg.wasm', import.meta.url)) });
+test('curtain wall browser commands persist real geometry and use the UI member index names', () => {
+  wasm.new_project('Curtain wall regression', 'CW');
+  const run = (command, args = {}) => JSON.parse(wasm.execute_project_command(command, JSON.stringify(args)));
+  const wall = run('create_vliesgevel', { width: 6000, height: 3000, mullionSpacing: 2000, transomSpacing: 1500 });
+  assert.equal(wall.panels.length, 6);
+  const edited = run('vliesgevel_remove_mullion', { id: wall.id, mullionIndex: 0 });
+  assert.equal(edited.mullions.length, wall.mullions.length - 1);
+  const geometry = run('get_vliesgevel_geometry', { id: wall.id });
+  assert.equal(geometry.overallWidth, 6000);
+  assert.equal(geometry.overallHeight, 3000);
+  assert.equal(geometry.panelRects.length, edited.panels.length);
+  assert.ok(geometry.panelRects.every(panel => panel.width > 0 && panel.height > 0));
+  const production = run('get_vliesgevel_production', { id: wall.id });
+  assert.equal(production.glassList.length, edited.panels.length);
+  assert.ok(production.bom.length > 0);
+  const saved = wasm.save_project_json();
+  assert.throws(() => run('create_vliesgevel', { width: 6000, height: 3000, mullionSpacing: 0, transomSpacing: 1500 }), /positive member spacing/);
+  assert.equal(wasm.save_project_json(), saved);
+  assert.throws(() => run('vliesgevel_remove_transom', { id: wall.id, transomIndex: 999 }), /member not found/);
+  wasm.new_project('Empty', '');
+  wasm.open_project_json(saved);
+  assert.deepEqual(run('get_vliesgevel', { id: wall.id }), edited);
+});
+test('browser property edits survive the real Rust save/reopen path and preserve other frames', () => {
+  wasm.new_project('Edit regression', 'SV-1');
+  const frame = JSON.parse(wasm.create_kozijn('First', 'K1', 1200, 1500));
+  const other = wasm.create_kozijn('Second', 'K2', 1600, 1800);
+  webProjectCommand(wasm, 'update_grid_sizes', {id:frame.id, columnSizes:[900], rowSizes:[1100]});
+  webProjectCommand(wasm, 'update_frame_colors', {id:frame.id, colorInside:'RAL9005', colorOutside:'RAL9010'});
+  const glazing = {...frame.cells[0].glazing, thicknessMm:32};
+  webProjectCommand(wasm, 'update_cell_glazing', {id:frame.id, cellIndex:0, glazingJson:JSON.stringify(glazing)});
+  const pricing = {discountPercentage:5, btwPercentage:21, btwVerlegd:false, transportCost:100, montageCostPerHour:50, montageHours:2};
+  webProjectCommand(wasm, 'update_pricing_config', {configJson:JSON.stringify(pricing)});
+  const saved = wasm.save_project_json();
+  wasm.new_project('Blank', '');
+  wasm.open_project_json(saved);
+  const reopened = JSON.parse(wasm.get_kozijn(frame.id));
+  assert.equal(reopened.grid.columns[0].size, 900);
+  assert.equal(reopened.grid.rows[0].size, 1100);
+  assert.equal(reopened.frame.colorInside, 'RAL9005');
+  assert.equal(reopened.cells[0].glazing.thicknessMm, 32);
+  assert.deepEqual(webProjectCommand(wasm, 'get_pricing_config').value, pricing);
+  assert.deepEqual(JSON.parse(wasm.get_all_kozijnen())[1], JSON.parse(other));
+  const before = wasm.save_project_json();
+  assert.throws(() => webProjectCommand(wasm, 'update_cell_glazing', {id:frame.id, cellIndex:99, glazingJson:'{}'}), /Cell not found/);
+  assert.throws(() => webProjectCommand(wasm, 'update_grid_sizes', {id:frame.id, columnSizes:[NaN], rowSizes:[500]}), /finite/);
+  for (const invalid of [{...pricing,btwPercentage:101}, {...pricing,transportCost:-1}, {...pricing,montageHours:null}]) {
+    assert.throws(() => webProjectCommand(wasm,'update_pricing_config',{configJson:JSON.stringify(invalid)}), /finite non-negative/);
+  }
+  assert.equal(wasm.save_project_json(), before, 'rejected edits must not alter the engine state');
+});
+
+const core = (command, args = {}) => JSON.parse(wasm.execute_project_command(command, JSON.stringify(args)));
+test('reference quotation drafts use current frames and local project pricing without losing edits', () => {
+  wasm.new_project('Estimate regression','SV-EST');
+  assert.throws(() => core('create_quotation'),/Add a frame/);
+  const frame = JSON.parse(wasm.create_kozijn('Estimate frame','EST-1',1200.25,1500.5));
+  const config = {discountPercentage:10,btwPercentage:18,btwVerlegd:false,transportCost:25,montageCostPerHour:45,montageHours:2};
+  webProjectCommand(wasm,'update_pricing_config',{configJson:JSON.stringify(config)});
+  const subtotal = core('get_cost_estimate',{id:frame.id}).totalCost;
+  const draft = core('create_quotation');
+  assert.deepEqual(draft.kozijnMarks,['EST-1']);
+  assert.ok(Math.abs(draft.totalInclBtw - (subtotal*0.9+25+90)*1.18) < 1e-8);
+  const saved = wasm.save_project_json();
+  assert.throws(() => core('create_quotation',{kozijnMarks:[],totalInclBtw:0}),/Choose existing/);
+  assert.throws(() => core('create_quotation_revision',{quotationId:draft.id,newTotal:-1,changeDescription:'Invalid'}),/non-negative/);
+  assert.throws(() => core('create_quotation_revision',{quotationId:draft.id,newTotal:100,changeDescription:' '}),/Describe/);
+  assert.equal(wasm.save_project_json(),saved);
+  wasm.new_project('Blank',''); wasm.open_project_json(saved);
+  assert.deepEqual(core('get_quotations'),[draft]);
+  const exhausted = JSON.parse(saved);
+  exhausted.quotations[0].version = 4294967295;
+  wasm.open_project_json(JSON.stringify(exhausted));
+  const unchanged = wasm.save_project_json();
+  assert.throws(() => core('create_quotation_revision',{quotationId:draft.id,newTotal:100,changeDescription:'Maximum revision'}),/maximum revision/);
+  assert.equal(wasm.save_project_json(),unchanged);
+});
+test('real Rust browser calculations, production and quotation revisions persist', () => {
+  wasm.new_project('Production regression', 'SV-2');
+  const frame = JSON.parse(wasm.create_kozijn_from_template('single_turn_tilt', 1200, 1500));
+  const estimate = core('get_cost_estimate', {id:frame.id});
+  assert.ok(estimate.materialCost > 0 && estimate.glassCost > 0 && estimate.totalCost > 0);
+  const costs = ['materialCost','glassCost','hardwareCost','gasketCost','panelCost','surfaceTreatmentCost','laborCost'];
+  assert.ok(Math.abs(costs.reduce((sum, key) => sum + estimate[key], 0) - estimate.totalCost) < 0.01);
+  const cuts = core('optimize_project_cut_list', {stockLengthMm:5800});
+  assert.ok(cuts.totalBarsUsed > 0);
+  for (const bar of cuts.allocations) {
+    assert.ok(bar.remainingMm >= 0);
+    assert.ok(Math.abs(bar.cuts.reduce((sum, cut) => sum + cut.lengthMm + 4, 0) + bar.remainingMm - bar.stockLengthMm) < 1e-6);
+  }
+  assert.throws(() => core('optimize_project_cut_list', {stockLengthMm:100}), /does not fit/);
+  const plan = core('get_production_plan', {hoursPerDay:8, workers:2});
+  assert.ok(plan.totalHours > 0 && plan.estimatedDays > 0 && plan.jobs.length === 1);
+  assert.throws(() => core('get_production_plan', {hoursPerDay:0}), /positive/);
+  const files = core('export_cnc_gcode', {id:frame.id});
+  assert.ok(files.length > 0 && files.every(([filename,content]) => filename.endsWith('.nc') && content.length > 20));
+  const requirements = [{entityType:'IfcWindow',psetName:'Required',propertyName:'UnknownRequiredProperty',required:true}];
+  assert.ok(core('validate_project_ids', {requirementsJson:JSON.stringify(requirements)}).some(result => !result.passed));
+  const quotation = core('create_quotation', {kozijnMarks:[frame.mark], totalInclBtw:1000});
+  core('update_quotation_status', {quotationId:quotation.id,status:'sent'});
+  const revision = core('create_quotation_revision', {quotationId:quotation.id,newTotal:1200,changeDescription:'Added installation'});
+  assert.equal(revision.version, 2);
+  const saved = wasm.save_project_json(); wasm.new_project('Blank',''); wasm.open_project_json(saved);
+  const reopened = core('get_quotations');
+  assert.deepEqual(reopened.map(value => [value.status,value.totalInclBtw,value.version]), [['sent',1000,1],['draft',1200,2]]);
+});
+
+test('BCF topics and combined frames survive browser save/reopen and reject invalid references', () => {
+  wasm.new_project('Coordination regression', 'SV-3');
+  const first = JSON.parse(wasm.create_kozijn('First','K1',1200,1500));
+  const second = JSON.parse(wasm.create_kozijn('Second','K2',1200,1500));
+  const call = (command,args) => webProjectCommand(wasm,command,args).value;
+  const topic = call('create_bcf_topic',{title:'Review threshold',description:'Confirm installation detail'});
+  call('add_bcf_comment',{guid:topic.guid,author:'Engineer',comment:'Reviewed on site'});
+  call('update_bcf_topic_status',{guid:topic.guid,status:'Closed'});
+  const combination = call('create_combination',{name:'Elevation',mark:'E1'});
+  call('add_to_combination',{combinationId:combination.id,kozijnId:first.id,offsetX:0,offsetY:0});
+  call('add_to_combination',{combinationId:combination.id,kozijnId:second.id,offsetX:1200,offsetY:0});
+  call('add_coupling',{combinationId:combination.id,memberAId:first.id,memberBId:second.id,couplingType:'side_to_side',couplingWidth:20});
+  const saved = wasm.save_project_json(); wasm.new_project('Blank',''); wasm.open_project_json(saved);
+  assert.equal(call('get_bcf_topics')[0].comments[0].comment,'Reviewed on site');
+  assert.equal(call('get_bcf_topics')[0].status,'Closed');
+  assert.equal(call('get_combinations')[0].couplings.length,1);
+  assert.throws(() => call('add_to_combination',{combinationId:combination.id,kozijnId:first.id,offsetX:0,offsetY:0}), /already/);
+  assert.equal(wasm.save_project_json(),saved);
+});

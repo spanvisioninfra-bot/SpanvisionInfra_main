@@ -1,0 +1,9 @@
+{
+  "command": "node node_modules/vitest/vitest.mjs run --maxWorkers=1",
+  "directory": "calc-workspace",
+  "started": "2026-10-05T08:12:32.934Z",
+  "finished": "2026-10-05T08:16:22.208Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/calc-tests.log"
+}

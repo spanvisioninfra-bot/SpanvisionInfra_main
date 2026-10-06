@@ -249,7 +249,7 @@ export function generateIfcCostFile(schedule: CostSchedule, items: CostItem[], o
       entity: `IFCCOSTITEM('${item.ifcGuid}',#${ownerHistId},'${encodeStepString(item.code)}','${encodeStepString(item.description)}',$,$,$)`,
     });
 
-    if (item.rowType !== 'chapter') {
+    if (item.rowType !== "chapter") {
       const hasMaterial = item.materialPrice !== null && item.materialPrice !== 0;
       const hasLabor = item.laborPrice !== null && item.laborPrice !== 0;
 

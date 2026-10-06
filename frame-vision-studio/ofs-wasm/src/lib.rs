@@ -13,6 +13,79 @@ use ofs_core::production::compute_production_data;
 
 static PROJECT: Mutex<Option<Project>> = Mutex::new(None);
 
+/// Read the same explicit IFC dimensions and units as the Windows importer.
+#[wasm_bindgen]
+pub fn import_ifc_text(content: &str) -> Result<String, String> {
+    let result = ofs_core::import::ifc_import::parse_ifc_text(content)?;
+    serde_json::to_string(&result).map_err(|e| e.to_string())
+}
+
+#[wasm_bindgen]
+pub fn compare_ifc_text(old: &str, new: &str) -> Result<String, String> {
+    let old = ofs_core::import::ifc_import::parse_ifc_text(old)?;
+    let new = ofs_core::import::ifc_import::parse_ifc_text(new)?;
+    serde_json::to_string(&ofs_core::ifc_roundtrip::compare_ifc_imports(&old, &new)).map_err(|e| e.to_string())
+}
+
+#[wasm_bindgen]
+pub fn compare_project_ifc_text(content: &str) -> Result<String, String> {
+    let old = ofs_core::import::ifc_import::parse_ifc_text(content)?;
+    with_project(|p| {
+        let diff = ofs_core::ifc_roundtrip::compare_project_to_ifc(p, old)?;
+        serde_json::to_string(&diff).map_err(|e| e.to_string())
+    })?
+}
+
+#[wasm_bindgen]
+pub fn export_ifc_text(id: &str, lod: Option<String>) -> Result<String, String> {
+    use ofs_core::export::ifc::LodLevel;
+    let lod = match lod.as_deref().unwrap_or("300") {
+        "200" => LodLevel::Lod200, "300" => LodLevel::Lod300, "400" => LodLevel::Lod400,
+        _ => return Err("Choose IFC LOD 200, 300 or 400.".into()),
+    };
+    with_project(|p| {
+        let index = find_kozijn(p, id)?;
+        ofs_core::export::ifc::validate_ifc_export(&p.kozijnen[index], lod)?;
+        Ok(ofs_core::export::ifc::generate_ifc_text_with_lod(&p.kozijnen[index], lod))
+    })?
+}
+
+#[wasm_bindgen]
+pub fn export_dxf_text(id: &str) -> Result<String, String> {
+    with_project(|p| {
+        let index = find_kozijn(p, id)?;
+        ofs_core::export::dxf::generate_dxf_text(&p.kozijnen[index])
+    })?
+}
+
+#[wasm_bindgen]
+pub fn export_glb_bytes(id: &str) -> Result<Vec<u8>, String> {
+    with_project(|p| {
+        let index = find_kozijn(p, id)?;
+        ofs_core::export::gltf::generate_glb_bytes(&p.kozijnen[index])
+    })?
+}
+
+/// Downloadable PDFs and Excel files use exactly the native generators.
+#[wasm_bindgen]
+pub fn export_document_bytes(kind: &str, format: &str, id: Option<String>) -> Result<Vec<u8>, String> {
+    with_project(|p| {
+        match (kind, format) {
+            ("schedule", "pdf") => ofs_core::export::pdf::kozijnstaat_pdf_bytes(p),
+            ("schedule", "xlsx") => ofs_core::export::xlsx::kozijnstaat_xlsx_bytes(p),
+            ("workshop", "pdf") => {
+                let index = find_kozijn(p, id.as_deref().ok_or("Select a frame for its workshop drawing.")?)?;
+                ofs_core::export::pdf::workshop_pdf_bytes(&p.kozijnen[index],p)
+            },
+            ("production", "pdf") => ofs_core::export::pdf::production_pdf_bytes(&ofs_core::export::checked_project_production(p)?),
+            ("production", "xlsx") => ofs_core::export::xlsx::production_xlsx_bytes(&ofs_core::export::checked_project_production(p)?),
+            ("labels", "pdf") => ofs_core::export::pdf_labels::generate_labels_pdf(p,&Default::default()),
+            ("quotation", "pdf") => ofs_core::export::pdf_quotation::project_quotation_pdf_bytes(p),
+            _ => Err("Unsupported document format. Choose PDF or Excel for this export.".into()),
+        }
+    })?
+}
+
 fn with_project<F, R>(f: F) -> Result<R, String>
 where
     F: FnOnce(&mut Project) -> R,
@@ -49,7 +122,7 @@ pub fn new_project(name: &str, number: &str) -> Result<String, String> {
 
 #[wasm_bindgen]
 pub fn open_project_json(json: &str) -> Result<String, String> {
-    let project: Project = serde_json::from_str(json).map_err(|e| e.to_string())?;
+    let project = Project::from_document_json(json)?;
     let result = serde_json::to_string(&project).map_err(|e| e.to_string())?;
     let mut guard = PROJECT.lock().map_err(|e| e.to_string())?;
     *guard = Some(project);
@@ -492,6 +565,11 @@ pub fn get_custom_profiles() -> Result<String, String> {
     with_project(|p| serde_json::to_string(&p.custom_profiles).unwrap())
 }
 
+#[wasm_bindgen]
+pub fn add_custom_profile(profile_json: &str) -> Result<(), String> {
+    with_project(|p| ofs_core::profile::store_custom_profile(p, profile_json))?
+}
+
 // ── Geometry ───────────────────────────────────────────────────
 
 #[wasm_bindgen]
@@ -618,4 +696,191 @@ pub fn get_project_export_data() -> Result<String, String> {
         }).collect();
         serde_json::to_string(&data).unwrap()
     })
+}
+
+#[wasm_bindgen]
+pub fn export_production_csv_files() -> Result<String, String> {
+    with_project(|p| {
+        let data = ofs_core::export::checked_project_production(p)?;
+        serde_json::to_string(&ofs_core::export::csv_production::production_csv_files(&data)?).map_err(|e| e.to_string())
+    })?
+}
+
+/// Browser commands use the same calculation and production functions as Tauri.
+/// Returning JSON keeps the WASM interface stable without recreating algorithms in JS.
+#[wasm_bindgen]
+pub fn execute_project_command(command: &str, args_json: &str) -> Result<String, String> {
+    use serde_json::{json, Value};
+    use ofs_core::calculation::{estimate_cost, PriceTable};
+    let args: Value = serde_json::from_str(args_json).map_err(|e| e.to_string())?;
+    let text = |key: &str| args[key].as_str().ok_or_else(|| format!("Missing {key}"));
+    let number = |key: &str| args[key].as_f64().filter(|value| value.is_finite()).ok_or_else(|| format!("Missing finite {key}"));
+    let prices = || -> Result<PriceTable, String> {
+        match args["priceTableJson"].as_str() {
+            Some(value) => serde_json::from_str(value).map_err(|e| e.to_string()),
+            None => Ok(PriceTable::default()),
+        }
+    };
+    let value = with_project(|p| -> Result<Value, String> {
+        match command {
+            "get_cost_estimate" => {
+                let index = find_kozijn(p, text("id")?)?;
+                Ok(json!(estimate_cost(&p.kozijnen[index], &prices()?)))
+            }
+            "get_cost_estimate_project" => {
+                let table = prices()?;
+                Ok(json!(p.kozijnen.iter().map(|k| estimate_cost(k, &table)).collect::<Vec<_>>()))
+            }
+            "get_glass_library" => Ok(json!(ofs_core::glass_library::builtin_glass_library())),
+            "get_cnc_parts" | "export_cnc_gcode" => {
+                let index = find_kozijn(p, text("id")?)?;
+                let parts = ofs_core::cnc::generate_cnc_parts(&p.kozijnen[index]);
+                if command == "get_cnc_parts" { return Ok(json!(parts)); }
+                use ofs_core::cnc::postprocessor::CncPostProcessor;
+                Ok(json!(ofs_core::cnc::gcode::GenericGCode.generate(&parts)?))
+            }
+            "optimize_project_cut_list" => {
+                let stock = args["stockLengthMm"].as_f64().unwrap_or(5800.0);
+                if !stock.is_finite() || stock <= 4.0 { return Err("Stock length must exceed the saw kerf".into()); }
+                let pieces = p.kozijnen.iter().flat_map(|k| {
+                    let data = compute_production_data(k);
+                    data.cut_list.into_iter().map(move |cut| (cut.piece_id, data.kozijn_mark.clone(), cut.gross_length_mm))
+                }).collect();
+                Ok(json!(ofs_core::optimization::optimize_cut_list(pieces, stock, 4.0)?))
+            }
+            "get_production_plan" => {
+                let hours = args["hoursPerDay"].as_f64().unwrap_or(8.0);
+                let workers = args["workers"].as_u64().unwrap_or(2);
+                if !(0.0..=24.0).contains(&hours) || hours == 0.0 || workers == 0 || workers > 10000 {
+                    return Err("Use positive work hours (up to 24) and a valid worker count".into());
+                }
+                Ok(json!(ofs_core::planning::generate_production_plan(p, hours, workers as u32)))
+            }
+            "get_all_vliesgevels" => Ok(json!(p.vliesgevels)),
+            "create_vliesgevel" | "create_vliesgevel_from_template" => {
+                use ofs_core::vliesgevel::grid;
+                let width = number("width")?;
+                let height = number("height")?;
+                let mut wall = if command == "create_vliesgevel" {
+                    grid::create_regular_grid(width, height, number("mullionSpacing")?, number("transomSpacing")?)?
+                } else {
+                    match text("template")? {
+                        "stick_system" => grid::template_stick_system(width, height)?,
+                        "unitized" => grid::template_unitized(width, height)?,
+                        "shopfront" => grid::template_shopfront(width, height)?,
+                        _ => return Err("Unknown curtain wall template".into()),
+                    }
+                };
+                wall.name = args["name"].as_str().unwrap_or("Curtain wall").into();
+                wall.mark = args["mark"].as_str().unwrap_or("CW01").into();
+                p.vliesgevels.push(wall.clone());
+                Ok(json!(wall))
+            }
+            "get_vliesgevel" | "get_vliesgevel_geometry" | "get_vliesgevel_production" |
+            "remove_vliesgevel" | "vliesgevel_add_mullion" | "vliesgevel_add_transom" |
+            "vliesgevel_remove_mullion" | "vliesgevel_remove_transom" | "vliesgevel_update_panel" => {
+                let id: uuid::Uuid = text("id")?.parse().map_err(|e: uuid::Error| e.to_string())?;
+                let index = p.vliesgevels.iter().position(|v| v.id == id).ok_or("Curtain wall not found")?;
+                if command == "remove_vliesgevel" { p.vliesgevels.remove(index); return Ok(Value::Null); }
+                let wall = &mut p.vliesgevels[index];
+                match command {
+                    "get_vliesgevel_geometry" => return Ok(json!(ofs_core::vliesgevel::geometry::compute_vliesgevel_2d(wall))),
+                    "get_vliesgevel_production" => return Ok(json!(ofs_core::vliesgevel::production::compute_vliesgevel_production(wall))),
+                    "vliesgevel_add_mullion" | "vliesgevel_add_transom" => {
+                        let vertical = command == "vliesgevel_add_mullion";
+                        let position = number(if vertical { "xPosition" } else { "yPosition" })?;
+                        let limit = if vertical { wall.overall_width } else { wall.overall_height };
+                        if position <= 0.0 || position >= limit { return Err("Member position must lie inside the curtain wall".into()); }
+                        if (wall.num_cols() + 1) * (wall.num_rows() + 1) > 10000 { return Err("Curtain wall panel limit reached".into()); }
+                        if vertical { wall.add_mullion(position); } else { wall.add_transom(position); }
+                    }
+                    "vliesgevel_remove_mullion" | "vliesgevel_remove_transom" => {
+                        let vertical = command == "vliesgevel_remove_mullion";
+                        let key = if vertical { "mullionIndex" } else { "transomIndex" };
+                        let member = args[key].as_u64().or_else(|| args["index"].as_u64()).ok_or("Missing member index")? as usize;
+                        let count = if vertical { wall.mullions.len() } else { wall.transoms.len() };
+                        if member >= count { return Err("Curtain wall member not found".into()); }
+                        if vertical { wall.remove_mullion(member); } else { wall.remove_transom(member); }
+                    }
+                    "vliesgevel_update_panel" => {
+                        let col = args["col"].as_u64().ok_or("Missing panel column")? as usize;
+                        let row = args["row"].as_u64().ok_or("Missing panel row")? as usize;
+                        let panel_type = serde_json::from_value(args["panelType"].clone()).map_err(|e| e.to_string())?;
+                        let panel = wall.panel_at_mut(col, row).ok_or("Curtain wall panel not found")?;
+                        panel.panel_type = panel_type;
+                    }
+                    _ => {}
+                }
+                Ok(json!(wall))
+            }
+            "validate_project_ids" => {
+                use ofs_core::ids::{IdsRequirement, IdsCheckResult};
+                let requirements: Vec<IdsRequirement> = match args["requirementsJson"].as_str() {
+                    Some(value) => serde_json::from_str(value).map_err(|e| e.to_string())?,
+                    None => ofs_core::ids::default_ids_requirements(),
+                };
+                let mut results = Vec::new();
+                for k in &p.kozijnen {
+                    results.extend(ofs_core::ids::validate_kozijn(k, &p.custom_profiles, &requirements));
+                    let errors = ofs_core::validation::validate(k);
+                    results.push(IdsCheckResult { requirement: "Geometry.KVT".into(), kozijn_mark: k.mark.clone(),
+                        passed: errors.is_empty(), actual_value: None,
+                        message: if errors.is_empty() { "OK".into() } else { errors.iter().map(ToString::to_string).collect::<Vec<_>>().join("; ") } });
+                }
+                for vg in &p.vliesgevels {
+                    let errors = ofs_core::vliesgevel::validation::validate_vliesgevel(vg);
+                    results.push(IdsCheckResult { requirement: "CurtainWall.Geometry".into(), kozijn_mark: vg.mark.clone(),
+                        passed: errors.is_empty(), actual_value: None,
+                        message: if errors.is_empty() { "OK".into() } else { errors.iter().map(ToString::to_string).collect::<Vec<_>>().join("; ") } });
+                }
+                Ok(json!(results))
+            }
+            "auto_select_hardware" | "update_security_class" => {
+                let index = find_kozijn(p, text("id")?)?;
+                let k = &mut p.kozijnen[index];
+                let cell_index = args["cellIndex"].as_u64().ok_or("Missing cell index")? as usize;
+                if k.grid.columns.is_empty() { return Err("Frame grid is empty".into()); }
+                let cell = k.cells.get_mut(cell_index).ok_or("Cell not found")?;
+                let width = k.grid.columns.get(cell_index % k.grid.columns.len()).ok_or("Column not found")?.size;
+                let height = k.grid.rows.get(cell_index / k.grid.columns.len()).ok_or("Row not found")?.size;
+                let security = if command == "update_security_class" {
+                    serde_json::from_value(args["securityClass"].clone()).map_err(|e| e.to_string())?
+                } else { cell.hardware_set.as_ref().map(|h| h.security_class).unwrap_or_default() };
+                cell.hardware_set = ofs_core::hardware::default_hardware_set(cell.panel_type, cell.opening_direction,
+                    width, height, cell.glazing.thickness_mm, &k.frame.material, security);
+                Ok(json!(k))
+            }
+            "get_quotations" => Ok(json!(p.quotations)),
+            "create_quotation" => {
+                let quotation = if args["totalInclBtw"].is_null() && args["kozijnMarks"].is_null() {
+                    ofs_core::quotation::Quotation::from_project(p)?
+                } else {
+                    let total = args["totalInclBtw"].as_f64().ok_or("Missing quotation total")?;
+                    ofs_core::quotation::Quotation::validate_amount(total)?;
+                    let marks: Vec<String> = serde_json::from_value(args["kozijnMarks"].clone()).map_err(|e| e.to_string())?;
+                    if marks.is_empty() || marks.iter().any(|mark| !p.kozijnen.iter().any(|frame| &frame.mark == mark)) {
+                        return Err("Choose existing project frames before creating a quotation.".into());
+                    }
+                    ofs_core::quotation::Quotation::new_draft(marks, total)
+                };
+                p.quotations.push(quotation.clone()); Ok(json!(quotation))
+            }
+            "update_quotation_status" => {
+                let quotation = p.quotations.iter_mut().find(|q| q.id == text("quotationId").unwrap_or("")).ok_or("Quotation not found")?;
+                quotation.status = serde_json::from_value(args["status"].clone()).map_err(|e| e.to_string())?;
+                Ok(json!(quotation))
+            }
+            "create_quotation_revision" => {
+                let total = args["newTotal"].as_f64().ok_or("Missing quotation total")?;
+                ofs_core::quotation::Quotation::validate_amount(total)?;
+                if text("changeDescription")?.trim().is_empty() { return Err("Describe the quotation revision.".into()); }
+                let quotation = p.quotations.iter().find(|q| q.id == text("quotationId").unwrap_or("")).ok_or("Quotation not found")?;
+                if quotation.version == u32::MAX { return Err("This quotation has reached the maximum revision number.".into()); }
+                let revision = quotation.create_revision(total, text("changeDescription")?);
+                p.quotations.push(revision.clone()); Ok(json!(revision))
+            }
+            _ => Err(format!("Unsupported browser command: {command}")),
+        }
+    })??;
+    serde_json::to_string(&value).map_err(|e| e.to_string())
 }

@@ -6,18 +6,25 @@
   import { confirmUnsavedChanges } from "../../lib/project-actions.js";
   import { isDirty } from "../../stores/project.js";
   import { APP_VERSION } from "../../lib/version.js";
+  import { onDestroy } from 'svelte';
 
   let appWindow = null;
   let maximized = false;
   let platform = "windows";
   const isTauri = typeof window !== "undefined" && window.__TAURI_INTERNALS__;
+  let removeResizeListener, removeCloseListener;
+  onDestroy(() => { removeResizeListener?.(); removeCloseListener?.(); });
 
   if (isTauri) {
     import("@tauri-apps/api/window").then(async (mod) => {
       appWindow = mod.getCurrentWindow();
       maximized = await appWindow.isMaximized();
-      appWindow.onResized(async () => {
+      removeResizeListener = await appWindow.onResized(async () => {
         maximized = await appWindow.isMaximized();
+      });
+      removeCloseListener = await appWindow.onCloseRequested(async event => {
+        event.preventDefault();
+        await close();
       });
     });
     import("@tauri-apps/api/core").then(async (mod) => {

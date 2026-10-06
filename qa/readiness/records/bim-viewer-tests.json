@@ -1,0 +1,9 @@
+{
+  "command": "npm run test:run -- --maxWorkers=1",
+  "directory": "vision-bim-validator/viewer",
+  "started": "2026-10-05T04:37:57.480Z",
+  "finished": "2026-10-05T04:38:27.147Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/bim-viewer-tests.log"
+}

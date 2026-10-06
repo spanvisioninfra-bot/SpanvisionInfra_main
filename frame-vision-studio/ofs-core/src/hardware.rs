@@ -56,6 +56,11 @@ pub enum HingeType {
     Inboor,     // concealed bore-in hinge
     Verdekt,    // fully concealed hinge
 }
+impl HingeType {
+    pub fn label_en(&self) -> &'static str { match self {
+        Self::Opleg => "Surface-mounted hinge", Self::Inboor => "Bore-in hinge", Self::Verdekt => "Concealed hinge",
+    } }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -87,6 +92,12 @@ pub enum HandleType {
     KrukKruk,     // double lever (doors)
     StangenGreep, // bar handle (doors)
 }
+impl HandleType {
+    pub fn label_en(&self) -> &'static str { match self {
+        Self::Kruk => "Lever handle", Self::Knop => "Knob", Self::TGreep => "T-handle",
+        Self::InlaatGreep => "Flush pull", Self::KrukKruk => "Double lever handle", Self::StangenGreep => "Bar handle",
+    } }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -114,6 +125,12 @@ pub enum LockType {
     MultiPoint,     // multipoint lock (doors)
     CylinderLock,   // single cylinder
     SlidingLock,    // sliding door lock
+}
+impl LockType {
+    pub fn label_en(&self) -> &'static str { match self {
+        Self::Espagnolet => "Cremone bolt", Self::MultiPoint => "Multipoint lock",
+        Self::CylinderLock => "Cylinder lock", Self::SlidingLock => "Sliding lock",
+    } }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

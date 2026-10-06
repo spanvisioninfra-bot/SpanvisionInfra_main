@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "checks": [
+    "Production ZIP passes CRC and contains five independently readable CSV files with correct cut lengths",
+    "Every CNC file is explicitly labelled as a generic unverified preview"
+  ]
+}

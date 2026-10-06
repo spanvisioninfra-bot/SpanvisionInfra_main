@@ -11,7 +11,7 @@
 import { tokenizeContentStream } from '../../text/content-stream-text.js';
 
 // Pad-operatoren die vullen: f, F en f* vullen; B, B*, b en b* vullen en lijnen.
-const VUL_OPERATOREN = new Set(['f', 'F', 'f*', "V", 'B*', 'b', 'b*']);
+const VUL_OPERATOREN = new Set(['f', 'F', 'f*', 'B', 'B*', 'b', 'b*']);
 
 /**
  * @param {string} content  gedecodeerde content-stream van de appearance

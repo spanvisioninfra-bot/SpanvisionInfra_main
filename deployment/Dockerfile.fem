@@ -1,0 +1,14 @@
+FROM rust:1.98.1-bookworm AS engines
+WORKDIR /build
+COPY fem-vision-studio/src-tauri/ ./
+RUN cargo build --locked --release -p toetsbrug -p section-properties --bin toetsbrug --bin doorsnedemotor
+
+FROM python:3.12-slim-bookworm
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 SPANVISION_FEM_ENGINE_DIR=/engines
+WORKDIR /suite
+COPY deployment/ ./deployment/
+RUN pip install --no-cache-dir fastapi==0.142.2 uvicorn==0.54.0 && useradd --create-home --uid 10001 spanvision
+COPY --from=engines /build/target/release/toetsbrug /build/target/release/doorsnedemotor /engines/
+USER spanvision
+EXPOSE 10000
+CMD ["sh", "-c", "exec python -m uvicorn deployment.fem_api:app --host 0.0.0.0 --port ${PORT:-10000} --workers 1 --limit-concurrency 8 --backlog 16 --proxy-headers"]

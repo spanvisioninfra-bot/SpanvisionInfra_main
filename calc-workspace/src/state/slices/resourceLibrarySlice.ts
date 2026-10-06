@@ -16,7 +16,7 @@ export interface ResourceLibrarySlice {
 function mapCategoryToResourceType(category: string): ResourceType {
   const c = category.toUpperCase();
   if (c.includes('MANUREN') || c.includes('PERSONEEL')) return 'arbeid';
-  if (c.includes('MACHINE')) return "equipment";
+  if (c.includes('MACHINE')) return "materieel";
   if (c.includes('ONDERAANNEMING')) return 'onderaannemer';
   if (c.includes('ZAND') || c.includes('GRIND') || c.includes('PRODUKT') || c.includes('BESTRATING')) return 'materiaal';
   return 'overig';
@@ -26,23 +26,23 @@ function mapCategoryToResourceType(category: string): ResourceType {
 function mapLibraryUnit(unit: string): CostUnit {
   const u = unit.toLowerCase().trim();
   switch (u) {
-    case 'uur': return "hrs";
+    case 'uur': return "uur";
     case 'm': case 'm1': return 'm';
     case 'm2': return 'm²';
     case 'm3': return 'm³';
     case 'kg': return 'kg';
     case 'ton': return 'ton';
-    case 'st': case 'stuk': return "pcs";
-    case 'dag': case 'dgn': return "days";
+    case 'st': case 'stuk': return "st";
+    case 'dag': case 'dgn': return "dgn";
     case 'km': return 'km';
-    case 'week': return "wk";
-    case 'mnd': return "mo";
-    case 'post': return "item";
-    case 'ls': return "LS";
+    case 'week': return "week";
+    case 'mnd': return "mnd";
+    case 'post': return "post";
+    case 'ls': return "ls";
     case '%': return '%';
-    case 'pm': return "PM";
-    case 'keer': return "times";
-    default: return "pcs";
+    case 'pm': return "pm";
+    case 'keer': return "keer";
+    default: return "st";
   }
 }
 
@@ -57,7 +57,7 @@ function parseLibraryJson(json: unknown): ResourceLibraryItem[] {
     id: `lib-${i}-${String(r.code ?? '')}`,
     code: String(r.code ?? ''),
     description: String(r.description ?? ''),
-    unit: mapLibraryUnit(String(r.unit ?? "pcs")),
+    unit: mapLibraryUnit(String(r.unit ?? "st")),
     resourceType: mapCategoryToResourceType(String(r.category ?? '')),
     defaultUnitPrice: typeof r.defaultUnitPrice === 'number' ? r.defaultUnitPrice : null,
     category: r.subCategory ? String(r.subCategory) : String(r.category ?? ''),

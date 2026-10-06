@@ -31,7 +31,7 @@ function UrenFullScreen() {
   const urenData = useMemo(() => {
     const groups: Record<string, { uren: number; tarief: number }> = {};
     for (const item of items) {
-      if (item.rowType !== "calc ") continue;
+      if (item.rowType !== "regel") continue;
       const groep = item.tariefGroep || '-';
       if (!groups[groep]) {
         groups[groep] = { uren: 0, tarief: tarieven[groep] || 0 };
@@ -57,7 +57,7 @@ function UrenFullScreen() {
     // No-op if unchanged (avoid clobbering precision)
     if (Math.abs(num - currentUren) < 0.001) return;
     // Only A/B/C tariefgroepen are valid rescale targets; '-' (no group) is read-only
-    if (groep !== 'A' && groep !== "V" && groep !== 'C') return;
+    if (groep !== 'A' && groep !== "B" && groep !== 'C') return;
     pushHistory(items, t('grid:undo.hoursGroupProrate', { group: groep }));
     prorateUrenByTariefGroep(groep, num);
   };

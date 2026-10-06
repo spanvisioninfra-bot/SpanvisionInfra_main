@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "checkedAt": "2026-10-06T06:56:55.730Z",
+  "checks": [
+    "Actual two-page PDF opens and paints its page canvas",
+    "Rectangle drawn through mouse input; page and annotation canvases remain sized in both themes",
+    "Save As downloads a PDF retaining both pages, 90-degree page rotation and a bounded rectangle appearance",
+    "Downloaded annotated PDF reopens with its actual annotation",
+    "Cancelling the browser file picker preserves the open annotated document",
+    "Malformed PDF reports its failure and restores the active annotated document, including a non-adjacent tab",
+    "A malformed first import leaves no failed tab and a valid retry opens the actual saved annotation"
+  ],
+  "errors": []
+}

@@ -199,6 +199,81 @@ pub struct ProfileDefinition {
     /// JSON key: `glasinval`.
     #[serde(default)]
     pub glasinval: Option<f64>,
+    /// Preserve supplier/editor metadata (including decorative inner contours)
+    /// across project save/reopen without changing the calculation fields.
+    #[serde(flatten)]
+    pub catalog_metadata: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+/// Validate completely before replacing a stored profile. Saving an existing id
+/// updates that definition rather than accumulating ambiguous duplicate entries.
+pub fn store_custom_profile(project: &mut crate::kozijn::Project, json: &str) -> Result<(), String> {
+    if json.len() > 2 * 1024 * 1024 { return Err("Profile definition exceeds the 2 MB limit.".into()); }
+    let profile: ProfileDefinition = serde_json::from_str(json).map_err(|e| format!("Invalid profile: {e}"))?;
+    if profile.id.trim().is_empty() || profile.name.trim().is_empty() || profile.id.chars().any(char::is_control) {
+        return Err("Profile id and name are required.".into());
+    }
+    if ![profile.width, profile.depth, profile.uf_value].iter().all(|v| v.is_finite() && *v > 0.0)
+        || ![profile.sightline, profile.glazing_rebate].iter().all(|v| v.is_finite() && *v >= 0.0) {
+        return Err("Profile dimensions and thermal values must be finite and valid.".into());
+    }
+    if !(3..=10000).contains(&profile.cross_section.len())
+        || profile.cross_section.iter().flatten().any(|v| !v.is_finite()) {
+        return Err("A profile contour needs 3–10000 finite points.".into());
+    }
+    let origin = profile.cross_section[0];
+    let area: f64 = profile.cross_section.iter().zip(profile.cross_section.iter().cycle().skip(1))
+        .take(profile.cross_section.len()).map(|(a,b)|
+            (a[0]-origin[0])*(b[1]-origin[1]) - (b[0]-origin[0])*(a[1]-origin[1])).sum();
+    if !area.is_finite() || area.abs() < 1e-9 { return Err("Profile contour has no usable area.".into()); }
+    if let Some(rebate) = &profile.sponning {
+        if ![rebate.width, rebate.depth].iter().all(|v| v.is_finite() && *v >= 0.0) {
+            return Err("Profile rebate dimensions must be finite and nonnegative.".into());
+        }
+    }
+    if let Some(index) = project.custom_profiles.iter().position(|p| p.id == profile.id) {
+        project.custom_profiles[index] = profile;
+    } else {
+        if project.custom_profiles.len() >= 1000 { return Err("A project supports up to 1000 custom profiles.".into()); }
+        project.custom_profiles.push(profile);
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod persistence_tests {
+    fn profile() -> serde_json::Value {
+        serde_json::json!({"id":"CUSTOM-01","name":"Custom section","material":"wood",
+            "width":67,"depth":114,"sightline":55,"glazingRebate":17,"ufValue":1.8,
+            "crossSection":[[0,0],[67,0],[67,114],[0,114]],"applicableAs":["frame"],
+            "manufacturer":"Local workshop","innerWalls":[[[10,10],[20,10],[20,20]]],"series":"67"})
+    }
+    #[test]
+    fn profile_updates_and_editor_metadata_survive_project_roundtrip() {
+        let mut project = crate::kozijn::Project::new("Profile check", "");
+        let mut definition = profile();
+        super::store_custom_profile(&mut project, &definition.to_string()).unwrap();
+        definition["name"] = serde_json::json!("Updated section");
+        super::store_custom_profile(&mut project, &definition.to_string()).unwrap();
+        let reopened: crate::kozijn::Project = serde_json::from_str(&serde_json::to_string(&project).unwrap()).unwrap();
+        assert_eq!(reopened.custom_profiles.len(), 1);
+        assert_eq!(reopened.custom_profiles[0].name, "Updated section");
+        assert_eq!(reopened.custom_profiles[0].catalog_metadata["innerWalls"], definition["innerWalls"]);
+        assert_eq!(reopened.custom_profiles[0].catalog_metadata["manufacturer"], "Local workshop");
+    }
+    #[test]
+    fn invalid_replacement_preserves_the_saved_profile() {
+        let mut project = crate::kozijn::Project::new("Profile check", "");
+        let mut definition = profile();
+        super::store_custom_profile(&mut project, &definition.to_string()).unwrap();
+        let previous = serde_json::to_string(&project).unwrap();
+        definition["depth"] = serde_json::json!(-1);
+        assert!(super::store_custom_profile(&mut project, &definition.to_string()).is_err());
+        definition["depth"] = serde_json::json!(114);
+        definition["crossSection"] = serde_json::json!([[0,0],[1,1],[2,2]]);
+        assert!(super::store_custom_profile(&mut project, &definition.to_string()).is_err());
+        assert_eq!(serde_json::to_string(&project).unwrap(), previous);
+    }
 }
 
 /// Sponning type classification per KVT

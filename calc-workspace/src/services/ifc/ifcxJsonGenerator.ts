@@ -30,7 +30,7 @@ function mapResourceTypeToBreakdownKey(rt: string | null): string {
   switch (rt) {
     case 'materiaal': return 'material';
     case 'arbeid': return 'labor';
-    case 'materieel': return 'equipment';
+    case 'materieel': return "materieel";
     case 'onderaannemer': return 'subcontractor';
     default: return 'material';
   }
@@ -121,13 +121,13 @@ function buildBreakdown(item: CostItem): Record<string, unknown> | null {
     equipment: { amount: 0, percentage: 0 },
     subcontractor: { amount: 0, percentage: 0 },
     total: totalAmount,
-    unit: item.unit || "pcs",
+    unit: item.unit || "st",
   };
 
   // For resource rows (regels), set the right breakdown category
-  if (item.rowType === "calc " && item.resourceType) {
+  if (item.rowType === "regel" && item.resourceType) {
     const key = mapResourceTypeToBreakdownKey(item.resourceType);
-    if (key === 'equipment' || key === 'subcontractor') {
+    if (key === "materieel" || key === 'subcontractor') {
       (breakdown[key] as Record<string, unknown>).amount = materialAmount;
       (breakdown[key] as Record<string, unknown>).percentage =
         totalAmount > 0 ? Math.round((materialAmount / totalAmount) * 1000) / 10 : 0;
@@ -172,12 +172,12 @@ function buildCostItemNode(
   if (item.quantity != null && item.quantity !== 0) {
     attributes['bsi::ifc::prop::Quantity'] = {
       value: item.quantity,
-      unit: item.unit || "pcs",
+      unit: item.unit || "st",
     };
   }
 
   // Cost breakdown for non-chapter items
-  if (item.rowType !== 'chapter') {
+  if (item.rowType !== "chapter") {
     const breakdown = buildBreakdown(item);
     if (breakdown) {
       attributes['ifcx::cost::breakdown'] = breakdown;
@@ -210,7 +210,7 @@ function buildCostItemNode(
   }
 
   // Norm calculation fields (for 'regel' rows)
-  if (item.rowType === "calc ") {
+  if (item.rowType === "regel") {
     if (item.normQuantity != null || item.normFactor != null || item.normDivisor != null || item.normUnitPrice != null) {
       attributes['ifcx::ocs::normCalculation'] = {
         ...(item.normQuantity != null ? { quantity: item.normQuantity } : {}),

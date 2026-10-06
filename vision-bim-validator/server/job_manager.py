@@ -51,6 +51,8 @@ class JobInfo(BaseModel):
     progress: Optional[str] = Field(
         None, description="Progress message during processing"
     )
+    ifc_filename: Optional[str] = None
+    ids_filename: Optional[str] = None
 
     model_config = ConfigDict(use_enum_values=True)
 
@@ -249,6 +251,8 @@ class JobManager:
             job_id=job_id,
             status=JobStatus.PENDING,
             created_at=datetime.now(timezone.utc),
+            ifc_filename=ifc_filename,
+            ids_filename=ids_filename,
         )
         self._jobs[job_id] = job
         return job

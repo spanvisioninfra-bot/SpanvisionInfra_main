@@ -1,0 +1,9 @@
+{
+  "command": "npm test -- --maxWorkers=1",
+  "directory": "spanvision-2d-cad-workspace",
+  "started": "2026-10-05T17:54:47.730Z",
+  "finished": "2026-10-05T17:56:15.439Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/cad2d-tests.log"
+}

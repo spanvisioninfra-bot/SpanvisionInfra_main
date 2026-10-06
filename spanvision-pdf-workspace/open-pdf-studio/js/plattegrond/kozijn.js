@@ -83,7 +83,7 @@ export function kozijnMaten(soort, params = {}) {
   const aanslagMm = Math.min(Math.max(0, getal(params.aanslagMm) ?? 0), stijlBreedteMm);
   const spelingMm = Math.max(0, getal(params.binnenSpelingMm) ?? 0);
   const borstweringMm = getal(params.borstweringMm);
-  const draaiNaar = deur && params.draaiNaar === 'buiten' ? "outside" : 'binnen';
+  const draaiNaar = deur && params.draaiNaar === 'buiten' ? "buiten" : 'binnen';
   // `swing` is de draairichting (links/rechtsdraaiend): de kant van de
   // scharnieren gezien vanaf de kant waar de deur van WEG draait — zo deed
   // het oude deursymbool het al. Draait de deur naar buiten, dan kijk je

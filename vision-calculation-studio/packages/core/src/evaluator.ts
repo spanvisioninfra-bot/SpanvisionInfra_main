@@ -1,7 +1,20 @@
 import { create, all, type MathJsInstance, type MathNode } from 'mathjs';
 import type { AstNode, ConditionalNode, EvaluatedNode } from './types.js';
+import { steelTensionFromNumbers } from './steel-tension.js';
 
 const math: MathJsInstance = create(all, {});
+
+// The report and UI use the same checked engine. Invalid inputs suppress all
+// result/conclusion lines rather than falling through to an apparent pass.
+math.import({
+  steelTensionValid: (...args: number[]) => {
+    try { steelTensionFromNumbers(...args as [number, number, number, number, number, number]); return true; } catch { return false; }
+  },
+  steelTensionYield: (...args: number[]) => steelTensionFromNumbers(...args as [number, number, number, number, number, number]).yieldingCapacityKN,
+  steelTensionRupture: (...args: number[]) => steelTensionFromNumbers(...args as [number, number, number, number, number, number]).ruptureCapacityKN,
+  steelTensionCapacity: (...args: number[]) => steelTensionFromNumbers(...args as [number, number, number, number, number, number]).sectionCapacityKN,
+  steelTensionUtilization: (...args: number[]) => steelTensionFromNumbers(...args as [number, number, number, number, number, number]).utilization,
+});
 
 /**
  * Trigonometric input mode. Default is `rad` (mathjs native). When set to
@@ -390,6 +403,14 @@ function evaluateNodes(nodes: AstNode[], scope: Scope, selectValues: SelectValue
         // CalcPAD `?` prompt — pick the user-supplied value or fall back to the default.
         const raw = selectValues[node.name] ?? node.defaultValue;
         const fullExpr = node.unit ? `${raw} ${node.unit}` : raw;
+        // The bounded international engine accepts literal numeric SI inputs.
+        // Reject malformed saved values instead of parseFloat's partial "12abc".
+        if (node.name.startsWith('tension_')) {
+          const numeric = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(raw.trim()) ? Number(raw) : NaN;
+          scope[node.name] = numeric;
+          if (!node.hidden) result.push({ type: 'input-prompt', name: node.name, label: node.label, unit: node.unit, currentValue: raw });
+          break;
+        }
         try {
           scope[node.name] = math.evaluate(fullExpr, {});
         } catch {

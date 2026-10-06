@@ -1,0 +1,13 @@
+[package]
+name = "spanvision-pointcloud-core-tests"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license = "LGPL-3.0-or-later"
+
+# Compile the shipped native engine directly, without starting or substituting Tauri.
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+memmap2 = "0.9"
+laz = "0.9"
+tempfile = "3.27"

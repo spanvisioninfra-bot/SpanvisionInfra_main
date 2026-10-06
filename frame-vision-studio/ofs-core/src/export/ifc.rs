@@ -4,10 +4,9 @@
 //! (IfcExtrudedAreaSolid), and property sets including ILS Houten
 //! Kozijnen v2.0 compliance.
 //!
-//! Writes IFC-SPF (.ifc) text format directly — no external crate needed.
+//! Writes IFC-SPF (.ifc) text format directly â€” no external crate needed.
 
 use std::fmt::Write as FmtWrite;
-use std::io::Write;
 
 use crate::kozijn::{Kozijn, Material, PanelType, OpeningDirection, WoodType};
 
@@ -30,12 +29,104 @@ pub fn generate_ifc(kozijn: &Kozijn, output_path: &str) -> Result<(), String> {
 
 /// Generate an IFC4 file from a kozijn definition with a specific LOD level.
 pub fn generate_ifc_with_lod(kozijn: &Kozijn, output_path: &str, lod: LodLevel) -> Result<(), String> {
+    validate_ifc_export(kozijn, lod)?;
+    build_ifc_writer(kozijn, lod).write_to_file(output_path)
+}
+
+/// The same IFC document for browser downloads and native file exports.
+pub fn generate_ifc_text(kozijn: &Kozijn) -> String {
+    generate_ifc_text_with_lod(kozijn, LodLevel::default())
+}
+
+pub fn generate_ifc_text_with_lod(kozijn: &Kozijn, lod: LodLevel) -> String {
+    build_ifc_writer(kozijn, lod).to_step(&format!("{}.ifc", kozijn.mark))
+}
+
+/// Front-view outlines use millimetres and SVG Y-down; IFC uses metres and Z-up.
+fn add_member_solid(ifc: &mut IfcWriter, ring: &[[f64; 2]], height: f64,
+    depth: f64, offset: f64, name: &str, normal: &str, axis_x: &str, axis_z: &str) -> String {
+    let mut points: Vec<String> = ring.iter().map(|p| ifc.add_entity(&format!(
+        "IFCCARTESIANPOINT(({:.6},{:.6}))", p[0] / 1000.0, height - p[1] / 1000.0
+    ))).collect();
+    if ring.first() != ring.last() { points.push(points[0].clone()); }
+    let line = ifc.add_entity(&format!("IFCPOLYLINE(({}))", points.join(",")));
+    let profile = ifc.add_entity(&format!("IFCARBITRARYCLOSEDPROFILEDEF(.AREA.,'{}',{})", name, line));
+    let origin = ifc.add_entity(&format!("IFCCARTESIANPOINT((0.0,{:.6},0.0))", -offset));
+    let position = ifc.add_entity(&format!("IFCAXIS2PLACEMENT3D({},{},{})", origin, normal, axis_x));
+    ifc.add_entity(&format!("IFCEXTRUDEDAREASOLID({},{},{},{:.6})", profile, position, axis_z, depth))
+}
+
+fn add_infill_solids(ifc: &mut IfcWriter, kozijn: &Kozijn,
+    geometry: &crate::geometry::KozijnGeometry2D, height: f64, depth: f64,
+    normal: &str, axis_x: &str, axis_z: &str) -> Vec<String> {
+    let mut solids = Vec::new();
+    for area in &geometry.cell_rects {
+        let cell = kozijn.cells.get(area.cell_index);
+        let (glass, filling) = match area.vulling.as_ref() {
+            Some(crate::layout::Vakvulling::Buiten) => continue,
+            Some(crate::layout::Vakvulling::Paneel { filling }) => (false, filling.as_ref()),
+            Some(crate::layout::Vakvulling::Deur { .. } | crate::layout::Vakvulling::Rooster) => (false, None),
+            Some(_) => (true, None),
+            None => (!matches!(cell.map(|c| c.panel_type), Some(PanelType::Panel | PanelType::Door | PanelType::Ventilation)),
+                cell.and_then(|c| c.panel_filling.as_ref())),
+        };
+        let thickness = if glass { cell.map(|c| c.glazing.thickness_mm / 1000.0).unwrap_or(0.024) }
+            else { filling.map(|p| p.thickness_mm / 1000.0).unwrap_or(depth) };
+        let offset = filling.and_then(|p| p.setback_mm).map(|s| s / 1000.0).unwrap_or((depth - thickness) / 2.0);
+        let r = &area.rect;
+        let ring = vec![[r.x, r.y], [r.x + r.width, r.y], [r.x + r.width, r.y + r.height], [r.x, r.y + r.height]];
+        solids.push(add_member_solid(ifc, &ring, height, thickness, offset,
+            &format!("{}{}", if glass { "Glazing" } else { "Infill" }, area.cell_index + 1), normal, axis_x, axis_z));
+    }
+    solids
+}
+
+/// Reject invalid solids rather than producing a malformed or misleading file.
+pub fn validate_ifc_export(kozijn: &Kozijn, lod: LodLevel) -> Result<(), String> {
+    let frame = &kozijn.frame;
+    for (name, value) in [("width", frame.outer_width), ("height", frame.outer_height),
+        ("depth", frame.frame_depth), ("member width", frame.frame_width)] {
+        if !value.is_finite() || value <= 0.0 { return Err(format!("IFC export requires a finite positive frame {name}.")); }
+    }
+    if lod == LodLevel::Lod200 { return Ok(()); }
+    if frame.shape.shape_type != crate::kozijn::ShapeType::Rectangular {
+        return Err("Detailed IFC export currently supports rectangular frames. Use LOD 200 for a bounding envelope of other shapes.".into());
+    }
+    if frame.outer_width <= 2.0 * frame.frame_width || frame.outer_height <= 2.0 * frame.frame_width {
+        return Err("Frame members leave no positive opening; reduce member width or increase overall dimensions.".into());
+    }
+    if kozijn.grid.columns.is_empty() || kozijn.grid.rows.is_empty() ||
+        kozijn.grid.columns.len().saturating_mul(kozijn.grid.rows.len()) > 5000 {
+        return Err("IFC export requires a valid grid with at most 5,000 cells.".into());
+    }
+    if kozijn.grid.columns.iter().chain(kozijn.grid.rows.iter()).any(|d| !d.size.is_finite() || d.size <= 0.0) {
+        return Err("IFC export requires finite positive cell dimensions.".into());
+    }
+    for cell in &kozijn.cells {
+        if !cell.glazing.thickness_mm.is_finite() || cell.glazing.thickness_mm <= 0.0 {
+            return Err("IFC export requires finite positive glazing thickness.".into());
+        }
+        if let Some(fill) = &cell.panel_filling {
+            if !fill.thickness_mm.is_finite() || fill.thickness_mm <= 0.0 || fill.setback_mm.is_some_and(|v| !v.is_finite()) {
+                return Err("IFC export requires finite positive infill thickness and finite setback.".into());
+            }
+        }
+    }
+    let geometry = crate::geometry::compute_2d_geometry(kozijn);
+    if geometry.cell_rects.iter().any(|c| [c.rect.x, c.rect.y, c.rect.width, c.rect.height].iter().any(|v| !v.is_finite()) || c.rect.width <= 0.0 || c.rect.height <= 0.0) {
+        return Err("IFC export found an invalid modeled cell outline.".into());
+    }
+    Ok(())
+}
+
+fn build_ifc_writer(kozijn: &Kozijn, lod: LodLevel) -> IfcWriter {
     let mut ifc = IfcWriter::new(&kozijn.id);
 
     let frame = &kozijn.frame;
     let cells = &kozijn.cells;
 
-    let has_door = cells.iter().any(|c| c.panel_type == PanelType::Door);
+    let has_door = cells.iter().any(|c| c.panel_type == PanelType::Door) ||
+        crate::geometry::compute_2d_geometry(kozijn).cell_rects.iter().any(|c| matches!(c.vulling, Some(crate::layout::Vakvulling::Deur { .. })));
     let ifc_class = if has_door { "IFCDOOR" } else { "IFCWINDOW" };
 
     // Dimensions in meters
@@ -47,19 +138,23 @@ pub fn generate_ifc_with_lod(kozijn: &Kozijn, output_path: &str, lod: LodLevel) 
     let owner_history = ifc.add_owner_history();
     let units = ifc.add_si_units();
 
-    // ── Geometry context ───────────────────────────────────────
+    // â”€â”€ Geometry context â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Created before the project record so IFCPROJECT can reference
     // it in RepresentationContexts (attribute 8).
 
     let origin_3d = ifc.add_entity("IFCCARTESIANPOINT((0.0,0.0,0.0))");
     let axis_z = ifc.add_entity("IFCDIRECTION((0.0,0.0,1.0))");
     let axis_x = ifc.add_entity("IFCDIRECTION((1.0,0.0,0.0))");
+    // Profiles use X for width and Y for height. Rotate their plane into
+    // world X/Z; extrusion then runs along negative world Y (frame depth).
+    let profile_normal = ifc.add_entity("IFCDIRECTION((0.0,-1.0,0.0))");
     let placement_3d = ifc.add_entity(&format!(
         "IFCAXIS2PLACEMENT3D({},{},{})",
         origin_3d, axis_z, axis_x
     ));
 
-    let true_north = ifc.add_entity("IFCDIRECTION((0.0,1.0,0.0))");
+    // IFC requires a two-dimensional TrueNorth direction, even in a 3D context.
+    let true_north = ifc.add_entity("IFCDIRECTION((0.0,1.0))");
     let context = ifc.add_entity(&format!(
         "IFCGEOMETRICREPRESENTATIONCONTEXT($,'Model',3,1.0E-5,{},{})",
         placement_3d, true_north
@@ -70,7 +165,7 @@ pub fn generate_ifc_with_lod(kozijn: &Kozijn, output_path: &str, lod: LodLevel) 
         context, "$"
     ));
 
-    // ── Spatial hierarchy ──────────────────────────────────────
+    // â”€â”€ Spatial hierarchy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     let guid_proj = ifc.guid();
     let project = ifc.add_entity(&format!(
@@ -80,17 +175,17 @@ pub fn generate_ifc_with_lod(kozijn: &Kozijn, output_path: &str, lod: LodLevel) 
 
     let guid_site = ifc.guid();
     let site = ifc.add_entity(&format!(
-        "IFCSITE('{}',{},'Bouwlocatie',$,$,$,$,$,.ELEMENT.,$,$,$,$,$)",
+        "IFCSITE('{}',{},'Site',$,$,$,$,$,.ELEMENT.,$,$,$,$,$)",
         guid_site, owner_history
     ));
     let guid_bldg = ifc.guid();
     let building = ifc.add_entity(&format!(
-        "IFCBUILDING('{}',{},'Gebouw',$,$,$,$,$,.ELEMENT.,$,$,$)",
+        "IFCBUILDING('{}',{},'Building',$,$,$,$,$,.ELEMENT.,$,$,$)",
         guid_bldg, owner_history
     ));
     let guid_stor = ifc.guid();
     let storey = ifc.add_entity(&format!(
-        "IFCBUILDINGSTOREY('{}',{},'Begane grond',$,$,$,$,$,.ELEMENT.,0.0)",
+        "IFCBUILDINGSTOREY('{}',{},'Ground floor',$,$,$,$,$,.ELEMENT.,0.0)",
         guid_stor, owner_history
     ));
 
@@ -99,7 +194,7 @@ pub fn generate_ifc_with_lod(kozijn: &Kozijn, output_path: &str, lod: LodLevel) 
     ifc.add_rel_aggregates(&owner_history, "SiteBuilding", &site, &[building.clone()]);
     ifc.add_rel_aggregates(&owner_history, "BuildingStorey", &building, &[storey.clone()]);
 
-    // ── Frame geometry (LOD-dependent) ──────────────────────────
+    // â”€â”€ Frame geometry (LOD-dependent) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     let product_shape = match lod {
         LodLevel::Lod200 => {
@@ -124,7 +219,7 @@ pub fn generate_ifc_with_lod(kozijn: &Kozijn, output_path: &str, lod: LodLevel) 
             ));
             let box_placement = ifc.add_entity(&format!(
                 "IFCAXIS2PLACEMENT3D({},{},{})",
-                origin_3d, axis_z, axis_x
+                origin_3d, profile_normal, axis_x
             ));
             let box_extrusion = ifc.add_entity(&format!(
                 "IFCEXTRUDEDAREASOLID({},{},{},{:.6})",
@@ -139,8 +234,35 @@ pub fn generate_ifc_with_lod(kozijn: &Kozijn, output_path: &str, lod: LodLevel) 
                 shape_rep
             ))
         }
-        LodLevel::Lod300 | LodLevel::Lod400 => {
-            // Frame + glass (current behavior); Lod400 same as 300 for now
+        LodLevel::Lod400 => {
+            // Export the actual modeled joint/layout outlines separately.
+            // Unspecified machining and hardware are not fabricated here.
+            let geometry = crate::geometry::compute_2d_geometry(kozijn);
+            let rect_ring = |r: &crate::geometry::Rect2D| vec![
+                [r.x, r.y], [r.x + r.width, r.y],
+                [r.x + r.width, r.y + r.height], [r.x, r.y + r.height],
+            ];
+            let mut outlines = if geometry.frame_polygons.is_empty() {
+                geometry.frame_rects.iter().filter(|r| r.width > 0.0 && r.height > 0.0)
+                    .map(rect_ring).collect::<Vec<_>>()
+            } else { geometry.frame_polygons.clone() };
+            if !geometry.arch_band.is_empty() { outlines.push(geometry.arch_band.clone()); }
+            outlines.extend(geometry.h_dividers.iter().chain(geometry.v_dividers.iter())
+                .filter(|r| r.width > 0.0 && r.height > 0.0).map(rect_ring));
+            let mut members = Vec::new();
+            for (index, ring) in outlines.iter().enumerate() {
+                members.push(add_member_solid(&mut ifc, ring, height_m, depth_m, 0.0,
+                    &format!("Member{}", index + 1), &profile_normal, &axis_x, &axis_z));
+            }
+            members.extend(add_infill_solids(&mut ifc, kozijn, &geometry, height_m, depth_m,
+                &profile_normal, &axis_x, &axis_z));
+            let rep = ifc.add_entity(&format!(
+                "IFCSHAPEREPRESENTATION({},'Body','SweptSolid',({}))", body_context, members.join(",")
+            ));
+            ifc.add_entity(&format!("IFCPRODUCTDEFINITIONSHAPE($,$,({}))", rep))
+        }
+        LodLevel::Lod300 => {
+            // Simplified frame and infill envelope.
             // Outer profile polyline
             let outer_pts: Vec<String> = [
                 (0.0, 0.0),
@@ -180,57 +302,21 @@ pub fn generate_ifc_with_lod(kozijn: &Kozijn, output_path: &str, lod: LodLevel) 
 
             let extrusion_placement = ifc.add_entity(&format!(
                 "IFCAXIS2PLACEMENT3D({},{},{})",
-                origin_3d, axis_z, axis_x
+                origin_3d, profile_normal, axis_x
             ));
             let extrusion = ifc.add_entity(&format!(
                 "IFCEXTRUDEDAREASOLID({},{},{},{:.6})",
                 profile, extrusion_placement, axis_z, depth_m
             ));
 
-            // Glass panel geometry
-            let glass_pts: Vec<String> = [
-                (fw_m, fw_m),
-                (width_m - fw_m, fw_m),
-                (width_m - fw_m, height_m - fw_m),
-                (fw_m, height_m - fw_m),
-                (fw_m, fw_m),
-            ]
-            .iter()
-            .map(|(x, y)| ifc.add_entity(&format!("IFCCARTESIANPOINT(({:.6},{:.6}))", x, y)))
-            .collect();
-            let glass_polyline = ifc.add_entity(&format!(
-                "IFCPOLYLINE(({}))",
-                glass_pts.iter().map(|s| s.as_str()).collect::<Vec<_>>().join(",")
-            ));
-            let glass_profile = ifc.add_entity(&format!(
-                "IFCARBITRARYCLOSEDPROFILEDEF(.AREA.,'GlassProfile',{})",
-                glass_polyline
-            ));
-
-            let glass_thickness = 0.024; // 24mm
-            let glass_offset = (depth_m - glass_thickness) / 2.0;
-            let glass_origin = ifc.add_entity(&format!(
-                "IFCCARTESIANPOINT((0.0,0.0,{:.6}))",
-                glass_offset
-            ));
-            let glass_placement = ifc.add_entity(&format!(
-                "IFCAXIS2PLACEMENT3D({},{},{})",
-                glass_origin, axis_z, axis_x
-            ));
-            let glass_extrusion = ifc.add_entity(&format!(
-                "IFCEXTRUDEDAREASOLID({},{},{},{:.6})",
-                glass_profile, glass_placement, axis_z, glass_thickness
-            ));
-
-            // Shape representation
+            let geometry = crate::geometry::compute_2d_geometry(kozijn);
+            let mut solids = vec![extrusion];
+            solids.extend(add_infill_solids(&mut ifc, kozijn, &geometry, height_m, depth_m,
+                &profile_normal, &axis_x, &axis_z));
             let shape_rep = ifc.add_entity(&format!(
-                "IFCSHAPEREPRESENTATION({},'Body','SweptSolid',({},{}))",
-                body_context, extrusion, glass_extrusion
+                "IFCSHAPEREPRESENTATION({},'Body','SweptSolid',({}))", body_context, solids.join(",")
             ));
-            ifc.add_entity(&format!(
-                "IFCPRODUCTDEFINITIONSHAPE($,$,({}))",
-                shape_rep
-            ))
+            ifc.add_entity(&format!("IFCPRODUCTDEFINITIONSHAPE($,$,({}))", shape_rep))
         }
     };
 
@@ -244,7 +330,7 @@ pub fn generate_ifc_with_lod(kozijn: &Kozijn, output_path: &str, lod: LodLevel) 
         placement_axis
     ));
 
-    // ── Element ────────────────────────────────────────────────
+    // â”€â”€ Element â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     // Derive the element GlobalId from the kozijn UUID so exports are
     // stable across runs (BCF references, roundtrip re-import).
@@ -275,16 +361,15 @@ pub fn generate_ifc_with_lod(kozijn: &Kozijn, output_path: &str, lod: LodLevel) 
         guid_rel, owner_history, element, storey
     ));
 
-    // ── Property sets ──────────────────────────────────────────
+    // â”€â”€ Property sets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     add_standard_psets(&mut ifc, &owner_history, &element, kozijn);
     add_ils_psets(&mut ifc, &owner_history, &element, kozijn);
 
-    // Write file
-    ifc.write_to_file(output_path)
+    ifc
 }
 
-// ── Standard property sets ─────────────────────────────────────
+// â”€â”€ Standard property sets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 fn add_standard_psets(ifc: &mut IfcWriter, oh: &str, element: &str, kozijn: &Kozijn) {
     let frame = &kozijn.frame;
@@ -363,7 +448,7 @@ fn add_standard_psets(ifc: &mut IfcWriter, oh: &str, element: &str, kozijn: &Koz
     ifc.add_property_set(oh, "Pset_OFS_Kozijn", element, &ofs_props);
 }
 
-// ── ILS Houten Kozijnen v2.0 property sets ─────────────────────
+// â”€â”€ ILS Houten Kozijnen v2.0 property sets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 fn add_ils_psets(ifc: &mut IfcWriter, oh: &str, element: &str, kozijn: &Kozijn) {
     let frame = &kozijn.frame;
@@ -688,7 +773,7 @@ fn add_ils_psets(ifc: &mut IfcWriter, oh: &str, element: &str, kozijn: &Kozijn) 
     }
 }
 
-// ── Helper functions ───────────────────────────────────────────
+// â”€â”€ Helper functions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Escape a string for embedding in a STEP (ISO 10303-21) string
 /// literal: backslashes and apostrophes are doubled.
@@ -834,7 +919,7 @@ fn calc_locking_points(kozijn: &Kozijn, cell_index: usize) -> i64 {
     (perimeter / 400.0).round().max(2.0) as i64
 }
 
-// ── IFC-SPF writer ─────────────────────────────────────────────
+// â”€â”€ IFC-SPF writer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 struct IfcWriter {
     entities: Vec<String>,
@@ -863,9 +948,9 @@ impl IfcWriter {
 
     /// Deterministic IFC GlobalId (22 chars, first char always 0-3).
     ///
-    /// Mixes the seed UUID with an incrementing counter — multiplying by
+    /// Mixes the seed UUID with an incrementing counter â€” multiplying by
     /// an odd constant is a bijection mod 2^128, so distinct counters
-    /// yield distinct GUIDs — and encodes the result MSB-first via
+    /// yield distinct GUIDs â€” and encodes the result MSB-first via
     /// `uuid_to_ifc_guid`, which keeps the leading character within the
     /// spec range 0-3. Deterministic, so repeated exports of the same
     /// kozijn produce identical files. (The workspace `uuid` crate has
@@ -879,7 +964,7 @@ impl IfcWriter {
 
     fn add_owner_history(&mut self) -> String {
         let person = self.add_entity("IFCPERSON($,$,'Frame Vision Studio',$,$,$,$,$)");
-        let org = self.add_entity("IFCORGANIZATION($,'Spanvision infra',$,$,$)");
+        let org = self.add_entity("IFCORGANIZATION($,'Spanvision Infra',$,$,$)");
         let person_org = self.add_entity(&format!(
             "IFCPERSONANDORGANIZATION({},{},$)",
             person, org
@@ -963,6 +1048,11 @@ impl IfcWriter {
     }
 
     fn write_to_file(&self, output_path: &str) -> Result<(), String> {
+        let text = self.to_step(output_path);
+        super::write_export_bytes(output_path, text.as_bytes())
+    }
+
+    fn to_step(&self, output_path: &str) -> String {
         let mut out = String::with_capacity(self.entities.len() * 100);
 
         // ISO header
@@ -974,7 +1064,7 @@ impl IfcWriter {
         );
         let _ = writeln!(
             out,
-            "FILE_NAME('{}','',('Frame Vision Studio'),('Spanvision infra'),'','Frame Vision Studio','');",
+            "FILE_NAME('{}','',('Frame Vision Studio'),('Spanvision Infra'),'','Frame Vision Studio','');",
             step_str(&output_path.replace('\\', "/"))
         );
         let _ = writeln!(out, "FILE_SCHEMA(('IFC4'));");
@@ -988,20 +1078,71 @@ impl IfcWriter {
         let _ = writeln!(out, "ENDSEC;");
         let _ = writeln!(out, "END-ISO-10303-21;");
 
-        let mut file = std::fs::File::create(output_path)
-            .map_err(|e| format!("Kan IFC bestand niet aanmaken: {}", e))?;
-        file.write_all(out.as_bytes())
-            .map_err(|e| format!("Kan IFC niet schrijven: {}", e))?;
-
-        Ok(())
+        out
     }
 }
 
-// ── Tests ──────────────────────────────────────────────────────
+// â”€â”€ Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn rejects_invalid_solids_and_unrepresented_detailed_shapes() {
+        let mut frame = Kozijn::new("Safe export", "SAFE", 900.0, 2100.0);
+        frame.frame.frame_width = 450.0;
+        assert!(validate_ifc_export(&frame, LodLevel::Lod300).unwrap_err().contains("no positive opening"));
+        frame.frame.frame_width = 67.0;
+        frame.frame.shape.shape_type = crate::kozijn::ShapeType::Round;
+        assert!(validate_ifc_export(&frame, LodLevel::Lod400).unwrap_err().contains("rectangular"));
+        assert!(validate_ifc_export(&frame, LodLevel::Lod200).is_ok());
+        frame.frame.outer_width = f64::NAN;
+        assert!(validate_ifc_export(&frame, LodLevel::Lod200).is_err());
+        let frame = Kozijn::new("Safe export", "SAFE", 900.0, 2100.0);
+        assert!(validate_ifc_export(&frame, LodLevel::Lod400).is_ok());
+    }
+
+    #[test]
+    fn detailed_geometry_exports_individual_members_and_real_infill_thickness() {
+        let mut frame = Kozijn::new("Detailed window", "DETAIL", 900.0, 2100.0);
+        frame.cells[0].glazing.thickness_mm = 36.0;
+        let simplified = generate_ifc_text_with_lod(&frame, LodLevel::Lod300);
+        let detailed = generate_ifc_text_with_lod(&frame, LodLevel::Lod400);
+        assert_eq!(simplified.matches("=IFCEXTRUDEDAREASOLID(").count(), 2);
+        assert_eq!(detailed.matches("=IFCEXTRUDEDAREASOLID(").count(), 5);
+        assert_eq!(detailed.matches("'Member").count(), 4);
+        assert!(detailed.contains("'Glazing1'"));
+        assert!(detailed.lines().any(|l| l.contains("=IFCEXTRUDEDAREASOLID(") && l.ends_with(",0.036000);")));
+        // The centered glazing starts 39 mm behind the front face (114-36)/2.
+        assert!(detailed.contains("IFCCARTESIANPOINT((0.0,-0.039000,0.0))"));
+        frame.cells[0].panel_type = PanelType::Door;
+        let door = generate_ifc_text_with_lod(&frame, LodLevel::Lod400);
+        assert!(door.contains("'Infill1'"));
+        assert!(!door.contains("'Glazing1'"));
+    }
+
+    #[test]
+    fn swept_profiles_use_world_z_for_height_and_y_for_depth() {
+        let frame = Kozijn::new("Upright window", "Z-UP", 900.0, 2100.0);
+        for lod in [LodLevel::Lod200, LodLevel::Lod300, LodLevel::Lod400] {
+            let text = generate_ifc_text_with_lod(&frame, lod);
+            let entities: std::collections::HashMap<_, _> = text.lines()
+                .filter_map(|line| line.split_once('='))
+                .collect();
+            for solid in entities.values().filter(|line| line.starts_with("IFCEXTRUDEDAREASOLID(")) {
+                let attrs = parse_step_attrs(solid);
+                let placement = parse_step_attrs(entities[attrs[1].as_str()]);
+                assert_eq!(entities[placement[1].as_str()], "IFCDIRECTION((0.0,-1.0,0.0));");
+                assert_eq!(entities[placement[2].as_str()], "IFCDIRECTION((1.0,0.0,0.0));");
+                // Ref X crossed with normal -Y gives profile Y = world +Z.
+                assert_eq!(entities[attrs[2].as_str()], "IFCDIRECTION((0.0,0.0,1.0));");
+                let origin = entities[placement[0].as_str()];
+                assert!(origin.starts_with("IFCCARTESIANPOINT((0.0,"));
+                assert!(origin.ends_with(",0.0));"));
+            }
+        }
+    }
 
     /// Export a kozijn to a temp file and return the IFC text.
     fn export_to_string(kozijn: &Kozijn) -> String {

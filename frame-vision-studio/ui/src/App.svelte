@@ -6,6 +6,11 @@
   import StatusBar from "./components/shell/StatusBar.svelte";
   import AppMenu from "./components/shell/AppMenu.svelte";
   import Settings from "./components/shell/Settings.svelte";
+  import IfcComparison from "./components/shell/IfcComparison.svelte";
+  import IfcImportPreview from "./components/shell/IfcImportPreview.svelte";
+  import ProjectUnsaved from './components/shell/ProjectUnsaved.svelte';
+  import { isDirty } from './stores/project.js';
+  import { editorIsDirty } from './stores/profileEditor.js';
   import Toast from "./components/shell/Toast.svelte";
   import ResizeHandle from "./components/shell/ResizeHandle.svelte";
   import KozijnEditor from "./components/editor/KozijnEditor.svelte";
@@ -92,6 +97,8 @@
   });
 </script>
 
+<svelte:window onbeforeunload={(event) => { if ($isDirty || $editorIsDirty) { event.preventDefault(); event.returnValue = ''; } }} />
+
 {#if $isLoading}
   <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:var(--bg-surface);color:var(--text-muted);">Loading...</div>
 {:else}
@@ -99,6 +106,9 @@
 <Ribbon />
 <AppMenu />
 <Settings />
+<IfcImportPreview />
+<IfcComparison />
+<ProjectUnsaved />
 
 <div class="workspace-tabs">
   <button

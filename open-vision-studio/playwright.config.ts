@@ -23,10 +23,10 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'off',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], ...(process.env.OPS_BROWSER_CHANNEL ? { channel: process.env.OPS_BROWSER_CHANNEL } : {}) } }],
   webServer: {
     command: 'node scripts/browser-test-server.mjs',
-    url: baseURL,
+    url: `${baseURL}/__ops_dev_ready__`,
     reuseExistingServer: false,
     timeout: 60_000,
   },

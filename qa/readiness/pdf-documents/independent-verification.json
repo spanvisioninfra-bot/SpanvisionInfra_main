@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "checkedAt": "2026-10-06T04:58:01.965250+00:00",
+  "file": "qa\\readiness\\pdf-documents\\annotated.pdf",
+  "checks": [
+    "Two pages and original text retained",
+    "90-degree page rotation retained",
+    "Bounded rectangle with normal appearance retained",
+    "Text character bounds fit both pages",
+    "Both pages rendered by Poppler; visual review required separately"
+  ],
+  "rendered": true
+}

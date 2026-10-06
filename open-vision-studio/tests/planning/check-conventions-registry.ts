@@ -399,7 +399,7 @@ const same = (label: string, got: unknown, want: unknown) => eq(label, canon(got
       && typeof common.notifications?.schedulingProfileApplied === 'string'
       && common.notifications.schedulingProfileApplied.includes(common.schedulingProfile.title));
     // Merknamen zijn in elke taal gelijk (de store-melding gebruikt ze onvertaald, spec v3.1 §6).
-    eq(`i18n ${locale} merknamen`, common.profiles?.builtIn, { p6: 'Primavera P6', msproject: 'Microsoft Project', ops: 'Open Planner Studio' });
+    eq(`i18n ${locale} merknamen`, common.profiles?.builtIn, { p6: 'Primavera P6', msproject: 'Microsoft Project', ops: 'Open Vision Studio' });
     // Geen sleutels buiten het register: een verweesde vertaling wijst op een hernoemde conventie.
     same(`i18n ${locale} conventions == register`, Object.keys(common.conventions ?? {}).sort(), [...CONVENTION_KEYS].sort());
   }

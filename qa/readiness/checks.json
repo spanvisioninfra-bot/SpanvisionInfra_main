@@ -1,0 +1,276 @@
+{
+  "cad2d-tests": {
+    "command": "npm test -- --maxWorkers=1",
+    "directory": "spanvision-2d-cad-workspace",
+    "started": "2026-10-05T17:54:47.730Z",
+    "finished": "2026-10-05T17:56:15.439Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/cad2d-tests.log"
+  },
+  "ifc-tests": {
+    "command": "node node_modules/vitest/vitest.mjs run --maxWorkers=2",
+    "directory": "ifc-view",
+    "started": "2026-10-05T11:38:14.749Z",
+    "finished": "2026-10-05T11:38:16.198Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/ifc-tests.log"
+  },
+  "calc-tests": {
+    "command": "node node_modules/vitest/vitest.mjs run --maxWorkers=1",
+    "directory": "calc-workspace",
+    "started": "2026-10-05T08:12:32.934Z",
+    "finished": "2026-10-05T08:16:22.208Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/calc-tests.log"
+  },
+  "cad2d-types": {
+    "command": "npm run typecheck",
+    "directory": "spanvision-2d-cad-workspace",
+    "started": "2026-10-05T17:59:13.140Z",
+    "finished": "2026-10-05T17:59:35.040Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/cad2d-types.log"
+  },
+  "ifc-types": {
+    "command": "node node_modules/typescript/bin/tsc -p apps/desktop/tsconfig.json",
+    "directory": "ifc-view",
+    "started": "2026-10-05T11:38:16.201Z",
+    "finished": "2026-10-05T11:38:18.214Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/ifc-types.log"
+  },
+  "calc-types": {
+    "command": "npm run typecheck",
+    "directory": "calc-workspace",
+    "started": "2026-10-05T08:10:01.892Z",
+    "finished": "2026-10-05T08:10:24.481Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/calc-types.log"
+  },
+  "pdf-tests": {
+    "command": "node ../../deployment/run-pdf-tests.mjs",
+    "directory": "spanvision-pdf-workspace/open-pdf-studio",
+    "started": "2026-10-06T04:48:20.374Z",
+    "finished": "2026-10-06T04:49:59.752Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/pdf-tests.log"
+  },
+  "bim-viewer-tests": {
+    "command": "npm run test:run -- --maxWorkers=1",
+    "directory": "vision-bim-validator/viewer",
+    "started": "2026-10-05T04:37:57.480Z",
+    "finished": "2026-10-05T04:38:27.147Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/bim-viewer-tests.log"
+  },
+  "bim-backend-tests": {
+    "command": ".venv\\Scripts\\python.exe -m pytest test server/tests -q",
+    "directory": "vision-bim-validator",
+    "started": "2026-10-05T05:22:00.122Z",
+    "finished": "2026-10-05T05:31:27.013Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/bim-backend-tests.log"
+  },
+  "stl-backend-tests": {
+    "command": ".venv\\Scripts\\python.exe -m pytest tests -q",
+    "directory": "spanvision-stl-3d-map-workspace",
+    "started": "2026-10-04T18:03:30.228Z",
+    "finished": "2026-10-04T18:03:45.288Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/stl-backend-tests.log"
+  },
+  "calculation-tests": {
+    "command": "npm run check",
+    "directory": "vision-calculation-studio",
+    "started": "2026-10-05T12:19:28.466Z",
+    "finished": "2026-10-05T12:19:46.224Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/calculation-tests.log"
+  },
+  "geo-tests": {
+    "command": "npm test -- --maxWorkers=2",
+    "directory": "spanvision-geptechniek-workspace/apps/desktop",
+    "started": "2026-10-05T09:58:05.810Z",
+    "finished": "2026-10-05T09:59:20.476Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/geo-tests.log"
+  },
+  "pile-tests": {
+    "command": "npm test",
+    "directory": "spanvision-pile-plane-workspace/apps/pile-plan-studio",
+    "started": "2026-10-04T18:05:29.584Z",
+    "finished": "2026-10-04T18:05:59.664Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/pile-tests.log"
+  },
+  "speech-types": {
+    "command": "npm run typecheck",
+    "directory": "spanvision-speech-workspace",
+    "started": "2026-10-05T07:27:54.655Z",
+    "finished": "2026-10-05T07:28:01.425Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/speech-types.log"
+  },
+  "pointcloud-types": {
+    "command": "npm run typecheck",
+    "directory": "spanvision-pointcloud-workspace",
+    "started": "2026-10-05T11:25:18.630Z",
+    "finished": "2026-10-05T11:25:21.723Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/pointcloud-types.log"
+  },
+  "field-types": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "directory": "spanvision-field-workspace",
+    "started": "2026-10-06T04:56:06.545Z",
+    "finished": "2026-10-06T04:56:06.811Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/field-types.log"
+  },
+  "fem-types": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "directory": "fem-vision-studio",
+    "started": "2026-10-04T17:40:47.466Z",
+    "finished": "2026-10-04T17:41:12.522Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/fem-types.log"
+  },
+  "planner-verify": {
+    "command": "npm run verify",
+    "directory": "open-vision-studio",
+    "started": "2026-10-06T04:28:26.380Z",
+    "finished": "2026-10-06T04:51:56.495Z",
+    "passed": false,
+    "exitCode": null,
+    "status": "interrupted",
+    "error": "ENOSPC: the audit log write failed during the timezone matrix. The full release gate did not complete.",
+    "log": "qa/readiness/planner-verify.log",
+    "runnerErrorLog": "qa/readiness/planner-release-errors.log",
+    "previousCompletedRun": "qa/readiness/planner-initial-full-gate.json"
+  },
+  "deployment-tests": {
+    "command": "node --test deployment/module-url.test.mjs",
+    "directory": ".",
+    "started": "2026-10-04T17:41:19.589Z",
+    "finished": "2026-10-04T17:41:20.044Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/deployment-tests.log"
+  },
+  "fem-v2-tests": {
+    "command": "npm test",
+    "directory": "fem-vision-studio/design-mockup",
+    "started": "2026-10-05T09:39:10.530Z",
+    "finished": "2026-10-05T09:43:41.074Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/fem-v2-tests.log"
+  },
+  "pointcloud-parser-tests": {
+    "command": "node --experimental-strip-types --test src/engine/pointcloud/XYZParser.test.ts src/engine/pointcloud/TextScanParsers.test.ts src/engine/pointcloud/PLYParser.test.ts src/engine/pointcloud/LASParser.test.ts src/engine/pointcloud/PointcloudTransforms.test.ts",
+    "directory": "spanvision-pointcloud-workspace",
+    "started": "2026-10-05T11:25:21.727Z",
+    "finished": "2026-10-05T11:25:22.041Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/pointcloud-parser-tests.log"
+  },
+  "fem-v2-types": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "directory": "fem-vision-studio/design-mockup",
+    "started": "2026-10-05T09:43:41.098Z",
+    "finished": "2026-10-05T09:44:50.422Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/fem-v2-types.log"
+  },
+  "frame-browser-edits": {
+    "command": "node --test src/lib/webProjectCommands.test.mjs",
+    "directory": "frame-vision-studio/ui",
+    "started": "2026-10-05T18:01:42.616Z",
+    "finished": "2026-10-05T18:01:42.857Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/frame-browser-edits.log"
+  },
+  "frame-core-tests": {
+    "command": "cargo test --locked -p ofs-core --jobs 1",
+    "directory": "frame-vision-studio",
+    "started": "2026-10-05T17:41:37.202Z",
+    "finished": "2026-10-05T17:42:04.615Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/frame-core-tests.log"
+  },
+  "fem-native-core-tests": {
+    "command": "cargo test --locked --release --workspace --exclude open-fem2d-studio --jobs 1 -- --test-threads=1",
+    "directory": "fem-vision-studio/src-tauri",
+    "started": "2026-10-05T09:34:46.093Z",
+    "finished": "2026-10-05T09:38:40.443Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/fem-native-core-tests.log"
+  },
+  "fem-api-tests": {
+    "command": "vision-bim-validator\\.venv\\Scripts\\python.exe -m unittest deployment.test_fem_api -v",
+    "directory": "",
+    "started": "2026-10-05T08:14:16.707Z",
+    "finished": "2026-10-05T08:14:19.485Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/fem-api-tests.log"
+  },
+  "pointcloud-native-tests": {
+    "command": "cargo test --manifest-path core-tests/Cargo.toml --locked --jobs 1",
+    "directory": "spanvision-pointcloud-workspace",
+    "started": "2026-10-05T11:23:25.537Z",
+    "finished": "2026-10-05T11:23:29.729Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/pointcloud-native-tests.log"
+  },
+  "pointcloud-desktop-check": {
+    "command": "cargo check --manifest-path src-tauri/Cargo.toml --locked --jobs 1",
+    "directory": "spanvision-pointcloud-workspace",
+    "started": "2026-10-05T11:23:29.733Z",
+    "finished": "2026-10-05T11:23:32.733Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/pointcloud-desktop-check.log"
+  },
+  "pile-native-tests": {
+    "command": "cargo test --workspace --locked --jobs 1",
+    "directory": "spanvision-pile-plane-workspace",
+    "started": "2026-10-05T11:23:44.413Z",
+    "finished": "2026-10-05T11:24:29.027Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/pile-native-tests.log"
+  },
+  "frame-desktop-check": {
+    "command": "cargo check --manifest-path src-tauri/Cargo.toml --locked --jobs 1",
+    "directory": "frame-vision-studio",
+    "started": "2026-10-05T18:02:03.913Z",
+    "finished": "2026-10-05T18:09:57.786Z",
+    "passed": true,
+    "exitCode": 0,
+    "log": "qa/readiness/frame-desktop-check.log"
+  }
+}

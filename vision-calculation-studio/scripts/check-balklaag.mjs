@@ -33,8 +33,10 @@ const PROJECT = { K_FI: 1, rekenwijze: 1 };
 const BASIS = {
   profiel: "12", sterkteklasse: "2", klimaat: "1", duurklasse: "2",
   L_d: "5000", a_opl: "50", hoh: "600", t_vloer: "18",
-  g_vloerplaat: "1.0", g_wanden: "0", g_plafond: "0", g_overig: "0",
-  q_k: "1.75", Q_k: "2", belastingcat: "2", verplaatsbaar: "0",
+  // Current sheet inputs: permanent area load, variable area load and point load.
+  // Keep the original nine independent reference results unchanged.
+  G_k: "1.0", Q_k: "1.75", F_k: "2", E_beschot: "7000", b_vloer: "5",
+  schema: "1", belastingcat: "2", verplaatsbaar: "0",
   "ψ_0_zelf": "0", "ψ_2_zelf": "0", controleer: "1", grensfactor: "0.004",
 };
 

@@ -11,6 +11,7 @@ impl CncPostProcessor for GenericGCode {
         let mut files = Vec::new();
         for part in parts {
             let mut code = String::new();
+            code.push_str("( GENERIC PREVIEW - NOT MACHINE-VERIFIED. TENON TOOLPATHS ARE NOT IMPLEMENTED. )\n");
             code.push_str(&format!("( Part: {} - {} )\n", part.piece_id, part.kozijn_mark));
             code.push_str(&format!("( Profile: {} L={:.0}mm )\n", part.profile_name, part.gross_length_mm));
             code.push_str("G90 G21\n"); // absolute, mm

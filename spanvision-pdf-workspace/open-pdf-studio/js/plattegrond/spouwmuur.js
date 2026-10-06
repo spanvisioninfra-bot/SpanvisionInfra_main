@@ -128,7 +128,7 @@ export function laagSparingMm(laag, kozijn) {
  * mee getekende omtrek de binnenkant) of 'links'.
  */
 export function laagLijnen(start, end, pakket, pxPerMm, binnenzijde = 'rechts') {
-  return spouwmuurLagen(start, end, pakket.lagen, pxPerMm, binnenzijde === 'links' ? 'links' : "right");
+  return spouwmuurLagen(start, end, pakket.lagen, pxPerMm, binnenzijde === 'links' ? 'links' : "rechts");
 }
 
 /**

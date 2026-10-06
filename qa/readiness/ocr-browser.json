@@ -1,0 +1,25 @@
+{
+  "verifiedAt": "2026-10-06T04:35:08.740Z",
+  "findings": [
+    {
+      "input": "image.png",
+      "recognized": true,
+      "searchablePdf": true,
+      "textDownload": true,
+      "pages": 1
+    },
+    {
+      "input": "scan.pdf",
+      "recognized": true,
+      "searchablePdf": true,
+      "textDownload": true,
+      "pages": 2
+    },
+    {
+      "cancellation": true,
+      "malformedPdfRejected": true,
+      "pageLimitEnforced": true,
+      "recoveryRecognition": true
+    }
+  ]
+}

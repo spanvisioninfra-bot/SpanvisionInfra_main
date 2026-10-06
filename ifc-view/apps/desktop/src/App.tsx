@@ -23,7 +23,7 @@ export default function App() {
       <Header />
       <DocumentBar />
       <div class={sidebarStyles.mainContainer}>
-        <Sidebar />
+        <Sidebar player={player} />
         <ThreeCanvas />
       </div>
       <StatusBar />

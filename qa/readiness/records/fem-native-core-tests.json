@@ -1,0 +1,9 @@
+{
+  "command": "cargo test --locked --release --workspace --exclude open-fem2d-studio --jobs 1 -- --test-threads=1",
+  "directory": "fem-vision-studio/src-tauri",
+  "started": "2026-10-05T09:34:46.093Z",
+  "finished": "2026-10-05T09:38:40.443Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/fem-native-core-tests.log"
+}

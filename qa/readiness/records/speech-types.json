@@ -1,0 +1,9 @@
+{
+  "command": "npm run typecheck",
+  "directory": "spanvision-speech-workspace",
+  "started": "2026-10-05T07:27:54.655Z",
+  "finished": "2026-10-05T07:28:01.425Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/speech-types.log"
+}

@@ -1,0 +1,57 @@
+{
+  "data": {
+    "autoDeploy": "yes",
+    "autoDeployTrigger": "commit",
+    "branch": "version/V.1.0",
+    "createdAt": "2026-10-04T16:27:10.911224Z",
+    "dashboardUrl": "https://dashboard.render.com/web/srv-db17snk9v7es73ec01r0",
+    "id": "srv-db17snk9v7es73ec01r0",
+    "name": "spanvision-stl",
+    "notifyOnFail": "default",
+    "ownerId": "tea-davr4ru7bikc73f55ph0",
+    "repo": "https://github.com/spanvisioninfra-bot/SpanvisionInfra_main",
+    "rootDir": "",
+    "serviceDetails": {
+      "buildPlan": "starter",
+      "cache": {
+        "profile": "no-cache"
+      },
+      "env": "docker",
+      "envSpecificDetails": {
+        "dockerCommand": "",
+        "dockerContext": ".",
+        "dockerfilePath": "./Dockerfile"
+      },
+      "healthCheckPath": "/api/ping",
+      "ipAllowList": [
+        {
+          "cidrBlock": "0.0.0.0/0",
+          "description": "everywhere"
+        }
+      ],
+      "maintenanceMode": {
+        "enabled": false,
+        "uri": ""
+      },
+      "numInstances": 1,
+      "openPorts": [],
+      "plan": "free",
+      "previews": {
+        "generation": "off"
+      },
+      "pullRequestPreviewsEnabled": "no",
+      "region": "singapore",
+      "renderSubdomainPolicy": "enabled",
+      "runtime": "docker",
+      "sshAddress": "srv-db17snk9v7es73ec01r0@ssh.singapore.render.com",
+      "url": "https://spanvision-stl.onrender.com"
+    },
+    "slug": "spanvision-stl",
+    "suspended": "not_suspended",
+    "suspenders": [],
+    "type": "web_service",
+    "updatedAt": "2026-10-06T06:43:57.110795Z",
+    "environmentId": null,
+    "projectId": null
+  }
+}

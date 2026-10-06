@@ -586,6 +586,12 @@ export function Canvas() {
 
     const drawing = s.drawings.find(d => d.id === s.activeDrawingId);
     if (!drawing?.boundary) return;
+    // An imported drawing already has a content viewport. Do not replace it
+    // with a boundary-centred empty view when this canvas first mounts.
+    if (s.shapes.some(shape => shape.drawingId === s.activeDrawingId)) {
+      hasCenteredRef.current = true;
+      return;
+    }
 
     const b = drawing.boundary;
     const centerX = b.x + b.width / 2;

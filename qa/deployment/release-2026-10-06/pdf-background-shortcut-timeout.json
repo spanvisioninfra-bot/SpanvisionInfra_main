@@ -1,0 +1,12 @@
+{
+  "passed": false,
+  "checkedAt": "2026-10-06T06:53:54.430Z",
+  "checks": [
+    "Actual two-page PDF opens and paints its page canvas",
+    "Rectangle drawn through mouse input; page and annotation canvases remain sized in both themes",
+    "Save As downloads a PDF retaining both pages, 90-degree page rotation and a bounded rectangle appearance",
+    "Downloaded annotated PDF reopens with its actual annotation"
+  ],
+  "errors": [],
+  "error": "TimeoutError: page.waitForEvent: Timeout 30000ms exceeded while waiting for event \"filechooser\"\n=========================== logs ===========================\nwaiting for event \"filechooser\"\n============================================================"
+}

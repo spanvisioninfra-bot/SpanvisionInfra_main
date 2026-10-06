@@ -1,0 +1,9 @@
+{
+  "command": "npm run typecheck",
+  "directory": "spanvision-pointcloud-workspace",
+  "started": "2026-10-05T11:25:18.630Z",
+  "finished": "2026-10-05T11:25:21.723Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/pointcloud-types.log"
+}

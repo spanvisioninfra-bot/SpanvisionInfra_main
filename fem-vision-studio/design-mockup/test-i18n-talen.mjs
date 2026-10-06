@@ -52,13 +52,16 @@ const lees = (taal, ns) => JSON.parse(readFileSync(join(LOCALES, taal, `${ns}.js
 log("\n1. Vier talen, geregistreerd en op schijf");
 const mappen = readdirSync(LOCALES).sort();
 ok(TALEN.every((t) => mappen.includes(t)), `mappen nl/en/de/fr bestaan (gevonden: ${mappen.join(", ")})`);
-for (const t of TALEN) {
-  ok(/code: "(auto|nl|en|de|fr)"/.test(CONFIG) && CONFIG.includes(`code: "${t}"`), `"${t}" staat in LANGUAGES`);
+for (const t of ["en"]) {
+  ok(CONFIG.includes(`code: "${t}"`), `"${t}" staat in LANGUAGES`);
   ok(new RegExp(`\\b${t}: \\{ common: `).test(CONFIG), `"${t}" heeft alle zes naamruimten in resources`);
 }
 for (const ns of NAAMRUIMTEN) {
-  ok(TALEN.every((t) => CONFIG.includes(`./locales/${t}/${ns}.json`)), `naamruimte "${ns}" wordt voor elke taal geïmporteerd`);
+  ok(CONFIG.includes(`./locales/en/${ns}.json`), `English namespace "${ns}" is imported`);
 }
+ok(CONFIG.includes('lng: "en"') && CONFIG.includes('supportedLngs: ["en"]'), "Spanvision Infra starts in English and supports English only");
+ok(!CONFIG.includes('LanguageDetector') && !CONFIG.includes('getSetting'), "browser and saved language cannot override English");
+ok(!/code: "(?:auto|nl|de|fr)"/.test(CONFIG), "other languages are not offered in the interface");
 
 /* ── 2. Sleutelpariteit met het Nederlands ────────────────────────────── */
 log("\n2. Dezelfde sleutels als het Nederlands, per naamruimte");
@@ -130,7 +133,7 @@ for (const taal of TALEN.filter((t) => t !== REFERENTIE)) {
 
 /* ── 4. De taalkeuze zelf ─────────────────────────────────────────────── */
 log("\n4. Taalnamen in de eigen taal");
-ok(CONFIG.includes('name: "Deutsch"') && CONFIG.includes('name: "Français"'), "Deutsch en Français heten zo in de keuzelijst");
+ok(CONFIG.includes('name: "English"') && !CONFIG.includes('name: "Deutsch"') && !CONFIG.includes('name: "Français"'), "English is the only interface language choice");
 
 log("");
 log(`${geslaagd} geslaagd, ${gefaald} gefaald`);

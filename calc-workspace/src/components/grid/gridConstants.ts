@@ -203,11 +203,11 @@ export function isCellEditable(colKey: string, rowType: string, _gridView?: Grid
     return rowType === 'begrotingspost' || rowType === 'bewakingspost' || rowType === 'regel' || rowType === 'tekstregel';
   }
   // Verrekenbaar: alleen chapter
-  if (colKey === 'verrekenbaar') return rowType === 'chapter';
+  if (colKey === 'verrekenbaar') return rowType === "chapter";
   // Tarief: alleen op rekenregel
   if (colKey === 'tarief') return rowType === 'regel';
   // Hoofdstuknummer: editable op chapter
-  if (colKey === 'chapterCode') return rowType === 'chapter';
+  if (colKey === 'chapterCode') return rowType === "chapter";
   // Nr: read-only (hiërarchisch berekend uit parent + sortOrder)
   if (colKey === 'rowNumber') return false;
   // Resource breakdown and computed columns are not editable

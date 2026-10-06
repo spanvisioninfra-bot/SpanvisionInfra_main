@@ -4,7 +4,7 @@
  * Reads uncompressed LAS files (1.0–1.4) from an ArrayBuffer and extracts
  * positions, colors, intensities, and classifications.
  *
- * LAZ (compressed) files are NOT supported — those require the Tauri backend.
+ * Compressed files use the separate laz-perf WASM parser.
  */
 
 export interface LASHeader {
@@ -73,6 +73,7 @@ export function getClassificationOffset(format: number): number {
 }
 
 export function parseLAS(buffer: ArrayBuffer): ParsedPointcloud {
+  if (buffer.byteLength < 227) throw new Error('Truncated LAS header');
   const view = new DataView(buffer);
 
   // Validate signature
@@ -83,20 +84,31 @@ export function parseLAS(buffer: ArrayBuffer): ParsedPointcloud {
 
   const versionMajor = view.getUint8(24);
   const versionMinor = view.getUint8(25);
+  if (versionMajor !== 1 || versionMinor > 4) throw new Error('Unsupported LAS version; expected LAS 1.0–1.4');
   const headerSize = view.getUint16(94, true);
   const offsetToPointData = view.getUint32(96, true);
   const pointDataFormat = view.getUint8(104);
   const pointDataRecordLength = view.getUint16(105, true);
   const legacyPointCount = view.getUint32(107, true);
+  const minimumHeader = versionMinor === 4 ? 375 : versionMinor === 3 ? 235 : 227;
+  if (headerSize < minimumHeader || headerSize > buffer.byteLength || offsetToPointData < headerSize || offsetToPointData > buffer.byteLength) throw new Error('Invalid or truncated LAS header offsets');
+  if (pointDataFormat & 0xc0) throw new Error('Compressed LAS data must be imported through the LAZ parser');
+  const minimumRecordLengths = [20, 28, 26, 34, 57, 63, 30, 36, 38, 59, 67];
+  const maximumFormat = versionMinor === 4 ? 10 : versionMinor === 3 ? 5 : versionMinor === 2 ? 3 : 1;
+  if (pointDataFormat > maximumFormat || pointDataRecordLength < minimumRecordLengths[pointDataFormat]) throw new Error('Unsupported LAS point format or invalid record length');
 
   // LAS 1.4 has 64-bit point count at offset 247
   let numberOfPoints = legacyPointCount;
-  if (versionMajor === 1 && versionMinor >= 4 && legacyPointCount === 0) {
+  if (versionMinor === 4) {
     // Read as two 32-bit values (JS doesn't handle uint64 well)
     const lo = view.getUint32(247, true);
     const hi = view.getUint32(251, true);
-    numberOfPoints = hi * 0x100000000 + lo;
+    const extendedCount = hi * 0x100000000 + lo;
+    if (extendedCount > 0) numberOfPoints = extendedCount;
   }
+  if (!Number.isSafeInteger(numberOfPoints) || numberOfPoints <= 0) throw new Error('LAS file contains no points or an invalid point count');
+  const dataEnd = offsetToPointData + numberOfPoints * pointDataRecordLength;
+  if (!Number.isSafeInteger(dataEnd) || dataEnd > buffer.byteLength) throw new Error('Truncated LAS point data');
 
   // Scale & offset (doubles at fixed positions)
   const scaleX = view.getFloat64(131, true);
@@ -105,14 +117,24 @@ export function parseLAS(buffer: ArrayBuffer): ParsedPointcloud {
   const offsetX = view.getFloat64(155, true);
   const offsetY = view.getFloat64(163, true);
   const offsetZ = view.getFloat64(171, true);
+  if (![scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ].every(Number.isFinite) || [scaleX, scaleY, scaleZ].some(scale => scale <= 0)) throw new Error('Invalid LAS scale or coordinate offset');
 
   // Bounds
-  const maxX = view.getFloat64(179, true);
-  const minX = view.getFloat64(187, true);
-  const maxY = view.getFloat64(195, true);
-  const minY = view.getFloat64(203, true);
-  const maxZ = view.getFloat64(211, true);
-  const minZ = view.getFloat64(219, true);
+  let maxX = -Infinity, minX = Infinity, maxY = -Infinity, minY = Infinity, maxZ = -Infinity, minZ = Infinity;
+  let maxColor = 0;
+  // Bounds cover all source points, including those omitted by the render budget.
+  for (let i = 0; i < numberOfPoints; i++) {
+    const offset = offsetToPointData + i * pointDataRecordLength;
+    const x = view.getInt32(offset, true) * scaleX + offsetX;
+    const y = view.getInt32(offset + 4, true) * scaleY + offsetY;
+    const z = view.getInt32(offset + 8, true) * scaleZ + offsetZ;
+    if (![x, y, z].every(Number.isFinite)) throw new Error('LAS contains non-finite coordinates');
+    minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+    minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+    minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
+    const rgb = getRGBOffset(pointDataFormat);
+    if (rgb >= 0) for (const channel of [0, 2, 4]) maxColor = Math.max(maxColor, view.getUint16(offset + rgb + channel, true));
+  }
 
   const header: LASHeader = {
     signature: sig,
@@ -127,9 +149,9 @@ export function parseLAS(buffer: ArrayBuffer): ParsedPointcloud {
   };
 
   // Center of bounds for coordinate offset
-  const cx = (minX + maxX) / 2;
-  const cy = (minY + maxY) / 2;
-  const cz = (minZ + maxZ) / 2;
+  const cx = minX / 2 + maxX / 2;
+  const cy = minY / 2 + maxY / 2;
+  const cz = minZ / 2 + maxZ / 2;
 
   // Limit points for browser performance
   const maxPoints = 1_000_000;
@@ -171,7 +193,9 @@ export function parseLAS(buffer: ArrayBuffer): ParsedPointcloud {
     intensities[outIdx] = intensity / 65535;
 
     // Classification
-    classifications[outIdx] = view.getUint8(offset + classOffset);
+    const classification = view.getUint8(offset + classOffset);
+    // LAS 1.1–1.3 legacy records pack synthetic/key-point/withheld flags into this byte.
+    classifications[outIdx] = pointDataFormat < 6 && versionMinor > 0 ? classification & 0x1f : classification;
 
     // RGB color
     if (hasColor && rgbOffset >= 0) {
@@ -179,10 +203,10 @@ export function parseLAS(buffer: ArrayBuffer): ParsedPointcloud {
       const r = view.getUint16(offset + rgbOffset, true);
       const g = view.getUint16(offset + rgbOffset + 2, true);
       const b = view.getUint16(offset + rgbOffset + 4, true);
-      // Detect 8-bit vs 16-bit colors: if max values are ≤255, treat as 8-bit
-      colors[outIdx * 3] = r > 255 ? r / 65535 : r / 255;
-      colors[outIdx * 3 + 1] = g > 255 ? g / 65535 : g / 255;
-      colors[outIdx * 3 + 2] = b > 255 ? b / 65535 : b / 255;
+      maxColor = Math.max(maxColor, r, g, b);
+      colors[outIdx * 3] = r;
+      colors[outIdx * 3 + 1] = g;
+      colors[outIdx * 3 + 2] = b;
     } else {
       // No color data — use white
       colors[outIdx * 3] = 0.8;
@@ -192,6 +216,13 @@ export function parseLAS(buffer: ArrayBuffer): ParsedPointcloud {
 
     outIdx++;
   }
+  // Compatibility for files whose producer stored byte RGB in the uint16 fields.
+  // Choose one scale for the cloud; channel-by-channel scaling corrupts dark colors.
+  if (hasColor) {
+    const divisor = maxColor <= 255 ? 255 : 65535;
+    for (let i = 0; i < colors.length; i++) colors[i] /= divisor;
+  }
+  if (!positions.every(Number.isFinite)) throw new Error('LAS coordinate range exceeds the renderer limits');
 
   // Trim arrays if we read fewer points than expected
   const finalPositions = outIdx < actualCount ? positions.slice(0, outIdx * 3) : positions;

@@ -165,7 +165,7 @@ export const CostGrid: React.FC = () => {
       if (lines > 1) return 10 + lines * 13;
     }
     // In wpcalc view, chapters get 8px top spacing (except the first)
-    if (gridView === 'wpcalc' && item?.rowType === 'chapter' && !item.parentId && index > 0) {
+    if (gridView === 'wpcalc' && item?.rowType === "chapter" && !item.parentId && index > 0) {
       return ROW_HEIGHT + 8;
     }
     return ROW_HEIGHT;
@@ -314,7 +314,7 @@ export const CostGrid: React.FC = () => {
       }
 
       // In wpcalc view: double-click on resource column sets resourceType
-      if (gridView === 'wpcalc' && item.rowType === "calc " && RESOURCE_COL_MAP[colDef.key]) {
+      if (gridView === 'wpcalc' && item.rowType === "regel" && RESOURCE_COL_MAP[colDef.key]) {
         pushHistory(items, t('changeResourceType'));
         updateItem(item.id, 'resourceType', RESOURCE_COL_MAP[colDef.key]);
         return;
@@ -462,7 +462,7 @@ export const CostGrid: React.FC = () => {
       const rect = rowEl.getBoundingClientRect();
       const y = ev.clientY - rect.top;
       const h = rect.height;
-      const canInside = target.rowType === 'chapter' || target.rowType === 'begrotingspost' || target.rowType === 'bewakingspost';
+      const canInside = target.rowType === "chapter" || target.rowType === 'begrotingspost' || target.rowType === 'bewakingspost';
       let pos: 'before' | 'after' | 'inside';
       if (canInside) pos = y < h / 3 ? 'before' : y > (2 * h) / 3 ? 'after' : 'inside';
       else pos = y < h / 2 ? 'before' : 'after';

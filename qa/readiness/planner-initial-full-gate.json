@@ -1,0 +1,9 @@
+{
+  "command": "npm run verify",
+  "directory": "open-vision-studio",
+  "started": "2026-10-05T16:54:21.766Z",
+  "finished": "2026-10-05T17:58:28.389Z",
+  "passed": false,
+  "exitCode": 1,
+  "log": "qa/readiness/planner-initial-full-gate.log"
+}

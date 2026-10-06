@@ -6,8 +6,9 @@ export function dialogFocus(node) {
   queueMicrotask(() => controls()[0]?.focus());
   function keydown(event) {
     if (event.key !== 'Tab') return;
+    event.stopPropagation();
     const items = controls();
-    if (!items.length) return;
+    if (!items.length) { event.preventDefault(); node.focus(); return; }
     const first = items[0], last = items[items.length - 1];
     if (event.shiftKey && (document.activeElement === first || !node.contains(document.activeElement))) {
       event.preventDefault(); last.focus();

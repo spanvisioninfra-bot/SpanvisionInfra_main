@@ -22,7 +22,7 @@ export function computeHideTotalSet(items: CostItem[]): Set<string> {
     }
   }
   for (const item of items) {
-    if (item.rowType !== 'chapter' && item.rowType !== 'begrotingspost') continue;
+    if (item.rowType !== "chapter" && item.rowType !== 'begrotingspost') continue;
     // Ingeklapt: kinderen worden niet gerenderd, dus nooit verbergen.
     if (item.isCollapsed) continue;
     const children = (childrenMap.get(item.id) ?? [])

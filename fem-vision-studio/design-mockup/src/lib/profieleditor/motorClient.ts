@@ -101,8 +101,8 @@ export async function roepMotor(
   });
   const data = await antwoord.json().catch(() => null);
   if (!antwoord.ok || !Array.isArray(data)) {
-    const fout = (data as { fout?: string } | null)?.fout;
-    throw new Error(fout ?? `De doorsnedemotor antwoordde met status ${antwoord.status}.`);
+    const fout = (data as { fout?: string; detail?: string } | null)?.fout ?? (data as { detail?: string } | null)?.detail;
+    throw new Error(fout ?? `The section engine returned HTTP ${antwoord.status}.`);
   }
   return data as MotorUitvoer[];
 }

@@ -285,7 +285,7 @@ export function steelFamilyPreviewSvg(family) {
     }
   }
   return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">` +
-    `<path d="${path}" fill="#000" fill-rule="evenodd" stroke="none"/></svg>`;
+    `<path d="${path}" fill="#000" fill-rule="evenodd" stroke="geen"/></svg>`;
 }
 
 // --- Catalog → palette group ------------------------------------------------

@@ -18,6 +18,9 @@ const routes = [
   { src: '/.*', headers: { 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'strict-origin-when-cross-origin' }, continue: true },
   { handle: 'filesystem' },
 ];
+if (id === 'fem') {
+  routes.splice(1, 0, { src: '/api/(toetsing|doorsnede)', dest: 'https://spanvision-fem-engine.onrender.com/api/$1' });
+}
 if (id === 'cad') routes.push({ src: '/app(?:/.*)?', dest: '/app/index.html' });
 else routes.push({ src: '/(.*)', dest: '/index.html' });
 if (id === 'hub') {

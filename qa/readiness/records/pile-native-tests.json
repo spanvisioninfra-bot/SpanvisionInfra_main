@@ -1,0 +1,9 @@
+{
+  "command": "cargo test --workspace --locked --jobs 1",
+  "directory": "spanvision-pile-plane-workspace",
+  "started": "2026-10-05T11:23:44.413Z",
+  "finished": "2026-10-05T11:24:29.027Z",
+  "passed": true,
+  "exitCode": 0,
+  "log": "qa/readiness/pile-native-tests.log"
+}

@@ -18,7 +18,8 @@ export function exportToOBJ(
   positions: Float32Array,
   indices: Uint32Array,
   normals?: Float32Array,
-  colors?: Float32Array
+  colors?: Float32Array,
+  surveyCenter?: [number, number, number]
 ): string {
   const numVerts = positions.length / 3;
   const numFaces = indices.length / 3;
@@ -32,9 +33,10 @@ export function exportToOBJ(
 
   // Vertices (with optional vertex colors as OBJ extension: v x y z r g b)
   for (let i = 0; i < numVerts; i++) {
-    const x = positions[i * 3];
-    const y = positions[i * 3 + 1];
-    const z = positions[i * 3 + 2];
+    const x = positions[i * 3] + (surveyCenter?.[0] ?? 0);
+    const y = surveyCenter ? surveyCenter[1] - positions[i * 3 + 2] : positions[i * 3 + 1];
+    const z = surveyCenter ? surveyCenter[2] + positions[i * 3 + 1] : positions[i * 3 + 2];
+    if (![x, y, z].every(Number.isFinite)) throw new Error('Cannot export non-finite mesh coordinates');
 
     if (colors) {
       const r = colors[i * 3];
@@ -52,8 +54,8 @@ export function exportToOBJ(
   if (normals) {
     for (let i = 0; i < numVerts; i++) {
       const nx = normals[i * 3];
-      const ny = normals[i * 3 + 1];
-      const nz = normals[i * 3 + 2];
+      const ny = surveyCenter ? -normals[i * 3 + 2] : normals[i * 3 + 1];
+      const nz = surveyCenter ? normals[i * 3 + 1] : normals[i * 3 + 2];
       lines.push(`vn ${nx.toFixed(6)} ${ny.toFixed(6)} ${nz.toFixed(6)}`);
     }
     lines.push('');

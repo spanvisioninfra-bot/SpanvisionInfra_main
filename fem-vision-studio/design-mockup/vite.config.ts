@@ -174,6 +174,9 @@ export default defineConfig(async () => ({
   //
   // 1. prevent Vite from obscuring rust errors
   clearScreen: false,
+  preview: {
+    proxy: { '/api': { target: 'http://127.0.0.1:10000', changeOrigin: true } },
+  },
   // 2. tauri expects a fixed port, fail if that port is not available
   server: {
     port: 1440,
