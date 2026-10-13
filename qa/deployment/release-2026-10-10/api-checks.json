@@ -1,0 +1,89 @@
+{
+  "verifiedAt": "2026-10-10T16:12:07.787Z",
+  "checks": [
+    {
+      "id": "bim-health",
+      "status": 200,
+      "response": {
+        "status": "healthy"
+      },
+      "passed": true
+    },
+    {
+      "id": "stl-health",
+      "status": 200,
+      "response": {
+        "app": "spanvision-stl-3d-map-workspace"
+      },
+      "passed": true
+    },
+    {
+      "id": "fem-health",
+      "status": 200,
+      "response": {
+        "status": "ok"
+      },
+      "passed": true
+    },
+    {
+      "id": "hub-bim-readiness",
+      "status": 200,
+      "response": {
+        "status": "healthy"
+      },
+      "passed": true
+    },
+    {
+      "id": "hub-stl-readiness",
+      "status": 200,
+      "response": {
+        "id": "stl",
+        "available": false,
+        "message": "Build and restart STL to preview the current edition.",
+        "brandDigest": "7de7c3190333489b9adade32717559308c55fc12c185f28f0936203416ef97ff",
+        "sourceFingerprint": null
+      },
+      "passed": true
+    },
+    {
+      "id": "fem-section-direct",
+      "url": "https://spanvision-fem-engine.onrender.com/api/doorsnede",
+      "area_mm2": 20000,
+      "iy_mm4": 66666666.66666666,
+      "iz_mm4": 16666666.666666664,
+      "passed": true
+    },
+    {
+      "id": "fem-section-vercel-proxy",
+      "url": "https://spanvision-fem.vercel.app/api/doorsnede",
+      "area_mm2": 20000,
+      "iy_mm4": 66666666.66666666,
+      "iz_mm4": 16666666.666666664,
+      "passed": true
+    },
+    {
+      "id": "/api/admin/users",
+      "status": 401,
+      "privateDataReturned": false,
+      "passed": true
+    },
+    {
+      "id": "/api/admin/user?user=12345678-1234-4234-8234-123456789abc",
+      "status": 401,
+      "privateDataReturned": false,
+      "passed": true
+    },
+    {
+      "id": "/api/commerce?__route=admin/users",
+      "status": 401,
+      "privateDataReturned": false,
+      "passed": true
+    }
+  ],
+  "accounts": {
+    "authAvailable": false,
+    "pricingApproved": false,
+    "sampleAdminPublished": false
+  },
+  "passed": true
+}

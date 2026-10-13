@@ -46,6 +46,8 @@
     <link data-trunk rel="copy-file" href="web/locale-labels.json" />
     <link data-trunk rel="copy-file" href="web/appearance.js" />
     <link data-trunk rel="copy-file" href="web/appearance.css" />
+    <link data-trunk rel="copy-file" href="web/workspace-launch.js" />
+    <script src="workspace-launch.js"></script>
       <link rel="stylesheet" href="appearance.css" />
     <script src="appearance.js" data-module="cad" data-slot="body"></script>
   </head>
@@ -66,10 +68,25 @@
           const caption = splash?.querySelector(".sub");
           if (caption) caption.textContent = labels[locale].loading;
         }).catch(() => {});
+        let opening;
         const done = () => {
-          if (!splash) return;
-          splash.classList.add("hide");
-          setTimeout(() => splash.remove(), 450);
+          if (opening) return opening;
+          opening = window.SpanvisionCADLaunch().then(() => {
+            if (!splash) return;
+            splash.classList.add("hide");
+            setTimeout(() => splash.remove(), 450);
+          }).catch(error => {
+            opening = null;
+            const caption = splash?.querySelector(".sub");
+            if (caption) caption.textContent = error.message;
+            if (splash && !splash.querySelector("button")) {
+              const retry = document.createElement("button");
+              retry.textContent = "Try again";
+              retry.onclick = () => { retry.remove(); done(); };
+              splash.appendChild(retry);
+            }
+          });
+          return opening;
         };
         if (document.querySelector("canvas")) return done();
         const observer = new MutationObserver(() => {

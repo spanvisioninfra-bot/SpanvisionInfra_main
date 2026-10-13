@@ -1,0 +1,202 @@
+{
+  "date": "10 October 2026",
+  "branch": "version/V.1.0",
+  "applicationCommit": "a54f958bc836fccbc2d3f80dd4fc56397b432388",
+  "deploymentToolsCommit": "30442a334e79a00f0740e28821f1b00a26b5a2f1",
+  "verifiedAt": "2026-10-10T16:12:20.829Z",
+  "vercel": [
+    {
+      "id": "hub",
+      "url": "https://spanvision-infra.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_2racRDPb2ABvrhy3ahe27L8qtXKv",
+      "verifiedAt": "2026-10-10T16:10:24.909Z",
+      "label": "Main Spanvision Infra website"
+    },
+    {
+      "id": "cad",
+      "url": "https://spanvision-cad.vercel.app/app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_8NYiGz89D3zcYGfMCGjZhfK5NwP7",
+      "verifiedAt": "2026-10-10T16:12:20.829Z",
+      "recoveredFrom": "Vercel CLI deployment log",
+      "label": "Vision CAD Studio"
+    },
+    {
+      "id": "cad2d",
+      "url": "https://spanvision-cad2d.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_FQp6AwtnUm4Wxq6JUjKGNHLtDF6s",
+      "verifiedAt": "2026-10-10T16:12:20.829Z",
+      "recoveredFrom": "Vercel CLI deployment log",
+      "label": "2D Vision Studio"
+    },
+    {
+      "id": "pdf",
+      "url": "https://spanvision-pdf.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_7sKUQqgKc2yhh4Rj1R6BBEBnFmxz",
+      "verifiedAt": "2026-10-10T16:07:53.569Z",
+      "label": "Vision Portable Document Studio"
+    },
+    {
+      "id": "ifc",
+      "url": "https://spanvision-ifc.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_AnnF2YLdPkWozdTt6aiGLevJ6xgb",
+      "verifiedAt": "2026-10-10T16:08:03.385Z",
+      "label": "Vision IFC Studio"
+    },
+    {
+      "id": "calc",
+      "url": "https://spanvision-calc.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_FK2epiu9adB323iC8FEbxDzKiLif",
+      "verifiedAt": "2026-10-10T16:08:14.597Z",
+      "label": "Calc Vision Studio"
+    },
+    {
+      "id": "planner",
+      "url": "https://spanvision-planner.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_7uGN1jXZTRpuYxBGbmCzh8H18r7G",
+      "verifiedAt": "2026-10-10T16:08:32.669Z",
+      "label": "Open Vision Studio"
+    },
+    {
+      "id": "fem",
+      "url": "https://spanvision-fem.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_32D75qUjBebxtR7DFwzBwrevyk6U",
+      "verifiedAt": "2026-10-10T16:08:48.968Z",
+      "label": "FEM Vision Studio"
+    },
+    {
+      "id": "frame",
+      "url": "https://spanvision-frame.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_FkBGUkS2SGN5fAZwSCoTXY1a9ibE",
+      "verifiedAt": "2026-10-10T16:08:58.611Z",
+      "label": "Frame Vision Studio"
+    },
+    {
+      "id": "calculation",
+      "url": "https://spanvision-calculation.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_9HTXuwqPkYRcn2ZamCY6WZ4kNnW9",
+      "verifiedAt": "2026-10-10T16:09:09.144Z",
+      "label": "Vision Calculation Studio"
+    },
+    {
+      "id": "geo",
+      "url": "https://spanvision-geo.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_9eSG5zXhHY9nNY5ikMwWmk1m9TPW",
+      "verifiedAt": "2026-10-10T16:09:18.796Z",
+      "label": "Vision Geotech Studio"
+    },
+    {
+      "id": "speech",
+      "url": "https://spanvision-speech.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_F6hfPFJtaPFCxPUuYDt7EwPhbcNn",
+      "verifiedAt": "2026-10-10T16:09:32.074Z",
+      "label": "Speech Vision Studio"
+    },
+    {
+      "id": "field",
+      "url": "https://spanvision-field.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_DVc9HoQxkcemvcJP6uCNQZBdbqtb",
+      "verifiedAt": "2026-10-10T16:09:41.874Z",
+      "label": "Vision Field Studio"
+    },
+    {
+      "id": "pointcloud",
+      "url": "https://spanvision-pointcloud.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_GKtEcjTDwM4xzbsqESb5Gj8EVvNY",
+      "verifiedAt": "2026-10-10T16:09:56.694Z",
+      "label": "Vision Pointcloud Studio"
+    },
+    {
+      "id": "pile",
+      "url": "https://spanvision-pile.vercel.app/",
+      "available": true,
+      "platform": "vercel",
+      "deploymentId": "dpl_9dL54cnHWnZ1f3aWZWQpyLDcF9wS",
+      "verifiedAt": "2026-10-10T16:10:09.001Z",
+      "label": "Vision Pile Studio"
+    }
+  ],
+  "render": [
+    {
+      "id": "bim",
+      "serviceId": "srv-db17sdfavr4c73amedbg",
+      "deploymentId": "dep-db566249v7es738q2r1g",
+      "commit": "30442a334e79a00f0740e28821f1b00a26b5a2f1",
+      "status": "live",
+      "region": "singapore",
+      "plan": "free",
+      "url": "https://spanvision-bim.onrender.com",
+      "createdAt": "2026-10-10T16:08:40.816225Z",
+      "finishedAt": "2026-10-10T16:10:26.441369Z"
+    },
+    {
+      "id": "fem-engine",
+      "serviceId": "srv-db29i6m7bikc73cvri0g",
+      "deploymentId": "dep-db566bad0e5s73ebg8b0",
+      "commit": "30442a334e79a00f0740e28821f1b00a26b5a2f1",
+      "status": "live",
+      "region": "singapore",
+      "plan": "free",
+      "url": "https://spanvision-fem-engine.onrender.com",
+      "createdAt": "2026-10-10T16:09:17.334888Z",
+      "finishedAt": "2026-10-10T16:10:18.261667Z"
+    },
+    {
+      "id": "stl",
+      "serviceId": "srv-db17snk9v7es73ec01r0",
+      "deploymentId": "dep-db566249v7es738q2r40",
+      "commit": "30442a334e79a00f0740e28821f1b00a26b5a2f1",
+      "status": "live",
+      "region": "singapore",
+      "plan": "free",
+      "url": "https://spanvision-stl.onrender.com",
+      "createdAt": "2026-10-10T16:08:40.8892Z",
+      "finishedAt": "2026-10-10T16:09:57.881263Z"
+    }
+  ],
+  "verification": {
+    "workspacePages": 17,
+    "bothThemes": true,
+    "localFontsAndCss": true,
+    "homeGroups": 4,
+    "adminGroups": 3,
+    "unitTests": 31,
+    "apiChecks": 10,
+    "authConfigured": false,
+    "pricingApproved": false,
+    "productionSampleAdmin": false
+  },
+  "limits": [
+    "Prebuilt browser artifacts refreshed; no Windows installers rebuilt.",
+    "CAD retained its unchanged hash-verified compiled Rust engine.",
+    "Authenticated success paths use explicit provider mocks.",
+    "Real account/admin/payment activation requires provider setup."
+  ]
+}

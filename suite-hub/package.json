@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 4230 --strictPort",
-    "build": "vite build"
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4230 --strictPort",
+    "test:bridge:browser": "node test/bridge-browser.mjs",
+    "test:cover:browser": "node test/bridge-browser.mjs"
   },
   "dependencies": {
-    "cobe": "2.0.1",
     "pdf-lib": "1.17.1",
     "pdfjs-dist": "6.4.299",
     "solid-js": "^1.9.11",

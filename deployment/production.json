@@ -3,14 +3,14 @@
   "modules": [
     {
       "id": "cad",
-      "label": "CAD",
+      "label": "Vision CAD Studio",
       "url": "https://spanvision-cad.vercel.app/app/",
       "available": true,
       "platform": "vercel"
     },
     {
       "id": "cad2d",
-      "label": "2D CAD",
+      "label": "2D Vision Studio",
       "url": "https://spanvision-cad2d.vercel.app/",
       "available": true,
       "platform": "vercel"
@@ -24,21 +24,21 @@
     },
     {
       "id": "pdf",
-      "label": "PDF",
+      "label": "Vision Portable Document Studio",
       "url": "https://spanvision-pdf.vercel.app/",
       "available": true,
       "platform": "vercel"
     },
     {
       "id": "ifc",
-      "label": "IFC",
+      "label": "Vision IFC Studio",
       "url": "https://spanvision-ifc.vercel.app/",
       "available": true,
       "platform": "vercel"
     },
     {
       "id": "calc",
-      "label": "Calc",
+      "label": "Calc Vision Studio",
       "url": "https://spanvision-calc.vercel.app/",
       "available": true,
       "platform": "vercel"
@@ -73,42 +73,42 @@
     },
     {
       "id": "geo",
-      "label": "Geotechnical",
+      "label": "Vision Geotech Studio",
       "url": "https://spanvision-geo.vercel.app/",
       "available": true,
       "platform": "vercel"
     },
     {
       "id": "speech",
-      "label": "Speech",
+      "label": "Speech Vision Studio",
       "url": "https://spanvision-speech.vercel.app/",
       "available": true,
       "platform": "vercel"
     },
     {
       "id": "stl",
-      "label": "STL-3D Map",
+      "label": "Vision STL -3D Studio",
       "url": "https://spanvision-stl.onrender.com/",
       "available": true,
       "platform": "render"
     },
     {
       "id": "field",
-      "label": "Field Workspace",
+      "label": "Vision Field Studio",
       "url": "https://spanvision-field.vercel.app/",
       "available": true,
       "platform": "vercel"
     },
     {
       "id": "pointcloud",
-      "label": "Pointcloud Workspace",
+      "label": "Vision Pointcloud Studio",
       "url": "https://spanvision-pointcloud.vercel.app/",
       "available": true,
       "platform": "vercel"
     },
     {
       "id": "pile",
-      "label": "Pile Plane Workspace",
+      "label": "Vision Pile Studio",
       "url": "https://spanvision-pile.vercel.app/",
       "available": true,
       "platform": "vercel"

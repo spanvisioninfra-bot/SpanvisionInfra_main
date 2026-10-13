@@ -4,7 +4,13 @@ WORKDIR /build
 COPY vision-bim-validator/viewer/package*.json ./
 RUN if [ "$SPANVISION_SERVICE" = "bim" ]; then npm ci; fi
 COPY vision-bim-validator/viewer/ ./
-RUN if [ "$SPANVISION_SERVICE" = "bim" ]; then npm run build; else mkdir -p dist; fi
+COPY deployment/browser-identity.mjs /browser-identity.mjs
+COPY deployment/browser-icons/ /browser-icons/
+COPY deployment/browser-ui.mjs /browser-ui.mjs
+COPY deployment/browser-ui/ /browser-ui/
+RUN if [ "$SPANVISION_SERVICE" = "bim" ]; then npm run build && node /browser-identity.mjs dist; else mkdir -p dist; fi
+COPY spanvision-stl-3d-map-workspace/web/ /build-stl/
+RUN node /browser-identity.mjs /build-stl /static/__spanvision-brand/
 
 FROM python:3.12-slim-bookworm
 ARG SPANVISION_SERVICE=bim
@@ -20,7 +26,7 @@ COPY vision-bim-validator/server/ ./vision-bim-validator/server/
 COPY vision-bim-validator/src/ ./vision-bim-validator/src/
 COPY vision-bim-validator/pyproject.toml vision-bim-validator/README.md ./vision-bim-validator/
 COPY spanvision-stl-3d-map-workspace/app/ ./spanvision-stl-3d-map-workspace/app/
-COPY spanvision-stl-3d-map-workspace/web/ ./spanvision-stl-3d-map-workspace/web/
+COPY --from=frontend /build-stl/ ./spanvision-stl-3d-map-workspace/web/
 COPY spanvision-stl-3d-map-workspace/legal/ ./spanvision-stl-3d-map-workspace/legal/
 COPY spanvision-stl-3d-map-workspace/LICENSE spanvision-stl-3d-map-workspace/requirements.txt spanvision-stl-3d-map-workspace/brand.json ./spanvision-stl-3d-map-workspace/
 RUN if [ "$SPANVISION_SERVICE" = "bim" ]; then \

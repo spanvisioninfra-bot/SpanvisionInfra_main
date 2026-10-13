@@ -4,6 +4,8 @@ Deze gids neemt je in ongeveer 10 minuten mee van een leeg project naar een voll
 
 ## Wat je gaat doen
 
+Vanuit Spanvision Infra opent deze tool na een kort opstartscherm direct de werkruimte. Het welkomstvenster wordt overgeslagen; een herstelkeuze voor een bestaand project blijft beschikbaar.
+
 1. Een nieuw project aanmaken.
 2. Taken toevoegen — via het lint, de taaktabel en het Gantt-diagram.
 3. De taken in een structuur (WBS) zetten met inspringen.

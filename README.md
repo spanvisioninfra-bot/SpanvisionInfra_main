@@ -4,6 +4,8 @@
 
 A shared entry point for all 16 CAD, BIM, document, calculation, planning, structural, geotechnical and field tools.
 
+Updated **10 October 2026**: the existing website now opens Home first, with Pricing, FAQ, account screens and protected super-admin plan management. See the [release and deployment record](docs/deployment-2026-10-10.md), [hosting guide](DEPLOYMENT-GUIDE.md) and [account/admin activation guide](commerce/README.md). Real sign-in and payments remain inactive until provider setup is completed.
+
 English is the only interface language in this edition. Language menus offer English, browser language detection is disabled, and legacy Dutch preferences open in English. Calc reports and the PDF OCR language picker also default to English. Imported document text, technical identifiers and company names retain their original content.
 
 ## Build and preview
@@ -26,11 +28,11 @@ Open [SpanvisionInfra](http://127.0.0.1:4230/). Tool links open independent edit
 
 The CAD browser build uses the available `kali-linux` WSL Rust/Trunk toolchain on this Windows host, with `/tmp/spanvision-target` as its build cache. On Linux it uses the local Rust/Trunk toolchain. Other modules use their local Vite installations; the PDF browser build bypasses native runtime preparation. These browser builds do not produce Windows installers.
 
-Build selected modules with `node branding/build.mjs speech hub`, `node branding/build.mjs cad2d pdf ifc calc hub` or `node branding/build.mjs cad`. Restart the preview command after rebuilding an unavailable module. Speech Workspace runs independently at port 4240 and uses its own SW mark; the suite retains GW. Run `npm run verify:speech` for speech screens, sample import, account previews, migration and theme persistence.
+Build selected modules with `node branding/build.mjs speech hub`, `node branding/build.mjs cad2d pdf ifc calc hub` or `node branding/build.mjs cad`. Restart the preview command after rebuilding an unavailable module. Speech Workspace runs independently at port 4240. Run `npm run verify:speech` for speech screens, sample import, account previews, migration and theme persistence.
 
 ## Shared identity and presentation
 
-`branding/brand.json` controls the organization, suite name, GW mark, module registry, default theme and palette. `brand:sync` produces local manifests, CSS adapters, Rust/Iced palette constants and vector marks. Local adapters travel with each app so its standalone builds do not require the suite directory. `brand:icons` produces the native raster and platform icons. `brand:check` detects adapter drift.
+`branding/brand.json` controls the organization, suite name, module registry, default theme and palette. The supplied company mark and themed browser icons are shared across the site and tools. `brand:sync` produces local manifests, CSS adapters, Rust/Iced palette constants and vector marks. Local adapters travel with each app so its standalone builds do not require the suite directory. `brand:icons` produces the native raster and platform icons. `brand:check` detects adapter drift.
 
 Spanvision Mono uses a black background, #121212 panels, #1B1B1B workspaces, #202020 raised controls, white/light-gray primary text, #999999 supporting labels and translucent white borders/focus states. The [Agenciy live preview](https://agenciy.framer.website/) is the requested visual reference. Natural-color photography and drawing/model/document colors stay independent of the UI palette. Existing theme and canvas preferences win over new-profile defaults.
 
@@ -49,13 +51,13 @@ Four additional studios are imported from the supplied Spanvision source archive
 | Frame Vision Studio | http://127.0.0.1:4275/ | Frame design, profiles, 3D views and production plans |
 | Vision Calculation Studio | http://127.0.0.1:4280/ | Visual calculation designers, calculation documents and reports |
 
-Install dependencies with `npm ci --prefix open-vision-studio`, `npm ci --prefix fem-vision-studio`, `npm ci --prefix frame-vision-studio/ui` and `npm ci --prefix vision-calculation-studio`. Run `node branding/sync.mjs --modules=planner,fem,frame,calculation`, then `node branding/build.mjs planner fem frame calculation hub` and `npm run preview:suite`. Verify their launcher links and browser workflows with `npm run verify:studios`. The studio source notices are linked from the hub footer.
+Install dependencies with `npm ci --prefix open-vision-studio`, `npm ci --prefix fem-vision-studio`, `npm ci --prefix frame-vision-studio/ui` and `npm ci --prefix vision-calculation-studio`. Run `node branding/sync.mjs --modules=planner,fem,frame,calculation`, then `node branding/build.mjs planner fem frame calculation hub` and `npm run preview:suite`. Verify their launcher links and browser workflows with `npm run verify:studios`. The studio source notices remain in the application and repository files.
 
 Frame uses the browser WebAssembly engine included in its source archive. FEM retains its local browser solver. Optional native design checks, filesystem integrations, configured AI services and other desktop-only functions keep the limitations documented in the respective studios; adding the launchers does not provide a desktop runtime.
 
 Vision BIM Validator is imported from `Vision-BIM-Validator-Spanvision.zip`. The main overview has direct 2D CAD and BIM shortcuts; both also appear in Tools. BIM opens at [127.0.0.1:4260/home](http://127.0.0.1:4260/home), with its model workspace at `/viewer` and real IFC/IDS validation at `/validate`. The suite starts its FastAPI backend and serves the built frontend on the same port.
 
-For a fresh BIM installation, create `vision-bim-validator/.venv` with Python 3.12, install `vision-bim-validator/server/requirements.txt` and the editable `vision-bim-validator` package in that environment, then run `npm ci --prefix vision-bim-validator/viewer`. Run `node branding/sync.mjs --modules=bim`, `node branding/build.mjs bim hub`, and `npm run preview:suite`. `npm run preview:bim` starts the validator independently; `SPANVISION_BIM_PYTHON` can select another prepared Python environment. Run `npm run verify:bim` against the running suite. Source attribution remains in the imported notices and is linked from the hub footer.
+For a fresh BIM installation, create `vision-bim-validator/.venv` with Python 3.12, install `vision-bim-validator/server/requirements.txt` and the editable `vision-bim-validator` package in that environment, then run `npm ci --prefix vision-bim-validator/viewer`. Run `node branding/sync.mjs --modules=bim`, `node branding/build.mjs bim hub`, and `npm run preview:suite`. `npm run preview:bim` starts the validator independently; `SPANVISION_BIM_PYTHON` can select another prepared Python environment. Run `npm run verify:bim` against the running suite. Source attribution remains in the imported notices.
 
 2D CAD opens at [127.0.0.1:4220](http://127.0.0.1:4220/). Choose **New drawing** to draft in the browser or **Open file** to import an existing drawing. Build it with `node branding/build.mjs cad2d` if needed.
 
@@ -65,7 +67,7 @@ STL-3D map workspace opens at [127.0.0.1:8765](http://127.0.0.1:8765/) and retai
 
 Run `npm run build:stl:windows` for its portable ZIP and Inno Setup installer. The standalone application includes its own branding, offline interface assets and open-source notices. See [STL architecture](spanvision-stl-3d-map-workspace/ARCHITECTURE.md) and [verification report](qa/stl/VERIFICATION.md) for storage migration, compatibility and delivery details.
 
-The hub provides overview, tool launcher, scan demonstration, login, sign-up and account screens. Account and scan demonstrations are labeled previews. No credentials are transmitted or saved, and profile changes exist only in memory for the current session. Real OCR capabilities remain in the corresponding editors.
+The hub opens Home first, with Pricing, FAQ, sign-in, sign-up, recovery, account and admin screens. Tools retains all 16 anonymous workspaces and uses a branded splash before each editor. The hub supports real local OCR, with recognition and PDF/text downloads in the browser. Local profiles persist in browser storage. Online authentication and billing use the server endpoints in `commerce`; they remain unavailable until Supabase, email and payment-provider configuration is supplied. The [account guide](commerce/README.md) describes setup and the verified-email/UUID requirements for the designated super admin.
 
 ## Verification and attribution
 
@@ -75,7 +77,7 @@ Run `node qa/english/browser-audit.mjs` against the preview to check every tool 
 
 Run `npm run verify:suite` against the running suite preview. It exercises responsive layouts at 320, 390, 820 and 1440 pixels, dialogs, keyboard focus, account validation, module availability and upstream-brand leakage. Fresh captures and results are in `qa/suite/`; see [verification](qa/suite/VERIFICATION.md).
 
-Each application retains its original license, copyright records and technical compatibility names. Attribution is also available from the hub footer. Archived upstream documents are provenance copies, outside the active suite. The repository's root MIT license applies to original suite integration code; it does not replace the individual applications' licenses or their dependencies' licenses, including LGPL, GPL, Apache and Creative Commons notices retained in their directories.
+Each application retains its original license, copyright records and technical compatibility names. Source notices remain in the application and repository files; the hub footer now links the company Instagram and Facebook pages. Archived upstream documents are provenance copies, outside the active suite. The repository's root MIT license applies to original suite integration code; it does not replace the individual applications' licenses or their dependencies' licenses, including LGPL, GPL, Apache and Creative Commons notices retained in their directories.
 
 ## Complete source layout
 
@@ -107,7 +109,7 @@ Pointcloud Workspace uses the PW mark and opens at http://127.0.0.1:4250/. Build
 
 ## Cloud deployment
 
-Updated 6 October 2026: the hub and 15 tools are deployed from `version/V.1.0`, commit `36aa5c04`. Canonical FEM v2 now uses its real Rust API on Render. Planner's updated deployment remains pending its full verification gate. See [deployment record](docs/deployment-2026-10-06.md) for live checks and remaining limits. A root [Planner verification workflow](.github/workflows/planner-verify.yml) is prepared for a hosted full gate and awaits manual commit/push.
+The release branch is `version/V.1.0`. Planner's required verification completed successfully on 9 October, including 333 browser tests; its workspace-launch build was published. The main site now includes Home, Pricing, FAQ and account/admin screens. Canonical FEM uses its real Rust API on Render. The [10 October deployment record](docs/deployment-2026-10-10.md) records this source publication and cloud refresh; the [6 October record](docs/deployment-2026-10-06.md) preserves the earlier release state. Passing these checks does not establish production readiness for every tool or engineering scenario.
 
 The main screen and 14 static browser tools run as independent Vercel projects so each editor retains its own asset paths and browser drafts. BIM Validator and STL-3D Map run on Render with their Python APIs and frontends on the same origin. `render.yaml` explicitly selects free services in Singapore; the shared Dockerfile chooses its dependency set using `SPANVISION_SERVICE=bim` or `stl`.
 

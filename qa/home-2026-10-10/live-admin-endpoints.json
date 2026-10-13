@@ -1,0 +1,23 @@
+{
+  "verifiedAt": "2026-10-10T15:44:07.423Z",
+  "origin": "https://spanvision-infra.vercel.app",
+  "authAvailable": false,
+  "checks": [
+    {
+      "route": "/api/admin/users",
+      "status": 401,
+      "privateDataReturned": false
+    },
+    {
+      "route": "/api/admin/user?user=12345678-1234-4234-8234-123456789abc",
+      "status": 401,
+      "privateDataReturned": false
+    },
+    {
+      "route": "/api/commerce?__route=admin/users",
+      "status": 401,
+      "privateDataReturned": false
+    }
+  ],
+  "passed": true
+}

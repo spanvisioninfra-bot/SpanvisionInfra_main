@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "width": 1440,
+      "mode": "dark",
+      "renamed": 11,
+      "toolLinks": 16,
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "mode": "light",
+      "renamed": 11,
+      "toolLinks": 16,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "mode": "dark",
+      "renamed": 11,
+      "toolLinks": 16,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "mode": "light",
+      "renamed": 11,
+      "toolLinks": 16,
+      "passed": true
+    },
+    {
+      "width": 320,
+      "mode": "dark",
+      "renamed": 11,
+      "toolLinks": 16,
+      "passed": true
+    },
+    {
+      "width": 320,
+      "mode": "light",
+      "renamed": 11,
+      "toolLinks": 16,
+      "passed": true
+    }
+  ]
+}

@@ -24,12 +24,16 @@
   "hub": {
     "port": 4230,
     "organization": "Spanvision Infra",
-    "mark": "SI"
+    "mark": "SI",
+    "socialLinks": {
+      "instagram": "https://www.instagram.com/spanvisioninfra/?hl=en",
+      "facebook": "https://www.facebook.com/profile.php?id=61595189699901"
+    }
   },
   "modules": [
     {
       "id": "cad",
-      "label": "CAD",
+      "label": "Vision CAD Studio",
       "productName": "CAD",
       "organization": "Spanvision Infra",
       "mark": "CAD",
@@ -42,7 +46,7 @@
     },
     {
       "id": "cad2d",
-      "label": "2D CAD",
+      "label": "2D Vision Studio",
       "productName": "2D CAD",
       "organization": "Spanvision Infra",
       "mark": "CAD",
@@ -67,7 +71,7 @@
     },
     {
       "id": "pdf",
-      "label": "PDF",
+      "label": "Vision Portable Document Studio",
       "directory": "spanvision-pdf-workspace/open-pdf-studio",
       "dist": "dist",
       "port": 3084,
@@ -76,7 +80,7 @@
     },
     {
       "id": "ifc",
-      "label": "IFC",
+      "label": "Vision IFC Studio",
       "directory": "ifc-view",
       "dist": "apps/desktop/dist",
       "port": 3005,
@@ -85,7 +89,7 @@
     },
     {
       "id": "calc",
-      "label": "Calc",
+      "label": "Calc Vision Studio",
       "directory": "calc-workspace",
       "dist": "dist",
       "port": 4225,
@@ -145,7 +149,7 @@
     },
     {
       "id": "geo",
-      "label": "Geotechnical",
+      "label": "Vision Geotech Studio",
       "directory": "spanvision-geptechniek-workspace",
       "frontendDirectory": "apps/desktop",
       "dist": "apps/desktop/dist",
@@ -155,7 +159,7 @@
     },
     {
       "id": "speech",
-      "label": "Speech",
+      "label": "Speech Vision Studio",
       "productName": "speech workspace",
       "mark": "SW",
       "directory": "spanvision-speech-workspace",
@@ -166,7 +170,7 @@
     },
     {
       "id": "stl",
-      "label": "STL-3D Map",
+      "label": "Vision STL -3D Studio",
       "productName": "STL-3D map workspace",
       "mark": "STL",
       "directory": "spanvision-stl-3d-map-workspace",
@@ -177,7 +181,7 @@
     },
     {
       "id": "field",
-      "label": "Field Workspace",
+      "label": "Vision Field Studio",
       "productName": "Field Workspace",
       "mark": "FW",
       "directory": "spanvision-field-workspace",
@@ -188,7 +192,7 @@
     },
     {
       "id": "pointcloud",
-      "label": "Pointcloud Workspace",
+      "label": "Vision Pointcloud Studio",
       "productName": "Pointcloud Workspace",
       "mark": "PW",
       "directory": "spanvision-pointcloud-workspace",
@@ -199,7 +203,7 @@
     },
     {
       "id": "pile",
-      "label": "Pile Plane Workspace",
+      "label": "Vision Pile Studio",
       "productName": "Pile Plane Workspace",
       "mark": "PPW",
       "directory": "spanvision-pile-plane-workspace",

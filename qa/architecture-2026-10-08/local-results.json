@@ -1,0 +1,94 @@
+{
+  "url": "http://127.0.0.1:4230/",
+  "verifiedAt": "2026-10-08T17:47:35.101Z",
+  "passed": true,
+  "checks": [
+    {
+      "width": 1440,
+      "mode": "dark",
+      "drawingVisible": true,
+      "reducedMotionStationary": true,
+      "themeRedraw": true,
+      "noHorizontalOverflow": true,
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "mode": "light",
+      "drawingVisible": true,
+      "reducedMotionStationary": true,
+      "themeRedraw": true,
+      "noHorizontalOverflow": true,
+      "passed": true
+    },
+    {
+      "width": 820,
+      "mode": "dark",
+      "drawingVisible": true,
+      "reducedMotionStationary": true,
+      "themeRedraw": true,
+      "noHorizontalOverflow": true,
+      "passed": true
+    },
+    {
+      "width": 820,
+      "mode": "light",
+      "drawingVisible": true,
+      "reducedMotionStationary": true,
+      "themeRedraw": true,
+      "noHorizontalOverflow": true,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "mode": "dark",
+      "drawingVisible": true,
+      "reducedMotionStationary": true,
+      "themeRedraw": true,
+      "noHorizontalOverflow": true,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "mode": "light",
+      "drawingVisible": true,
+      "reducedMotionStationary": true,
+      "themeRedraw": true,
+      "noHorizontalOverflow": true,
+      "passed": true
+    },
+    {
+      "width": 320,
+      "mode": "dark",
+      "drawingVisible": true,
+      "reducedMotionStationary": true,
+      "themeRedraw": true,
+      "noHorizontalOverflow": true,
+      "passed": true
+    },
+    {
+      "width": 320,
+      "mode": "light",
+      "drawingVisible": true,
+      "reducedMotionStationary": true,
+      "themeRedraw": true,
+      "noHorizontalOverflow": true,
+      "passed": true
+    },
+    {
+      "animation": true,
+      "pausesOffscreen": true,
+      "resumesOnscreen": true,
+      "liveReducedMotion": true,
+      "themeRedrawWhilePaused": true,
+      "navigationRemount": true,
+      "passed": true
+    },
+    {
+      "canvasUnavailableFallback": true,
+      "noHorizontalOverflow": true,
+      "passed": true
+    }
+  ],
+  "browserErrors": []
+}

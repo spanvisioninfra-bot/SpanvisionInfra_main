@@ -1,0 +1,60 @@
+{
+  "url": "https://spanvision-infra.vercel.app/",
+  "verifiedAt": "2026-10-08T17:27:41.947Z",
+  "passed": true,
+  "checks": [
+    {
+      "width": 1440,
+      "mode": "dark",
+      "socialLinks": 2,
+      "oldFooterLinks": 0,
+      "toolLinks": 16,
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "mode": "light",
+      "socialLinks": 2,
+      "oldFooterLinks": 0,
+      "toolLinks": 16,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "mode": "dark",
+      "socialLinks": 2,
+      "oldFooterLinks": 0,
+      "toolLinks": 16,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "mode": "light",
+      "socialLinks": 2,
+      "oldFooterLinks": 0,
+      "toolLinks": 16,
+      "passed": true
+    },
+    {
+      "width": 320,
+      "mode": "dark",
+      "socialLinks": 2,
+      "oldFooterLinks": 0,
+      "toolLinks": 16,
+      "passed": true
+    },
+    {
+      "width": 320,
+      "mode": "light",
+      "socialLinks": 2,
+      "oldFooterLinks": 0,
+      "toolLinks": 16,
+      "passed": true
+    }
+  ],
+  "socialLinks": {
+    "Instagram": "https://www.instagram.com/spanvisioninfra/?hl=en",
+    "Facebook": "https://www.facebook.com/profile.php?id=61595189699901"
+  },
+  "browserErrors": []
+}

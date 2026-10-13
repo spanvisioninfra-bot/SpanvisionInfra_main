@@ -1,0 +1,50 @@
+{
+  "url": "https://spanvision-infra.vercel.app/#modules",
+  "verifiedAt": "2026-10-08T14:50:55.951Z",
+  "passed": true,
+  "results": [
+    {
+      "width": 1440,
+      "mode": "dark",
+      "renamed": 11,
+      "links": 16,
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "mode": "light",
+      "renamed": 11,
+      "links": 16,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "mode": "dark",
+      "renamed": 11,
+      "links": 16,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "mode": "light",
+      "renamed": 11,
+      "links": 16,
+      "passed": true
+    },
+    {
+      "width": 320,
+      "mode": "dark",
+      "renamed": 11,
+      "links": 16,
+      "passed": true
+    },
+    {
+      "width": 320,
+      "mode": "light",
+      "renamed": 11,
+      "links": 16,
+      "passed": true
+    }
+  ],
+  "browserErrors": []
+}

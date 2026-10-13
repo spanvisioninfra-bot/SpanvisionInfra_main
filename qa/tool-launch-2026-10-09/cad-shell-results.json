@@ -1,0 +1,51 @@
+{
+  "verifiedAt": "2026-10-09T05:51:59.095Z",
+  "checks": [
+    {
+      "mode": "dark",
+      "launch": true,
+      "activeDocument": {
+        "dirty": false,
+        "id": 2,
+        "path": null,
+        "revision": 0,
+        "start": false,
+        "title": "Drawing1"
+      },
+      "repeatPreservesDrawing": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "mode": "light",
+      "launch": true,
+      "activeDocument": {
+        "dirty": false,
+        "id": 2,
+        "path": null,
+        "revision": 0,
+        "start": false,
+        "title": "Drawing1"
+      },
+      "repeatPreservesDrawing": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "mode": "dark",
+      "launch": false,
+      "activeDocument": {
+        "dirty": false,
+        "id": 1,
+        "path": null,
+        "revision": 0,
+        "start": true,
+        "title": "Start"
+      },
+      "repeatPreservesDrawing": true,
+      "errors": [],
+      "passed": true
+    }
+  ],
+  "passed": true
+}

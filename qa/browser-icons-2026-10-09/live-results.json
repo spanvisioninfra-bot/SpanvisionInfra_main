@@ -1,0 +1,422 @@
+{
+  "checks": [
+    {
+      "tool": "cad",
+      "platform": "vercel",
+      "url": "https://spanvision-cad.vercel.app/app/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-cad.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-cad.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "cad2d",
+      "platform": "vercel",
+      "url": "https://spanvision-cad2d.vercel.app/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-cad2d.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-cad2d.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "pdf",
+      "platform": "vercel",
+      "url": "https://spanvision-pdf.vercel.app/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-pdf.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-pdf.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "ifc",
+      "platform": "vercel",
+      "url": "https://spanvision-ifc.vercel.app/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-ifc.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-ifc.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "calc",
+      "platform": "vercel",
+      "url": "https://spanvision-calc.vercel.app/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-calc.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-calc.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "planner",
+      "platform": "vercel",
+      "url": "https://spanvision-planner.vercel.app/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-planner.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-planner.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "fem",
+      "platform": "vercel",
+      "url": "https://spanvision-fem.vercel.app/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-fem.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-fem.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "frame",
+      "platform": "vercel",
+      "url": "https://spanvision-frame.vercel.app/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-frame.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-frame.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "calculation",
+      "platform": "vercel",
+      "url": "https://spanvision-calculation.vercel.app/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-calculation.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-calculation.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "geo",
+      "platform": "vercel",
+      "url": "https://spanvision-geo.vercel.app/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-geo.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-geo.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "speech",
+      "platform": "vercel",
+      "url": "https://spanvision-speech.vercel.app/?appearance=dark&launch=workspace#workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-speech.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-speech.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "field",
+      "platform": "vercel",
+      "url": "https://spanvision-field.vercel.app/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-field.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-field.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "pointcloud",
+      "platform": "vercel",
+      "url": "https://spanvision-pointcloud.vercel.app/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-pointcloud.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-pointcloud.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "pile",
+      "platform": "vercel",
+      "url": "https://spanvision-pile.vercel.app/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-pile.vercel.app/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-pile.vercel.app/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "bim",
+      "platform": "render",
+      "url": "https://spanvision-bim.onrender.com/viewer?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-bim.onrender.com/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-bim.onrender.com/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "tool": "stl",
+      "platform": "render",
+      "url": "https://spanvision-stl.onrender.com/?appearance=dark&launch=workspace",
+      "checks": [
+        {
+          "mode": "dark",
+          "href": "https://spanvision-stl.onrender.com/static/__spanvision-brand/company-dark.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        },
+        {
+          "mode": "light",
+          "href": "https://spanvision-stl.onrender.com/static/__spanvision-brand/company-light.svg",
+          "svg": true,
+          "pngFallback": true,
+          "decoded": true,
+          "passed": true
+        }
+      ],
+      "legacyRemoved": true,
+      "errors": [],
+      "passed": true
+    }
+  ],
+  "verifiedAt": "2026-10-09T06:15:44.875Z",
+  "passed": true
+}

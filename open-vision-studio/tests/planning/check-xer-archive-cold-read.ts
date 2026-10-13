@@ -2,11 +2,13 @@
 // is daarbij bewust beschermd: alleen readIFCWithXerReconstruction mag de lazy XER-chunk laden.
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 const root = process.cwd();
-const esbuild = join(root, 'node_modules', 'esbuild', 'bin', 'esbuild');
+// Laat esbuild zelf de platformbinary kiezen; bin/esbuild is op Linux een ELF-bestand.
+const { buildSync } = createRequire(join(root, 'package.json'))('esbuild') as typeof import('esbuild');
 const temporary = mkdtempSync(join(tmpdir(), 'ops-xer-cold-read-'));
 const writer = join(temporary, 'writer.mjs');
 const rawReader = join(temporary, 'reader-raw.mjs');
@@ -21,13 +23,22 @@ const expect = (label: string, condition: boolean): void => {
 };
 
 function bundle(source: string, output: string): void {
-  execFileSync(process.execPath, [esbuild,
-    source, '--log-level=error', '--bundle', '--platform=node', '--format=esm',
-    `--alias:@=${join(root, 'src')}`,
-    '--define:import.meta.env.DEV=false', '--define:import.meta.env.PROD=true',
-    '--define:import.meta.env.MODE="production"', '--define:__OPS_DEV_INSTANCE__="test"',
-    `--outfile=${output}`,
-  ], { cwd: root, stdio: 'pipe' });
+  buildSync({
+    absWorkingDir: root,
+    entryPoints: [source],
+    logLevel: 'error',
+    bundle: true,
+    platform: 'node',
+    format: 'esm',
+    alias: { '@': join(root, 'src') },
+    define: {
+      'import.meta.env.DEV': 'false',
+      'import.meta.env.PROD': 'true',
+      'import.meta.env.MODE': '"production"',
+      '__OPS_DEV_INSTANCE__': '"test"',
+    },
+    outfile: output,
+  });
 }
 
 function childJson(entry: string): Record<string, unknown> {

@@ -1,0 +1,19 @@
+{
+  "origin": "http://127.0.0.1:4231",
+  "verifiedAt": "2026-10-10T16:03:28.240Z",
+  "checks": [
+    {
+      "name": "Real unconfigured website: admin is hidden and anonymous API access is rejected",
+      "passed": true
+    },
+    {
+      "name": "Mocked admin UI: all-plan account, listing, validated grant, audit, clearing and focus",
+      "passed": true
+    },
+    {
+      "name": "Mocked member UI: direct admin navigation does not request private user data",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

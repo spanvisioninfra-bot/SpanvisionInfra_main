@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "width": 1440,
+      "mode": "dark",
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "mode": "light",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "mode": "dark",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "mode": "light",
+      "passed": true
+    }
+  ],
+  "reload": true,
+  "profileTheme": true,
+  "browserErrors": []
+}

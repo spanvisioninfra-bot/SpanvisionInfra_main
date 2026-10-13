@@ -1,0 +1,767 @@
+{
+  "verifiedAt": "2026-10-09T06:38:12.714Z",
+  "preview": true,
+  "checks": [
+    {
+      "tool": "hub",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 7,
+          "canvases": [
+            {
+              "width": 490.171875,
+              "height": 437.4375
+            }
+          ]
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 7,
+          "canvases": [
+            {
+              "width": 490.171875,
+              "height": 437.4375
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "mobileFits": true,
+      "before": {
+        "font": "\"Segoe UI\", Arial, sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": [
+          {
+            "width": 490.171875,
+            "height": 437.4375
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "tool": "cad",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 0,
+          "canvases": [
+            {
+              "width": 1440,
+              "height": 980
+            }
+          ]
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 0,
+          "canvases": [
+            {
+              "width": 1440,
+              "height": 980
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "\"Times New Roman\"",
+        "width": 1440,
+        "height": 980,
+        "canvases": [
+          {
+            "width": 1440,
+            "height": 980
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "tool": "cad2d",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 93,
+          "canvases": [
+            {
+              "width": 992,
+              "height": 743
+            }
+          ]
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 93,
+          "canvases": [
+            {
+              "width": 992,
+              "height": 743
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "Inter, system-ui, Avenir, Helvetica, Arial, sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": [
+          {
+            "width": 992,
+            "height": 743
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "tool": "bim",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 26,
+          "canvases": [
+            {
+              "width": 716,
+              "height": 792
+            }
+          ]
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 26,
+          "canvases": [
+            {
+              "width": 716,
+              "height": 792
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": [
+          {
+            "width": 716,
+            "height": 792
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "tool": "pdf",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 120,
+          "canvases": [
+            {
+              "width": 0,
+              "height": 0
+            },
+            {
+              "width": 0,
+              "height": 0
+            },
+            {
+              "width": 0,
+              "height": 0
+            }
+          ]
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 120,
+          "canvases": [
+            {
+              "width": 0,
+              "height": 0
+            },
+            {
+              "width": 0,
+              "height": 0
+            },
+            {
+              "width": 0,
+              "height": 0
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "\"Segoe UI\", Tahoma, Geneva, Verdana, sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": [
+          {
+            "width": 0,
+            "height": 0
+          },
+          {
+            "width": 0,
+            "height": 0
+          },
+          {
+            "width": 0,
+            "height": 0
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "tool": "ifc",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 16,
+          "canvases": [
+            {
+              "width": 1080,
+              "height": 892
+            }
+          ]
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 16,
+          "canvases": [
+            {
+              "width": 1080,
+              "height": 892
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "\"DM Sans\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": [
+          {
+            "width": 1080,
+            "height": 892
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "tool": "calc",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 94,
+          "canvases": []
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 94,
+          "canvases": []
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "Inter, \"Segoe UI\", Tahoma, Geneva, Verdana, sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": []
+      },
+      "passed": true
+    },
+    {
+      "tool": "planner",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 46,
+          "canvases": [
+            {
+              "width": 772,
+              "height": 733
+            },
+            {
+              "width": 772,
+              "height": 733
+            }
+          ]
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 46,
+          "canvases": [
+            {
+              "width": 772,
+              "height": 733
+            },
+            {
+              "width": 772,
+              "height": 733
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "Inter, system-ui, sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": [
+          {
+            "width": 772,
+            "height": 733
+          },
+          {
+            "width": 772,
+            "height": 733
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "tool": "fem",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 77,
+          "canvases": []
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 77,
+          "canvases": []
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "\"Segoe UI\", Tahoma, Geneva, Verdana, sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": []
+      },
+      "passed": true
+    },
+    {
+      "tool": "frame",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 51,
+          "canvases": []
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 51,
+          "canvases": []
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "Inter, system-ui, sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": []
+      },
+      "passed": true
+    },
+    {
+      "tool": "calculation",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 58,
+          "canvases": []
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 58,
+          "canvases": []
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": []
+      },
+      "passed": true
+    },
+    {
+      "tool": "geo",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 24,
+          "canvases": []
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 24,
+          "canvases": []
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "\"Segoe UI\", Tahoma, Geneva, Verdana, sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": []
+      },
+      "passed": true
+    },
+    {
+      "tool": "speech",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 16,
+          "canvases": []
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 16,
+          "canvases": []
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "\"Segoe UI\", system-ui, -apple-system, sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": []
+      },
+      "passed": true
+    },
+    {
+      "tool": "stl",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 18,
+          "canvases": []
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 18,
+          "canvases": []
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "Inter, system-ui, sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": []
+      },
+      "passed": true
+    },
+    {
+      "tool": "field",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 81,
+          "canvases": [
+            {
+              "width": 0,
+              "height": 0
+            },
+            {
+              "width": 0,
+              "height": 0
+            }
+          ]
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 81,
+          "canvases": [
+            {
+              "width": 0,
+              "height": 0
+            },
+            {
+              "width": 0,
+              "height": 0
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": [
+          {
+            "width": 0,
+            "height": 0
+          },
+          {
+            "width": 0,
+            "height": 0
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "tool": "pointcloud",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 25,
+          "canvases": [
+            {
+              "width": 1184,
+              "height": 793
+            }
+          ]
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1440,
+          "viewportWidth": 1440,
+          "buttons": 25,
+          "canvases": [
+            {
+              "width": 1184,
+              "height": 793
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "Inter, system-ui, Avenir, Helvetica, Arial, sans-serif",
+        "width": 1440,
+        "height": 980,
+        "canvases": [
+          {
+            "width": 1184,
+            "height": 793
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "tool": "pile",
+      "modes": [
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1800,
+          "viewportWidth": 1440,
+          "buttons": 547,
+          "canvases": [
+            {
+              "width": 732,
+              "height": 755
+            }
+          ]
+        },
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "uiFontReady": true,
+          "headingFontReady": true,
+          "bodyWidth": 1800,
+          "viewportWidth": 1440,
+          "buttons": 547,
+          "canvases": [
+            {
+              "width": 732,
+              "height": 755
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "before": {
+        "font": "\"Times New Roman\"",
+        "width": 1440,
+        "height": 980,
+        "canvases": [
+          {
+            "width": 732,
+            "height": 755
+          }
+        ]
+      },
+      "passed": true
+    }
+  ],
+  "passed": true
+}

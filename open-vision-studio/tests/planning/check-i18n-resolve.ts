@@ -10,6 +10,7 @@
  */
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,6 +21,8 @@ const diffs: string[] = [];
 const ok = (label: string, cond: boolean, detail = '') => { checks++; if (!cond) diffs.push(`${label}${detail ? ` — ${detail}` : ''}`); };
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+// De JS-API werkt met zowel de Windows-wrapper als de native Linux/macOS-binary.
+const { buildSync } = createRequire(join(root, 'package.json'))('esbuild') as typeof import('esbuild');
 const work = mkdtempSync(join(tmpdir(), 'ops-i18n-resolve-'));
 const repo = join(work, 'repo');
 const bundle = join(work, 'resolve.mjs');
@@ -43,9 +46,15 @@ const edit = (fn: (loc: string, obj: JsonObject) => JsonObject, ns = 'common') =
 const unmerged = () => git('diff', '--name-only', '--diff-filter=U').out.trim().split('\n').filter(Boolean);
 
 try {
-  const esbuild = spawnSync(process.execPath, [join(root, 'node_modules', 'esbuild', 'bin', 'esbuild'), join(root, 'scripts', 'i18n-resolve.ts'),
-    '--bundle', '--platform=node', '--format=esm', '--log-level=error', `--outfile=${bundle}`], { encoding: 'utf8' });
-  if (esbuild.status !== 0) throw new Error(`bundelen van i18n-resolve.ts mislukt: ${esbuild.stderr}`);
+  buildSync({
+    absWorkingDir: root,
+    entryPoints: [join(root, 'scripts', 'i18n-resolve.ts')],
+    bundle: true,
+    platform: 'node',
+    format: 'esm',
+    logLevel: 'error',
+    outfile: bundle,
+  });
 
   // Basis: tien sleutels per bestand, één per regel (de vaste opmaak).
   mkdirSync(repo, { recursive: true });

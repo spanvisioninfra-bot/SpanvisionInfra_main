@@ -4,6 +4,8 @@ This guide takes you, in about 10 minutes, from an empty project to a fully calc
 
 ## What you'll do
 
+Opening this tool from Spanvision Infra takes you through a brief splash directly to the workspace. The welcome dialog is skipped; any recovery choice for an existing project is still shown.
+
 1. Create a new project.
 2. Add tasks — via the ribbon, the task table and the Gantt chart.
 3. Put the tasks into a structure (WBS) by indenting.

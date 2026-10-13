@@ -1,0 +1,152 @@
+{
+  "verifiedAt": "2026-10-09T04:09:27.088Z",
+  "passed": true,
+  "checks": [
+    {
+      "tool": "cad",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "cad2d",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "bim",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "pdf",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "ifc",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "calc",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "planner",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "fem",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "frame",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "calculation",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "geo",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "speech",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "stl",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "field",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "pointcloud",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "tool": "pile",
+      "splash": true,
+      "directWorkspaceUrl": true,
+      "handoffFixture": true,
+      "passed": true
+    },
+    {
+      "unknownToolRejected": true,
+      "arbitraryUrlIgnored": true,
+      "passed": true
+    },
+    {
+      "unavailableToolStaysOnSplash": true,
+      "retryRecovers": true,
+      "passed": true
+    },
+    {
+      "mobileLightSplash": true,
+      "reducedMotion": true,
+      "noOverflow": true,
+      "passed": true
+    },
+    {
+      "actualCad2d": true,
+      "directEditor": true,
+      "drawingInput": true,
+      "automaticDraftRecovery": true,
+      "manualProjectStart": true,
+      "passed": true
+    },
+    {
+      "actualCad2dMobile": true,
+      "directEditor": true,
+      "passed": true
+    },
+    {
+      "storageUnavailableStillOpensEditor": true,
+      "passed": true
+    }
+  ],
+  "browserErrors": []
+}

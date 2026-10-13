@@ -15,6 +15,7 @@ const mobile = isMobileViewer();
 const Editor = lazy(() => mobile ? import('../tablet/TabletApp') : import('../../App'));
 
 export default function WebApp() {
+  const [directLaunch, setDirectLaunch] = useState(() => new URL(location.href).searchParams.get('launch') === 'workspace');
   const [started, setStarted] = useState(false);
   const [drafts, setDrafts] = useState<BrowserDraft[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,6 +31,7 @@ export default function WebApp() {
         await writeDraft(extractDraft(state, useReviewStore.getState().byDocument[state.activeDocumentId]));
         setDrafts(await listDrafts());
       } catch { notifyWeb('Could not save the recovery draft. Download your project to keep a copy.', true); }
+      setDirectLaunch(false);
       setStarted(false);
     };
     window.addEventListener('spanvision-start', onStart);
@@ -42,13 +44,21 @@ export default function WebApp() {
       try {
         await migrateLegacyDraft();
         const stored = await listDrafts();
-        if (live) setDrafts(stored);
+        if (live) {
+          setDrafts(stored);
+          if (directLaunch && stored[0]) restoreBrowserDraft(stored[0]);
+        }
       } catch { notifyWeb('Draft recovery is unavailable in this browser. You can still open and download local files.', true); }
-      finally { if (live) setLoading(false); }
+      finally {
+        if (live) {
+          setLoading(false);
+          if (directLaunch) setStarted(true);
+        }
+      }
     };
     void load();
     return () => { live = false; };
-  }, []);
+  }, [directLaunch]);
   useEffect(() => {
     if (!started) return;
     return startBrowserSession();
@@ -89,7 +99,8 @@ export default function WebApp() {
     <div className="web-editor" inert={!started} aria-hidden={!started}>
       <Suspense fallback={<div className="web-loading"><Loader2 className="animate-spin" size={24} /><span>Opening workspace…</span></div>}><Editor /></Suspense>
     </div>
-    {!started && <div className="web-start-overlay" data-web-modal>
+    {!started && directLaunch && <div className="web-loading" role="status"><Loader2 className="animate-spin" size={24} /><span>Opening workspace…</span></div>}
+    {!started && !directLaunch && <div className="web-start-overlay" data-web-modal>
       <section className="web-start" aria-label="Start a CAD project">
         <header className="web-start-brand"><img src="/logo.svg" alt={BRAND.mark} /><span>{BRAND.organization}</span><span className="web-edition">WEB WORKSPACE</span></header>
         <div className="web-start-intro"><span className="web-eyebrow">DRAW · REFINE · BUILD</span><h1>{BRAND.product}</h1><p>A precise space for your next idea.<br />Create a drawing, open a file, or pick up where you left off.</p></div>

@@ -50,6 +50,9 @@ for (const id of ids) {
   const response = await fetch(new URL(module.path, url), { signal: AbortSignal.timeout(30000) });
   if (!response.ok || !(response.headers.get('content-type') || '').includes('text/html')) throw new Error(`Public page check failed for ${id}: ${response.status}`);
   report[id] = { id, url: new URL(module.path, url).href, available: true, platform: 'vercel', deploymentId: metadata?.deployment.id, verifiedAt: new Date().toISOString() };
-  await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
+  // Preserve the previous valid record if a disk-full error interrupts writing.
+  const temporaryReport = reportPath + '.tmp';
+  await fs.writeFile(temporaryReport, JSON.stringify(report, null, 2));
+  await fs.rename(temporaryReport, reportPath);
   console.log(`${id}: ${report[id].url}`);
 }

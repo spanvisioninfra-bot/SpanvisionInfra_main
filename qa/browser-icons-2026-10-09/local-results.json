@@ -1,0 +1,110 @@
+{
+  "verifiedAt": "2026-10-09T06:27:08.032Z",
+  "checks": [
+    {
+      "tool": "cad",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "tool": "cad2d",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "tool": "bim",
+      "packaged": true,
+      "platform": "render-prepared",
+      "passed": true
+    },
+    {
+      "tool": "pdf",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "tool": "ifc",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "tool": "calc",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "tool": "planner",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "tool": "fem",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "tool": "frame",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "tool": "calculation",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "tool": "geo",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "tool": "speech",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "tool": "stl",
+      "packaged": true,
+      "platform": "render-prepared",
+      "passed": true
+    },
+    {
+      "tool": "field",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "tool": "pointcloud",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "tool": "pile",
+      "packaged": true,
+      "platform": "vercel",
+      "passed": true
+    },
+    {
+      "themeSwitching": true,
+      "legacyRemoved": true,
+      "idempotent": true,
+      "imagesDecoded": true,
+      "errors": [],
+      "passed": true
+    }
+  ],
+  "passed": true
+}

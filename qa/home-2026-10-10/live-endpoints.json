@@ -1,0 +1,41 @@
+{
+  "verifiedAt": "2026-10-10T16:11:26.788Z",
+  "origin": "https://spanvision-infra.vercel.app",
+  "checks": [
+    {
+      "route": "/",
+      "status": 200
+    },
+    {
+      "route": "/api/account/config",
+      "status": 200
+    },
+    {
+      "route": "/api/account/session",
+      "status": 200
+    },
+    {
+      "route": "/__suite/status",
+      "status": 200
+    },
+    {
+      "route": "/api/account/sign-in",
+      "status": 503,
+      "expected": "Setup required; no account or payment activated"
+    }
+  ],
+  "account": {
+    "authAvailable": false,
+    "pricingApproved": false,
+    "checkoutAvailable": {
+      "IN": false,
+      "US": false,
+      "GB": false
+    },
+    "plans": [
+      "Explorer",
+      "Studio",
+      "Team"
+    ]
+  }
+}

@@ -1,0 +1,81 @@
+/* Spanvision Infra: clear engineering typography and restrained chrome. */
+@font-face{font-family:"Spanvision Sans";src:url("Inter-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Spanvision Sans";src:url("Inter-Medium.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"Spanvision Sans";src:url("Inter-SemiBold.woff2") format("woff2");font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:"Spanvision Sans";src:url("Inter-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"Spanvision Display";src:url("SpaceGrotesk-Medium.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"Spanvision Display";src:url("SpaceGrotesk-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+
+@media screen {
+  :root[data-sv-tool]{
+    --sv-font-ui:"Spanvision Sans",Inter,system-ui,sans-serif;
+    --sv-font-display:"Spanvision Display","Spanvision Sans",system-ui,sans-serif;
+    --font-body:var(--sv-font-ui);--font-heading:var(--sv-font-display);
+    --font-sans:var(--sv-font-ui);--font-family:var(--sv-font-ui);
+    --sv-ui-radius:8px;--sv-panel-radius:14px;
+  }
+  :root[data-sv-tool] body{
+    font-family:var(--sv-font-ui)!important;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  :root[data-sv-tool] :is(button,input,select,textarea,.sv-appearance-control,.sv-map-location){font-family:var(--sv-font-ui)!important}
+  :root[data-sv-tool] :is(h1,h2,h3,.titlebar-title,.brand-name,.project-title,.panel-title,.section-title){font-family:var(--sv-font-display)!important;letter-spacing:-.025em}
+  :root[data-sv-tool] :is(input[type="number"],table,.statusbar,.status-bar,#statusbar){font-variant-numeric:tabular-nums}
+  :root[data-sv-tool] :is(pre,code,kbd,.font-mono,.monospace,.mono,.command-input,[class*="-mono"]){font-family:ui-monospace,"Cascadia Code","Consolas",monospace!important}
+
+  /* Engineering editors keep their current dimensions and hit areas. */
+  :root[data-sv-tool]:not([data-sv-tool="hub"]):not([data-theme="high-contrast"]) :is(.titlebar,.title-bar,.sv-cad2d-titlebar,.top-bar,.topbar){
+    border-bottom-color:var(--sv-border);
+    background:linear-gradient(180deg,var(--sv-raised),var(--sv-surface));
+    box-shadow:inset 0 1px 0 color-mix(in srgb,var(--sv-text) 4%,transparent);
+  }
+  :root[data-sv-tool]:not([data-sv-tool="hub"]) :is(.ribbon-tab,.panel-tab,.sidebar-tab,.doc-tab,.workspace-tab){
+    font-weight:500;letter-spacing:.005em;
+    border-top-left-radius:7px;border-top-right-radius:7px;
+  }
+  :root[data-sv-tool]:not([data-sv-tool="hub"]):not([data-theme="high-contrast"]) :is(.ribbon-tab.active,.panel-tab.active,.workspace-tab.active,.doc-tab.active){
+    box-shadow:inset 0 -2px 0 var(--sv-text);font-weight:600;
+  }
+  :root[data-sv-tool]:not([data-sv-tool="hub"]) :is(.ribbon-button,.ribbon-btn,.toolbar-button,.toolbar-btn,.btn,.btn-primary,.btn-secondary){border-radius:var(--sv-ui-radius)}
+  :root[data-sv-tool] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),select,textarea){border-radius:6px}
+  :root[data-sv-tool] .sv-appearance-control select{border-radius:8px;font-weight:500;box-shadow:inset 0 1px 0 color-mix(in srgb,var(--sv-text) 4%,transparent)}
+  :root[data-sv-tool]:not([data-sv-tool="hub"]) :is(.panel-header,.sidebar-header,.properties-header,.section-header){font-weight:600;letter-spacing:.035em}
+  :root[data-sv-tool]:not([data-sv-tool="hub"]) :is(.dialog,.modal,.dialog-container,.modal-content,.settings-dialog){border-radius:var(--sv-panel-radius);box-shadow:0 20px 64px #0004}
+  :root[data-sv-tool]:not([data-sv-tool="hub"]) :is(.statusbar,.status-bar,#statusbar){border-top:1px solid var(--sv-border);font-size:11px}
+  :root[data-sv-tool="cad"] #loading .title{font-family:var(--sv-font-display);font-size:28px;letter-spacing:-.03em}
+  :root[data-sv-tool="cad"] #loading .sub{font-family:var(--sv-font-ui);font-size:13px}
+
+  /* The main site is more spacious; the studios use the same type system. */
+  :root[data-sv-tool="hub"] :is(.hero h1,.company-intro h1,.page-intro h1){font-family:var(--sv-font-display);letter-spacing:-.045em;font-weight:500;line-height:1.06}
+  :root[data-sv-tool="hub"] .brand-lockup{font-weight:600;letter-spacing:-.025em}
+  :root[data-sv-tool="hub"] .brand-lockup small{font-weight:400;letter-spacing:.025em}
+  :root[data-sv-tool="hub"] .company-intro-bottom p{line-height:1.85;max-width:550px}
+  :root[data-sv-tool="hub"] .company-catalog .module-card{
+    border:1px solid var(--sv-border);border-radius:14px;
+    padding:24px;background:var(--sv-surface);
+    box-shadow:inset 0 1px 0 color-mix(in srgb,var(--sv-text) 3%,transparent);
+  }
+  :root[data-sv-tool="hub"] .company-catalog .module-card h3{font-family:var(--sv-font-display);font-size:clamp(25px,2.3vw,32px);font-weight:500;line-height:1.18;letter-spacing:-.035em}
+  :root[data-sv-tool="hub"] .company-catalog .module-card p{font-size:13px;line-height:1.75}
+  :root[data-sv-tool="hub"] .company-catalog .module-icon{border-radius:12px;background:var(--sv-raised);border:1px solid var(--sv-border)}
+  :root[data-sv-tool="hub"] .button{border-radius:10px;font-weight:500;letter-spacing:-.015em}
+  :root[data-sv-tool="hub"] :is(.footer-social a,.scan-dialog,.suggestion-card){border-radius:12px}
+  :root[data-sv-tool="hub"] .catalog-heading h2{font-family:var(--sv-font-display);font-weight:500;letter-spacing:-.03em}
+  :root[data-sv-tool="hub"] .eyebrow{font-family:var(--sv-font-ui);font-weight:500;letter-spacing:.16em}
+  :root[data-sv-tool="hub"] .tool-splash h1{font-family:var(--sv-font-display);letter-spacing:-.03em}
+
+  @media(hover:hover) and (pointer:fine){
+    :root[data-sv-tool="hub"] .company-catalog .module-card:hover{border-color:var(--sv-focus);background:var(--sv-raised);box-shadow:0 12px 36px #0001}
+    :root[data-sv-tool]:not([data-sv-tool="hub"]):not([data-theme="high-contrast"]) :is(.ribbon-button,.ribbon-btn,.toolbar-button,.toolbar-btn,.btn-secondary):hover:not(:disabled){background-color:var(--sv-raised)}
+  }
+  @media(max-width:600px){
+    :root[data-sv-tool="hub"] .company-catalog .module-card{padding:20px;border-radius:12px}
+    :root[data-sv-tool="hub"] .company-catalog .module-card h3{font-size:27px}
+  }
+  @media(prefers-reduced-motion:no-preference){
+    :root[data-sv-tool] :is(.ribbon-button,.ribbon-btn,.toolbar-button,.toolbar-btn,.btn,.module-card,.button){transition:background-color 160ms ease,border-color 160ms ease,box-shadow 180ms ease}
+  }
+  @media(forced-colors:active){
+    :root[data-sv-tool] :is(.titlebar,.title-bar,.sv-cad2d-titlebar,.top-bar,.topbar,.module-card){background:Canvas!important;color:CanvasText!important;box-shadow:none!important}
+  }
+}

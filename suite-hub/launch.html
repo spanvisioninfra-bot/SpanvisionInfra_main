@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" data-theme="spanvision-mono">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <meta name="robots" content="noindex">
+  <title>Opening workspace — Spanvision Infra</title>
+  <link id="company-favicon" rel="icon" href="/spanvision-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/appearance.css">
+  <script src="/appearance.js" data-module="hub"></script>
+</head>
+<body>
+  <main class="tool-splash" aria-busy="true">
+    <div class="splash-content">
+      <div class="splash-mark"><img id="splash-logo" src="/spanvision-mark.svg" width="72" height="72" alt=""><span class="splash-ring" aria-hidden="true"></span></div>
+      <p class="splash-organization">Spanvision Infra</p>
+      <h1 id="splash-title">Your workspace</h1>
+      <p id="splash-status" role="status" aria-live="polite">Opening workspace…</p>
+      <div class="splash-progress" aria-hidden="true"><span></span></div>
+      <div id="splash-actions" hidden><button id="splash-retry" type="button">Try again</button><a href="/#modules">Back to tools</a></div>
+      <noscript><p>Enable JavaScript to open this workspace.</p><a href="/#modules">Back to tools</a></noscript>
+    </div>
+  </main>
+  <script type="module" src="/src/launch.js"></script>
+</body>
+</html>

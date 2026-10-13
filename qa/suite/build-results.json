@@ -4,7 +4,7 @@
   "ifc": "passed",
   "calc": "passed",
   "hub": "passed",
-  "cad": "passed",
+  "cad": "cad-build failed (1). See qa/suite/cad-build.log.",
   "geo": "passed",
   "speech": "passed",
   "stl": "passed",

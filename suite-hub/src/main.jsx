@@ -1,27 +1,36 @@
-import { createSignal, onMount, onCleanup, For, Show } from 'solid-js';
+import { createSignal, createEffect, onMount, onCleanup, For, Show } from 'solid-js';
 import { render } from 'solid-js/web';
 import brand from './brand.json';
 import { readLocalProfile, saveLocalProfile } from './local-profile';
-import Globe from './Globe';
-import { isLocalPreview, moduleUrl } from './module-url';
+import MarketingHome, {Pricing,FAQ} from './MarketingHome';
+import {AuthGateway,OnlineAccount} from './AccountGateway';
+import {createAccountState} from './account-client';
+import AdminPanel from './AdminPanel';
+import ToolIcon from './ToolIcon';
+import { isLocalPreview, moduleUrl, toolLaunchUrl } from './module-url';
 import './preview.css';
 import './palette.css';
 import './hub.css';
+import './marketing.css';
+import './admin.css';
 
 const organization=brand.hub.organization||brand.organization;
 function Arrow() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>; }
-function ToolIcon(props) {
-  const paths={cad:'M4 4h16v16H4zM4 16 16 4M8 20 20 8',cad2d:'M4 20V4h16M8 16l8-8 3 3-8 8-4 1z',bim:'m12 3 9 5v9l-9 5-9-5V8zM3 8l9 5 9-5M12 13v9',pdf:'M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6',ifc:'m12 3 9 5v9l-9 5-9-5V8zM3 8l9 5 9-5M12 13v9',calc:'M5 3h14v18H5zM8 7h8M8 11h2M14 11h2M8 15h2M14 15h2M8 18h2M14 18h2',planner:'M4 5h16v16H4zM8 3v4M16 3v4M4 10h16M8 14h3M13 17h3',fem:'M3 20h18M5 20V5h14v15M5 5l14 15M19 5 5 20M3 5h4M17 5h4',frame:'M3 20h18M5 20V5h14v15M3 5h4M17 5h4M4 19h2M18 19h2',calculation:'M4 4h16v16H4zM8 8h3M9.5 6.5v3M14 8h3M8 13l3 3M11 13l-3 3M14 13h3M14 16h3',geo:'M3 5h18M3 10c3-3 6 3 9 0s6 3 9 0M3 15c3-3 6 3 9 0s6 3 9 0M3 20h18',speech:'M4 10v4M8 6v12M12 3v18M16 6v12M20 10v4',stl:'m12 3 9 5-9 5-9-5zM3 12l9 5 9-5M3 16l9 5 9-5',field:'M9 4H5v17h14V4h-4M9 2h6v5H9zM8 13l3 3 5-6',pointcloud:'M4 4h2v2H4zM11 4h2v2h-2zM18 4h2v2h-2zM4 11h2v2H4zM11 11h2v2h-2zM18 11h2v2h-2zM4 18h2v2H4zM11 18h2v2h-2zM18 18h2v2h-2z',pile:'M3 6h18M6 6v13M12 6v13M18 6v13M4 19h4M10 19h4M16 19h4'};
-  return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={paths[props.module.id]}/></svg>;
+function Mark(props) { return <a class="brand-lockup" href="#landing" aria-label={`${organization} home`}><img class="company-mark" src={props.mode==='light'?'/spanvision-mark-light.svg':'/spanvision-mark.svg'} width="44" height="44" alt="" aria-hidden="true"/><span>{organization}<small>Engineering tools</small></span></a>; }
+function SocialIcon(props) {
+  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <Show when={props.platform==='instagram'} fallback={<path fill="currentColor" d="M14 22v-8h3l.5-4H14V7.5c0-1 .3-1.5 1.5-1.5H18V2.3A22 22 0 0 0 14.7 2C11.4 2 10 4 10 7v3H7v4h3v8z"/>}>
+      <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+    </Show>
+  </svg>;
 }
-function Mark() { return <a class="brand-lockup" href="#landing" aria-label={`${organization} home`}><img src="/spanvision-mark.svg" alt={brand.hub.mark||'SI'}/><span>{organization}<small>Engineering tools</small></span></a>; }
+function SocialLinks() {
+  const links=[{platform:'instagram',label:'Instagram',url:brand.hub.socialLinks?.instagram},{platform:'facebook',label:'Facebook',url:brand.hub.socialLinks?.facebook}];
+  return <nav class="footer-social" aria-label="Spanvision Infra social pages"><For each={links.filter(link=>link.url)}>{link=><a href={link.url} target="_blank" rel="noopener noreferrer" aria-label={`${organization} on ${link.label} (opens in a new tab)`}><SocialIcon platform={link.platform}/><span>{link.label}</span></a>}</For></nav>;
+}
 
 function currentScreen() {
-  const requested=location.hash.slice(1)||'landing';
-  if(requested==='login'||requested==='signup') {
-    history.replaceState(history.state,'',location.pathname+location.search+'#account');
-    return 'account';
-  }
+  const requested=location.hash.slice(1)==='main-content'?'landing':location.hash.slice(1)||'landing';
   if(requested==='suggestions') {
     history.replaceState(history.state,'',location.pathname+location.search+'#modules');
     return 'modules';
@@ -29,8 +38,13 @@ function currentScreen() {
   return requested;
 }
 function App() {
+  const account=createAccountState();
   const [screen,setScreen]=createSignal(currentScreen());
   const [mode,setMode]=createSignal(document.documentElement.dataset.svMode || 'dark');
+  createEffect(()=>{
+    const favicon=document.getElementById('company-favicon');
+    if(favicon)favicon.href=mode()==='light'?'/spanvision-mark-light.svg':'/spanvision-mark.svg';
+  });
   const [status,setStatus]=createSignal({});
   const [name,setName]=createSignal(readLocalProfile().name);
   const [error,setError]=createSignal('');
@@ -43,10 +57,9 @@ function App() {
   const [scanError,setScanError]=createSignal('');
   const [scanPages,setScanPages]=createSignal('all');
   let modal, upload, scanController, previousFocus, requestController;
-  const validScreens=['landing','modules','account'];
+  const validScreens=['landing','modules','pricing','faq','login','signup','forgot','verify','reset','account','profile','admin'];
   const localPreview=isLocalPreview(location.hostname);
-  const openUrl=module=>moduleUrl(module,status()[module.id],mode(),location.hostname);
-  function exploreTools() { document.getElementById('tools-title')?.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'}); }
+  const openUrl=module=>toolLaunchUrl(module,status()[module.id],mode(),location);
   function clearScan() { scanController?.abort(); scanController=undefined; }
   function closeScan() { clearScan(); modal.close(); previousFocus?.focus(); }
   function openScan(event) { previousFocus=event.currentTarget;clearScan();setScanState('ready');setScanError('');setProgress(0);modal.showModal(); }
@@ -126,6 +139,7 @@ function App() {
     if(modal?.open)closeScan();
   }
   onMount(()=>{
+    account.refresh();
     const syncMode=()=>setMode(document.documentElement.dataset.svMode || 'dark');
     window.addEventListener('spanvision:mode-change',syncMode);
     window.addEventListener('spanvision:mode-observed',syncMode);
@@ -149,38 +163,35 @@ function App() {
     </Show>;
   }
   function Modules() {
-    return <div class="module-grid"><For each={brand.modules}>{(module,index)=><article class="module-card" data-module={module.id}>
-      <div class="module-top"><div class="module-identity"><span class="tool-glyph"><ToolIcon module={module}/></span><span class="feature-number">/{String(index()+1).padStart(2,'0')}</span></div><span class={`availability ${status()[module.id]?.available?'available':''}`}><i/>{status()[module.id]?.available?'Ready to open':status()[module.id]?'Unavailable':'Checking…'}</span></div>
-      <h3>{module.id==='pile'&&<img class="field-card-mark" src="/ppw-mark.svg" alt="PPW"/>}{module.id==='pointcloud'&&<img class="field-card-mark" src="/pw-mark.svg" alt="PW"/>}{module.id==='field'&&<img class="field-card-mark" src="/fw-mark.svg" alt="FW"/>}{module.label}</h3><p>{module.description}</p>
+    return <div class="module-grid"><For each={brand.modules}>{module=><article class="module-card" data-module={module.id}>
+      <div class="module-top"><span class="tool-glyph"><ToolIcon id={module.id}/></span></div>
+      <h3>{module.label}</h3><p>{module.description}</p>
       <div class="module-bottom"><ToolLink module={module}/><small>{status()[module.id]?.available?'Opens in a new tab':status()[module.id]?.message||'Checking the local preview…'}</small></div>
     </article>}</For></div>;
   }
   return <>
-    <a class="skip-link" href="#main-content">Skip to content</a>
-    <header class="preview-header" data-sv-reveal><Mark/><nav aria-label="Main navigation"><For each={['landing','modules','account']}>{route=><a href={`#${route}`} classList={{current:screen()===route}} aria-current={screen()===route?'page':undefined}>{({landing:'Overview',modules:'Tools',account:'Profile'})[route]}</a>}</For></nav><a href="#modules" class="button button-light header-action" onClick={event=>{if(screen()==='landing'||screen()==='modules'){event.preventDefault();exploreTools();}}}>Open workspace<Arrow/></a></header>
+    <a class="skip-link" href="#main-content" onClick={event=>{event.preventDefault();document.getElementById('main-content')?.focus();}}>Skip to content</a>
+    <header class="preview-header marketing-header" data-sv-reveal><Mark mode={mode()}/><nav aria-label="Main navigation"><For each={['landing','modules','pricing','faq']}>{route=><a href={`#${route}`} classList={{current:screen()===route}} aria-current={screen()===route?'page':undefined}>{({landing:'Home',modules:'Tools',pricing:'Pricing',faq:'FAQ'})[route]}</a>}</For><Show when={account.user()?.role==='super_admin'}><a href="#admin" classList={{current:screen()==='admin'}} aria-current={screen()==='admin'?'page':undefined}>Admin</a></Show></nav><Show when={account.user()} fallback={<a class="header-sign-in" href="#login" aria-current={screen()==='login'?'page':undefined}>Sign in</a>}><a class="header-sign-in" href="#account">My account</a></Show><a href={account.user()?'#modules':'#signup'} class="button button-light header-action">{account.user()?'Open workspace':'Create account'}<Arrow/></a></header>
     <main id="main-content" tabindex="-1">
-      <Show when={screen()==='landing'||screen()==='modules'}>
+      <Show when={screen()==='landing'}><MarketingHome mode={mode()} account={account} openScan={openScan} organization={organization} toolCount={brand.modules.length}/></Show>
+      <Show when={screen()==='pricing'}><div class="dedicated-pricing"><Pricing account={account}/></div></Show>
+      <Show when={screen()==='faq'}><div class="dedicated-faq"><FAQ/></div></Show>
+      <Show when={['login','signup','forgot','verify','reset'].includes(screen())}><AuthGateway screen={screen()} account={account} mode={mode()}/></Show>
+      <Show when={screen()==='account'}><OnlineAccount account={account}/></Show>
+      <Show when={screen()==='admin'}><AdminPanel account={account}/></Show>
+      <Show when={screen()==='modules'}>
         <section class="company-tools-page">
-          <div class="company-intro">
-            <div class="company-intro-copy">
-            <span class="eyebrow" data-sv-reveal><i class="intro-line"/>ENGINEERING & INFRASTRUCTURE</span>
-            <h1 data-sv-reveal>{organization}</h1>
-            <div class="company-intro-bottom"><p data-sv-reveal>From first sketch to final calculation.<br/>Draw, validate, plan and build in one connected workspace.</p><div class="intro-actions" data-sv-reveal><button class="button button-light" onClick={exploreTools}>Explore all tools<Arrow/></button><button class="button button-outline" onClick={openScan}>Explore scan & OCR</button></div></div>
-            <div class="intro-summary" data-sv-reveal><span><b>{brand.modules.length}</b> engineering tools</span><i/><span>One workspace. Your workflow.</span></div>
-            </div>
-            <Globe mode={mode()}/>
-          </div>
           <section class="company-catalog" aria-labelledby="tools-title">
-            <div class="catalog-heading" data-sv-reveal><div><h2 id="tools-title">All tools <span>{brand.modules.length}</span></h2><p>Choose a tool to open its workspace in a new tab.</p></div><button class="button button-outline" onClick={refreshStatus}>Check availability<Arrow/></button></div>
+            <div class="catalog-heading" data-sv-reveal><div><span class="eyebrow">SPANVISION INFRA TOOLKIT</span><h1 id="tools-title">All tools <span>{brand.modules.length}</span></h1><p>Choose a tool to open its workspace in a new tab.</p></div><button class="button button-outline" onClick={refreshStatus}>Check availability<Arrow/></button></div>
             <Modules/>
             <p class="catalog-note">{localPreview?'Files and saved preferences stay with each workspace.':'Browser drafts stay with each workspace. BIM and map processing uses temporary cloud storage; download your results to keep them.'}</p>
           </section>
         </section>
       </Show>
-      <Show when={screen()==='account'}><section class="account-page"><span class="preview-badge">LOCAL PROFILE</span><div class="account-heading"><div><span class="eyebrow">YOUR WORKSPACE</span><h1>Your local profile.</h1><p>Set a display name and choose your preferred appearance.</p></div><a href="#modules" class="button button-light">Open workspace<Arrow/></a></div><div class="account-grid"><aside class="account-nav"><span class="selected" aria-current="page">Profile</span><a href="#modules">All tools<Arrow/></a></aside><div class="account-card"><div class="profile-header"><span class="avatar">{name().split(' ').filter(Boolean).map(s=>s[0]).join('').slice(0,2)||'SI'}</span><div><h2>{name()||'Your workspace'}</h2><p>Local profile · {organization}</p></div></div><form novalidate onSubmit={submitProfile}><label>Display name<input name="name" value={name()} maxlength="80" autocomplete="name" placeholder="Your name"/></label><label>Organization<input value={organization} readonly/></label><label>Interface theme<select aria-label="Interface theme" value={mode()} onChange={event=>window.SpanvisionAppearance.setMode(event.currentTarget.value)}><option value="light">Light</option><option value="dark">Dark</option></select></label><Show when={error()}><p role="alert" class="form-error">{error()}</p></Show><Show when={success()}><p role="status" class="form-success">{success()}</p></Show><button class="button button-light">Save profile<Arrow/></button></form></div><div class="account-details"><article><span class="eyebrow">LOCAL BY DESIGN</span><h3>Your files. Your control.</h3><p>Your profile saves in this browser. Tools open anonymously, and each workspace keeps its own drafts. Download project files to back them up or move them to another device.</p></article><article><span class="eyebrow">APPEARANCE</span><div class="palette"><i/><i/><i/><i/></div><p>{mode()==='light'?'Light':'Dark'} mode<br/>A clear space for detailed work.</p></article></div></div></section></Show>
+      <Show when={screen()==='profile'}><section class="account-page"><span class="preview-badge">LOCAL PROFILE</span><div class="account-heading"><div><span class="eyebrow">YOUR WORKSPACE</span><h1>Your local profile.</h1><p>Set a display name and choose your preferred appearance.</p></div><a href="#modules" class="button button-light">Open workspace<Arrow/></a></div><div class="account-grid"><aside class="account-nav"><span class="selected" aria-current="page">Profile</span><a href="#modules">All tools<Arrow/></a></aside><div class="account-card"><div class="profile-header"><span class="avatar">{name().split(' ').filter(Boolean).map(s=>s[0]).join('').slice(0,2)||'SI'}</span><div><h2>{name()||'Your workspace'}</h2><p>Local profile · {organization}</p></div></div><form novalidate onSubmit={submitProfile}><label>Display name<input name="name" value={name()} maxlength="80" autocomplete="name" placeholder="Your name"/></label><label>Organization<input value={organization} readonly/></label><label>Interface theme<select aria-label="Interface theme" value={mode()} onChange={event=>window.SpanvisionAppearance.setMode(event.currentTarget.value)}><option value="light">Light</option><option value="dark">Dark</option></select></label><Show when={error()}><p role="alert" class="form-error">{error()}</p></Show><Show when={success()}><p role="status" class="form-success">{success()}</p></Show><button class="button button-light">Save profile<Arrow/></button></form></div><div class="account-details"><article><span class="eyebrow">LOCAL BY DESIGN</span><h3>Your files. Your control.</h3><p>Your profile saves in this browser. Tools open anonymously, and each workspace keeps its own drafts. Download project files to back them up or move them to another device.</p></article><article><span class="eyebrow">APPEARANCE</span><div class="palette"><i/><i/><i/><i/></div><p>{mode()==='light'?'Light':'Dark'} mode<br/>A clear space for detailed work.</p></article></div></div></section></Show>
       <Show when={!validScreens.includes(screen())}><section class="suggestions-page"><h1>Page not found.</h1><a href="#landing" class="button button-light">Back to overview<Arrow/></a></section></Show>
     </main>
-    <footer class="preview-footer"><Mark/><span>© 2026 {organization}</span><div><a href="#account">Local profile</a><a href="/notices.md" target="_blank" rel="noopener noreferrer">Open-source notices</a><a href="/bim-notices.md" target="_blank" rel="noopener noreferrer">BIM source notices</a><a href="/studio-notices.md" target="_blank" rel="noopener noreferrer">Studio source notices</a><a href="/ocr-notices.txt" target="_blank" rel="noopener noreferrer">OCR credits</a><a href="/globe-notices.txt" target="_blank" rel="noopener noreferrer">Globe credits</a></div></footer>
+    <footer class="preview-footer"><Mark mode={mode()}/><span>© 2026 {organization}</span><SocialLinks/></footer>
     <dialog ref={modal} class="scan-dialog" aria-labelledby="scan-title" onKeyDown={trapScanFocus} onCancel={event=>{event.preventDefault();closeScan();}}>
       <div class="scan-heading"><h2 id="scan-title">Scan & make searchable</h2><button class="scan-close" aria-label="Close scan" onClick={closeScan}>×</button></div><p class="scan-intro">Turn a scanned PDF into a document you can search.</p>
       <input hidden ref={upload} type="file" accept="application/pdf,image/*" onChange={event=>{const file=event.target.files?.[0];if(file){setScanFile(file);setFilename(file.name);setScanResult(null);setScanState('ready');setScanError('');}}}/>

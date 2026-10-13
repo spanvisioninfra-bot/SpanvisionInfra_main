@@ -1,0 +1,572 @@
+{
+  "checks": [
+    {
+      "tool": "hub",
+      "platform": "vercel",
+      "url": "https://spanvision-infra.vercel.app/",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 9,
+          "canvases": [
+            {
+              "width": 490.171875,
+              "height": 437.4375
+            }
+          ]
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 9,
+          "canvases": [
+            {
+              "width": 490.171875,
+              "height": 437.4375
+            }
+          ]
+        }
+      ],
+      "mobileFits": true,
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-infra.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "cad",
+      "platform": "vercel",
+      "url": "https://spanvision-cad.vercel.app/app/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 0,
+          "canvases": []
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 0,
+          "canvases": []
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-cad.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "cad2d",
+      "platform": "vercel",
+      "url": "https://spanvision-cad2d.vercel.app/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 93,
+          "canvases": [
+            {
+              "width": 992,
+              "height": 743
+            }
+          ]
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 93,
+          "canvases": [
+            {
+              "width": 992,
+              "height": 743
+            }
+          ]
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-cad2d.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "pdf",
+      "platform": "vercel",
+      "url": "https://spanvision-pdf.vercel.app/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 120,
+          "canvases": [
+            {
+              "width": 0,
+              "height": 0
+            },
+            {
+              "width": 0,
+              "height": 0
+            },
+            {
+              "width": 0,
+              "height": 0
+            }
+          ]
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 120,
+          "canvases": [
+            {
+              "width": 0,
+              "height": 0
+            },
+            {
+              "width": 0,
+              "height": 0
+            },
+            {
+              "width": 0,
+              "height": 0
+            }
+          ]
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-pdf.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "ifc",
+      "platform": "vercel",
+      "url": "https://spanvision-ifc.vercel.app/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 16,
+          "canvases": [
+            {
+              "width": 1080,
+              "height": 892
+            }
+          ]
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 16,
+          "canvases": [
+            {
+              "width": 1080,
+              "height": 892
+            }
+          ]
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-ifc.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "calc",
+      "platform": "vercel",
+      "url": "https://spanvision-calc.vercel.app/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 94,
+          "canvases": []
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 94,
+          "canvases": []
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-calc.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "planner",
+      "platform": "vercel",
+      "url": "https://spanvision-planner.vercel.app/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 46,
+          "canvases": [
+            {
+              "width": 772,
+              "height": 733
+            },
+            {
+              "width": 772,
+              "height": 733
+            }
+          ]
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 46,
+          "canvases": [
+            {
+              "width": 772,
+              "height": 733
+            },
+            {
+              "width": 772,
+              "height": 733
+            }
+          ]
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-planner.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "fem",
+      "platform": "vercel",
+      "url": "https://spanvision-fem.vercel.app/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 77,
+          "canvases": []
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 77,
+          "canvases": []
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-fem.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "frame",
+      "platform": "vercel",
+      "url": "https://spanvision-frame.vercel.app/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 51,
+          "canvases": []
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 51,
+          "canvases": []
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-frame.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "calculation",
+      "platform": "vercel",
+      "url": "https://spanvision-calculation.vercel.app/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 58,
+          "canvases": []
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 58,
+          "canvases": []
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-calculation.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "geo",
+      "platform": "vercel",
+      "url": "https://spanvision-geo.vercel.app/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 24,
+          "canvases": []
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 24,
+          "canvases": []
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-geo.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "speech",
+      "platform": "vercel",
+      "url": "https://spanvision-speech.vercel.app/?appearance=dark&launch=workspace#workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 16,
+          "canvases": []
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 16,
+          "canvases": []
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-speech.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "field",
+      "platform": "vercel",
+      "url": "https://spanvision-field.vercel.app/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 81,
+          "canvases": [
+            {
+              "width": 0,
+              "height": 0
+            },
+            {
+              "width": 0,
+              "height": 0
+            }
+          ]
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 81,
+          "canvases": [
+            {
+              "width": 0,
+              "height": 0
+            },
+            {
+              "width": 0,
+              "height": 0
+            }
+          ]
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-field.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "pointcloud",
+      "platform": "vercel",
+      "url": "https://spanvision-pointcloud.vercel.app/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 25,
+          "canvases": [
+            {
+              "width": 1184,
+              "height": 793
+            }
+          ]
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 25,
+          "canvases": [
+            {
+              "width": 1184,
+              "height": 793
+            }
+          ]
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-pointcloud.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "pile",
+      "platform": "vercel",
+      "url": "https://spanvision-pile.vercel.app/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 547,
+          "canvases": [
+            {
+              "width": 732,
+              "height": 755
+            }
+          ]
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 547,
+          "canvases": [
+            {
+              "width": 732,
+              "height": 755
+            }
+          ]
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-pile.vercel.app/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "bim",
+      "platform": "render",
+      "url": "https://spanvision-bim.onrender.com/viewer?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 26,
+          "canvases": [
+            {
+              "width": 716,
+              "height": 792
+            }
+          ]
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 26,
+          "canvases": [
+            {
+              "width": 716,
+              "height": 792
+            }
+          ]
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-bim.onrender.com/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "tool": "stl",
+      "platform": "render",
+      "url": "https://spanvision-stl.onrender.com/?appearance=dark&launch=workspace",
+      "modes": [
+        {
+          "mode": "light",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 18,
+          "canvases": []
+        },
+        {
+          "mode": "dark",
+          "font": "\"Spanvision Sans\", Inter, system-ui, sans-serif",
+          "buttons": 18,
+          "canvases": []
+        }
+      ],
+      "fonts": {
+        "ui": true,
+        "display": true
+      },
+      "stylesheet": "https://spanvision-stl.onrender.com/static/__spanvision-ui/workspace-ui.css?v=ef319261c117",
+      "passed": true,
+      "errors": []
+    }
+  ],
+  "verifiedAt": "2026-10-10T16:12:20.829Z",
+  "stylesheetSha256": "ef319261c117a26bb8ea7b4f2103ffffb033c607aa5717f4a3a77338b1fc36e9",
+  "passed": true
+}

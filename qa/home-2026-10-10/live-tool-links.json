@@ -1,0 +1,71 @@
+{
+  "verifiedAt": "2026-10-10T13:01:59.312Z",
+  "origin": "https://spanvision-infra.vercel.app",
+  "links": [
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=cad&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=cad2d&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=bim&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=pdf&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=ifc&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=calc&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=planner&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=fem&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=frame&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=calculation&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=geo&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=speech&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=stl&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=field&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=pointcloud&appearance=light",
+      "target": "_blank"
+    },
+    {
+      "href": "https://spanvision-infra.vercel.app/launch.html?tool=pile&appearance=light",
+      "target": "_blank"
+    }
+  ],
+  "passed": true
+}

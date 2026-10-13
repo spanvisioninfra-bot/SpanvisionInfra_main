@@ -1,0 +1,20 @@
+{
+  "id": "cad",
+  "brandDigest": "84c6d0cef375b1ba97dbd667bc83ad3ba579ff090e470b8784c87e5839bdf5d9",
+  "sourceFingerprint": "8012e2d1c4b77662c55708d8337725e2d52d813ad06471cd4dc544af23d540e2",
+  "builtAt": "2026-10-09T05:51:20.686Z",
+  "buildMethod": "Browser loader assembly with unchanged, hash-verified deployed Rust engine",
+  "engineSourceCommit": "36aa5c04e5cd6470095365ae72b86c903dbd6e11",
+  "retainedArtifacts": [
+    {
+      "file": "/app/SpanvisionCAD-123b54943ea89e57.js",
+      "bytes": 169334,
+      "sha256": "b592fec603fc1e1a86d1faa6e53a82de29848c1242e2da9dce568c2373966856"
+    },
+    {
+      "file": "/app/SpanvisionCAD-123b54943ea89e57_bg.wasm",
+      "bytes": 74534340,
+      "sha256": "c2a1a15da77229a18e7284609876e9f8368990d50adf2748c3a762af3e9b11d0"
+    }
+  ]
+}

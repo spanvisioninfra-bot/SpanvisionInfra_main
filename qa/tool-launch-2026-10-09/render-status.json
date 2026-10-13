@@ -1,0 +1,26 @@
+[
+  {
+    "name": "spanvision-fem-engine",
+    "status": "live",
+    "deployedAt": "2026-10-06T06:48:50.376269Z",
+    "commit": "36aa5c04e5cd6470095365ae72b86c903dbd6e11",
+    "region": "singapore",
+    "suspended": "not_suspended"
+  },
+  {
+    "name": "spanvision-bim",
+    "status": "live",
+    "deployedAt": "2026-10-06T06:45:53.440792Z",
+    "commit": "36aa5c04e5cd6470095365ae72b86c903dbd6e11",
+    "region": "singapore",
+    "suspended": "not_suspended"
+  },
+  {
+    "name": "spanvision-stl",
+    "status": "live",
+    "deployedAt": "2026-10-06T06:45:42.143261Z",
+    "commit": "36aa5c04e5cd6470095365ae72b86c903dbd6e11",
+    "region": "singapore",
+    "suspended": "not_suspended"
+  }
+]

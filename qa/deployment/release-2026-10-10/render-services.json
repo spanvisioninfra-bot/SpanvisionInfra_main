@@ -1,0 +1,55 @@
+[
+  {
+    "name": "spanvision-bim",
+    "id": "srv-db17sdfavr4c73amedbg",
+    "branch": "version/V.1.0",
+    "buildFilter": {
+      "ignoredPaths": [],
+      "paths": [
+        "Dockerfile",
+        "deployment/*.py",
+        "deployment/browser-identity.mjs",
+        "deployment/browser-ui.mjs",
+        "deployment/browser-icons/**",
+        "deployment/browser-ui/**",
+        "vision-bim-validator/**"
+      ]
+    },
+    "region": "singapore",
+    "plan": "free"
+  },
+  {
+    "name": "spanvision-fem-engine",
+    "id": "srv-db29i6m7bikc73cvri0g",
+    "branch": "version/V.1.0",
+    "buildFilter": {
+      "ignoredPaths": [],
+      "paths": [
+        "deployment/Dockerfile.fem",
+        "deployment/fem_api.py",
+        "fem-vision-studio/src-tauri/**"
+      ]
+    },
+    "region": "singapore",
+    "plan": "free"
+  },
+  {
+    "name": "spanvision-stl",
+    "id": "srv-db17snk9v7es73ec01r0",
+    "branch": "version/V.1.0",
+    "buildFilter": {
+      "ignoredPaths": [],
+      "paths": [
+        "Dockerfile",
+        "deployment/*.py",
+        "deployment/browser-identity.mjs",
+        "deployment/browser-ui.mjs",
+        "deployment/browser-icons/**",
+        "deployment/browser-ui/**",
+        "spanvision-stl-3d-map-workspace/**"
+      ]
+    },
+    "region": "singapore",
+    "plan": "free"
+  }
+]

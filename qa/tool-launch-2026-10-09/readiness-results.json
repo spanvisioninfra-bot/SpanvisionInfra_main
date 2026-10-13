@@ -1,0 +1,26 @@
+{
+  "verifiedAt": "2026-10-09T04:35:36.319Z",
+  "passed": true,
+  "checks": [
+    {
+      "tool": "bim",
+      "waitsThrough503": true,
+      "rejectsWrongReadinessPayload": true,
+      "healthProbeOmitsCookies": true,
+      "passed": true
+    },
+    {
+      "tool": "stl",
+      "waitsThrough503": true,
+      "rejectsWrongReadinessPayload": true,
+      "healthProbeOmitsCookies": true,
+      "passed": true
+    },
+    {
+      "readinessTimeout": true,
+      "retryAfterTimeout": true,
+      "passed": true
+    }
+  ],
+  "browserErrors": []
+}

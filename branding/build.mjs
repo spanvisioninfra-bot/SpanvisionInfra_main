@@ -3,6 +3,8 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { root,brand,write,fingerprint,digest,appDirectory } from './common.mjs';
 import { stlInputs, pythonPath } from './stl.mjs';
+import { installBrowserIdentity } from '../deployment/browser-identity.mjs';
+import { installWorkspaceUi } from '../deployment/browser-ui.mjs';
 const requested=process.argv.slice(2);
 const modules=brand.modules.filter(m=>!requested.length||requested.includes(m.id));
 const out=path.join(root,'qa/suite');fs.mkdirSync(out,{recursive:true});
@@ -58,6 +60,8 @@ async function build(module) {
    // Build the browser entry directly, bypassing only native runtime preparation.
    await run(process.execPath,[path.join(app,'node_modules/vite/bin/vite.js'),'build'],app,module.id+'-build');
  }
+ await installBrowserIdentity(dist,{entries:module.id==='cad'?['app/index.html']:module.id==='stl'?['index.html','web/index.html']:['index.html'],prefix:module.id==='stl'?'/static/__spanvision-brand/':'/__spanvision-brand/'});
+ if(module.id==='stl')for(const directory of ['__spanvision-brand','__spanvision-ui'])fs.cpSync(path.join(dist,directory),path.join(dist,'web',directory),{recursive:true});
  if(fingerprint(module)!==source)throw new Error(`${module.label} source changed during its build; rebuild before previewing.`);
  write(path.relative(root,path.join(dist,'suite-build.json')),JSON.stringify({id:module.id,brandDigest:digest(module),sourceFingerprint:source,builtAt:new Date().toISOString(),...(module.id==='stl'?{inputs:stlInputs(module)}:{})},null,2)+'\n');
  console.log(`${module.label} built and stamped.`);
@@ -68,7 +72,7 @@ for(const module of modules) {
  catch(error){result[module.id]=error.message;console.error(error.message);}
 }
 if(!requested.length||requested.includes('hub')) {
- try {const hub={id:'hub',directory:'suite-hub'};const source=fingerprint(hub);await run(process.execPath,[path.join(root,'suite-hub/node_modules/vite/bin/vite.js'),'build'],path.join(root,'suite-hub'),'hub-build');if(source!==fingerprint(hub))throw new Error('Hub source changed during its build.');write('suite-hub/dist/suite-build.json',JSON.stringify({brandDigest:digest(),sourceFingerprint:source,builtAt:new Date().toISOString()},null,2)+'\n');result.hub='passed';}
+ try {const hub={id:'hub',directory:'suite-hub'};const source=fingerprint(hub);await run(process.execPath,[path.join(root,'suite-hub/node_modules/vite/bin/vite.js'),'build'],path.join(root,'suite-hub'),'hub-build');await installWorkspaceUi(path.join(root,'suite-hub/dist'),{optionalEntries:['launch.html']});if(source!==fingerprint(hub))throw new Error('Hub source changed during its build.');write('suite-hub/dist/suite-build.json',JSON.stringify({brandDigest:digest(),sourceFingerprint:source,builtAt:new Date().toISOString()},null,2)+'\n');result.hub='passed';}
  catch(error){result.hub=error.message;console.error(error.message);}
 }
 const previous=fs.existsSync(path.join(out,'build-results.json'))?JSON.parse(fs.readFileSync(path.join(out,'build-results.json'),'utf8')):{};

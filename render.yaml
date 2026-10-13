@@ -4,7 +4,7 @@ services:
     runtime: docker
     plan: free
     region: singapore
-    branch: main
+    branch: version/V.1.0
     dockerfilePath: ./deployment/Dockerfile.fem
     dockerContext: .
     healthCheckPath: /health
@@ -18,7 +18,7 @@ services:
     runtime: docker
     plan: free
     region: singapore
-    branch: main
+    branch: version/V.1.0
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /health
@@ -26,6 +26,10 @@ services:
       paths:
         - Dockerfile
         - deployment/*.py
+        - deployment/browser-identity.mjs
+        - deployment/browser-ui.mjs
+        - deployment/browser-icons/**
+        - deployment/browser-ui/**
         - vision-bim-validator/**
     envVars:
       - key: SPANVISION_SERVICE
@@ -35,7 +39,7 @@ services:
     runtime: docker
     plan: free
     region: singapore
-    branch: main
+    branch: version/V.1.0
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /api/ping
@@ -43,6 +47,10 @@ services:
       paths:
         - Dockerfile
         - deployment/*.py
+        - deployment/browser-identity.mjs
+        - deployment/browser-ui.mjs
+        - deployment/browser-icons/**
+        - deployment/browser-ui/**
         - spanvision-stl-3d-map-workspace/**
     envVars:
       - key: SPANVISION_SERVICE

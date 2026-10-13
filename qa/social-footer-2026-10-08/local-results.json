@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "width": 1440,
+      "mode": "dark",
+      "socialLinks": 2,
+      "oldFooterLinks": 0,
+      "keyboardFocus": true,
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "mode": "light",
+      "socialLinks": 2,
+      "oldFooterLinks": 0,
+      "keyboardFocus": true,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "mode": "dark",
+      "socialLinks": 2,
+      "oldFooterLinks": 0,
+      "keyboardFocus": true,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "mode": "light",
+      "socialLinks": 2,
+      "oldFooterLinks": 0,
+      "keyboardFocus": true,
+      "passed": true
+    },
+    {
+      "width": 320,
+      "mode": "dark",
+      "socialLinks": 2,
+      "oldFooterLinks": 0,
+      "keyboardFocus": true,
+      "passed": true
+    },
+    {
+      "width": 320,
+      "mode": "light",
+      "socialLinks": 2,
+      "oldFooterLinks": 0,
+      "keyboardFocus": true,
+      "passed": true
+    }
+  ],
+  "popupDestinations": true,
+  "browserErrors": []
+}
