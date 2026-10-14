@@ -12,7 +12,10 @@ const module = id === 'hub' ? { id, directory: 'suite-hub', dist: 'dist', path: 
 if (!module || ['bim', 'stl'].includes(id)) throw new Error('Choose hub or a static frontend module; BIM and STL run on Render.');
 const output = path.join(root, 'qa/deployment/output', id);
 await fs.mkdir(output, { recursive: true });
-const staticDir = path.join(output, '.vercel/output/static');
+const vercelOutput = path.join(output, '.vercel/output');
+const staticDir = path.join(vercelOutput, 'static');
+
+await fs.rm(vercelOutput, { recursive: true, force: true });
 await fs.mkdir(staticDir, { recursive: true });
 // Windows builds may live on another drive behind a directory junction.
 const source = await fs.realpath(path.join(root, module.directory, module.dist));
