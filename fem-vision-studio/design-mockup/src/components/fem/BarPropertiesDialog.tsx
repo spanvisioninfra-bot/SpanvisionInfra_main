@@ -378,7 +378,7 @@ export default function BarPropertiesDialog({ beam, nodes, beams, beamForces, on
   ];
 
   const durationOptions: Array<{ value: NonNullable<BeamCheckConfig["loadDuration"]> | "auto"; label: string }> = [
-    { value: "auto",          label: t("cfg.durAuto", "Automatisch (per combinatie)") },
+    { value: "auto",          label: t("cfg.durAuto", "Automatic (per combination)") },
     { value: "permanent",     label: t("cfg.durPermanent") },
     { value: "long",          label: t("cfg.durLong") },
     { value: "medium",        label: t("cfg.durMedium") },
@@ -745,7 +745,7 @@ export default function BarPropertiesDialog({ beam, nodes, beams, beamForces, on
                     label={t("cfg.loadDuration")}
                     info={t(
                       "cfg.durHint",
-                      "Automatisch: k_mod volgt per UGT-combinatie uit de kortstdurende belasting (EN 1995-1-1 3.1.3(2)). Een gekozen klasse werkt als ondergrens: zij kan de duur alleen verlengen.",
+                      "Automatic: k_mod follows the shortest-duration load in each ULS combination (EN 1995-1-1 3.1.3(2)). A selected class acts as a lower bound and can only extend the duration.",
                     )}
                   >
                     <select
@@ -765,7 +765,7 @@ export default function BarPropertiesDialog({ beam, nodes, beams, beamForces, on
                     label={t("cfg.ltbSupportSpacing", "Kipsteunafstand (mm)")}
                     info={t(
                       "cfg.ltbSupportSpacingHint",
-                      "Kipsteunafstand leeg = staaflengte. Dit is de ℓ waaruit tabel 6.1 de meewerkende lengte l_ef maakt; l_ef bepaalt σ_m,crit en daarmee k_crit (6.33)/(6.35).",
+                      "An empty lateral restraint spacing uses the member length. This is ℓ, from which Table 6.1 determines the effective length l_ef; l_ef determines σ_m,crit and k_crit (6.33)/(6.35).",
                     )}
                   >
                     <input
@@ -786,7 +786,7 @@ export default function BarPropertiesDialog({ beam, nodes, beams, beamForces, on
                       value={ltbPositie}
                       onChange={(e) => setLtbPositie(e.target.value as typeof ltbPositie)}
                     >
-                      <option value="centreOfGravity">{t("cfg.ltbPosCentroid", "Zwaartepunt (geen correctie)")}</option>
+                      <option value="centreOfGravity">{t("cfg.ltbPosCentroid", "Centroid (no correction)")}</option>
                       <option value="compressionEdge">{t("cfg.ltbPosCompression", "Drukzijde (l_ef + 2h)")}</option>
                       <option value="tensionEdge">{t("cfg.ltbPosTension", "Trekzijde (l_ef − 0,5h)")}</option>
                     </select>
@@ -794,13 +794,13 @@ export default function BarPropertiesDialog({ beam, nodes, beams, beamForces, on
                   <label className="bar-props-hint" style={{ display: "flex", gap: 6, alignItems: "center" }}>
                     <input type="checkbox" checked={kiptoets}
                       onChange={(e) => setKiptoets(e.target.checked)} />
-                    {t("cfg.performLtbCheck", "Kiptoets (art. 6.3.3) uitvoeren")}
+                    {t("cfg.performLtbCheck", "Perform lateral-torsional buckling check (clause 6.3.3)")}
                   </label>
                   {!kiptoets && (
                     <div className="bar-props-hint" role="note">
                       {t(
                         "cfg.performLtbCheckOffHint",
-                        "Kiptoets uit: u verklaart dat de gedrukte rand over de volle lengte zijdelings gesteund is (dakbeschot, vloerplaat) en de opleggingen torsievast zijn, zodat k_crit = 1,0 (art. 6.3.3(5)). Die aanname komt zo in het rapport te staan.",
+                        "Lateral-torsional buckling check disabled: you declare that the compression edge is laterally restrained along its entire length (roof decking or floor slab) and the supports restrain torsion, so k_crit = 1.0 (6.3.3(5)). This assumption is included in the report.",
                       )}
                     </div>
                   )}
@@ -808,7 +808,7 @@ export default function BarPropertiesDialog({ beam, nodes, beams, beamForces, on
                     label={t("cfg.kCr", "Scheurfactor k_cr (6.1.7)")}
                     info={t(
                       "cfg.kCrHint",
-                      "b_ef = k_cr · b (6.13a). Leeg = 1,0: NEN-EN 1995-1-1/NB bij 6.1.7 voor een prismatische doorsnede. De Europese aanbeveling van 6.1.7(2) is 0,67 voor gezaagd en gelijmd gelamineerd hout; alleen waarden in (0, 1] worden bewaard.",
+                      "b_ef = k_cr · b (6.13a). Empty = 1.0: NEN-EN 1995-1-1/NB at 6.1.7 for a prismatic section. The European recommendation in 6.1.7(2) is 0.67 for solid and glued laminated timber; only values in (0, 1] are saved.",
                     )}
                   >
                     <input
@@ -824,12 +824,12 @@ export default function BarPropertiesDialog({ beam, nodes, beams, beamForces, on
                         label={t("cfg.cltKdef", "k_def kruislaaghout (§7.2)")}
                         info={t(
                           "cfg.cltKdefHint",
-                          "Tabel 3.2 van EN 1995-1-1 kent geen k_def voor kruislaaghout, en de nationale bijlage voegt er geen toe. Er wordt daarom geen waarde aangenomen: vul k_def én de bron in (ETA of productverklaring van de plaat, bij deze klimaatklasse). Ontbreekt een van beide, dan worden w_fin en w_add niet getoetst en staat die reden in het rapport.",
+                          "Table 3.2 of EN 1995-1-1 provides no k_def for cross-laminated timber, and the national annex adds none. No value is assumed: enter k_def and its source (the panel ETA or product declaration for this service class). If either is missing, w_fin and w_add are not checked and the report states the reason.",
                         )}
                       >
                         <input
                           type="number" className="bar-props-input" step="0.05" min="0"
-                          placeholder={t("cfg.cltKdefLeeg", "verplicht")}
+                          placeholder={t("cfg.cltKdefLeeg", "required")}
                           value={cltKdefStr}
                           onChange={(e) => setCltKdefStr(e.target.value)}
                         />

@@ -47,10 +47,10 @@ function validatePageOptions(options?: ExtImportSourcePageOptions): { offset: nu
   const offset = options?.offset ?? 0;
   const limit = options?.limit ?? DEFAULT_PAGE_SIZE;
   if (!Number.isSafeInteger(offset) || offset < 0) {
-    throw new RangeError('Broncatalogus-offset moet een niet-negatief safe integer zijn.');
+    throw new RangeError('Source catalog offset must be a non-negative safe integer.');
   }
   if (!Number.isSafeInteger(limit) || limit < 1 || limit > EXT_IMPORT_SOURCE_PAGE_SIZE_MAX) {
-    throw new RangeError(`Broncatalogus-limit moet 1..${EXT_IMPORT_SOURCE_PAGE_SIZE_MAX} zijn.`);
+    throw new RangeError(`Source catalog limit must be 1..${EXT_IMPORT_SOURCE_PAGE_SIZE_MAX}.`);
   }
   return { offset, limit };
 }
@@ -273,7 +273,7 @@ export function toExtImportSourceInfo(
 
 export function getExtImportSourceChunk(archive: XerSourceArchive, index: number): Uint8Array {
   if (!Number.isSafeInteger(index) || index < 0 || index >= archive.byteChunks.length) {
-    throw new RangeError(`XER-bronchunk-index valt buiten 0..${Math.max(archive.byteChunks.length - 1, 0)}.`);
+    throw new RangeError(`XER source chunk index is outside 0..${Math.max(archive.byteChunks.length - 1, 0)}.`);
   }
   const encoded = archive.byteChunks[index];
   const binary = atob(encoded);

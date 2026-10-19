@@ -65,7 +65,7 @@ export default function PdfPreviewModal({
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={`PDF voorvertoning — ${projectName}`} width={920}>
+    <Modal open={open} onClose={onClose} title={`PDF preview — ${projectName}`} width={920}>
       <div className="pdf-preview-modal-body">
         {busy && (
           <div className="pdf-preview-state">
@@ -83,7 +83,7 @@ export default function PdfPreviewModal({
           <iframe
             className="pdf-preview-frame"
             src={src}
-            title={`PDF voorvertoning ${projectName}`}
+            title={`PDF preview ${projectName}`}
           />
         )}
       </div>

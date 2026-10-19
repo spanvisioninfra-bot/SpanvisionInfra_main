@@ -255,7 +255,7 @@ export function invokeStep(def: BatchStepTool, args: unknown, ctx: McpContext): 
   const res = def.handler(args, ctx) as McpToolResult | Promise<McpToolResult>;
   if (isThenable(res)) {
     res.then(() => undefined, () => undefined);
-    throw new McpStepError('INTERNAL', `tool '${def.name}' leverde een asynchroon resultaat; batch-stappen moeten synchroon zijn`);
+    throw new McpStepError('INTERNAL', `tool '${def.name}' returned an asynchronous result; batch steps must be synchronous`);
   }
   if (!res.ok) throw new McpStepError(res.code, res.error);
   return { data: res.data, ...(res.itemRejections ? { itemRejections: res.itemRejections } : {}) };
@@ -312,7 +312,7 @@ export function executeSteps(
       if (schemaError) {
         throw new McpStepError(
           'VALIDATION',
-          `stap ${i + 1}: ongeldige argumenten voor ${def.name} — ${schemaError}`,
+          `step ${i + 1}: invalid arguments for ${def.name} — ${schemaError}`,
         );
       }
 

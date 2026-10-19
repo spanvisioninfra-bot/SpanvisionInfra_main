@@ -163,7 +163,7 @@ export function bepaalOnbepaaldheidVanModel(
     return {
       graad: null,
       statischBepaald: false,
-      toelichting: "Het model bevat geen staven; de graad van statische onbepaaldheid is niet bepaald.",
+      toelichting: "The model has no members; the degree of static indeterminacy is undefined.",
       m, r, j, c, metPlaten,
     };
   }
@@ -175,9 +175,9 @@ export function bepaalOnbepaaldheidVanModel(
       graad: null,
       statischBepaald: false,
       toelichting:
-        "De opleggingen zijn niet aan de toetsing meegegeven, dus de graad van " +
-        "statische onbepaaldheid kon niet worden bepaald. De varianten worden " +
-        "daarom behandeld alsof de constructie statisch onbepaald is.",
+        "Supports were not supplied to the check, so the degree of static " +
+        "indeterminacy could not be determined. Variants are therefore treated " +
+        "as statically indeterminate.",
       m, r, j, c, metPlaten,
     };
   }
@@ -185,16 +185,16 @@ export function bepaalOnbepaaldheidVanModel(
   const graad = 3 * m + r - 3 * j - c;
   const telling =
     `n = 3·m + r − 3·j − c = 3·${m} + ${r} − 3·${j} − ${c} = ${graad} ` +
-    `(m = staven, r = oplegreactiecomponenten, j = knopen, c = ontkoppelde vrijheidsgraden).`;
+    `(m = members, r = support reaction components, j = nodes, c = released degrees of freedom).`;
 
   if (metPlaten) {
     return {
       graad,
       statischBepaald: false,
       toelichting:
-        `${telling} Het model bevat wandschijven; die tellen niet mee in deze ` +
-        "staventelling en voegen altijd redundantie toe. De constructie wordt " +
-        "daarom als statisch onbepaald behandeld.",
+        `${telling} The model contains wall plates, which are excluded from this ` +
+        "member count and always add redundancy. The structure is therefore " +
+        "treated as statically indeterminate.",
       m, r, j, c, metPlaten,
     };
   }
@@ -204,11 +204,10 @@ export function bepaalOnbepaaldheidVanModel(
       graad,
       statischBepaald: false,
       toelichting:
-        `${telling} Een negatieve uitkomst wijst op een mechanisme, terwijl het ` +
-        "model wél is doorgerekend. De telling klopt dan niet met het model " +
-        "(bijvoorbeeld door een lokaal mechanisme naast een elders overbepaald " +
-        "deel), en de varianten worden behandeld alsof de constructie statisch " +
-        "onbepaald is.",
+        `${telling} A negative result suggests a mechanism, although the model ` +
+        "was successfully analyzed. The count does not represent the model " +
+        "(for example, a local mechanism beside a redundant part), so variants " +
+        "are treated as statically indeterminate.",
       m, r, j, c, metPlaten,
     };
   }
@@ -218,8 +217,8 @@ export function bepaalOnbepaaldheidVanModel(
       graad,
       statischBepaald: true,
       toelichting:
-        `${telling} De constructie is statisch bepaald: de krachtsverdeling volgt ` +
-        "uit evenwicht alleen en verandert niet met de doorsnede.",
+        `${telling} The structure is statically determinate: internal forces follow ` +
+        "from equilibrium alone and do not change with the cross-section.",
       m, r, j, c, metPlaten,
     };
   }
@@ -228,9 +227,9 @@ export function bepaalOnbepaaldheidVanModel(
     graad,
     statischBepaald: false,
     toelichting:
-      `${telling} De constructie is ${graad}-voudig statisch onbepaald: de ` +
-      "krachtsverdeling hangt af van de stijfheidsverhoudingen en verandert dus " +
-      "mee met de doorsnede.",
+      `${telling} The structure is statically indeterminate to degree ${graad}: ` +
+      "internal force distribution depends on relative stiffness and therefore " +
+      "changes with the cross-section.",
     m, r, j, c, metPlaten,
   };
 }

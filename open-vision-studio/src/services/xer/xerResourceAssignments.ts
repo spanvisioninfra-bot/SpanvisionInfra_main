@@ -72,7 +72,7 @@ function assertUniqueAssignmentIds(rows: readonly XerRow[]): void {
     const firstLine = firstLineById.get(sourceId);
     if (firstLine !== undefined) {
       throw new XerImportError('XER_DUPLICATE_ID',
-        `TASKRSRC.taskrsrc_id bevat dubbele id '${sourceId}' op regels ${firstLine} and ${row.line}.`,
+        `TASKRSRC.taskrsrc_id contains duplicate id '${sourceId}' on lines ${firstLine} and ${row.line}.`,
         { table: 'TASKRSRC', field: 'taskrsrc_id', line: row.line, lines: [firstLine, row.line] });
     }
     firstLineById.set(sourceId, row.line);

@@ -118,7 +118,7 @@ export function buildPlaatCheckInputs(data: PlaatBuildData): PlaatBuildResult {
     const s = uitkomst.stijfheid;
     if (s.soort === null) {
       // Kan niet: er is een materiaal. Toch niet stil doorlopen.
-      skipped.push({ plateId: plaat.id, reason: "materiaalsoort onbekend — niet getoetst" });
+      skipped.push({ plateId: plaat.id, reason: "Unknown material type; not checked" });
       continue;
     }
     const soort = KERN_SOORT[s.soort];

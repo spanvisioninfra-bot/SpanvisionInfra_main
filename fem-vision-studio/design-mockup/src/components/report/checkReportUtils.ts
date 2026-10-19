@@ -602,7 +602,7 @@ export function belastingduurTekst(
 export function statusLabel(t: TFunction, status: CheckStatus): string {
   switch (status) {
     case "Ok": return t("report.statusOk", "Voldoet");
-    case "NotOk": return t("report.statusNotOk", "Voldoet niet");
+    case "NotOk": return t("report.statusNotOk", "Does not pass");
     default: return t("report.statusNa", "N.v.t.");
   }
 }

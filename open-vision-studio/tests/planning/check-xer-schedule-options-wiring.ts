@@ -593,7 +593,7 @@ if (corpusRoot && existsSync(corpusRoot)) {
   ]);
   const byId = new Map(openedProjects(noEndSource).map(result => [result.project.id, result]));
   const truth = scanRawXerScheduleOptions(noEndSource);
-  const FALLBACK = 'N (geen projecteinddatum en geen taakeinddatum in de bron: projecteinde = max(EF))';
+  const FALLBACK = "N (no project or task finish date in the source: project finish = max(EF))";
   eq('3 Y zonder bruikbaar projecteinde valt terug op N; mét taak- of projecteinde blijft Y (lezer én grondwaarheid)',
     ['P-Y', 'P-T', 'P-E'].map(projectId => {
       const result = byId.get(projectId);

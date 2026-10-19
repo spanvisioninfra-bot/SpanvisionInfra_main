@@ -1214,7 +1214,7 @@ export function solveNonlinear(
       });
 
       if (!Number.isFinite(incrNorm) || !Number.isFinite(dispNorm)) {
-        log({ soort: 'fout', tekst: 'De normen zijn niet-eindig — het stelsel loopt weg' });
+        log({ soort: 'fout', tekst: 'The norms are non-finite; the system is diverging' });
         if (opts.geometricNonlinear) throw new Error(DIVERGENCE_MSG);
         break;
       }
@@ -1240,7 +1240,7 @@ export function solveNonlinear(
       if (growthCount >= 3 && opts.geometricNonlinear) {
         log({
           soort: 'fout',
-          tekst: 'De increment-norm groeit drie iteraties op rij — de last ligt op of boven de kniklast',
+          tekst: 'The increment norm has increased for three consecutive iterations; the load is at or above the buckling load',
         });
         throw new Error(DIVERGENCE_MSG);
       }
@@ -1898,11 +1898,11 @@ function solveMixed(
   for (const k of opts.randKoppelingen ?? []) {
     const si = nodeIdToIndex.get(k.slaafKnoopId);
     if (si === undefined) {
-      throw new Error(`Randkoppeling: knoop ${k.slaafKnoopId} is geen actieve rekenknoop.`);
+      throw new Error(`Edge constraint: node ${k.slaafKnoopId} is not an active calculation node.`);
     }
     const som = k.meesters.reduce((s, m) => s + m.gewicht, 0);
     if (!(Math.abs(som - 1) <= 1e-9)) {
-      throw new Error(`Randkoppeling van knoop ${k.slaafKnoopId}: de gewichten tellen op tot ${som}, niet 1.`);
+      throw new Error(`Edge constraint for node ${k.slaafKnoopId}: the weights sum to ${som}, rather than 1.`);
     }
     for (const d of [0, 1]) {
       slaafDofs.push({
@@ -1910,7 +1910,7 @@ function solveMixed(
         meesters: k.meesters.map((m) => {
           const mi = nodeIdToIndex.get(m.knoopId);
           if (mi === undefined) {
-            throw new Error(`Randkoppeling van knoop ${k.slaafKnoopId}: meester ${m.knoopId} is geen actieve rekenknoop.`);
+            throw new Error(`Edge constraint for node ${k.slaafKnoopId}: master ${m.knoopId} is not an active calculation node.`);
           }
           return { dof: mi * dofsPerNode + d, w: m.gewicht };
         }),
@@ -1920,11 +1920,11 @@ function solveMixed(
   const slaafSet = new Set(slaafDofs.map((s) => s.dof));
   for (const s of slaafDofs) {
     if (s.meesters.some((m) => slaafSet.has(m.dof))) {
-      throw new Error('Randkoppeling: een meesterknoop is zelf aan een rand gekoppeld.');
+      throw new Error("Edge constraint: a master node is itself constrained to an edge.");
     }
   }
   if (constrainedDofs.some((d) => slaafSet.has(d))) {
-    throw new Error('Randkoppeling: een aan een plaatrand gekoppelde knoop draagt een starre oplegging.');
+    throw new Error("Edge constraint: a node constrained to a plate edge has a rigid support.");
   }
   if (slaafDofs.length > 0) {
     log({
@@ -2058,7 +2058,7 @@ function solveMixed(
       try {
         nieuw = losOp(Kt);
       } catch {
-        log({ soort: 'fout', tekst: 'Het stelsel K = Ke + Kg is niet oplosbaar' });
+        log({ soort: 'fout', tekst: 'The system K = Ke + Kg cannot be solved' });
         throw new Error(
           'Second-order (P-Delta) analysis is unstable — the applied load is at or above the critical (buckling) load'
         );
@@ -2084,7 +2084,7 @@ function solveMixed(
       });
 
       if (!Number.isFinite(incrNorm) || !Number.isFinite(dispNorm)) {
-        log({ soort: 'fout', tekst: 'De normen zijn niet-eindig — het stelsel loopt weg' });
+        log({ soort: 'fout', tekst: 'The norms are non-finite; the system is diverging' });
         throw new Error(
           'Second-order (P-Delta) analysis did not converge — the applied load is at or above the critical (buckling) load'
         );
@@ -2103,7 +2103,7 @@ function solveMixed(
       if (groei >= 3) {
         log({
           soort: 'fout',
-          tekst: 'De increment-norm groeit drie iteraties op rij — de last ligt op of boven de kniklast',
+          tekst: 'The increment norm has increased for three consecutive iterations; the load is at or above the buckling load',
         });
         throw new Error(
           'Second-order (P-Delta) analysis did not converge — the applied load is at or above the critical (buckling) load'

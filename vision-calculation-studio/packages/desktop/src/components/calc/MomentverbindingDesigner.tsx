@@ -195,7 +195,7 @@ export default function MomentverbindingDesigner() {
           <label>Web weld throat a (mm)
             <input type="number" step={1} value={aLf} onChange={(e) => set("a_lijf", parseFloat(e.target.value))} />
           </label>
-          <span className="gd-note">End plate becomes {fmt(hKp)} mm hoog: {nRij} rows at {fmt(eKp)} + {nRij - 1}×{fmt(pKp)}, with {fmt(rest)} mm rest onderaan.</span>
+          <span className="gd-note">End plate becomes {fmt(hKp)} mm hoog: {nRij} rows at {fmt(eKp)} + {nRij - 1}×{fmt(pKp)}, with {fmt(rest)} mm remaining at the bottom.</span>
 
           <span className="vd-ctrl-h">Load</span>
           <label>Span L<sub>b</sub> (mm)

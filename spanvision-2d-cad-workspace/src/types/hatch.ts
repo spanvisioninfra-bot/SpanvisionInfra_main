@@ -540,7 +540,7 @@ export const BUILTIN_PATTERNS: CustomHatchPattern[] = [
   // Crosshatch at 45deg
   {
     id: 'nen47-speciale-steenachtige',
-    name: 'NEN47-2 Speciale steenachtige materialen',
+    name: "NEN47-2 Special mineral materials",
     description: 'Special stone-like materials per NEN 47 - crosshatch at 45 degrees',
     scaleType: 'drafting',
     source: 'builtin',

@@ -85,7 +85,7 @@ export function runInScratchDocument<T>(
   fn: (state: AppState) => T,
   docId?: string,
 ): ScratchRunResult<T> {
-  if (!contextFactory) throw new Error('De scratch-documentcontextfabriek is nog niet gekoppeld');
+  if (!contextFactory) throw new Error('The scratch document context factory is not connected');
   const ctx = contextFactory({ emitHostEvents: false });
   // 1. Hydrateren via het documentcontract — dezelfde functie die `switchDocument` gebruikt, dus
   //    élk (ook toekomstig) documentveld rijdt automatisch mee.

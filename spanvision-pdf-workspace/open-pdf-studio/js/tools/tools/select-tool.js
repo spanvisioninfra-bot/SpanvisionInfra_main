@@ -311,7 +311,7 @@ export const selectTool = {
             clickedAnnotation._hoverSub = null;
             // Ontdekbaarheid: statusbalk-hint voor de tweede klik.
             try {
-              updateStatusMessage('Klik nogmaals om een onderdeel te selecteren (paneel, rand of rasterlijn)');
+              updateStatusMessage('Click again to select a component (panel, edge, or grid line)');
             } catch (_) { /* statusbalk optioneel */ }
           }
           if (gevelPreset(clickedAnnotation) && !ctx.isSelected(clickedAnnotation)) {

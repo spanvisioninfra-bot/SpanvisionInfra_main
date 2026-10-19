@@ -132,7 +132,7 @@ export function BcfPlatformSection() {
             type="button"
             className="bcf-panel__btn bcf-panel__btn--secondary"
             onClick={bcfRefreshProjects}
-            title="Ververs projecten"
+            title="Refresh projects"
           >
             ↻
           </button>
@@ -352,7 +352,7 @@ function CreateProjectForm({ onCreated }: { onCreated: () => void }) {
         />
       </div>
       <div className="bcf-panel__field">
-        <label className="bcf-panel__label">Beschrijving (optioneel)</label>
+        <label className="bcf-panel__label">Description (optional)</label>
         <input
           className="bcf-panel__input"
           type="text"

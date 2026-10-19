@@ -537,7 +537,7 @@ export function WallTypesDialog({ isOpen, onClose }: WallTypesDialogProps) {
                   <div>
                     <h3 className="text-sm font-semibold text-cad-text">{selectedWallType.name} {selectedWallType.thickness}mm</h3>
                     <div className="text-[10px] text-cad-text-dim mt-0.5">
-                      IFC Class: IfcWallType &middot; Category: {selectedWallCategory?.label || 'Overig'}
+                      IFC Class: IfcWallType &middot; Category: {selectedWallCategory?.label || 'Other'}
                     </div>
                   </div>
 
@@ -693,7 +693,7 @@ export function WallTypesDialog({ isOpen, onClose }: WallTypesDialogProps) {
                   <div>
                     <h3 className="text-sm font-semibold text-cad-text">{selectedSlabType.name} {selectedSlabType.thickness}mm</h3>
                     <div className="text-[10px] text-cad-text-dim mt-0.5">
-                      IFC Class: IfcSlabType &middot; Category: {selectedSlabCategory?.label || 'Overig'}
+                      IFC Class: IfcSlabType &middot; Category: {selectedSlabCategory?.label || 'Other'}
                     </div>
                   </div>
 
@@ -868,7 +868,7 @@ export function WallTypesDialog({ isOpen, onClose }: WallTypesDialogProps) {
                   <div>
                     <h3 className="text-sm font-semibold text-cad-text">{selectedColumnType.name}</h3>
                     <div className="text-[10px] text-cad-text-dim mt-0.5">
-                      IFC Class: IfcColumnType &middot; Category: {selectedColumnCategory?.label || 'Overig'}
+                      IFC Class: IfcColumnType &middot; Category: {selectedColumnCategory?.label || 'Other'}
                     </div>
                   </div>
 
@@ -1082,7 +1082,7 @@ export function WallTypesDialog({ isOpen, onClose }: WallTypesDialogProps) {
                   <div>
                     <h3 className="text-sm font-semibold text-cad-text">{selectedBeamType.name}</h3>
                     <div className="text-[10px] text-cad-text-dim mt-0.5">
-                      IFC Class: IfcBeamType &middot; Category: {selectedBeamCategory?.label || 'Overig'}
+                      IFC Class: IfcBeamType &middot; Category: {selectedBeamCategory?.label || 'Other'}
                     </div>
                   </div>
 

@@ -8,32 +8,29 @@
  * Variabelenamen komen exact overeen met TweepaalsPoerDesigner.tsx.
  */
 
-export const tweepaalsPoer = `"Two-pile cap — column op two piles
+export const tweepaalsPoer = `"Two-pile cap — column on two piles
 
-'<i>Een poer die de kolomlast over twee palen verdeelt. Bij een gedrongen poer
-'werkt het als een staafwerk: twee drukdiagonalen van de kolom naar de palen,
-'opgenomen door een trekband onderin. Die trekband moet volledig boven de paal
-'verankerd zijn — vandaar de opgebogen staafeinden.</i>
+'<i>A pile cap distributes the column load between two piles. A deep cap behaves as a strut-and-tie system: two compression struts from the column to the piles and a tension tie at the bottom. The tie must be fully anchored above each pile, hence the bent-up bar ends.</i>
 
 # 1. Geometry
 
-@select kolomvorm "Vorm van de column"
+@select kolomvorm "Column shape"
   Circular column = 1
   Rectangular column = 2
 @end
 
-@select paalvorm "Vorm van de pile"
+@select paalvorm "Pile shape"
   Rectangular pile = 1
   Circular pile = 2
 @end
 
-d_kolom = ?*(mm)', diameter of breedte van de kolom'
+d_kolom = ?*(mm)', column diameter or width'
 b_paal = ?*(mm)', paalafmeting in de lengterichting'
 l_paal = ?*(mm)', paalafmeting in de dwarsrichting'
-b_poer = ?*(mm)', breedte van de poer b'
-h_poer = ?*(mm)', hoogte van de poer h'
-l_hoh = ?*(mm)', hart-op-hart afstand van de palen l'
-oversteek = ?*(mm)', oversteek van de poer voorbij het paalhart'
+b_poer = ?*(mm)', pile cap width b'
+h_poer = ?*(mm)', pile cap depth h'
+l_hoh = ?*(mm)', pile center-to-center spacing l'
+oversteek = ?*(mm)', pile cap projection beyond the pile centerline'
 
 # 2. Concrete and reinforcement
 
@@ -57,19 +54,19 @@ oversteek = ?*(mm)', oversteek van de poer voorbij het paalhart'
   Not verifiable = 2
 @end
 
-c_dek = ?*(mm)', dekking c'
-n_langs = ?', aantal staven in de trekband'
+c_dek = ?*(mm)', cover c'
+n_langs = ?', number of tension tie bars'
 d_langs = ?*(mm)', staafdiameter trekband'
-n_sneden = ?', aantal beugelsneden'
+n_sneden = ?', number of stirrup legs'
 d_beugel = ?*(mm)', beugeldiameter'
 s_beugel = ?*(mm)', beugelafstand'
 
 # 3. Loads
 
-F_Ed = ?*(kN)', rekenwaarde van de kolomlast F_Ed'
+F_Ed = ?*(kN)', design column load F_Ed'
 F_qp = ?*(kN)', quasi-blijvende kolomlast F_qp'
 
-'<h6>Overzicht van de invoer</h6>
+'<h6>Input summary</h6>
 d_kolom
 b_poer
 h_poer
@@ -79,10 +76,7 @@ n_langs
 d_langs
 F_Ed
 
-# 4. Toetsing
+# 4. Checks
 
-'<i><b>Nog niet uitgewerkt.</b> Dit blad legt voorlopig alleen de invoer en het
-'parametrische beeld vast. De paalreacties, het staafwerkmodel met de
-'drukdiagonalen en de trekband (§6.5), de knoopspanningen boven de palen, de
-'verankering van de trekband, de dwarskracht en de pons rond de kolom volgen.</i>
+'<i><b>Not yet implemented.</b> This sheet defines inputs and a parametric drawing only. Pile reactions, compression struts and tension tie (§6.5), nodal stresses above piles, tie anchorage, shear, and punching around the column are planned.</i>
 `;

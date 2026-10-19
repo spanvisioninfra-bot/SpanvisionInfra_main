@@ -295,7 +295,7 @@ export default function PdfTextEditOverlay() {
         <div
           class="pdf-text-editor-grip"
           data-keep-text-editor="1"
-          title="Sleep om het tekstblok te verplaatsen (Esc annuleert)"
+          title="Drag to move the text block (Esc cancels)"
           style={gripStyle()}
           onPointerDown={startGripDrag}
         />

@@ -100,7 +100,7 @@ export const stenenrijTemplate = {
     { key: 'totaleMaat', label: 'Totale maat (mm)', labelEn: 'Total size (mm)', type: 'number', default: 1000, min: 1, step: 10 },
     { key: 'lagenmaat', label: 'Lagenmaat (mm)', labelEn: 'Course gauge (mm)', type: 'number', default: 62.5, min: 1, step: 0.5 },
     { key: 'koppenmaat', label: 'Koppenmaat (mm)', labelEn: 'Header gauge (mm)', type: 'number', default: 110, min: 1, step: 1 },
-    { key: 'voeg', label: 'Voeg (mm)', labelEn: 'Joint (mm)', type: 'number', default: 10, min: 0, step: 0.5 },
+    { key: 'voeg', label: 'Joint (mm)', labelEn: 'Joint (mm)', type: 'number', default: 10, min: 0, step: 0.5 },
     { key: 'steenbreedte', label: 'Steenbreedte (mm)', labelEn: 'Brick width (mm)', type: 'number', default: 100, min: 1, step: 1 },
   ],
   layoutMm: layoutStenenrijMm,

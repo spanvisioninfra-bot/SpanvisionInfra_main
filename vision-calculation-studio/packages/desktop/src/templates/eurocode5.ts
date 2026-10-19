@@ -11,7 +11,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** EN 1995-1-1 §6.1.6 — Buiging */
-export const ec5Buiging = `# Toetsing Bending — EN 1995-1-1 §6.1.6
+export const ec5Buiging = `# Bending check — EN 1995-1-1 §6.1.6
 
 ## Material
 
@@ -60,15 +60,15 @@ Short (< 1 week) = 4
 Zeer kort = 5
 @end
 
-Partiele factor (tabel 2.3 NB):
+Partial factor (NB Table 2.3):
 
 gamma_M = 1.3
 
-Modificatiefactor k_mod (tabel 3.1):
+Modification factor k_mod (Table 3.1):
 
 k_mod = 0.8
 
-Rekenwaarde buigsterkte (art. 2.4.1, formule 2.14):
+Design bending strength (art. 2.4.1, expression 2.14):
 
 f_md = k_mod * f_mk / gamma_M to N/mm^2
 
@@ -90,11 +90,11 @@ I_y = b * h^3 / 12 to mm^4
 L = 3000 mm
 q_d = 5.0 kN/m
 
-Maatgevend moment (gelijkmatig verdeelde belasting):
+Governing moment (uniformly distributed load):
 
 M_Ed = q_d * L^2 / 8 to kN*m
 
-## Toetsing bending (art. 6.1.6, formula 6.11)
+## Bending check (art. 6.1.6, expression 6.11)
 
 Buigspanning:
 
@@ -116,7 +116,7 @@ UC_buiging = sigma_md / f_md
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** EN 1995-1-1 §6.1.7 — Afschuiving */
-export const ec5Afschuiving = `# Toetsing Shear — EN 1995-1-1 §6.1.7
+export const ec5Afschuiving = `# Shear check — EN 1995-1-1 §6.1.7
 
 ## Material
 
@@ -141,7 +141,7 @@ f_vk = 3.5 N/mm^2
 gamma_M = 1.3
 k_mod = 0.8
 
-Rekenwaarde afschuifsterkte (formule 2.14):
+Design shear strength (expression 2.14):
 
 f_vd = k_mod * f_vk / gamma_M to N/mm^2
 
@@ -154,7 +154,7 @@ Scheurfactor k_cr (NB art. 6.1.7):
 
 k_cr = 1.0
 
-Effectieve breedte (formule 6.13a):
+Effective width (expression 6.13a):
 
 b_ef = k_cr * b to mm
 
@@ -163,13 +163,13 @@ b_ef = k_cr * b to mm
 L = 3000 mm
 q_d = 5.0 kN/m
 
-Maatgevende dwarskracht:
+Governing shear force:
 
 V_Ed = q_d * L / 2 to kN
 
-## Toetsing shear (art. 6.1.7, formula 6.13)
+## Shear check (art. 6.1.7, expression 6.13)
 
-Schuifspanning (rechthoekige doorsnede):
+Shear stress (rectangular section):
 
 tau_d = 3/2 * V_Ed / (b_ef * h) to N/mm^2
 
@@ -189,7 +189,7 @@ UC_afschuiving = tau_d / f_vd
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** EN 1995-1-1 §6.1.4 — Druk evenwijdig aan de vezel */
-export const ec5Druk = `# Toetsing Druk Parallel — EN 1995-1-1 §6.1.4
+export const ec5Druk = `# Compression parallel to grain check — EN 1995-1-1 §6.1.4
 
 ## Material
 
@@ -209,7 +209,7 @@ f_c0k = houtsoort * 1 N/mm^2
 gamma_M = 1.3
 k_mod = 0.8
 
-Rekenwaarde druksterkte (formule 2.14):
+Design compressive strength (expression 2.14):
 
 f_c0d = k_mod * f_c0k / gamma_M to N/mm^2
 
@@ -226,7 +226,7 @@ A = b * h to mm^2
 
 N_Ed = 50 kN
 
-## Toetsing compression evenwijdig (art. 6.1.4, formula 6.2)
+## Compression parallel to grain check (art. 6.1.4, expression 6.2)
 
 Drukspanning:
 
@@ -248,7 +248,7 @@ UC_druk = sigma_c0d / f_c0d
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** EN 1995-1-1 §6.1.5 — Druk loodrecht op de vezel */
-export const ec5DrukLoodrecht = `# Toetsing Druk Perpendicular — EN 1995-1-1 §6.1.5
+export const ec5DrukLoodrecht = `# Compression perpendicular to grain check — EN 1995-1-1 §6.1.5
 
 ## Material
 
@@ -268,13 +268,13 @@ f_c90k = houtsoort * 1 N/mm^2
 gamma_M = 1.3
 k_mod = 0.8
 
-Rekenwaarde druksterkte loodrecht (formule 2.14):
+Design perpendicular compressive strength (expression 2.14):
 
 f_c90d = k_mod * f_c90k / gamma_M to N/mm^2
 
 ## Geometry support
 
-Breedte ligger:
+Beam width:
 
 b = 70 mm
 
@@ -292,7 +292,7 @@ Factor k_c,90:
 
 k_c90 = steunpunttype * 1
 
-Effectieve contactlengte (vergroot met max 30 mm per zijde):
+Effective contact length (increased by up to 30 mm per side):
 
 L_ef = L_opl + 2 * 30 mm
 
@@ -306,7 +306,7 @@ Oplegreactie:
 
 F_c90d = 15 kN
 
-## Toetsing compression loodrecht (art. 6.1.5, formula 6.3)
+## Compression perpendicular to grain check (art. 6.1.5, expression 6.3)
 
 Drukspanning loodrecht (formule 6.4):
 
@@ -328,7 +328,7 @@ UC_c90 = sigma_c90d / (k_c90 * f_c90d)
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** EN 1995-1-1 §6.3.2 — Knik (kolommen aan druk) */
-export const ec5Knik = `# Toetsing Buckling — EN 1995-1-1 §6.3.2
+export const ec5Knik = `# Buckling check — EN 1995-1-1 §6.3.2
 
 ## Material
 
@@ -352,7 +352,7 @@ E_005 = 7400 N/mm^2
 gamma_M = 1.3
 k_mod = 0.8
 
-Rekenwaarde druksterkte:
+Design compressive strength:
 
 f_c0d = k_mod * f_c0k / gamma_M to N/mm^2
 
@@ -376,7 +376,7 @@ Traagheidsmoment om zwakke as:
 
 I_z = h * b^3 / 12 to mm^4
 
-## Systeem
+## System
 
 Kniklengte:
 
@@ -384,11 +384,11 @@ L_k = 3000 mm
 
 ## Knikberekening (art. 6.3.2)
 
-Slankheid (zwakke as):
+Slenderness (weak axis):
 
 lambda_z = L_k / (b / sqrt(12))
 
-Relatieve slankheid (formule 6.22):
+Relative slenderness (expression 6.22):
 
 lambda_relz = lambda_z / pi * sqrt(f_c0k / E_005)
 
@@ -404,7 +404,7 @@ k_cz = 1 / (k_z + sqrt(k_z^2 - lambda_relz^2))
 
 N_Ed = 80 kN
 
-## Toetsing buckling (art. 6.3.2, formula 6.23 simplified)
+## Buckling check (art. 6.3.2, simplified expression 6.23)
 
 Drukspanning:
 
@@ -430,7 +430,7 @@ UC_knik = sigma_c0d / (k_cz * f_c0d)
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** EN 1995-1-1 §7.2 — Doorbuiging */
-export const ec5Doorbuiging = `# Toetsing Deflection — EN 1995-1-1 §7.2 / §2.2.3
+export const ec5Doorbuiging = `# Deflection check — EN 1995-1-1 §7.2 / §2.2.3
 
 ## Material
 
@@ -453,7 +453,7 @@ Klasse 2 (k_def = 0.80) = 0.80
 Klasse 3 (k_def = 2.00) = 2.00
 @end
 
-Vervormingsfactor k_def (tabel 3.2):
+Deformation factor k_def (Table 3.2):
 
 k_def = klimaatklasse * 1
 
@@ -470,49 +470,49 @@ Traagheidsmoment:
 
 I_y = b * h^3 / 12 to mm^4
 
-## Systeem en load
+## System and loads
 
 Overspanning:
 
 L = 4000 mm
 
-Blijvende belasting (karakteristiek):
+Permanent load (characteristic):
 
 g_k = 1.0 kN/m
 
-Veranderlijke belasting (karakteristiek):
+Variable load (characteristic):
 
 q_k = 2.5 kN/m
 
 ## Ogenblikkelijke deflection (w_inst)
 
-Doorbuiging onder blijvende belasting:
+Deflection from permanent loads:
 
 w_inst_G = 5 * g_k * L^4 / (384 * E_mean * I_y) to mm
 
-Doorbuiging onder veranderlijke belasting:
+Deflection from variable loads:
 
 w_inst_Q = 5 * q_k * L^4 / (384 * E_mean * I_y) to mm
 
-Totale ogenblikkelijke doorbuiging:
+Total instantaneous deflection:
 
 w_inst = w_inst_G + w_inst_Q to mm
 
-## Uiteindelijke deflection met creep (formula 2.3-2.4)
+## Final deflection with creep (expressions 2.3-2.4)
 
-Uiteindelijke doorbuiging onder G (formule 2.3):
+Final deflection under G (expression 2.3):
 
 w_fin_G = w_inst_G * (1 + k_def) to mm
 
-Uiteindelijke doorbuiging onder Q (formule 2.4):
+Final deflection under Q (expression 2.4):
 
 w_fin_Q = w_inst_Q * (1 + psi_2 * k_def) to mm
 
-Totale uiteindelijke doorbuiging:
+Total final deflection:
 
 w_fin = w_fin_G + w_fin_Q to mm
 
-Netto doorbuiging (formule 7.2, zonder zeeg):
+Net deflection (expression 7.2, without precamber):
 
 w_netfin = w_fin to mm
 
@@ -541,19 +541,19 @@ UC_fin = w_fin / w_fin_lim
 #if UC_inst < 1
   w_inst voldoet ({{w_inst}} mm < {{w_inst_lim}} mm).
 #else
-  w_inst voldoet NIET!
+  w_inst fails!
 #end if
 
 #if UC_netfin < 1
   w_net,fin voldoet ({{w_netfin}} mm < {{w_netfin_lim}} mm).
 #else
-  w_net,fin voldoet NIET!
+  w_net,fin fails!
 #end if
 
 #if UC_fin < 1
   w_fin voldoet ({{w_fin}} mm < {{w_fin_lim}} mm).
 #else
-  w_fin voldoet NIET!
+  w_fin fails!
 #end if
 `;
 
@@ -562,7 +562,7 @@ UC_fin = w_fin / w_fin_lim
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** EN 1995-1-1 Complete — Volledige houten balk toetsing */
-export const ec5HoutenBalk = `# Volledige Toetsing Houten Balk — EN 1995-1-1
+export const ec5HoutenBalk = `# Complete timber beam checks — EN 1995-1-1
 
 ## Project details
 
@@ -582,7 +582,7 @@ GL28h — f_mk=28 f_vk=3.5 f_c0k=26.5 f_c90k=2.5 E=12600 E005=10500 = 128
 GL32h — f_mk=32 f_vk=3.5 f_c0k=29 f_c90k=3.3 E=13700 E005=11100 = 132
 @end
 
-Karakteristieke waarden (EN 338 / EN 14080):
+Characteristic values (EN 338 / EN 14080):
 
 f_mk = 24 N/mm^2
 f_vk = 4.0 N/mm^2
@@ -605,11 +605,11 @@ Short (< 1 week, k_mod=0.90) = 0.90
 Zeer kort (k_mod=1.10) = 1.10
 @end
 
-Partiele factor (tabel 2.3):
+Partial factor (Table 2.3):
 
 gamma_M = houttype * 1
 
-Modificatiefactor (tabel 3.1):
+Modification factor (Table 3.1):
 
 k_mod = belastingduurklasse * 1
 
@@ -642,7 +642,7 @@ I_y = b * h^3 / 12 to mm^4
 
 I_z = h * b^3 / 12 to mm^4
 
-## Systeem
+## System
 
 Overspanning:
 
@@ -654,7 +654,7 @@ L_opl = 100 mm
 
 ## Load (design values)
 
-Gelijkmatig verdeelde belasting:
+Uniformly distributed load:
 
 q_d = 5.0 kN/m
 
@@ -662,7 +662,7 @@ Maatgevend moment:
 
 M_Ed = q_d * L^2 / 8 to kN*m
 
-Maatgevende dwarskracht:
+Governing shear force:
 
 V_Ed = q_d * L / 2 to kN
 
@@ -706,7 +706,7 @@ UC_afschuiving = tau_d / f_vd
 
 ---
 
-## 3. Druk loodrecht op support (art. 6.1.5, formula 6.3)
+## 3. Compression perpendicular to grain at the support (art. 6.1.5, expression 6.3)
 
 k_c90 = 1.5
 
@@ -728,15 +728,15 @@ UC_c90 = sigma_c90d / (k_c90 * f_c90d)
 
 ## 4. Lateral torsional buckling (art. 6.3.3, formula 6.33)
 
-Meewerkende lengte (tabel 6.1, q-belasting):
+Effective length (Table 6.1, uniform load):
 
 l_ef = 0.9 * L to mm
 
-Kritische buigspanning voor gezaagd hout (formule 6.32):
+Critical bending stress for sawn timber (expression 6.32):
 
 sigma_mcrit = 0.78 * b^2 / (h * l_ef) * E_005 to N/mm^2
 
-Relatieve slankheid bij buiging (formule 6.30):
+Relative bending slenderness (expression 6.30):
 
 lambda_relm = sqrt(f_mk / sigma_mcrit)
 
@@ -766,31 +766,31 @@ UC_kip = sigma_md / (k_crit * f_md)
 
 ## 5. Deflection (art. 7.2 / art. 2.2.3)
 
-Vervormingsfactor k_def (tabel 3.2, klasse 1):
+Deformation factor k_def (Table 3.2, class 1):
 
 k_def = 0.60
 
 psi_2 = 0.3
 
-Verdeling belasting (aanname 60% blijvend, 40% veranderlijk):
+Load distribution (assumed 60% permanent, 40% variable):
 
 g_k = 0.6 * q_d / 1.35 to kN/m
 q_k = 0.4 * q_d / 1.5 to kN/m
 
-Ogenblikkelijke doorbuiging:
+Instantaneous deflection:
 
 w_inst_G = 5 * g_k * L^4 / (384 * E_mean * I_y) to mm
 w_inst_Q = 5 * q_k * L^4 / (384 * E_mean * I_y) to mm
 w_inst = w_inst_G + w_inst_Q to mm
 
-Uiteindelijke doorbuiging met kruip (formule 2.3, 2.4):
+Final deflection with creep (expressions 2.3, 2.4):
 
 w_fin_G = w_inst_G * (1 + k_def) to mm
 w_fin_Q = w_inst_Q * (1 + psi_2 * k_def) to mm
 w_fin = w_fin_G + w_fin_Q to mm
 w_netfin = w_fin to mm
 
-Grenswaarden (tabel 7.2):
+Limits (Table 7.2):
 
 w_inst_lim = L / 300 to mm
 w_netfin_lim = L / 250 to mm
@@ -800,20 +800,20 @@ UC_doorbuiging = w_netfin / w_netfin_lim
 #if UC_doorbuiging < 1
   [OK] Doorbuiging voldoet ({{w_netfin}} mm < {{w_netfin_lim}} mm).
 #else
-  [NIET OK] Doorbuiging voldoet NIET!
+  [FAIL] Deflection exceeds the limit!
 #end if
 
 ---
 
 ## Summary
 
-| Toetsing | UC | Resultaat |
+| Check | UC | Result |
 |---|---|---|
 | Buiging (6.1.6) | {{UC_buiging}} | |
-| Afschuiving (6.1.7) | {{UC_afschuiving}} | |
-| Druk loodrecht (6.1.5) | {{UC_c90}} | |
+| Shear (6.1.7) | {{UC_afschuiving}} | |
+| Compression perpendicular to grain (6.1.5) | {{UC_c90}} | |
 | Kip (6.3.3) | {{UC_kip}} | |
-| Doorbuiging (7.2) | {{UC_doorbuiging}} | |
+| Deflection (7.2) | {{UC_doorbuiging}} | |
 
 ## Overzicht
 

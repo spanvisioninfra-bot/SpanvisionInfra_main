@@ -8,28 +8,24 @@
  * Variabelenamen komen exact overeen met BetonkolomDesigner.tsx.
  */
 
-export const betonkolom = `"Concrete column — compression en bending met second-order effects
+export const betonkolom = `"Concrete column — compression and bending with second-order effects
 
-'<i>Een gewapende betonkolom onder normaalkracht en buiging. De slankheid
-'bepaalt of tweede-orde-effecten meegenomen moeten worden; de staafverdeling
-'over de omtrek bepaalt het M-N-interactiediagram. De invoer volgt de
-'tabbladen van het referentieprogramma: geometrie, wapening, knik en
-'belasting.</i>
+'<i>A reinforced concrete column under axial force and bending. Slenderness determines whether second-order effects must be included; the perimeter bar arrangement determines the M-N interaction diagram. Inputs follow the reference program: geometry, reinforcement, buckling, and loads.</i>
 
 # 1. Geometry
 
-@select vorm "Vorm van de section"
+@select vorm "Section shape"
   Rectangular column = 1
   Circular column = 2
 @end
 
-h_kol = ?*(mm)', hoogte van de doorsnede h'
-b_kol = ?*(mm)', breedte van de doorsnede b'
+h_kol = ?*(mm)', section height h'
+b_kol = ?*(mm)', section width b'
 L_kol = ?*(mm)', kolomlengte L'
 
 @select insitu "In-situ gestorte funderingspaal"
-  Nee = 0
-  Ja = 1
+  No = 0
+  Yes = 1
 @end
 
 # 2. Concrete and reinforcement
@@ -50,9 +46,9 @@ L_kol = ?*(mm)', kolomlengte L'
   B500C = 3
 @end
 
-c_dek = ?*(mm)', dekking op de beugel c'
-n_h = ?', aantal staven langs de hoogte (per zijde)'
-n_b = ?', aantal staven langs de breedte (per zijde)'
+c_dek = ?*(mm)', stirrup cover c'
+n_h = ?', number of bars along the height (per side)'
+n_b = ?', number of bars along the width (per side)'
 d_staaf = ?*(mm)', staafdiameter langswapening'
 d_beugel = ?*(mm)', beugeldiameter'
 s_beugel = ?*(mm)', beugelafstand'
@@ -64,11 +60,11 @@ L_crz = ?*(mm)', kniklengte om de z-as L_0,z'
 
 # 4. Loads
 
-N_Ed = ?*(kN)', normaalkracht N_Ed (druk positief)'
+N_Ed = ?*(kN)', axial force N_Ed (compression positive)'
 M_yEd = ?*(kN*m)', moment om de y-as M_y,Ed'
 M_zEd = ?*(kN*m)', moment om de z-as M_z,Ed'
 
-'<h6>Overzicht van de invoer</h6>
+'<h6>Input summary</h6>
 h_kol
 b_kol
 L_kol
@@ -77,10 +73,7 @@ d_staaf
 N_Ed
 M_yEd
 
-# 5. Toetsing
+# 5. Checks
 
-'<i><b>Nog niet uitgewerkt.</b> Dit blad legt voorlopig alleen de invoer en het
-'parametrische beeld vast. De slankheidsgrens λ<sub>lim</sub> van §5.8.3.1, de
-'tweede-orde-vergroting volgens de nominale stijfheid (§5.8.7) of de nominale
-'kromming (§5.8.8), het M-N-interactiediagram en de minimum­wapening volgen.</i>
+'<i><b>Not yet implemented.</b> This sheet currently defines inputs and the parametric drawing only. The slenderness limit λ<sub>lim</sub> in §5.8.3.1, second-order magnification using nominal stiffness (§5.8.7) or curvature (§5.8.8), M-N interaction, and minimum reinforcement are planned.</i>
 `;

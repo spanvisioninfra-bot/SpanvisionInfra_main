@@ -553,7 +553,7 @@ export function applyCalendarUpdate(projectCal: WorkCalendar, pool: CompanyPool)
   // op alleen id+herkomst terugbrengen — alle inhoud weg. Gooi in plaats daarvan expliciet. De enige
   // caller guardt al op status==='changed' (bron bestaat), dus dit pad hoort onbereikbaar te zijn.
   if (!source) {
-    throw new Error(`applyCalendarUpdate: pool-origineel niet gevonden voor kalender "${projectCal.name}" (id=${projectCal.id}, libraryItemId=${id ?? "missing"})`);
+    throw new Error(`applyCalendarUpdate: pool original was not found for calendar "${projectCal.name}" (id=${projectCal.id}, libraryItemId=${id ?? "missing"})`);
   }
   const patched = applyDiffFields(projectCal, source, CALENDAR_DIFF_FIELDS);
   patched.libraryOrigin = makeOrigin(pool, id!, computeCalendarHash(source));
@@ -571,7 +571,7 @@ export function applyResourceUpdate(projectRes: Resource, pool: CompanyPool): Re
   const source = id ? pool.resources.find((r) => r.id === id) : undefined;
   // Zelfde vangnet als applyCalendarUpdate — geen stille reductie tot id+herkomst.
   if (!source) {
-    throw new Error(`applyResourceUpdate: pool-origineel niet gevonden voor resource "${projectRes.name}" (id=${projectRes.id}, libraryItemId=${id ?? "missing"})`);
+    throw new Error(`applyResourceUpdate: pool original was not found for resource "${projectRes.name}" (id=${projectRes.id}, libraryItemId=${id ?? "missing"})`);
   }
   const patched = applyDiffFields(projectRes, source, RESOURCE_DIFF_FIELDS);
   patched.libraryOrigin = makeOrigin(pool, id!, computeResourceHash(source));

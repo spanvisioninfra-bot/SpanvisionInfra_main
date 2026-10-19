@@ -54,7 +54,7 @@ export function ProjectTreePanel({ onAddClick }: Props) {
     spread: "Funderingen",
     wall: "Wanden",
     anchor: "Ankers",
-    other: "Overig",
+    other: "Other",
   };
 
   return (

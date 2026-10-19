@@ -197,10 +197,10 @@ export default function ReportPreview({ data, onDetach }: ReportPreviewProps) {
                 onClick={() => pasTypeToe("volledig")}
                 title={t(
                   "report.rapportTypeVolledigHint",
-                  "De complete berekening: alle secties, inclusief invoertabellen en de afleidingen per staaf.",
+                  "The complete calculation: all sections, including input tables and derivations for each member.",
                 )}
               >
-                {t("report.rapportTypeVolledig", "Volledig")}
+                {t("report.rapportTypeVolledig", "Complete")}
               </button>
               <button
                 type="button"
@@ -208,7 +208,7 @@ export default function ReportPreview({ data, onDetach }: ReportPreviewProps) {
                 onClick={() => pasTypeToe("beperkt")}
                 title={t(
                   "report.rapportTypeBeperktHint",
-                  "De kern voor de opdrachtgever: uitgangspunten, schets, resultaten en toetsingsoverzicht.",
+                  "The essentials for the client: assumptions, sketch, results and verification overview.",
                 )}
               >
                 {t("report.rapportTypeBeperkt", "Beperkt")}
@@ -218,11 +218,11 @@ export default function ReportPreview({ data, onDetach }: ReportPreviewProps) {
               {aangepast
                 ? t(
                     "report.rapportTypeAangepast",
-                    "Aangepast — de sectiekeuze wijkt af van dit type. Klik het type opnieuw om terug te zetten.",
+                    "Custom — the selected sections differ from this report type. Click the type again to reset.",
                   )
                 : t(
                     "report.rapportTypeHint",
-                    "Een voorinstelling: hieronder blijft elke sectie los aan of uit te zetten.",
+                    "A preset: each section below can still be enabled or disabled separately.",
                   )}
             </p>
 
@@ -240,7 +240,7 @@ export default function ReportPreview({ data, onDetach }: ReportPreviewProps) {
                 }
               >
                 <option value="beknopt">
-                  {t("report.toetsingBeknopt", "Beknopt — alleen unity checks")}
+                  {t("report.toetsingBeknopt", "Concise — unity checks only")}
                 </option>
                 <option value="gedetailleerd">
                   {t("report.toetsingGedetailleerd", "Gedetailleerd — met afleidingen")}
@@ -256,7 +256,7 @@ export default function ReportPreview({ data, onDetach }: ReportPreviewProps) {
               <div className="report-staaf-keuze">
                 <div className="report-staaf-keuze-kop">
                   <span className="report-opmaak-label">
-                    {t("report.staafKeuze", "Uitgebreide uitvoer per staaf")}
+                    {t("report.staafKeuze", "Detailed output per member")}
                   </span>
                   <button
                     type="button"
@@ -264,24 +264,24 @@ export default function ReportPreview({ data, onDetach }: ReportPreviewProps) {
                     onClick={resetToetsStaven}
                     disabled={!staafKeuzeAangepast}
                   >
-                    {t("report.staafKeuzeAlles", "Alle staven")}
+                    {t("report.staafKeuzeAlles", "All members")}
                   </button>
                 </div>
                 <p className="report-sidebar-hint">
                   {checkDetailAan
                     ? t(
                         "report.staafKeuzeHint",
-                        "Alleen de aangevinkte staven krijgen hun afleidingen in het rapport; het toetsingsoverzicht toont altijd alle staven.",
+                        "Only selected members include their derivations in the report; the check overview always shows all members.",
                       )
                     : t(
                         "report.staafKeuzeSectieUit",
-                        "Het hoofdstuk “Toetsing per staaf” staat uit — zet het hieronder aan om deze keuze te laten meetellen.",
+                        "The \"Checks per member\" chapter is disabled. Enable it below to include this selection.",
                       )}
                 </p>
                 <div className="report-section-list">
                   {checkResults.map((r) => {
                     const aan = isToetsStaafZichtbaar(verborgenToetsStaven, r.beam_id);
-                    const naam = `${t("report.colBeam", "Staaf")} ${r.beam_id} — ${
+                    const naam = `${t("report.colBeam", "Member")} ${r.beam_id} — ${
                       isSteelCheckResult(r) ? r.profile_name : r.section_name
                     }`;
                     return (
@@ -309,14 +309,14 @@ export default function ReportPreview({ data, onDetach }: ReportPreviewProps) {
             <p className="report-sidebar-hint">
               {t(
                 "report.sectionsHint2",
-                "Vinkje: in het rapport of niet. Naam: spring ernaartoe.",
+                "Checkbox: include in the report. Name: jump to the section.",
               )}{" "}
               {/* Alleen tonen als er werkelijk iets doorgehaald staat —
                   anders is dit een zin over iets wat niet te zien is. */}
               {nietVanToepassing.size > 0 &&
                 t(
                   "report.sectionsHintNvt",
-                  "Doorgehaald: dit model kan dat hoofdstuk niet vullen, dus het staat niet in het rapport. Wijs het aan voor de reden.",
+                  "Struck through: this model has no data for that chapter, so it is omitted. Hover for the reason.",
                 )}
             </p>
 
@@ -354,7 +354,7 @@ export default function ReportPreview({ data, onDetach }: ReportPreviewProps) {
                       className="report-section-link"
                       disabled={!aan}
                       onClick={() => scrollNaarSectie(id)}
-                      title={nvt ?? t("report.jumpTo", "Spring naar dit hoofdstuk")}
+                      title={nvt ?? t("report.jumpTo", "Jump to this chapter")}
                     >
                       {nvt ? <s>{naam}</s> : naam}
                     </button>
@@ -376,10 +376,10 @@ export default function ReportPreview({ data, onDetach }: ReportPreviewProps) {
                 "Binnen/buiten" heet hier links/rechts: het rapport is
                 enkelzijdig drukwerk, dus er is geen spiegeling per even/
                 oneven pagina (zie ReportOpmaak in reportStore). */}
-            <div className="report-sidebar-kop">{t("report.opmaak", "Opmaak")}</div>
+            <div className="report-sidebar-kop">{t("report.opmaak", "Layout")}</div>
             <div className="report-opmaak">
               <OpmaakSlider
-                label={t("report.margeBoven", "Marge boven")}
+                label={t("report.margeBoven", "Top margin")}
                 waarde={margeBoven}
                 eenheid="mm"
                 min={MARGE_MIN_MM}
@@ -388,7 +388,7 @@ export default function ReportPreview({ data, onDetach }: ReportPreviewProps) {
                 onChange={zetOpmaak("margeBoven")}
               />
               <OpmaakSlider
-                label={t("report.margeOnder", "Marge onder")}
+                label={t("report.margeOnder", "Bottom margin")}
                 waarde={margeOnder}
                 eenheid="mm"
                 min={MARGE_MIN_MM}
@@ -449,7 +449,7 @@ export default function ReportPreview({ data, onDetach }: ReportPreviewProps) {
                   }
                 >
                   <option value={1}>
-                    {t("report.tocDiepte1", "Alleen hoofdstukken")}
+                    {t("report.tocDiepte1", "Chapters only")}
                   </option>
                   <option value={2}>
                     {t("report.tocDiepte2", "Met subsecties")}
@@ -498,7 +498,7 @@ export function DetachedReportPreview() {
         <div className="report-sync-waiting">
           {t(
             "report.waitingForMain",
-            "Wachten op het hoofdvenster — het rapport verschijnt zodra de verbinding er is.",
+            "Waiting for the main window. The report appears once connected.",
           )}
         </div>
       )}

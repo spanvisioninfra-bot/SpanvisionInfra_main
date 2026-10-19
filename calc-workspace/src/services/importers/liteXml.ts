@@ -42,7 +42,7 @@ function decode(text: string, xml: string, at: number): string {
     if (e === undefined) fail(`onbekende entiteit ${m}`, xml, at);
     if (e[0] === '#') {
       const cp = e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
-      if (!Number.isFinite(cp) || cp < 0 || cp > 0x10ffff) fail(`ongeldige tekenverwijzing &${e};`, xml, at);
+      if (!Number.isFinite(cp) || cp < 0 || cp > 0x10ffff) fail(`invalid character reference &${e};`, xml, at);
       return String.fromCodePoint(cp);
     }
     return NAMED[e];
@@ -70,7 +70,7 @@ export function parseLiteXml(input: string): XElement {
 
   const pushText = (raw: string, at: number): void => {
     if (stack.length === 0) {
-      if (raw.trim() !== '') fail('tekst buiten het wortelelement', xml, at);
+      if (raw.trim() !== '') fail("text outside the root element", xml, at);
       return;
     }
     const text = raw.indexOf('\r') >= 0 ? raw.replace(/\r\n?/g, '\n') : raw;
@@ -95,7 +95,7 @@ export function parseLiteXml(input: string): XElement {
       const qname = xml.slice(i + 1, gt).trim();
       const expected = qnames.pop();
       const node = stack.pop();
-      if (!node || expected !== qname) fail(`sluittag </${qname}> past niet bij <${expected ?? '?'}>`, xml, lt);
+      if (!node || expected !== qname) fail(`sluittag </${qname}> does not match <${expected ?? '?'}>`, xml, lt);
       i = gt + 1;
       continue;
     }
@@ -118,7 +118,7 @@ export function parseLiteXml(input: string): XElement {
       if (xml.startsWith('[CDATA[', i + 1)) {
         const end = xml.indexOf(']]>', i + 8);
         if (end < 0) fail('onafgesloten CDATA', xml, lt);
-        if (stack.length === 0) fail('CDATA buiten het wortelelement', xml, lt);
+        if (stack.length === 0) fail("CDATA outside the root element", xml, lt);
         stack[stack.length - 1].children.push(xml.slice(i + 8, end).replace(/\r\n?/g, '\n'));
         i = end + 3;
         continue;
@@ -143,7 +143,7 @@ export function parseLiteXml(input: string): XElement {
     // ── Starttag ──
     let j = i;
     while (j < n && !isNameEnd(xml.charCodeAt(j))) j++;
-    if (j === i) fail('elementnaam ontbreekt', xml, lt);
+    if (j === i) fail('element name is missing', xml, lt);
     const qname = xml.slice(i, j);
     const node: XElement = { name: localName(qname), attrs: {}, children: [] };
     i = j;
@@ -157,16 +157,16 @@ export function parseLiteXml(input: string): XElement {
       j = i;
       while (j < n && !isNameEnd(xml.charCodeAt(j))) j++;
       const aname = xml.slice(i, j);
-      if (!aname) fail('attribuutnaam ontbreekt', xml, lt);
+      if (!aname) fail('attribute name is missing', xml, lt);
       i = j;
       while (i < n && isSpace(xml.charCodeAt(i))) i++;
-      if (xml.charCodeAt(i) !== 61) fail(`attribuut ${aname} zonder waarde`, xml, lt);
+      if (xml.charCodeAt(i) !== 61) fail(`attribuut ${aname} without a value`, xml, lt);
       i++;
       while (i < n && isSpace(xml.charCodeAt(i))) i++;
       const q = xml.charCodeAt(i);
       if (q !== 34 && q !== 39) fail(`attribuut ${aname} zonder aanhalingstekens`, xml, lt);
       const end = xml.indexOf(String.fromCharCode(q), i + 1);
-      if (end < 0) fail(`attribuut ${aname} niet afgesloten`, xml, lt);
+      if (end < 0) fail(`attribuut ${aname} unterminated`, xml, lt);
       const raw = xml.slice(i + 1, end);
       node.attrs[localName(aname)] = decode(raw, xml, lt).replace(/[\t\n\r]/g, ' ');
       i = end + 1;
@@ -174,7 +174,7 @@ export function parseLiteXml(input: string): XElement {
 
     const selfClosing = xml.charCodeAt(i) === 47;
     if (selfClosing) i++;
-    if (xml.charCodeAt(i) !== 62) fail('starttag niet afgesloten met >', xml, lt);
+    if (xml.charCodeAt(i) !== 62) fail('opening tag is not terminated by >', xml, lt);
     i++;
 
     if (stack.length > 0) {
@@ -190,8 +190,8 @@ export function parseLiteXml(input: string): XElement {
     }
   }
 
-  if (stack.length > 0) fail(`element <${qnames[qnames.length - 1]}> is niet gesloten`, xml, n);
-  if (!root) fail('geen wortelelement', xml, 0);
+  if (stack.length > 0) fail(`element <${qnames[qnames.length - 1]}> is not closed`, xml, n);
+  if (!root) fail('no root element', xml, 0);
   return root;
 }
 

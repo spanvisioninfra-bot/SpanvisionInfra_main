@@ -55,7 +55,7 @@ export const houtBalkTemplate = {
       default: 'vuren',
     },
     { key: 'schaal', label: "Scale", labelEn: 'Scale', type: 'number', default: 1, min: 0.1, step: 0.1 },
-    { key: 'toonLabel', label: 'Maat tonen', labelEn: 'Show size', type: 'boolean', default: true },
+    { key: 'toonLabel', label: "Show dimensions", labelEn: 'Show size', type: 'boolean', default: true },
   ],
   realSizeMm(params) {
     // LIGGEND: lengte (l) horizontaal, hoogte (b) verticaal.

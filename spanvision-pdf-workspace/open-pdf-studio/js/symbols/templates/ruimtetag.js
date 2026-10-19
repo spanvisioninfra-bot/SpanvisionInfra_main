@@ -90,7 +90,7 @@ export const ruimteTagTemplate = {
     { key: 'naam', label: "Name", labelEn: 'Name', type: 'string', default: 'Ruimte' },
     { key: 'nummer', label: 'Nummer', labelEn: 'Number', type: 'string', default: '' },
     { key: 'decimalen', label: 'Decimalen', labelEn: 'Decimals', type: 'number', default: 1, min: 0, max: 3, step: 1 },
-    { key: 'toonOppervlakte', label: 'Oppervlakte tonen', labelEn: 'Show area', type: 'boolean', default: true },
+    { key: 'toonOppervlakte', label: "Show area", labelEn: 'Show area', type: 'boolean', default: true },
   ],
   snapPoints(params, bbox) {
     return [{ kind: 'center', x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 }];

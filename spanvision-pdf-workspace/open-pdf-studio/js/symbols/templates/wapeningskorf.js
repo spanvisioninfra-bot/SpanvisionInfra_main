@@ -292,18 +292,18 @@ export const wapeningskorfTemplate = {
   params: [
     { key: 'breedte', label: "Width (mm)", labelEn: 'Width (mm)', type: 'number', default: 400, min: 50, step: 10 },
     { key: 'hoogte', label: "Height (mm)", labelEn: 'Height (mm)', type: 'number', default: 400, min: 50, step: 10 },
-    { key: 'dekking', label: 'Dekking (mm)', labelEn: 'Cover (mm)', type: 'number', default: 30, min: 0, step: 5 },
+    { key: 'dekking', label: 'Cover (mm)', labelEn: 'Cover (mm)', type: 'number', default: 30, min: 0, step: 5 },
     { key: 'bovenAantal', label: "Top count", labelEn: 'Top count', type: 'number', default: 4, min: 0, step: 1 },
-    { key: 'bovenDiameter', label: 'Boven ⌀ (mm)', labelEn: 'Top ⌀ (mm)', type: 'number', default: 12, min: 4, step: 2 },
+    { key: 'bovenDiameter', label: 'Top ⌀ (mm)', labelEn: 'Top ⌀ (mm)', type: 'number', default: 12, min: 4, step: 2 },
     { key: 'onderAantal', label: "Bottom count", labelEn: 'Bottom count', type: 'number', default: 6, min: 0, step: 1 },
-    { key: 'onderDiameter', label: 'Onder ⌀ (mm)', labelEn: 'Bottom ⌀ (mm)', type: 'number', default: 16, min: 4, step: 2 },
+    { key: 'onderDiameter', label: 'Bottom ⌀ (mm)', labelEn: 'Bottom ⌀ (mm)', type: 'number', default: 16, min: 4, step: 2 },
     { key: 'zijAantal', label: "Side count", labelEn: 'Side count', type: 'number', default: 2, min: 0, step: 1 },
     { key: 'zijDiameter', label: 'Zij ⌀ (mm)', labelEn: 'Side ⌀ (mm)', type: 'number', default: 10, min: 4, step: 2 },
     { key: 'beugelDiameter', label: 'Beugel ⌀ (mm)', labelEn: 'Stirrup ⌀ (mm)', type: 'number', default: 8, min: 4, step: 2 },
     { key: 'beugelAfstand', label: 'Beugel h.o.h. (mm)', labelEn: 'Stirrup spacing (mm)', type: 'number', default: 150, min: 25, step: 25 },
     { key: 'naam', label: 'Onderschrift', labelEn: 'Caption', type: 'string', default: 'Korf A' },
-    { key: 'toonMaatlijnen', label: 'Maatlijnen tonen', labelEn: 'Show dimensions', type: 'boolean', default: true },
-    { key: 'toonLabels', label: 'Labels tonen', labelEn: 'Show labels', type: 'boolean', default: true },
+    { key: 'toonMaatlijnen', label: "Show dimension lines", labelEn: 'Show dimensions', type: 'boolean', default: true },
+    { key: 'toonLabels', label: "Show labels", labelEn: 'Show labels', type: 'boolean', default: true },
   ],
 
   // Lokale mm-geometrie — ook het aangrijpingspunt voor de unittest.

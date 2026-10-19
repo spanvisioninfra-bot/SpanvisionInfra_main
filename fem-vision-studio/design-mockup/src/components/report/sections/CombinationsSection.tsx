@@ -50,11 +50,11 @@ export default function CombinationsSection() {
 
   return (
     <div className="rpt-block">
-      <h2 className="rpt-h2">{t("report.sectionCombinations", "Belastingcombinaties")}</h2>
+      <h2 className="rpt-h2">{t("report.sectionCombinations", "Load combinations")}</h2>
 
       {combinations.length === 0 || loadCases.length === 0 ? (
         <p className="rpt-empty-note">
-          {t("report.noCombinations", "Geen belastingcombinaties in het model.")}
+          {t("report.noCombinations", "No load combinations in the model.")}
         </p>
       ) : (
         <>
@@ -131,7 +131,7 @@ export default function CombinationsSection() {
             <div className="rpt-note">
               {t(
                 "report.comboSkippedHeading",
-                "Niet in de berekening meegenomen:",
+                "Not included in the calculation:",
               )}
               <ul>
                 {overgeslagenCombinaties.map((o) => (

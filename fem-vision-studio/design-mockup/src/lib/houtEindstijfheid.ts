@@ -115,7 +115,7 @@
  *  - tweede orde: daar schrijft 2.2.2(1)P, derde streepje, rekenwaarden voor
  *    "die niet zijn aangepast aan de belastingsduur" — E_mean,fin is dan niet
  *    de regel, en er komt geen variant;
- *  - een houtdeel zonder bekende k_def (kruislaaghout zonder opgegeven k_def,
+ *  - een houtdeel zonder bekende k_def (CLT without a specified k_def,
  *    een houten wandschijf): dan valt E_mean,fin niet te bepalen, en rekenen
  *    met een aangenomen k_def zou een getal verzinnen;
  *  - de kruip van beton (E_cm blijft staan), de stijfheid van vrij materiaal,
@@ -155,11 +155,11 @@ import { vt } from "./vertaalbareTekst";
 /**
  * De koppen van de meldingen hieronder, voor de projectboom. De boom toonde
  * de eerste zin van de melding, en die bleef in elke taal Nederlands
- * (issue #33); de melding zelf is een rekenmelding en blijft Nederlands.
+ * (issue #33); both headings and calculation messages now use English.
  */
-const KOP_NIET_DOORGEREKEND = vt("common:tree.timberFinalStiffness.notCalculated", "Eindstijfheid hout niet doorgerekend");
-const KOP_DOORGEREKEND_UGT = vt("common:tree.timberFinalStiffness.calculatedUls", "Eindstijfheid hout doorgerekend (UGT)");
-const KOP_DOORGEREKEND_BGT = vt("common:tree.timberFinalStiffness.calculatedSls", "Eindstijfheid hout doorgerekend (BGT)");
+const KOP_NIET_DOORGEREKEND = vt("common:tree.timberFinalStiffness.notCalculated", "Timber final stiffness not calculated");
+const KOP_DOORGEREKEND_UGT = vt("common:tree.timberFinalStiffness.calculatedUls", "Timber final stiffness calculated (ULS)");
+const KOP_DOORGEREKEND_BGT = vt("common:tree.timberFinalStiffness.calculatedSls", "Timber final stiffness calculated (SLS)");
 
 // ── k_def ─────────────────────────────────────────────────────────────────
 
@@ -197,34 +197,34 @@ export interface Kruipgedrag {
 export function kruipgedragVanStaaf(b: Beam): Kruipgedrag {
   switch (materiaalVanStaaf(b)) {
     case "staal":
-      return { soort: "geen", kDef: 0, sleutel: "staal", omschrijving: "staal (kruipt niet)" };
+      return { soort: "geen", kDef: 0, sleutel: "staal", omschrijving: "steel (no creep)" };
     case "hout": {
       const sc = b.checkConfig?.serviceClass ?? 1;
       const kDef = K_DEF_TABEL_3_2[sc];
       return {
         soort: "hout", kDef, sleutel: `hout:${kDef}`,
-        omschrijving: `hout met k_def = ${nl(kDef)}`,
+        omschrijving: `timber with k_def = ${nl(kDef)}`,
       };
     }
     case "clt": {
       const k = b.checkConfig?.cltKdef;
       if (typeof k === "number" && Number.isFinite(k) && k >= 0) {
-        return { soort: "hout", kDef: k, sleutel: `hout:${k}`, omschrijving: `hout met k_def = ${nl(k)}` };
+        return { soort: "hout", kDef: k, sleutel: `hout:${k}`, omschrijving: `timber with k_def = ${nl(k)}` };
       }
       return {
         soort: "hout", kDef: null, sleutel: "hout:onbekend",
-        omschrijving: "kruislaaghout zonder opgegeven k_def",
+        omschrijving: "CLT without a specified k_def",
       };
     }
     case "beton":
-      return { soort: "beton", kDef: null, sleutel: "beton", omschrijving: "beton (kruip volgens EN 1992-1-1 3.1.4)" };
+      return { soort: "beton", kDef: null, sleutel: "beton", omschrijving: "concrete (creep per EN 1992-1-1 3.1.4)" };
     case "vrij":
       return {
         soort: "onbekend", kDef: null, sleutel: `vrij:${b.material ?? ""}`,
-        omschrijving: "vrij materiaal (kruipgedrag onbekend)",
+        omschrijving: "custom material (unknown creep behavior)",
       };
     default:
-      return { soort: "onbekend", kDef: null, sleutel: "onbekend", omschrijving: "niet herkend materiaal (kruipgedrag onbekend)" };
+      return { soort: "onbekend", kDef: null, sleutel: "onbekend", omschrijving: "unrecognized material (unknown creep behavior)" };
   }
 }
 
@@ -239,29 +239,29 @@ function heeftVeren(b: Beam): boolean {
 export function kruipgedragVanPlaat(p: Plate): Kruipgedrag {
   if ((p.materiaal ?? "").trim() === "") {
     return (p.E ?? PLATE_DEFAULTS.E) === PLATE_DEFAULTS.E
-      ? { soort: "geen", kDef: 0, sleutel: "staal", omschrijving: "staal (kruipt niet)" }
-      : { soort: "onbekend", kDef: null, sleutel: `plaat-E:${p.E}`, omschrijving: "wandschijf met een eigen E zonder materiaal (kruipgedrag onbekend)" };
+      ? { soort: "geen", kDef: 0, sleutel: "staal", omschrijving: "steel (no creep)" }
+      : { soort: "onbekend", kDef: null, sleutel: `plaat-E:${p.E}`, omschrijving: "wall plate with a custom E and no material (unknown creep behavior)" };
   }
   // Alleen de SOORT telt voor het kruipgedrag. Een kruislaaghouten wand
   // waarvan de G₁₂-keuze nog ontbreekt (issue #14) is nog steeds hout en geen
   // "niet herkend materiaal"; de weigering daarvan komt uit de berekening.
   const soort = plaatMateriaalSoort(p.materiaal);
   if (soort === "onbekend" || soort === null) {
-    return { soort: "onbekend", kDef: null, sleutel: "onbekend", omschrijving: "wandschijf met een niet herkend materiaal" };
+    return { soort: "onbekend", kDef: null, sleutel: "onbekend", omschrijving: "wall plate with an unrecognized material" };
   }
   switch (soort) {
     case "staal":
-      return { soort: "geen", kDef: 0, sleutel: "staal", omschrijving: "staal (kruipt niet)" };
+      return { soort: "geen", kDef: 0, sleutel: "staal", omschrijving: "steel (no creep)" };
     case "beton":
-      return { soort: "beton", kDef: null, sleutel: "beton", omschrijving: "beton (kruip volgens EN 1992-1-1 3.1.4)" };
+      return { soort: "beton", kDef: null, sleutel: "beton", omschrijving: "concrete (creep per EN 1992-1-1 3.1.4)" };
     case "hout":
     case "clt":
       return {
         soort: "hout", kDef: null, sleutel: "hout:onbekend",
-        omschrijving: "houten wandschijf (zonder klimaatklasse, dus zonder bekende k_def)",
+        omschrijving: "timber wall plate (no service class, so k_def is unknown)",
       };
     default:
-      return { soort: "onbekend", kDef: null, sleutel: `vrij:${p.materiaal}`, omschrijving: "vrij materiaal (kruipgedrag onbekend)" };
+      return { soort: "onbekend", kDef: null, sleutel: `vrij:${p.materiaal}`, omschrijving: "custom material (unknown creep behavior)" };
   }
 }
 
@@ -324,9 +324,9 @@ const NVT_LEEG: Omit<EindstijfheidUitkomst, "reden"> = {
 /** De naam van de soort, als opsomming. */
 function groepTekst(g: KruipGroep): string {
   const delen: string[] = [];
-  if (g.staven.length > 0) delen.push(`staaf ${g.staven.join(", ")}`);
-  if (g.verbindingen.length > 0) delen.push(`verende aansluiting van staaf ${g.verbindingen.join(", ")}`);
-  if (g.platen.length > 0) delen.push(`wandschijf ${g.platen.map((i) => i + 1).join(", ")}`);
+  if (g.staven.length > 0) delen.push(`member ${g.staven.join(", ")}`);
+  if (g.verbindingen.length > 0) delen.push(`elastic connection of member ${g.verbindingen.join(", ")}`);
+  if (g.platen.length > 0) delen.push(`wall plate ${g.platen.map((i) => i + 1).join(", ")}`);
   return `${g.omschrijving}: ${delen.join("; ")}`;
 }
 
@@ -361,8 +361,8 @@ export function bepaalEindstijfheidHout(model: EindstijfheidModel): Eindstijfhei
         soort: "hout", kDef: kv,
         sleutel: kv === null ? "verbinding:onbekend" : `hout:${kv}`,
         omschrijving: kv === null
-          ? "verende aansluiting aan hout zonder bekende k_def"
-          : `verbinding met k_def = 2·${nl(k.kDef!)} = ${nl(kv)} (2.3.2.2(3))`,
+          ? "elastic timber connection with unknown k_def"
+          : `connection with k_def = 2·${nl(k.kDef!)} = ${nl(kv)} (2.3.2.2(3))`,
       }).verbindingen.push(b.id);
     }
   }
@@ -373,11 +373,11 @@ export function bepaalEindstijfheidHout(model: EindstijfheidModel): Eindstijfhei
   });
 
   const lijst = [...groepen.values()];
-  if (!metHout) return { ...NVT_LEEG, groepen: lijst, reden: "Het model bevat geen hout." };
+  if (!metHout) return { ...NVT_LEEG, groepen: lijst, reden: "The model has no timber." };
   if (lijst.length <= 1) {
     return {
       ...NVT_LEEG, groepen: lijst,
-      reden: "Alle delen hebben hetzelfde kruipgedrag; E_mean volstaat (EN 1995-1-1 2.2.2(1)P, 2.2.3(5)).",
+      reden: "All parts have the same creep behavior; E_mean is sufficient (EN 1995-1-1 2.2.2(1)P, 2.2.3(5)).",
     };
   }
 
@@ -385,34 +385,34 @@ export function bepaalEindstijfheidHout(model: EindstijfheidModel): Eindstijfhei
   if (onb.statischBepaald) {
     return {
       ...NVT_LEEG, groepen: lijst, onbepaaldheid: onb,
-      reden: "De constructie is statisch bepaald: de krachtsverdeling hangt niet van de stijfheid af (EN 1995-1-1 2.2.2(1)P).",
+      reden: "The structure is statically determinate: force distribution is independent of stiffness (EN 1995-1-1 2.2.2(1)P).",
     };
   }
 
   const opsomming = lijst.map(groepTekst).join(" — ");
   const kop =
-    "Hout in een statisch onbepaalde constructie met verschillend kruipgedrag " +
-    `(${opsomming}). ${onb.toelichting} De vereenvoudiging van EN 1995-1-1 2.2.3(5) ` +
-    "geldt daarom niet: in de eindtoestand kruipt het hout weg en verschuift de " +
-    "krachtsverdeling naar de stijvere delen (2.2.2(1)P, tweede streepje).";
+    "Timber in a statically indeterminate structure with different creep behavior " +
+    `(${opsomming}). ${onb.toelichting} The simplification in EN 1995-1-1 2.2.3(5) ` +
+    "therefore does not apply: timber creep in the final state redistributes " +
+    "internal forces to the stiffer parts (2.2.2(1)P, second bullet).";
 
   // ── Tweede orde: E_mean,fin is dan niet de regel ────────────────────────
   if (model.analysetype !== "eersteOrde") {
     return {
       status: "alleenMelding", groepen: lijst, onbepaaldheid: onb, kDefPerStaaf: new Map(),
       betonPhiPerStaaf: new Map(),
-      reden: "tweede orde",
+      reden: "second order",
       meldingen: [{
         niveau: "waarschuwing", caseId: null, kop: KOP_NIET_DOORGEREKEND,
         tekst:
-          `Eindstijfheid hout niet doorgerekend. ${kop} Bij een tweede-orde-berekening ` +
-          "schrijft 2.2.2(1)P (derde streepje) rekenwaarden voor die niet zijn aangepast " +
-          "aan de belastingsduur, en niet E_mean,fin; er is geen eindtoestandvariant " +
-          "berekend. Beoordeel de krachtsverdeling in de eindtoestand apart, bijvoorbeeld " +
-          "met een eerste-orde-berekening. Ook de langeduurvervorming in de " +
-          "bruikbaarheidsgrenstoestand (2.2.3(4)) is niet berekend: de doorbuigingstoets " +
-          "van het hout gebruikt de vereenvoudiging w_fin = w_inst + k_def·w_qp van " +
-          "2.2.3(5), die hier niet geldt, en w_fin en w_add kunnen te klein zijn.",
+          `Timber final stiffness not calculated. ${kop} For second-order analysis, ` +
+          "2.2.2(1)P (third bullet) requires design values without adjustment for " +
+          "load duration rather than E_mean,fin; no final-state variant has been " +
+          "calculated. Assess the final-state force distribution separately, for example " +
+          "using first-order analysis. Long-term serviceability deformation " +
+          "(2.2.3(4)) has also not been calculated: the timber deflection check " +
+          "uses w_fin = w_inst + k_def·w_qp from 2.2.3(5), which does not apply " +
+          "here, so w_fin and w_add may be underestimated.",
       }],
     };
   }
@@ -423,18 +423,18 @@ export function bepaalEindstijfheidHout(model: EindstijfheidModel): Eindstijfhei
     return {
       status: "alleenMelding", groepen: lijst, onbepaaldheid: onb, kDefPerStaaf: new Map(),
       betonPhiPerStaaf: new Map(),
-      reden: "k_def onbekend",
+      reden: "unknown k_def",
       meldingen: [{
         niveau: "waarschuwing", caseId: null, kop: KOP_NIET_DOORGEREKEND,
         tekst:
-          `Eindstijfheid hout niet doorgerekend. ${kop} Voor ` +
-          `${zonderKdef.map(groepTekst).join("; ")} is k_def niet bekend, en zonder k_def ` +
-          "valt E_mean,fin = E_mean/(1 + ψ₂·k_def) (2.3.2.2(2)) niet te bepalen; er wordt " +
-          "geen k_def aangenomen. De krachtsverdeling is alleen met E_mean berekend, en " +
-          "welke kant de fout op gaat is niet te zeggen. Vul k_def in (kruislaaghout: " +
-          "ETA of productverklaring) of beoordeel de eindtoestand apart. Ook de " +
-          "langeduurvervorming (2.2.3(4)) is niet berekend: de doorbuigingstoets gebruikt " +
-          "de vereenvoudiging van 2.2.3(5), en w_fin en w_add kunnen te klein zijn.",
+          `Timber final stiffness not calculated. ${kop} For ` +
+          `${zonderKdef.map(groepTekst).join("; ")}, k_def is unknown. Without k_def, ` +
+          "E_mean,fin = E_mean/(1 + ψ₂·k_def) (2.3.2.2(2)) cannot be determined; " +
+          "no k_def is assumed. Forces were calculated using E_mean only, and the " +
+          "direction of the error is unknown. Enter k_def (for CLT, use the ETA or " +
+          "product declaration) or assess the final state separately. Long-term " +
+          "deformation (2.2.3(4)) has also not been calculated: the deflection check " +
+          "uses the simplification in 2.2.3(5), so w_fin and w_add may be underestimated.",
       }],
     };
   }
@@ -454,42 +454,42 @@ export function bepaalEindstijfheidHout(model: EindstijfheidModel): Eindstijfhei
   const bijzonder: string[] = [];
   if (lijst.some((g) => g.sleutel === "beton")) {
     bijzonder.push(
-      "Beton houdt in de eindtoestand E_cm: zijn eigen kruip (EN 1992-1-1 3.1.4) zit " +
-        "niet in deze variant.",
+      "Concrete retains E_cm in this final-state variant; its own creep " +
+        "(EN 1992-1-1 3.1.4) is not included.",
     );
   }
   if (lijst.some((g) => g.sleutel.startsWith("vrij:") || g.sleutel === "onbekend" || g.sleutel.startsWith("plaat-E:"))) {
-    bijzonder.push("Vrij of niet herkend materiaal houdt zijn opgegeven E; zijn kruip is onbekend.");
+    bijzonder.push("Custom or unrecognized material retains its specified E; its creep is unknown.");
   }
   const metVeren =
     model.supports.some((s) => s.type === "zSpring" || s.type === "xSpring" || s.type === "rotSpring") ||
     model.beams.some((b) => b.bedding && b.bedding.k > 0);
   if (metVeren) {
-    bijzonder.push("Verende opleggingen en bedding houden hun stijfheid.");
+    bijzonder.push("Elastic supports and foundations retain their stiffness.");
   }
 
   // De BGT-kanttekeningen: welke langeduurstijfheid elk deel krijgt.
   const bgtBijzonder: string[] = [];
   if (betonPhiPerStaaf.size > 0) {
     bgtBijzonder.push(
-      `Betonstaaf ${[...betonPhiPerStaaf.entries()].map(([id, phi]) => `${id} (φ = ${nl(phi)})`).join(", ")} ` +
-        "krijgt E_c,eff = E_cm/(1 + φ(∞,t₀)) (EN 1992-1-1 7.4.3(5), uitdrukking 7.20), " +
-        "met de ongescheurde doorsnede.",
+      `Concrete member ${[...betonPhiPerStaaf.entries()].map(([id, phi]) => `${id} (φ = ${nl(phi)})`).join(", ")} ` +
+        "uses E_c,eff = E_cm/(1 + φ(∞,t₀)) (EN 1992-1-1 7.4.3(5), expression 7.20) " +
+        "with the uncracked section.",
     );
   }
   if (betonZonderPhi.length > 0) {
     bgtBijzonder.push(
-      `Betonstaaf ${betonZonderPhi.join(", ")} houdt E_cm: voor die staaf is geen ` +
-        "φ(∞,t₀) opgegeven (niet in het §5.8-blok en niet als projectwaarde; een waarde " +
-        "volgens bijlage B wordt pas in de toetsing berekend). Zijn kruip ontbreekt dan " +
-        "in de eindtoestand, het beton trekt te veel kracht naar zich toe en de zakking " +
-        "van het hout kan te klein zijn. Geef φ(∞,t₀) op om dat te voorkomen.",
+      `Concrete member ${betonZonderPhi.join(", ")} retains E_cm because no ` +
+        "φ(∞,t₀) is specified in the §5.8 block or project settings; an Annex B value " +
+        "is calculated only during checking. Its creep is therefore omitted from " +
+        "the final state: concrete attracts too much force and timber deflection " +
+        "may be underestimated. Specify φ(∞,t₀) to prevent this.",
     );
   }
   if (lijst.some((g) => g.sleutel.startsWith("vrij:") || g.sleutel === "onbekend" || g.sleutel.startsWith("plaat-E:"))) {
-    bgtBijzonder.push("Vrij of niet herkend materiaal houdt zijn opgegeven E; zijn kruip is onbekend.");
+    bgtBijzonder.push("Custom or unrecognized material retains its specified E; its creep is unknown.");
   }
-  if (metVeren) bgtBijzonder.push("Verende opleggingen en bedding houden hun stijfheid.");
+  if (metVeren) bgtBijzonder.push("Elastic supports and foundations retain their stiffness.");
 
   return {
     status: "doorrekenen", groepen: lijst, onbepaaldheid: onb, kDefPerStaaf, betonPhiPerStaaf,
@@ -498,37 +498,37 @@ export function bepaalEindstijfheidHout(model: EindstijfheidModel): Eindstijfhei
       {
         niveau: "waarschuwing", caseId: null, kop: KOP_DOORGEREKEND_UGT,
         tekst:
-          `Eindstijfheid hout doorgerekend (UGT). ${kop} Elke UGT-combinatie is daarom ` +
-          "ook doorgerekend in de eindtoestand, met per houtstaaf E_mean,fin = " +
-          "E_mean/(1 + ψ₂·k_def) (2.3.2.2(2), uitdrukking 2.10) en per verende " +
-          "aansluiting aan hout K_fin = K/(1 + ψ₂·2·k_def) (2.3.2.2(3)). Omdat vooraf " +
-          "niet vaststaat welke belasting de grootste spanning geeft, is elke ψ₂ van de " +
-          "combinatie doorgerekend (1 voor blijvend en overig, ψ₂ van de categorie voor " +
-          "veranderlijk; sneeuw en wind hebben ψ₂ = 0 en veranderen niets). De varianten " +
-          "heten \"… (eindtoestand ψ₂ = …)\"; de toetsing en de omhullende nemen de " +
-          "ongunstigste, ook de combinatie met E_mean zelf." +
+          `Timber final stiffness calculated (ULS). ${kop} Each ULS combination is ` +
+          "also analyzed in the final state, using E_mean,fin = " +
+          "E_mean/(1 + ψ₂·k_def) per timber member (2.3.2.2(2), expression 2.10) and " +
+          "K_fin = K/(1 + ψ₂·2·k_def) per elastic timber connection (2.3.2.2(3)). " +
+          "The governing load is unknown before analysis, so every ψ₂ in the " +
+          "combination is evaluated (1 for permanent and other loads, the category " +
+          "ψ₂ for variable loads; snow and wind have ψ₂ = 0 and cause no change). " +
+          "Variants are named \"… (final state ψ₂ = …)\"; checks and the envelope " +
+          "use the most unfavorable result, including the original E_mean combination." +
           (bijzonder.length > 0 ? ` ${bijzonder.join(" ")}` : ""),
       },
       {
         niveau: "waarschuwing", caseId: null, kop: KOP_DOORGEREKEND_BGT,
         tekst:
-          "Eindstijfheid hout doorgerekend (BGT). In deze constructie met verschillend " +
-          "kruipgedrag geldt de vereenvoudiging w_fin = w_inst + k_def·w_qp van EN 1995-1-1 " +
-          "2.2.3(5) niet; 2.2.3(4) schrijft de langeduurvervorming onder de quasi-blijvende " +
-          "combinatie voor met E_mean,fin = E_mean/(1 + k_def) (2.3.2.2(1), uitdrukking 2.7). " +
-          "Elke quasi-blijvende BGT-combinatie (6.16b) is daarom ook doorgerekend in de " +
-          "eindtoestand, met per houtstaaf E_mean,fin = E_mean/(1 + k_def) en per verende " +
-          "aansluiting aan hout K_fin = K/(1 + 2·k_def) (2.3.2.2(3)); staal houdt zijn E. " +
-          "Die varianten heten \"… (eindtoestand BGT)\". De doorbuigingstoets van elke " +
-          "houtstaaf rekent daarmee w_fin = w_inst + (w_qp,fin − w_qp) en w_add = w_fin − w₁ " +
-          "(w₂ + w₃, NEN-EN 1990 NB figuur NB.1), met w_qp en w_qp,fin uit dezelfde combinatie. " +
-          "Kent het model geen quasi-blijvende BGT-combinatie, dan valt die toets met een " +
-          "notitie terug op de vereenvoudiging." +
+          "Timber final stiffness calculated (SLS). For this structure with different " +
+          "creep behavior, w_fin = w_inst + k_def·w_qp from EN 1995-1-1 " +
+          "2.2.3(5) does not apply. Clause 2.2.3(4) requires long-term deformation under " +
+          "the quasi-permanent combination using E_mean,fin = E_mean/(1 + k_def) (2.3.2.2(1), expression 2.7). " +
+          "Each quasi-permanent SLS combination (6.16b) is therefore also analyzed " +
+          "in the final state, using E_mean,fin = E_mean/(1 + k_def) per timber member " +
+          "and K_fin = K/(1 + 2·k_def) per elastic timber connection (2.3.2.2(3)); steel retains E. " +
+          "Variants are named \"… (final state SLS)\". Each timber member's deflection " +
+          "check uses w_fin = w_inst + (w_qp,fin − w_qp) and w_add = w_fin − w₁ " +
+          "(w₂ + w₃, NEN-EN 1990 NB figure NB.1), with w_qp and w_qp,fin from the same combination. " +
+          "If the model has no quasi-permanent SLS combination, the check falls back " +
+          "to the simplification and adds a note." +
           (bgtBijzonder.length > 0 ? ` ${bgtBijzonder.join(" ")}` : "") +
-          " Niet doorgerekend: de doorbuigingstoetsen van staal- en betonstaven lezen hun " +
-          "eigen BGT-combinaties met de stijfheid direct na belasten, terwijl die delen in " +
-          "de eindtoestand meer kracht krijgen; hun langeduurzakking kan daardoor te klein " +
-          "zijn. Beoordeel die apart.",
+          " Not calculated: steel and concrete deflection checks use their own " +
+          "SLS combinations with initial stiffness, although these parts attract " +
+          "more force in the final state. Their long-term deflection may therefore " +
+          "be underestimated. Assess these separately.",
       },
     ],
   };
@@ -607,7 +607,7 @@ export function metEindtoestandVarianten(
       uit.push({
         ...c,
         id: c.id + EINDTOESTAND_COMBO_OFFSET * BGT_EINDTOESTAND_VEELVOUD,
-        name: `${c.name} (eindtoestand BGT)`,
+        name: `${c.name} (final state SLS)`,
         eindtoestand: { psi2: 1, bgt: true },
       });
       continue;
@@ -617,7 +617,7 @@ export function metEindtoestandVarianten(
       uit.push({
         ...c,
         id: c.id + EINDTOESTAND_COMBO_OFFSET * Math.round(psi2 * 100),
-        name: `${c.name} (eindtoestand ψ₂ = ${nl(psi2)})`,
+        name: `${c.name} (final state ψ₂ = ${nl(psi2)})`,
         eindtoestand: { psi2 },
       });
     }
@@ -648,7 +648,7 @@ export function eindstijfheidInvoer(
       const phi = bgt ? uitkomst.betonPhiPerStaaf?.get(b.id) : undefined;
       if (phi !== undefined) {
         if (b.E === undefined) {
-          throw new Error(`Staaf ${b.id}: geen E in de solverinvoer; E_c,eff (EN 1992-1-1 7.4.3(5)) is niet te bepalen.`);
+          throw new Error(`Member ${b.id}: no E in the solver input; E_c,eff (EN 1992-1-1 7.4.3(5)) cannot be determined.`);
         }
         return { ...b, E: b.E / (1 + phi) };
       }
@@ -657,7 +657,7 @@ export function eindstijfheidInvoer(
       if (b.E === undefined) {
         // bouwMultiInput vult E altijd; zonder E zou hier de staal-default van de
         // engine geschaald worden — dat is geen hout meer.
-        throw new Error(`Staaf ${b.id}: geen E in de solverinvoer; E_mean,fin (EN 1995-1-1 2.3.2.2(2)) is niet te bepalen.`);
+        throw new Error(`Member ${b.id}: no E in the solver input; E_mean,fin (EN 1995-1-1 2.3.2.2(2)) cannot be determined.`);
       }
       const fStaaf = 1 / (1 + psi2 * kDef);
       const fVerbinding = 1 / (1 + psi2 * 2 * kDef);

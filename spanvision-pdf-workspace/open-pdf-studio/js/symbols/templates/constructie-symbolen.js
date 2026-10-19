@@ -20,7 +20,7 @@ function arcering(x0, x1, y, slag) {
 // ── Oplegging (steunpunt) ──────────────────────────────────────────────────
 export const opleggingTemplate = {
   id: 'oplegging',
-  name: 'Oplegging',
+  name: "Support",
   nameEn: 'Support',
   category: 'NL Constructie',
   defaultSize: { width: 64, height: 64 },
@@ -211,7 +211,7 @@ export const windverbandTemplate = {
   params: [
     { key: 'type', label: 'Type', labelEn: 'Type', type: 'enum', options: [
         { value: 'kruis', label: "Cross" },
-        { value: 'enkel', label: 'Enkele diagonaal' },
+        { value: 'enkel', label: "Single diagonal" },
       ], default: 'kruis' },
   ],
   render(params = {}, bbox) {

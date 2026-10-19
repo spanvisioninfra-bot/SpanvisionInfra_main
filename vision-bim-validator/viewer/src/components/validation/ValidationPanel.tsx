@@ -454,7 +454,7 @@ export function ValidationPanel() {
                   type="button"
                   className="vt-header__icon-btn vt-header__icon-btn--bcf"
                   onClick={handleCreateBcfBulk}
-                  title="Alle failures → BCF"
+                  title="All failures → BCF"
                 >
                   BCF
                 </button>

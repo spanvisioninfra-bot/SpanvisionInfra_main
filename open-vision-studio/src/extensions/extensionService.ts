@@ -149,7 +149,7 @@ async function gateConsent(
 export async function installFromCatalog(entry: CatalogEntry): Promise<InstallOutcome> {
   try {
     const res = await fetch(entry.downloadUrl);
-    if (!res.ok) throw new Error(`Download mislukt: HTTP ${res.status}`);
+    if (!res.ok) throw new Error(`Download failed: HTTP ${res.status}`);
 
     const bytes = new Uint8Array(await res.arrayBuffer());
 
@@ -336,14 +336,14 @@ export async function installFromZipBlob(
     try {
       rawManifest = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(manifestEntry.data));
     } catch (error) {
-      throw new Error(`manifest.json bevat ongeldige JSON: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(`manifest.json contains invalid JSON: ${error instanceof Error ? error.message : String(error)}`);
     }
     const parsedManifest = parseExtensionManifest(rawManifest, 'fresh');
     if (!parsedManifest.ok) throw new Error(parsedManifest.error);
     const manifest = parsedManifest.value;
 
     const mainEntry = files.find((file) => file.name === manifest.main);
-    if (!mainEntry) throw new Error(`Hoofdbestand "${manifest.main}" niet gevonden in ZIP`);
+    if (!mainEntry) throw new Error(`Main file "${manifest.main}" was not found in ZIP`);
 
     const mainCode = new TextDecoder('utf-8', { fatal: true }).decode(mainEntry.data);
 

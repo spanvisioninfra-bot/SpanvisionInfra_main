@@ -143,7 +143,7 @@ export function createStoreRuntime(opts?: StoreRuntimeOptions): StoreRuntime {
 
   const requireActiveLease = (lease: McpTransactionLease): ActiveMcpLease => {
     if (activeMcpLease !== lease) {
-      throw new Error('MCP-transactielease is niet actief voor deze store-runtime');
+      throw new Error('The MCP transaction lease is inactive for this store runtime');
     }
     return activeMcpLease;
   };
@@ -313,7 +313,7 @@ export function createStoreRuntime(opts?: StoreRuntimeOptions): StoreRuntime {
 
     enterMcpTransaction() {
       if (activeMcpLease) {
-        throw new Error('MCP-transactie is niet herintreedbaar binnen dezelfde store-runtime');
+        throw new Error('An MCP transaction cannot be re-entered within the same store runtime');
       }
       const lease: ActiveMcpLease = {
         token: Symbol('mcp-transaction'),

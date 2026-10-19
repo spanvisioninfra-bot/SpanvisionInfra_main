@@ -185,7 +185,7 @@ export function startGuideSession(
 ): void {
   if (active && active.binding.extensionId !== binding.extensionId) {
     throw new Error(
-      `Extensie "${binding.extensionId}": er loopt al een begeleiding van extensie "${active.binding.extensionId}"`,
+      `Extension "${binding.extensionId}": a guide from extension "${active.binding.extensionId}" is already running`,
     );
   }
   stopGuideSession();

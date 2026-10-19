@@ -47,7 +47,7 @@ function checkNorm(checks: MemberCheckResult[]): string {
   const delen = [staal && "EN 1993-1-1", hout && "EN 1995-1-1", beton && "EN 1992-1-1"]
     .filter((x): x is string => !!x);
   if (delen.length <= 1) return delen[0] ?? "";
-  return `${delen.slice(0, -1).join(", ")} en ${delen[delen.length - 1]}`;
+  return `${delen.slice(0, -1).join(", ")} and ${delen[delen.length - 1]}`;
 }
 
 const esc = (s: unknown): string =>
@@ -58,7 +58,7 @@ const fmt = (v: number, dec = 2): string =>
 
 export function buildReportHtml(input: ReportInput): string {
   const { nodes, beams, supports, loads, loadCases, result } = input;
-  const title = input.projectName?.trim() || "Open FEM2D Studio — rapport";
+  const title = input.projectName?.trim() || "Open FEM2D Studio — report";
   const now = new Date().toLocaleString("en-GB");
 
   const sections: string[] = [];
@@ -67,23 +67,23 @@ export function buildReportHtml(input: ReportInput): string {
   sections.push(`
     <h2>1. Model</h2>
     <table>
-      <tr><th>Onderdeel</th><th>Aantal</th></tr>
-      <tr><td>Knopen</td><td>${nodes.length}</td></tr>
-      <tr><td>Staven</td><td>${beams.length}</td></tr>
-      <tr><td>Opleggingen</td><td>${supports.length}</td></tr>
-      <tr><td>Belastingen</td><td>${loads.length}</td></tr>
-      <tr><td>Belastinggevallen</td><td>${loadCases.length}</td></tr>
+      <tr><th>Component</th><th>Count</th></tr>
+      <tr><td>Nodes</td><td>${nodes.length}</td></tr>
+      <tr><td>Members</td><td>${beams.length}</td></tr>
+      <tr><td>Supports</td><td>${supports.length}</td></tr>
+      <tr><td>Loads</td><td>${loads.length}</td></tr>
+      <tr><td>Load cases</td><td>${loadCases.length}</td></tr>
     </table>
 
-    <h3>1.1 Knopen</h3>
+    <h3>1.1 Nodes</h3>
     <table>
       <tr><th>ID</th><th>x (m)</th><th>z (m)</th></tr>
       ${nodes.map(n => `<tr><td>${n.id}</td><td>${fmt(n.x / 1000, 3)}</td><td>${fmt(n.z / 1000, 3)}</td></tr>`).join("")}
     </table>
 
-    <h3>1.2 Staven</h3>
+    <h3>1.2 Members</h3>
     <table>
-      <tr><th>ID</th><th>Van</th><th>Naar</th><th>Profiel</th><th>Materiaal</th><th>Scharnieren</th></tr>
+      <tr><th>ID</th><th>From</th><th>To</th><th>Section</th><th>Material</th><th>Releases</th></tr>
       ${beams.map(b => {
         const rel: string[] = [];
         if (b.releases?.startRy) rel.push("A:φY");
@@ -92,9 +92,9 @@ export function buildReportHtml(input: ReportInput): string {
       }).join("")}
     </table>
 
-    <h3>1.3 Opleggingen</h3>
+    <h3>1.3 Supports</h3>
     <table>
-      <tr><th>Knoop</th><th>Type</th><th>k</th></tr>
+      <tr><th>Node</th><th>Type</th><th>k</th></tr>
       ${supports.map(s => `<tr><td>${s.nodeId}</td><td>${esc(s.type)}</td><td>${s.k !== undefined ? fmt(s.k, 1) : "—"}</td></tr>`).join("")}
     </table>
   `);
@@ -102,28 +102,28 @@ export function buildReportHtml(input: ReportInput): string {
   // ── 2. Belastingen per geval ───────────────────────────────────────────
   const loadRows = (caseId: number) => loads.filter(l => l.caseId === caseId).map(l => {
     if (l.type === "lineLoad") {
-      const dir = l.qDir === "x" ? "horizontaal" : "verticaal";
+      const dir = l.qDir === "x" ? "horizontal" : "vertical";
       const q = l.qStart !== undefined && l.qEnd !== undefined && l.qStart !== l.qEnd
         ? `${fmt(l.qStart ?? l.q ?? 0, 2)} → ${fmt(l.qEnd ?? 0, 2)}`
         : fmt(l.q ?? 0, 2);
-      return `<tr><td>Lijnlast</td><td>staaf ${l.beamId}</td><td>q = ${q} kN/m (${dir})</td></tr>`;
+      return `<tr><td>Line load</td><td>member ${l.beamId}</td><td>q = ${q} kN/m (${dir})</td></tr>`;
     }
     if (l.type === "pointForce")
-      return `<tr><td>Puntlast</td><td>knoop ${l.nodeId}</td><td>Fx=${fmt(l.fx ?? 0, 1)} kN, Fz=${fmt(l.fz ?? 0, 1)} kN</td></tr>`;
+      return `<tr><td>Point load</td><td>node ${l.nodeId}</td><td>Fx=${fmt(l.fx ?? 0, 1)} kN, Fz=${fmt(l.fz ?? 0, 1)} kN</td></tr>`;
     if (l.type === "pointMoment")
-      return `<tr><td>Moment</td><td>knoop ${l.nodeId}</td><td>My=${fmt(l.my ?? 0, 1)} kNm</td></tr>`;
+      return `<tr><td>Moment</td><td>node ${l.nodeId}</td><td>My=${fmt(l.my ?? 0, 1)} kNm</td></tr>`;
     if (l.type === "thermal")
-      return `<tr><td>Thermisch</td><td>staaf ${l.beamId}</td><td>ΔT=${fmt(l.deltaT ?? 0, 1)} K</td></tr>`;
+      return `<tr><td>Thermal</td><td>member ${l.beamId}</td><td>ΔT=${fmt(l.deltaT ?? 0, 1)} K</td></tr>`;
     return "";
   }).join("");
 
   sections.push(`
-    <h2>2. Belastingen</h2>
+    <h2>2. Loads</h2>
     ${loadCases.map(lc => `
       <h3>2.${lc.id} ${esc(lc.name)} (${esc(lc.type)})</h3>
       <table>
-        <tr><th>Type</th><th>Op</th><th>Waarde</th></tr>
-        ${loadRows(lc.id) || `<tr><td colspan="3">— geen belastingen —</td></tr>`}
+        <tr><th>Type</th><th>Op</th><th>Value</th></tr>
+        ${loadRows(lc.id) || `<tr><td colspan="3">— no loads —</td></tr>`}
       </table>
     `).join("")}
   `);
@@ -132,20 +132,20 @@ export function buildReportHtml(input: ReportInput): string {
   if (result) {
     const scope = input.scopeName ? ` — ${esc(input.scopeName)}` : "";
     sections.push(`
-      <h2>3. Resultaten${scope}</h2>
-      <p>Max. verplaatsing: <strong>${fmt(result.maxDisplacement, 2)} mm</strong></p>
+      <h2>3. Results${scope}</h2>
+      <p>Max. displacement: <strong>${fmt(result.maxDisplacement, 2)} mm</strong></p>
 
-      <h3>3.1 Reacties</h3>
+      <h3>3.1 Reactions</h3>
       <table>
-        <tr><th>Knoop</th><th>Fx (kN)</th><th>Fz (kN)</th><th>My (kNm)</th></tr>
+        <tr><th>Node</th><th>Fx (kN)</th><th>Fz (kN)</th><th>My (kNm)</th></tr>
         ${Array.from(result.reactions.entries()).map(([nid, r]) =>
           `<tr><td>${nid}</td><td>${fmt(r.fx / 1000, 2)}</td><td>${fmt(r.fz / 1000, 2)}</td><td>${fmt(r.my / 1e6, 2)}</td></tr>`
         ).join("")}
       </table>
 
-      <h3>3.2 Element-krachten</h3>
+      <h3>3.2 Member forces</h3>
       <table>
-        <tr><th>Staaf</th><th>N (kN)</th><th>V (kN)</th><th>M_start (kNm)</th><th>M_eind (kNm)</th><th>|M|max (kNm)</th></tr>
+        <tr><th>Member</th><th>N (kN)</th><th>V (kN)</th><th>M_start (kNm)</th><th>M_eind (kNm)</th><th>|M|max (kNm)</th></tr>
         ${Array.from(result.elements.entries()).map(([bid, ef]) => {
           let mMax = Math.max(Math.abs(ef.M_start), Math.abs(ef.M_end));
           if (ef.bendingMoment?.length) for (const m of ef.bendingMoment) if (Math.abs(m) > mMax) mMax = Math.abs(m);
@@ -161,9 +161,9 @@ export function buildReportHtml(input: ReportInput): string {
     const checks = input.checks ?? [];
     if (checks.length > 0) {
       sections.push(`
-        <h2>4. Toetsing — ${esc(checkNorm(checks))}</h2>
+        <h2>4. Verification — ${esc(checkNorm(checks))}</h2>
         <table>
-          <tr><th>Staaf</th><th>Doorsnede</th><th>Materiaal</th><th>Maatgevende toets</th><th>Artikel</th><th>UC</th><th>Status</th></tr>
+          <tr><th>Member</th><th>Cross-section</th><th>Material</th><th>Governing check</th><th>Clause</th><th>UC</th><th>Status</th></tr>
           ${checks.map(r => {
             const g = r.checks.find(c => c.id === r.governing_check_id)?.kind.data;
             const voldoet = r.uc_max <= 1.0;
@@ -175,24 +175,24 @@ export function buildReportHtml(input: ReportInput): string {
               <td>${esc(g?.title ?? r.governing_check_id)}</td>
               <td>${esc(g?.article ?? "")}</td>
               <td><strong>${fmt(r.uc_max, 3)}</strong></td>
-              <td>${voldoet ? "✓ OK" : "✗ NIET OK"}</td>
+              <td>${voldoet ? "✓ OK" : "✗ NOT OK"}</td>
             </tr>`;
           }).join("")}
         </table>
       `);
     } else {
       sections.push(`
-        <h2>4. Toetsing</h2>
-        <p><em>Geen toetsingsresultaten beschikbaar — de normtoetsing draait in
-        de desktop-app.</em></p>
+        <h2>4. Verification</h2>
+        <p><em>No verification results are available — code verification runs in
+        the desktop app.</em></p>
       `);
     }
   } else {
-    sections.push(`<h2>3. Resultaten</h2><p><em>Geen berekening uitgevoerd — klik eerst op Berekenen.</em></p>`);
+    sections.push(`<h2>3. Results</h2><p><em>No analysis has been run — click Calculate first.</em></p>`);
   }
 
   return `<!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <title>${esc(title)}</title>
@@ -217,7 +217,7 @@ export function buildReportHtml(input: ReportInput): string {
 </head>
 <body>
 <h1>${esc(title)}</h1>
-<div class="meta">Gegenereerd: ${esc(now)} · Open FEM2D Studio v2 · ${nodes.length} knopen · ${beams.length} staven</div>
+<div class="meta">Generated: ${esc(now)} · Open FEM2D Studio v2 · ${nodes.length} nodes · ${beams.length} members</div>
 ${sections.join("\n")}
 </body>
 </html>`;
@@ -243,7 +243,7 @@ export function downloadReportHtml(input: ReportInput): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${(input.projectName?.trim() || "rapport").replace(/[^\w-]+/g, "_")}.html`;
+  a.download = `${(input.projectName?.trim() || "report").replace(/[^\w-]+/g, "_")}.html`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

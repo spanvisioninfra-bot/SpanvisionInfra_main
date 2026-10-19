@@ -177,7 +177,8 @@ export default function PonsDesigner() {
           </label>
           <label className="gd-chk" title="Enter β manually instead of calculating it according to §6.4.3">
             <input type="checkbox" checked={betaKeuze === 1} onChange={(e) => set("beta_keuze", e.target.checked ? 1 : 0)} />
-            β handmatig
+
+            β manual
           </label>
           {betaKeuze === 1 && (
             <label>β
@@ -299,7 +300,7 @@ export default function PonsDesigner() {
           <br />The control perimeter follows the 1:2 spread in section; at an edge or corner column it ends at the slab edge.</span>
         <span className="vd-live">
           {BETONLABEL[fck]} · {STAALSOORT.find((o) => o.v === staal)?.label} ·
-          {vorm === 2 ? `circular column Ø${fmt(c1)}` : `column ${fmt(c1)}×${fmt(c2)}`} · plate h = {fmt(hP)} mm · dekking {fmt(cDek)} · Ø{fmt(dy)}-{fmt(sy)} / Ø{fmt(dz)}-{fmt(sz)} ·
+          {vorm === 2 ? `circular column Ø${fmt(c1)}` : `column ${fmt(c1)}×${fmt(c2)}`} · plate h = {fmt(hP)} mm · cover {fmt(cDek)} · Ø{fmt(dy)}-{fmt(sy)} / Ø{fmt(dz)}-{fmt(sz)} ·
           d = {fmt(dEff)} mm · u<sub>0</sub> = {fmt(u0)} · u<sub>1</sub> = {fmt(u1eff)} mm ·
           {plaats === 1 ? "internal column" : plaats === 2 ? "edge column" : "corner column"} ·
           {kop === 0 ? "no column head" : kop === 1 ? " rectangular head" : " circular head"} ·

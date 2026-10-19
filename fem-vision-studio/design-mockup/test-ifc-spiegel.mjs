@@ -185,7 +185,7 @@ checkEq("wortel = IfcProject", boom.type, "IfcProject");
 checkEq("wortelnaam = projectnaam", boom.naam, "Loods Noord");
 const knopenTak = plat.find(k => k.type === "IfcStructuralPointConnection");
 const stavenTak = plat.find(k => k.type === "IfcStructuralCurveMember");
-const steunTak  = plat.find(k => k.naam === "Opleggingen");
+const steunTak  = plat.find(k => k.naam === "Supports");
 checkEq("tak Knopen telt het echte aantal", knopenTak?.aantal, model.nodes.length);
 checkEq("tak Knopen heeft evenveel kinderen", knopenTak?.kinderen?.length, model.nodes.length);
 checkEq("tak Staven telt het echte aantal", stavenTak?.aantal, model.beams.length);
@@ -201,7 +201,7 @@ const boomTekst = plat.map(k => `${k.type} ${k.naam}`).join("\n");
 checkTrue("geen verzonnen verdiepingen in de boom",
   !/Ground Floor|First Floor|Default Site|Sample Project/.test(boomTekst));
 checkTrue("knoop 3 staat met zijn coördinaat in de boom",
-  boomTekst.includes("Knoop 3 — x 6,000 m, z 5,000 m"));
+  boomTekst.includes("Node 3 — x 6,000 m, z 5,000 m"));
 
 // ─────────────────────────────────────────────────────────────────────────
 log("\n[3] Export structureel — draagsysteem zonder belastingen");
@@ -355,17 +355,17 @@ checkEq("een doorsnedeset per staaf",
 
 log("  — de boom toont de bouwkundige staven ernaast");
 const platB = platteBoom(bouwIfcBoom(model));
-const bouwTak = platB.find(k => k.naam === "Bouwkundige staven");
+const bouwTak = platB.find(k => k.naam === "Physical members");
 checkEq("tak 'Bouwkundige staven' telt het echte aantal",
   bouwTak?.aantal, model.beams.length);
 const elementTeksten = (bouwTak?.kinderen ?? []).map(k => `${k.type} ${k.naam}`);
 checkTrue("staaf 5 (de luifel) staat er als ligger met zijn koker",
-  elementTeksten.some(t => t.startsWith("IfcBeam Ligger 5") && t.includes("SHS 60x60x4")));
+  elementTeksten.some(t => t.startsWith("IfcBeam Beam 5") && t.includes("SHS 60x60x4")));
 checkTrue("staaf 1 staat er als kolom",
-  elementTeksten.some(t => t.startsWith("IfcColumn Kolom 1")));
+  elementTeksten.some(t => t.startsWith("IfcColumn Column 1")));
 checkEq("zonder bouwkundig model verdwijnt de tak uit de boom",
   platteBoom(bouwIfcBoom(model, { zonderBouwkundig: true }))
-    .filter(k => k.naam === "Bouwkundige staven").length, 0);
+    .filter(k => k.naam === "Physical members").length, 0);
 
 log("  — een betonstaaf met korf toont zijn wapening");
 const betonModel = {
@@ -389,8 +389,8 @@ const betonModel = {
 const wapeningTak = platteBoom(bouwIfcBoom(betonModel))
   .find(k => k.type === "IfcReinforcingBar");
 checkTrue("de korf staat onder de ligger in de boom",
-  wapeningTak !== undefined && /onder 3/.test(wapeningTak.naam) &&
-  /boven 2/.test(wapeningTak.naam) && /beugel/.test(wapeningTak.naam));
+  wapeningTak !== undefined && /bottom 3/.test(wapeningTak.naam) &&
+  /top 2/.test(wapeningTak.naam) && /stirrup/.test(wapeningTak.naam));
 const betonIfc = bouwIfcRekenmodel(betonModel);
 checkEq("het bestand draagt zes wapeningsstaven",
   tel(betonIfc, "IFCREINFORCINGBAR"), 6);

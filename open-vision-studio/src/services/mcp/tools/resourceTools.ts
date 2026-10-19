@@ -512,7 +512,7 @@ function manageResourcesCore(ctx: McpContext, actions: ResourceAction[]): Mutati
     const before = ctx.app.store.getState().resources.find((r) => r.id === plan.id);
     if (!before) {
       // Kan alleen bij een defect in de classificatie — harde stapfout i.p.v. stil doorgaan.
-      throw new McpStepError('NOT_FOUND', `resource '${plan.id}' bestaat niet (na classificatie)`);
+      throw new McpStepError('NOT_FOUND', `resource '${plan.id}' does not exist after classification`);
     }
     const name = before.name;
     const diff = ctx.transactions.draft.removeResource(plan.id);

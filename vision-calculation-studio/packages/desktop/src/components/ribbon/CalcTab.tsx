@@ -92,24 +92,24 @@ export default function CalcTab({ onSettingsClick: _onSettingsClick }: CalcTabPr
   return (
     <div className="ribbon-content">
       <div className="ribbon-groups">
-        <RibbonGroup label={t("calc.file", "Bestand")}>
+        <RibbonGroup label={t("calc.file", "File")}>
           <RibbonButton icon={newDocIcon} label={t("calc.new", "New")} size="large" onClick={handleNew} />
           <RibbonButton icon={openFolderIcon} label={t("calc.browse", "Browse…")} size="large" onClick={handleOpen} />
           <RibbonButton icon={saveDiskIcon} label={t("calc.save", "Save")} size="large" onClick={handleSave} />
         </RibbonGroup>
 
-        <RibbonGroup label={t("calc.edit", "Bewerken")}>
+        <RibbonGroup label={t("calc.edit", "Edit")}>
           <RibbonButtonStack>
             <RibbonButton
               icon={undoIcon}
-              label={t("calc.undo", "Ongedaan")}
+              label={t("calc.undo", "Undo")}
               size="small"
               disabled={!kanOngedaan}
               onClick={ongedaan}
             />
             <RibbonButton
               icon={redoIcon}
-              label={t("calc.redo", "Opnieuw")}
+              label={t("calc.redo", "Redo")}
               size="small"
               disabled={!kanOpnieuw}
               onClick={opnieuw}

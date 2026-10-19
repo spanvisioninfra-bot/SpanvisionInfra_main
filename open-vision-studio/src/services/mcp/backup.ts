@@ -206,7 +206,7 @@ export function createBackupService(deps: BackupDeps): BackupService {
   /** Schrijf één snapshot voor `docId`, ruim daarna op, en geef het pad terug. Rejec­t bij fs-fout. */
   async function writeSnapshot(docId: string): Promise<string> {
     const doc = deps.getDoc(docId);
-    if (!doc) throw new Error(`AI-backup: document '${docId}' niet gevonden`);
+    if (!doc) throw new Error(`AI backup: document '${docId}' was not found`);
     const fs = await deps.getFs();
     const base = await fs.appDataDir();
     const bucket = backupBucket(docId, doc.filePath);
@@ -268,7 +268,7 @@ export function createBackupService(deps: BackupDeps): BackupService {
 
   async function makeManualBackup(): Promise<string> {
     const docId = deps.activeDocId();
-    if (!docId) throw new Error('AI-backup: geen actief document om te back-uppen');
+    if (!docId) throw new Error("AI backup: no active document to back up");
     const path = await writeSnapshot(docId);
     autoBackedUp.delete(docId); // reset de auto-teller voor dit document
     return path;
@@ -360,7 +360,7 @@ export const ensureBackup: EnsureBackupFn = (docId, kind) =>
 
 /** "Nu backup maken". Web/niet-Tauri ⇒ reject (er is geen fs-bestemming). */
 export function makeManualBackup(): Promise<string> {
-  if (!isTauri()) return Promise.reject(new Error('AI-backup: alleen in de desktop-app beschikbaar'));
+  if (!isTauri()) return Promise.reject(new Error("AI backup: available only in the desktop app"));
   return service().makeManualBackup();
 }
 

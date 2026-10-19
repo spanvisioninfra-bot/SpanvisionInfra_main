@@ -445,7 +445,7 @@ export default function GordingDesigner() {
                 <label>Q<sub>k</sub> geconcentreerd (kN)
                   <input type="number" step={0.5} value={Qk} disabled={varType === 2} onChange={(e) => setVal("Q_k", parseFloat(e.target.value))} />
                 </label>
-                <div className="gd-note">Select = distributed load q<sub>k</sub>; anders concentrated load Q<sub>k</sub>.</div>
+                <div className="gd-note">Select = distributed load q<sub>k</sub>; otherwise concentrated load Q<sub>k</sub>.</div>
               </>
             )}
             {loadTab === 2 && (
@@ -456,7 +456,7 @@ export default function GordingDesigner() {
                 <label>Peak velocity pressure q<sub>p</sub> (kN/m²)
                   <input type="number" value={+qpWind.toFixed(3)} disabled />
                 </label>
-                <div className="gd-note">C<sub>pe</sub> = 0,70 (zone F-G-H), C<sub>pi</sub> = −0,30 — vaste NB-waarden.</div>
+                <div className="gd-note">C<sub>pe</sub> = 0,70 (zone F-G-H), C<sub>pi</sub>  = −0.30 — fixed National Annex values.</div>
               </>
             )}
             {loadTab === 3 && (
@@ -486,7 +486,8 @@ export default function GordingDesigner() {
           <span className="vd-ctrl-h">Options</span>
           <label style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
             <input type="checkbox" checked={controleer === 1} onChange={(e) => setVal("controleer", e.target.checked ? 1 : 0)} style={{ width: "auto" }} />
-            Controleer doorbuiging
+
+            Check deflection
           </label>
           <label>Permissible additional deflection
             <select value={grens} onChange={(e) => setVal("grensfactor", parseFloat(e.target.value))}>
@@ -581,7 +582,7 @@ export default function GordingDesigner() {
       <div className="vd-foot">
         <span>Click a blue dimension to edit it and update the calculation sheet.</span>
         <span className="vd-live">
-          α = {fmt(alphaDeg, 1)}° · roof length {Math.round(slopeLen)} mm · h.o.h. {Math.round(hohSlope)} mm · bending (6.11) {fmt(UC_611, 2)} · (6.12) {fmt(UC_612, 2)} · afschuiving {fmt(UC_shear, 2)} · doorbuiging w<sub>y</sub> {fmt(UC_wy, 2)} · w<sub>z</sub> {fmt(UC_wz, 2)}
+          α = {fmt(alphaDeg, 1)}° · roof length {Math.round(slopeLen)} mm · h.o.h. {Math.round(hohSlope)} mm · bending (6.11) {fmt(UC_611, 2)} · (6.12) {fmt(UC_612, 2)} · afschuiving {fmt(UC_shear, 2)}  · deflection w<sub>y</sub> {fmt(UC_wy, 2)} · w<sub>z</sub> {fmt(UC_wz, 2)}
         </span>
       </div>
     </div>

@@ -62,51 +62,51 @@ export type Oordeel =
  */
 export function beoordeelRekenVoorwaarden(v: RekenVoorwaarden): Oordeel {
   if (v.lopendeRekengangen > 0) {
-    return { soort: "wacht", reden: "er loopt een rekengang (rekenen, fysisch niet-lineaire ronde of toetsing)" };
+    return { soort: "wacht", reden: "a calculation is running (analysis, physically nonlinear iteration or verification)" };
   }
   if (v.herberekeningGepland) {
-    return { soort: "wacht", reden: "er staat na een modelwijziging een herberekening gepland" };
+    return { soort: "wacht", reden: "a recalculation is scheduled after a model change" };
   }
-  if (v.toetsingLoopt) return { soort: "wacht", reden: "de toetsing loopt nog" };
+  if (v.toetsingLoopt) return { soort: "wacht", reden: "verification is still running" };
 
-  if (!v.heeftModel) return { soort: "weiger", reden: "er staat geen model in de app" };
+  if (!v.heeftModel) return { soort: "weiger", reden: "there is no model in the app" };
   if (v.rekenfout !== null) {
-    return { soort: "weiger", reden: `de laatste rekengang mislukte: ${v.rekenfout}` };
+    return { soort: "weiger", reden: `the last calculation failed: ${v.rekenfout}` };
   }
   if (!v.heeftResultaten) {
     return {
       soort: "weiger",
       reden:
-        "er zijn geen resultaten — er is nog niet gerekend, of het model is na de laatste " +
-        "berekening gewijzigd. Roep eerst `rekenen` aan",
+        "there are no results — no calculation has been run, or the model changed after the last " +
+        "calculation. Call `rekenen` first",
     };
   }
   if (v.toetsfout !== null) {
-    return { soort: "weiger", reden: `de toetsing gaf een fout: ${v.toetsfout}` };
+    return { soort: "weiger", reden: `verification returned an error: ${v.toetsfout}` };
   }
   if (v.analysetype === "tweedeOrdeFysisch" && !v.resultatenUitVolledigeRekengang) {
     return {
       soort: "weiger",
       reden:
-        "bij tweede orde fysisch niet-lineair horen de resultaten uit de volledige rekengang " +
-        "te komen (knop Berekenen of `rekenen`), mét de fysisch niet-lineaire ronde; de " +
-        "resultaten die nu in de app staan komen uit een andere weg. Roep `rekenen` aan",
+        "physically nonlinear second-order analysis requires results from the full calculation " +
+        "(Calculate button or `rekenen`), including the physically nonlinear iteration; the " +
+        "current results came from a different process. Call `rekenen`",
     };
   }
   if (v.toetsbareStaven && !v.toetsingGedraaid) {
     return {
       soort: "weiger",
       reden:
-        "de toetsing ontbreekt of is na een wijziging gewist, terwijl het model toetsbare " +
-        "staven heeft. Roep `rekenen` of `toetsen` aan",
+        "verification is missing or was cleared after a change, while the model contains " +
+        "members that require verification. Call `rekenen` or `toetsen`",
     };
   }
   if (v.toetsbareStaven && !v.toetsingHoortBijResultaten) {
     return {
       soort: "weiger",
       reden:
-        "de toetsing hoort bij een andere berekening dan de resultaten die nu in het rapport " +
-        "staan (verouderd). Roep `toetsen` of `rekenen` aan",
+        "verification belongs to a different calculation from the results currently shown in the report " +
+        "(outdated). Call `toetsen` or `rekenen`",
     };
   }
   // Een model ZONDER toetsbare staven is geldig: dan staat er niets te toetsen.
@@ -135,13 +135,13 @@ const STANDAARD_TIJDSLIMIET_MS = 120_000;
 export function leesExportOpties(args: Record<string, unknown>): ExportOpties {
   const bekend = new Set(["type", "formaat", "orientatie", "project", "tijdslimiet_ms"]);
   for (const k of Object.keys(args)) {
-    if (!bekend.has(k)) throw new Error(`onbekend argument \`${k}\` (bekend: ${[...bekend].join(", ")})`);
+    if (!bekend.has(k)) throw new Error(`unknown argument “${k}” (known: ${[...bekend].join(", ")})`);
   }
   const keuze = <T extends string>(k: string, toegestaan: readonly T[]): T | null => {
     const v = args[k];
     if (v === undefined || v === null) return null;
     if (typeof v !== "string" || !(toegestaan as readonly string[]).includes(v)) {
-      throw new Error(`\`${k}\` moet een van ${toegestaan.join(" | ")} zijn, niet ${JSON.stringify(v)}`);
+      throw new Error(`“${k}” must be one of ${toegestaan.join(" | ")}, not ${JSON.stringify(v)}`);
     }
     return v as T;
   };
@@ -152,7 +152,7 @@ export function leesExportOpties(args: Record<string, unknown>): ExportOpties {
   let kop: RapportKop | null = null;
   const p = args.project;
   if (p !== undefined && p !== null) {
-    if (typeof p !== "object" || Array.isArray(p)) throw new Error("`project` moet een object zijn");
+    if (typeof p !== "object" || Array.isArray(p)) throw new Error("`project` must be an object");
     const velden: Record<string, keyof RapportKop> = {
       naam: "name",
       nummer: "projectNumber",
@@ -164,10 +164,10 @@ export function leesExportOpties(args: Record<string, unknown>): ExportOpties {
     for (const [k, v] of Object.entries(p as Record<string, unknown>)) {
       const doel = velden[k];
       if (!doel) {
-        throw new Error(`onbekend veld \`project.${k}\` (bekend: ${Object.keys(velden).join(", ")})`);
+        throw new Error(`unknown field “project.${k}” (known: ${Object.keys(velden).join(", ")})`);
       }
       if (v === null || v === undefined) continue;
-      if (typeof v !== "string") throw new Error(`\`project.${k}\` moet tekst zijn`);
+      if (typeof v !== "string") throw new Error(`“project.${k}” must be text`);
       kop[doel] = v;
     }
   }
@@ -175,7 +175,7 @@ export function leesExportOpties(args: Record<string, unknown>): ExportOpties {
   let tijdslimietMs = STANDAARD_TIJDSLIMIET_MS;
   const t = args.tijdslimiet_ms;
   if (t !== undefined && t !== null) {
-    if (typeof t !== "number" || !Number.isFinite(t)) throw new Error("`tijdslimiet_ms` moet een getal zijn");
+    if (typeof t !== "number" || !Number.isFinite(t)) throw new Error("`tijdslimiet_ms` must be a number");
     tijdslimietMs = Math.min(600_000, Math.max(1_000, t));
   }
   return { type, formaat, orientatie, kop, tijdslimietMs };
@@ -201,14 +201,14 @@ export interface ExportMoment {
  * van een ander model bevatten, en dat is van buiten niet te zien.
  */
 export function vergelijkExportMoment(voor: ExportMoment, na: ExportMoment): string | null {
-  if (na.weergave !== "report") return `de weergave werd tijdens het printen gewisseld (naar "${na.weergave}")`;
-  if (na.generatie !== voor.generatie) return "het model of de rekengang veranderde tijdens het printen";
-  if (na.toetsingOp !== voor.toetsingOp) return "de toetsing veranderde tijdens het printen";
+  if (na.weergave !== "report") return `the view changed during printing (to "${na.weergave}")`;
+  if (na.generatie !== voor.generatie) return "the model or calculation changed during printing";
+  if (na.toetsingOp !== voor.toetsingOp) return "verification changed during printing";
   if (na.slagen !== voor.slagen) {
-    return `het rapport werd tijdens het printen opnieuw gepagineerd (slag ${voor.slagen} → ${na.slagen})`;
+    return `the report was repaginated during printing (pass ${voor.slagen} → ${na.slagen})`;
   }
   if (na.aantalVellen !== voor.aantalVellen) {
-    return `het aantal vellen veranderde tijdens het printen (${voor.aantalVellen} → ${na.aantalVellen})`;
+    return `the sheet count changed during printing (${voor.aantalVellen} → ${na.aantalVellen})`;
   }
   return null;
 }

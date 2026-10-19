@@ -73,7 +73,7 @@ export function PlaatToetsRapport({
     return (
       <div className="rpt-block">
         <h2 className="rpt-h2">{title}</h2>
-        <p className="rpt-empty-note">{t("report.noPlates", "Geen platen in het model.")}</p>
+        <p className="rpt-empty-note">{t("report.noPlates", "No plates in the model.")}</p>
       </div>
     );
   }
@@ -82,7 +82,7 @@ export function PlaatToetsRapport({
       <div className="rpt-block">
         <h2 className="rpt-h2">{title}</h2>
         <p className="rpt-empty-note">
-          {t("report.notChecked", "Nog niet getoetst — voer de normtoetsing uit via het tabblad Toetsing.")}
+          {t("report.notChecked", "Not checked yet. Run the code checks from the Checks tab.")}
         </p>
       </div>
     );

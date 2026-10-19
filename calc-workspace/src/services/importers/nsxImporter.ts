@@ -37,13 +37,13 @@ export function importNsx(xml: string): NsxImportResult {
   const norms: NormEntry[] = [];
 
   if (!root) {
-    warnings.push('NSX document heeft geen root element.');
+    warnings.push('The NSX document has no root element.');
     return { norms, warnings };
   }
 
   const entries = children(root, 'Norm');
   if (entries.length === 0) {
-    warnings.push('NSX bevat geen <Norm> elementen.');
+    warnings.push('The NSX file contains no <Norm> elements.');
   }
 
   entries.forEach((n) => {

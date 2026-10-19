@@ -526,7 +526,7 @@ function buildDwgPayload(
 
   for (const n of src.notes) {
     if (!n.text.trim()) continue;
-    ents.push({ layer: "OPMERKINGEN", type: "text", points: [toRd(n.lat, n.lon)], text: n.text, height: LABEL_H });
+    ents.push({ layer: "NOTES", type: "text", points: [toRd(n.lat, n.lon)], text: n.text, height: LABEL_H });
   }
 
   const pushRings = (features: GeoJSON.Feature[], layer: string) => {
@@ -1637,7 +1637,7 @@ export default function SonderingstekeningView() {
           // en bewaar in step-state; volgende klik op de kaart bepaalt
           // de zijde.
           const raw = window.prompt(
-            "Offset-afstand in meters? (positief getal)",
+            "Offset distance in metres? (positive number)",
             "1",
           );
           if (raw === null) return;
@@ -3011,7 +3011,7 @@ export default function SonderingstekeningView() {
       if (noteModeRef.current) {
         noteModeRef.current = false;
         setNoteMode(false);
-        const txt = window.prompt("Opmerking:", "");
+        const txt = window.prompt("Note:", "");
         if (txt && txt.trim()) {
           setNotes((prev) => [
             ...prev,
@@ -5274,7 +5274,7 @@ export default function SonderingstekeningView() {
     const doExportDwg = async () => {
       const { IS_TAURI } = await import("../../utils/platform");
       if (!IS_TAURI) {
-        setToast("DWG-export werkt alleen in de desktop-app");
+        setToast("DWG export is available only in the desktop app");
         setTimeout(() => setToast(null), 3000);
         return;
       }
@@ -5378,7 +5378,7 @@ export default function SonderingstekeningView() {
         );
       } catch (err) {
         console.error("export_dwg failed", err);
-        setToast(`DWG-export mislukt: ${String(err)}`);
+        setToast(`DWG export failed: ${String(err)}`);
       } finally {
         setTimeout(() => setToast(null), 4000);
       }
@@ -5669,7 +5669,7 @@ export default function SonderingstekeningView() {
                 }
               };
               reader.onerror = () => {
-                setToast("Kon logo niet lezen");
+                setToast("Unable to read the logo");
                 setTimeout(() => setToast(null), 2200);
               };
               reader.readAsDataURL(f);

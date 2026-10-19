@@ -81,11 +81,11 @@ export async function initMcpBridge(): Promise<() => void> {
 // (en in het meerstaps-lijstje naast Ongedaan verschijnen).
 const ITEM_MUTATIES: Record<string, string> = {
   set_items: 'Assistent: regels vervangen',
-  add_chapter: 'Assistent: hoofdstuk toevoegen',
-  add_item: 'Assistent: rij toevoegen',
+  add_chapter: 'Assistant: add chapter',
+  add_item: 'Assistant: add row',
   update_item: 'Assistent: rij wijzigen',
-  remove_item: 'Assistent: rij verwijderen',
-  move_items: 'Assistent: rijen verplaatsen',
+  remove_item: 'Assistant: delete row',
+  move_items: 'Assistant: move rows',
   indent_item: 'Assistent: inspringen',
   outdent_item: 'Assistent: uitspringen',
 };

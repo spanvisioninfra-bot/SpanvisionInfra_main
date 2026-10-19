@@ -367,9 +367,9 @@ export function combineResults(
     const fin = getEindtoestandGevallen(perCase, bgt ? "bgt" : combo.eindtoestand.psi2);
     if (fin === undefined) {
       throw new Error(
-        `Combinatie "${combo.name}" is een eindtoestandvariant (E_mean,fin, ` +
-          `NEN-EN 1995-1-1 ${bgt ? "2.3.2.2(1)" : "2.3.2.2(2)"}), maar de eindtoestand is niet doorgerekend. ` +
-          "Er wordt niet stil met E_mean gerekend.",
+        `Combination "${combo.name}" is a final-state variant (E_mean,fin, ` +
+          `NEN-EN 1995-1-1 ${bgt ? "2.3.2.2(1)" : "2.3.2.2(2)"}), but its final state has not been calculated. ` +
+          "The calculation will not silently fall back to E_mean.",
       );
     }
     if (getSecondOrderState(perCase)) {

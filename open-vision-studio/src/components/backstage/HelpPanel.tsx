@@ -174,7 +174,7 @@ export function HelpPanel() {
           fetchTextAsset(`${import.meta.env.BASE_URL}docs/${l}/${a.id}.md`);
         // Val per artikel terug op EN als de vertaling voor deze taal (nog) ontbreekt.
         return fetchLang(lang)
-          .catch(() => (lang === 'en' ? Promise.reject(new Error('geen EN-fallback')) : fetchLang('en')))
+          .catch(() => (lang === 'en' ? Promise.reject(new Error('No English fallback')) : fetchLang('en')))
           .then(text => ({ id: a.id, text, ok: true as const }))
           .catch(err => {
             console.error(`[Help] Artikel "${a.id}" (taal ${lang}, incl. EN-fallback) laden mislukt:`, err);

@@ -10,10 +10,7 @@
 
 export const verticaalWindverband = `"Vertical wind bracing — trekstaaftoetsing
 
-'<i>Toetsing van de trekstaaf (strip of hoeklijn) in een verticaal windverband.
-'De getrokken diagonaal voert de horizontale wind-shear af naar de fundering;
-'de tegenovergestelde diagonaal in een X-kruis wordt slap en niet meegerekend.
-'Toets volgens EN 1993-1-1 §6.2.3 (trek, bruto + netto doorsnede).</i>
+'<i>Checks a tension member (flat or angle) in vertical wind bracing. The tension diagonal transfers horizontal wind shear to the foundation; the opposite diagonal in an X brace becomes slack and is excluded. Check per EN 1993-1-1 §6.2.3 for gross and net section tension.</i>
 
 # 1. Profielkeuze
 
@@ -64,7 +61,7 @@ export const verticaalWindverband = `"Vertical wind bracing — trekstaaftoetsin
 f_y = staalkwaliteit N/mm^2
 f_u = if(staalkwaliteit ≡ 235; 360; if(staalkwaliteit ≡ 275; 430; 510)) N/mm^2', treksterkte EN 10025'
 γ_M0 = 1.0
-γ_M2 = 1.25', voor netto doorsnede met boutgat'
+γ_M2 = 1.25', for the net section with a bolt hole'
 
 #hide
 'Profielmatrix: [id | A (mm²)]
@@ -75,45 +72,39 @@ A = hlookup(profiles; profile; 1; 2)*mm^2
 '<h6>Gekozen profiel</h6>
 A
 
-# 2. Geometry van de stabiliteitsbeun
+# 2. Bracing bay geometry
 
-b = ?*(m)', breedte van de beun (h.o.h. tussen kolommen)'
-h = ?*(m)', verdiepingshoogte van de beun'
+b = ?*(m)', bay width (column center-to-center spacing)'
+h = ?*(m)', bay story height'
 
 L_d = sqrt(b^2 + h^2)', diagonaal-systemlengte'
-α = atan(h/b)', hoek van de diagonaal met de horizontale (rad)'
+α = atan(h/b)', diagonal angle to the horizontal (rad)'
 α_deg = α*180/pi
 cos_α = b/L_d
 sin_α = h/L_d
 
-# 3. Windkracht op de beun
+# 3. Wind force on the bracing bay
 
-F_h = ?*(kN)', totale horizontale wind-rekenwaarde op deze beun (UGT)'
+F_h = ?*(kN)', total horizontal design wind force on this bay (ULS)'
 
 # 4. Kracht in de getrokken diagonaal (ontbinding)
 
 #if verbandtype ≡ 1
-    'Enkele diagonaal — neemt de volledige horizontale kracht op
+    'Single diagonal — carries the full horizontal force
     type_label = "enkele diagonaal"
 #else
     'X-kruis trek-only — slechts één diagonaal werkt per windrichting
     type_label = "X-kruis (trek-only)"
 #end if
 
-'De horizontale wind F<sub>h</sub> wordt langs de diagonaal ontbonden:
-'  F<sub>t,Ed</sub> = F<sub>h</sub> / cos α   (langs de diagonaal)
-'  F<sub>v</sub>   = F<sub>t,Ed</sub> · sin α   (verticaal — drukt op kolom + fundering)
+'Horizontal wind F<sub>h</sub> resolves along the diagonal: F<sub>t,Ed</sub> = F<sub>h</sub>/cos α along the diagonal, and F<sub>v</sub> = F<sub>t,Ed</sub>·sin α vertically into the column and foundation.
 
 F_t,Ed = F_h/cos_α', trekkracht in de werkende diagonaal'
 F_v = F_t,Ed*sin_α', verticale reactiecomponent in de getrokken hoekpunten'
 
 # 5. Model-drawing — aanzicht in XZ-plane
 
-'<i>Rechthoekige stabiliteitsbeun met kruis-windverband. Aan de top wordt
-'F<sub>h</sub> aangebracht (rood). De getrokken diagonaal (groen, dik) voert
-'de kracht af; de tegenovergestelde diagonaal (lichtgrijs gestippeld) wordt
-'slap. Rechts naast het kruis is het krachtdriehoekje getoond met de
-'ontbinding F<sub>t</sub> = √(F<sub>h</sub>² + F<sub>v</sub>²).</i>
+'<i>Rectangular bracing bay with X bracing. F<sub>h</sub> acts at the top in red. The thick green tension diagonal transfers the force; the opposite dotted gray diagonal becomes slack. The adjacent force triangle shows F<sub>t</sub> = √(F<sub>h</sub>² + F<sub>v</sub>²).</i>
 
 #hide
 sw = 260', breedte van het frame in svg-pixels
@@ -169,8 +160,8 @@ tri_h = tri_w*sh/sw
 '  </g>
 '</svg>'
 
-'Krachtwaarden uit de ontbinding:
-'  F<sub>h</sub> = 'F_h'  (toegepaste wind, horizontaal)
+'Resolved forces:
+'  F<sub>h</sub> = 'F_h'  (applied horizontal wind)
 '  F<sub>t,Ed</sub> = F<sub>h</sub> / cos α = 'F_t,Ed'
 '  F<sub>v</sub> = F<sub>t,Ed</sub> · sin α = 'F_v'
 
@@ -180,23 +171,21 @@ N_pl,Rd = A*f_y/γ_M0
 UC_t = F_t,Ed/N_pl,Rd
 
 #if UC_t ≤ 1.0
-    'UC<sub>t,bruto</sub> = F<sub>t,Ed</sub>/N<sub>pl,Rd</sub> = 'UC_t'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>t,bruto</sub> = F<sub>t,Ed</sub>/N<sub>pl,Rd</sub> = 'UC_t'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>t,bruto</sub> = F<sub>t,Ed</sub>/N<sub>pl,Rd</sub> = 'UC_t'<span style="color: red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>t,bruto</sub> = F<sub>t,Ed</sub>/N<sub>pl,Rd</sub> = 'UC_t'<span style="color: red"> > 1.0 → <b>Fails</b></span>
 #end if
 
 # 7. Netto section at boutaansluiting — §6.2.3 (2)
 
-'<i>Verlaag de bruto-doorsnede met boutgaten. Bij excentrische aansluiting
-'van een hoeklijn aan één been past §3.10.3 (effectieve netto doorsnede)
-'extra reductiefactoren — niet in deze sheet.</i>
+'<i>Deduct bolt holes from the gross section. For an angle connected eccentrically through one leg, §3.10.3 requires additional effective-net-area reduction factors; these are excluded from this sheet.</i>
 
-d_bout = ?*(mm)', boutgatdiameter (0 = geen bouten / volledig gelast)'
-n_bouten = ?', aantal boutgaten in dezelfde dwarsdoorsnede'
-t_aansluit = ?*(mm)', dikte op de aansluiting (strip-dikte of hoeklijn-been)'
+d_bout = ?*(mm)', bolt hole diameter (0 = no bolts / fully welded)'
+n_bouten = ?', number of bolt holes in the same cross-section'
+t_aansluit = ?*(mm)', connection thickness (flat thickness or angle leg)'
 
 A_net = A - n_bouten*d_bout*t_aansluit
-N_u,Rd = 0.9*A_net*f_u/γ_M2', §6.2.3 (2) netto-doorsnede met γ_M2'
+N_u,Rd = 0.9*A_net*f_u/γ_M2', §6.2.3(2) net section with γ_M2'
 
 #if A_net ≤ 0 mm^2
     '<span style="color: red"><b>Aantal/diameter bouten te groot: A<sub>net</sub> ≤ 0</b></span>
@@ -206,21 +195,11 @@ N_u,Rd = 0.9*A_net*f_u/γ_M2', §6.2.3 (2) netto-doorsnede met γ_M2'
     A_net
     N_u,Rd
     #if UC_net ≤ 1.0
-        'UC<sub>t,netto</sub> = F<sub>t,Ed</sub>/N<sub>u,Rd</sub> = 'UC_net'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+        'UC<sub>t,netto</sub> = F<sub>t,Ed</sub>/N<sub>u,Rd</sub> = 'UC_net'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
     #else
-        'UC<sub>t,netto</sub> = F<sub>t,Ed</sub>/N<sub>u,Rd</sub> = 'UC_net'<span style="color: red"> > 1.0 → <b>Voldoet NIET</b></span>
+        'UC<sub>t,netto</sub> = F<sub>t,Ed</sub>/N<sub>u,Rd</sub> = 'UC_net'<span style="color: red"> > 1.0 → <b>Fails</b></span>
     #end if
 #end if
 
-'<hr/>
-'<i>Vereenvoudigingen en aandachtspunten:
-'<ul>
-'<li>Trek-only ontwerp — drukcontrole en BGT-verplaatsing zijn bewust niet
-'opgenomen. Geldig voor strippen en niet-stijve hoeklijnen die onder druk
-'slap worden.</li>
-'<li>Bij hoeklijn aangesloten op één been geldt §3.10.3 — effectieve netto
-'doorsnede (β-factoren). Sheet rekent met volle A<sub>net</sub>.</li>
-'<li>Verbindingen niet getoetst — bouten op afschuiving, blok-shear,
-'lasdoorsneden uit EN 1993-1-8.</li>
-'</ul></i>
+'<hr/><i>Simplifications and limitations:<ul><li>Tension-only design: compression and SLS displacement checks are excluded. Applicable to flats and flexible angles that become slack in compression.</li><li>An angle connected through one leg requires §3.10.3 β factors for effective net area. This sheet uses full A<sub>net</sub>.</li><li>Connections are not checked: bolt shear, block tearing, and weld sections require EN 1993-1-8.</li></ul></i>
 `;

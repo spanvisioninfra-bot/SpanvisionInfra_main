@@ -85,7 +85,7 @@ function GebiedTabel({
           <th>
             b<sub>eff</sub> [mm]
           </th>
-          <th>{t("report.beffZoneVanIngevoerd", "van de ingevoerde breedte")}</th>
+          <th>{t("report.beffZoneVanIngevoerd", "of the entered width")}</th>
         </tr>
       </thead>
       <tbody>

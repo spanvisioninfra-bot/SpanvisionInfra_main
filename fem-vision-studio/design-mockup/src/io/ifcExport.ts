@@ -2243,43 +2243,43 @@ export function bouwIfcBoom(
   opties: IfcExportOpties = {},
 ): IfcBoomKnoop {
   const projectNaam =
-    model.project?.naam?.trim() || model.projectNaam?.trim() || "Rekenmodel";
-  const locatie = model.project?.locatie?.trim() || "Terrein";
-  const knoopNaam = new Map(model.nodes.map(n => [n.id, `Knoop ${n.id}`]));
+    model.project?.naam?.trim() || model.projectNaam?.trim() || "Analysis model";
+  const locatie = model.project?.locatie?.trim() || "Site";
+  const knoopNaam = new Map(model.nodes.map(n => [n.id, `Node ${n.id}`]));
 
   const knopen: IfcBoomKnoop = {
     type: "IfcStructuralPointConnection",
-    naam: "Knopen",
+    naam: "Nodes",
     aantal: model.nodes.length,
     kinderen: model.nodes.map(n => ({
       type: "IfcVertexPoint",
-      naam: `Knoop ${n.id} — x ${nl(n.x / 1000)} m, z ${nl(n.z / 1000)} m`,
+      naam: `Node ${n.id} — x ${nl(n.x / 1000)} m, z ${nl(n.z / 1000)} m`,
     })),
   };
 
   const staven: IfcBoomKnoop = {
     type: "IfcStructuralCurveMember",
-    naam: "Staven",
+    naam: "Members",
     aantal: model.beams.length,
     kinderen: model.beams.map(b => ({
       type: "IfcMaterialProfile",
-      naam: `Staaf ${b.id} — ${b.material ?? "S235"} ${b.profile ?? "HEA160"} ` +
-        `(${knoopNaam.get(b.from) ?? `knoop ${b.from}?`} → ${knoopNaam.get(b.to) ?? `knoop ${b.to}?`})`,
+      naam: `Member ${b.id} — ${b.material ?? "S235"} ${b.profile ?? "HEA160"} ` +
+        `(${knoopNaam.get(b.from) ?? `node ${b.from}?`} → ${knoopNaam.get(b.to) ?? `node ${b.to}?`})`,
     })),
   };
 
   const opleggingNaam: Record<string, string> = {
-    pinned: "Scharnieroplegging", fixed: "Inklemming",
-    xRoller: "Rol (X vast)", zRoller: "Rol (Z vast)",
-    zSpring: "Veer Z", xSpring: "Veer X", rotSpring: "Draaiveer",
+    pinned: "Pinned support", fixed: "Fixed support",
+    xRoller: "Roller (X restrained)", zRoller: "Roller (Z restrained)",
+    zSpring: "Z spring", xSpring: "X spring", rotSpring: "Rotational spring",
   };
   const opleggingen: IfcBoomKnoop = {
     type: "IfcBoundaryNodeCondition",
-    naam: "Opleggingen",
+    naam: "Supports",
     aantal: model.supports.length,
     kinderen: model.supports.map(s => ({
       type: "IfcBoundaryNodeCondition",
-      naam: `Knoop ${s.nodeId} — ${opleggingNaam[s.type] ?? s.type}` +
+      naam: `Node ${s.nodeId} — ${opleggingNaam[s.type] ?? s.type}` +
         (s.k !== undefined ? ` (k = ${nl(s.k, 2)})` : ""),
     })),
   };
@@ -2287,11 +2287,11 @@ export function bouwIfcBoom(
   const platenInBoom = (model.plates ?? []).filter((p) => (p.nodeIds?.length ?? 0) >= 3);
   const platen: IfcBoomKnoop = {
     type: "IfcStructuralSurfaceMember",
-    naam: "Platen",
+    naam: "Plates",
     aantal: platenInBoom.length,
     kinderen: platenInBoom.map((p) => ({
       type: "IfcFaceSurface",
-      naam: `Plaat ${p.id} — t = ${nl(p.thickness ?? 20, 0)} mm, hoeken ${(p.nodeIds ?? []).join(", ")}`,
+      naam: `Plaat ${p.id} — t = ${nl(p.thickness ?? 20, 0)} mm, corners ${(p.nodeIds ?? []).join(", ")}`,
     })),
   };
   const kinderenModel: IfcBoomKnoop[] = platenInBoom.length > 0
@@ -2327,7 +2327,7 @@ export function bouwIfcBoom(
   // onderdelen van het analysemodel.
   const kinderenGebouw: IfcBoomKnoop[] = [{
     type: "IfcStructuralAnalysisModel",
-    naam: `Rekenmodel ${projectNaam}`,
+    naam: `Analysis model ${projectNaam}`,
     kinderen: kinderenModel,
   }];
   if (opties.zonderBouwkundig !== true) {
@@ -2351,18 +2351,18 @@ export function bouwIfcBoom(
       const korf = b.checkConfig?.betonKorf;
       if (korf && isBetonMateriaal(materiaal)) {
         const delen: string[] = [];
-        if (korf.bottom.count > 0) delen.push(`onder ${korf.bottom.count}Ø${korf.bottom.diameter_mm}`);
-        if (korf.top.count > 0) delen.push(`boven ${korf.top.count}Ø${korf.top.diameter_mm}`);
-        if (korf.stirrup_diameter_mm > 0) delen.push(`beugel Ø${korf.stirrup_diameter_mm}`);
+        if (korf.bottom.count > 0) delen.push(`bottom ${korf.bottom.count}Ø${korf.bottom.diameter_mm}`);
+        if (korf.top.count > 0) delen.push(`top ${korf.top.count}Ø${korf.top.diameter_mm}`);
+        if (korf.stirrup_diameter_mm > 0) delen.push(`stirrup Ø${korf.stirrup_diameter_mm}`);
         kinderen.push({
           type: "IfcReinforcingBar",
-          naam: `Wapening — ${delen.join(", ") || "geen staven"}`,
+          naam: `Reinforcement — ${delen.join(", ") || "no bars"}`,
           aantal: korf.bottom.count + korf.top.count + (korf.stirrup_diameter_mm > 0 ? 1 : 0),
         });
       }
       elementen.push({
         type: kolom ? "IfcColumn" : "IfcBeam",
-        naam: `${kolom ? "Kolom" : "Ligger"} ${b.id} — ${materiaal} ${profiel}, ` +
+        naam: `${kolom ? "Column" : "Beam"} ${b.id} — ${materiaal} ${profiel}, ` +
           `${nl(lengteMm / 1000)} m${staart}`,
         kinderen: kinderen.length > 0 ? kinderen : undefined,
       });
@@ -2370,7 +2370,7 @@ export function bouwIfcBoom(
     if (elementen.length > 0) {
       kinderenGebouw.push({
         type: "IfcBeam",
-        naam: "Bouwkundige staven",
+        naam: "Physical members",
         aantal: elementen.length,
         kinderen: elementen,
       });
@@ -2385,7 +2385,7 @@ export function bouwIfcBoom(
       naam: locatie,
       kinderen: [{
         type: "IfcBuilding",
-        naam: "Gebouw",
+        naam: "Building",
         kinderen: kinderenGebouw,
       }],
     }],
@@ -2395,35 +2395,35 @@ export function bouwIfcBoom(
 /** Eenregelige omschrijving van een belasting, met eenheden. */
 function omschrijfLast(l: Load): string {
   const doel = l.nodeId !== undefined
-    ? `knoop ${l.nodeId}`
-    : l.beamId !== undefined ? `staaf ${l.beamId}`
+    ? `node ${l.nodeId}`
+    : l.beamId !== undefined ? `member ${l.beamId}`
     : l.plateId !== undefined
-      ? `plaat ${l.plateId}, ${l.edgeIndex !== undefined ? `rand ${l.edgeIndex + 1}` : (l.edge ?? "rand ?")}`
+      ? `plate ${l.plateId}, ${l.edgeIndex !== undefined ? `edge ${l.edgeIndex + 1}` : (l.edge ?? "edge ?")}`
       : "?";
   switch (l.type) {
     case "pointForce": {
       const delen: string[] = [];
       if (l.fx !== undefined && l.fx !== 0) delen.push(`Fx ${nl(l.fx, 2)} kN`);
       if (l.fz !== undefined && l.fz !== 0) delen.push(`Fz ${nl(l.fz, 2)} kN`);
-      const plek = l.posFrac !== undefined ? ` op ${nl(l.posFrac * 100, 0)}%` : "";
-      return `Puntlast ${l.id} — ${delen.join(", ") || "0 kN"} op ${doel}${plek}`;
+      const plek = l.posFrac !== undefined ? ` on ${nl(l.posFrac * 100, 0)}%` : "";
+      return `Point load ${l.id} — ${delen.join(", ") || "0 kN"} on ${doel}${plek}`;
     }
     case "pointMoment":
-      return `Moment ${l.id} — My ${nl(l.my ?? 0, 2)} kNm op ${doel}`;
+      return `Moment ${l.id} — My ${nl(l.my ?? 0, 2)} kNm on ${doel}`;
     case "thermal":
-      return `Temperatuur ${l.id} — ΔT ${nl(l.deltaT ?? 0, 1)} K op ${doel}`;
+      return `Temperature ${l.id} — ΔT ${nl(l.deltaT ?? 0, 1)} K on ${doel}`;
     case "lineLoad": {
       const qA = l.qStart ?? l.q ?? 0;
       const qB = l.qEnd ?? l.q ?? 0;
       const waarde = qA === qB ? `${nl(qA, 2)} kN/m` : `${nl(qA, 2)} → ${nl(qB, 2)} kN/m`;
       const deel = (l.startFrac ?? 0) > 0 || (l.endFrac ?? 1) < 1
-        ? ` (deel ${nl((l.startFrac ?? 0) * 100, 0)}–${nl((l.endFrac ?? 1) * 100, 0)}%)`
+        ? ` (part ${nl((l.startFrac ?? 0) * 100, 0)}–${nl((l.endFrac ?? 1) * 100, 0)}%)`
         : "";
-      const stelsel = l.qCoord === "local" ? " lokaal" : "";
-      return `Lijnlast ${l.id} — ${waarde} ${l.qDir ?? "z"}${stelsel} op ${doel}${deel}`;
+      const stelsel = l.qCoord === "local" ? " local" : "";
+      return `Line load ${l.id} — ${waarde} ${l.qDir ?? "z"}${stelsel} on ${doel}${deel}`;
     }
     default:
-      return `Belasting ${l.id} (${l.type}) op ${doel}`;
+      return `Belasting ${l.id} (${l.type}) on ${doel}`;
   }
 }
 

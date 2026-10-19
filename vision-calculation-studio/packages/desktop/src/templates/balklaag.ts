@@ -16,9 +16,7 @@
 
 export const balklaag = `"Floor joists — timber floor beams according to EN 1995-1-1
 
-'<i>Toetsing van een houten vloerbalk (balklaag) op een enkelvoudige overspanning,
-'belast door permanente + veranderlijke vloerbelasting en een geconcentreerde
-'last. BGT-doorbuiging incl. kruip en UGT-buiging + afschuiving.</i>
+'<i>Checks a simply supported timber floor joist under permanent and variable floor loads and a concentrated load. Includes SLS deflection with creep and ULS bending and shear.</i>
 
 # 1. Section and material
 
@@ -104,7 +102,7 @@ k_h = if(gelijmd ≡ 1; k_h_gelijmd; k_h_massief)
 f_m,k_eff = k_h*f_m,k', karakteristieke buigsterkte incl. hoogtefactor'
 #show
 
-'<h6>Gekozen profiel en materiaal</h6>
+'<h6>Selected section and material</h6>
 b_balk
 h_balk
 f_m,k
@@ -114,8 +112,8 @@ k_mod
 k_h
 f_m,k_eff
 
-f_m,d = k_mod*f_m,k_eff/γ_M', rekenwaarde buigsterkte (incl. k_h)'
-f_v,d = k_mod*f_v,k/γ_M', rekenwaarde afschuifsterkte'
+f_m,d = k_mod*f_m,k_eff/γ_M', design bending strength (including k_h)'
+f_v,d = k_mod*f_v,k/γ_M', design shear strength'
 f_m,d
 f_v,d
 
@@ -130,17 +128,16 @@ f_v,d
 
 L_d = ?*(mm)', dagmaat (vrije overspanning)'
 a_opl = ?*(mm)', opleglengte per zijde'
-hoh = ?*(mm)', hart-op-hart afstand van de balken'
+hoh = ?*(mm)', joist center-to-center spacing'
 t_vloer = ?*(mm)', dikte beschot'
 E_beschot = ?*(N/mm^2)', E-modulus beschot (E_0,ser,rep)'
-b_vloer = ?*(m)', breedte van het vloerveld — nodig voor de trillingstoets'
+b_vloer = ?*(m)', floor panel width — required for the vibration check'
 
-'<i>De maten hieronder gelden alleen voor het gekozen schema; bij een ander
-'schema blijven ze buiten beschouwing.</i>
-a_over = ?*(mm)', lengte van het overstek — alleen bij schema 2'
-L_veld2 = ?*(mm)', tweede overspanning — alleen bij schema 3'
-b_sparing = ?*(mm)', breedte van de sparing = overspanning raveelbalk — schema 4'
-l_staart = ?*(mm)', staartlengte van de onderbroken balken — schema 4'
+'<i>The dimensions below apply only to the selected structural model; they are ignored for other models.</i>
+a_over = ?*(mm)', overhang length — model 2 only'
+L_veld2 = ?*(mm)', second span — model 3 only'
+b_sparing = ?*(mm)', opening width = trimmer beam span — model 4'
+l_staart = ?*(mm)', tail length of interrupted joists — model 4'
 
 #hide
 'De theoretische overspanning van het maatgevende veld. Bij een raveelbalk is
@@ -153,12 +150,7 @@ L_th = if(schema ≡ 4; L_th_rav; L_th_0)', theoretische overspanning'
 
 # 3. Loads
 
-'<i>Eén permanente en één veranderlijke vloerbelasting. Wat daarin thuishoort
-'bepaal je zelf: vloerafwerking, plafond, vaste scheidingswanden en overige
-'blijvende lasten tellen op in G<sub>k</sub>. Verplaatsbare scheidingswanden
-'horen volgens EN 1991-1-1 §6.3.1.2 juist bij de veranderlijke last Q<sub>k</sub>.
-'Het eigen gewicht van de balk zelf komt hier niet bij — dat rekent de sheet
-'in §5 zelf uit de doorsnede en de dichtheid.</i>
+'<i>Enter one permanent and one variable floor load. Include floor finishes, ceilings, fixed partitions, and other sustained loads in G<sub>k</sub>. Movable partitions belong to variable load Q<sub>k</sub> under EN 1991-1-1 §6.3.1.2. Do not include the beam self-weight here: §5 calculates it from section area and density.</i>
 
 G_k = ?*(kN/m^2)', permanente vloerbelasting'
 Q_k = ?*(kN/m^2)', veranderlijke vloerbelasting'
@@ -178,8 +170,8 @@ F_k = ?*(kN)', geconcentreerde last'
   Enter manually = 11
 @end
 
-ψ_0_zelf = ?', ψ0 — alleen bij "zelf invullen"'
-ψ_2_zelf = ?', ψ2 — alleen bij "zelf invullen"'
+ψ_0_zelf = ?', ψ0 — manual input only'
+ψ_2_zelf = ?', ψ2 — manual input only'
 
 #hide
 'ψ-factoren uit NEN-EN 1990 Tabel NB.2 — A1.1. Dezelfde waarden als het
@@ -200,11 +192,9 @@ Q_k_eff = Q_k', veranderlijke vloerbelasting'
 A = b_balk*h_balk
 I_y = b_balk*h_balk^3/12', traagheidsmoment'
 W_y = b_balk*h_balk^2/6', weerstandsmoment'
-S_y = b_balk*h_balk^2/8', statisch moment (NL) voor afschuiving'
+S_y = b_balk*h_balk^2/8', first moment of area (NL) for shear'
 
-'<i><b>Splitspunt — eigen gewicht (register punt 8).</b> De referentie-uitwerking rekent met een
-'vaste 550 kg/m³ én g = 10 m/s²; de norm met ρ<sub>mean</sub> uit EN 338 en
-'g = 9,81. Welke van de twee de conclusie stuurt staat in de projectgegevens.</i>
+'<i><b>Alternative assumption — self-weight (register item 8).</b> The reference calculation uses a fixed density of 550 kg/m³ and g = 10 m/s²; the code method uses ρ<sub>mean</sub> from EN 338 and g = 9.81. Project settings determine which assumption governs the conclusion.</i>
 #hide
 ρ_xc = 550 kg/m^3
 g_xc = 10 m/s^2
@@ -214,13 +204,9 @@ g_balk_xc = A*ρ_xc*g_xc to kN/m', eigen gewicht — de referentie-uitwerking'
 g_balk_nb = A*ρ_mean*g_nb to kN/m', eigen gewicht — EN 338'
 g_balk = if(rekenwijze ≡ 1; g_balk_xc; g_balk_nb)', gehanteerd eigen gewicht'
 
-# 4b. Force distribution van het selected schema
+# 4b. Force distribution of the selected structural model
 
-'<i>Elk veld is een overspanning met een inklemmend eindmoment; daarmee
-'volstaat één stel coëfficiënten voor alle schema's. Vermenigvuldigd met de
-'lijnlast geven ze het moment, de dwarskracht en de zakking. De coëfficiënten
-'zijn nagerekend tegen een onafhankelijke numerieke balkberekening: momenten en
-'dwarskrachten komen exact uit, de zakking ligt 0 tot 4 % aan de veilige kant.</i>
+'<i>Each span has a restraining end moment, allowing one coefficient set for all structural models. Multiplying by the line load gives moment, shear force, and deflection. Independent numerical beam analysis verified the coefficients: moments and shear forces agree exactly; deflection is 0–4% conservative.</i>
 
 #hide
 'Schema 1 en 4 — enkelvoudige ligger.
@@ -256,12 +242,9 @@ c_M = if(schema ≡ 2; c_M_2; if(schema ≡ 3; c_M_3; c_M_1))', veldmoment per e
 c_Ms = if(schema ≡ 2; c_Ms_2; if(schema ≡ 3; c_Ms_3; c_Ms_1))', steunmoment per eenheid lijnlast'
 c_V = if(schema ≡ 2; c_V_2; if(schema ≡ 3; c_V_3; c_V_1))', dwarskracht per eenheid lijnlast'
 c_u = if(schema ≡ 2; c_u_2; if(schema ≡ 3; c_u_3; c_u_1))', zakking × EI per eenheid lijnlast'
-c_ue = if(schema ≡ 2; c_ue_2; 0*mm^4)', zakking × EI van het overstekeinde'
+c_ue = if(schema ≡ 2; c_ue_2; 0*mm^4)', overhang tip deflection × EI'
 
-'<i>Voor de diagrammen verderop zijn ook de vórmen nodig, niet alleen de
-'uiterste waarden. Hieronder staan ze dimensieloos — met q = 1 en EI = 1 — zodat
-'de tekeningen ze op de berekende waarden kunnen schalen. Ook deze zijn
-'nagerekend tegen een numerieke balkberekening: over de hele lengte exact.</i>
+'<i>The diagrams require complete shapes as well as extreme values. The dimensionless shapes below use q = 1 and EI = 1, allowing drawings to scale to the calculated results. Independent numerical beam analysis verified them exactly over the full length.</i>
 
 #hide
 'Ondergrens van 1 mm op de lengtes. Bij het allereerste renderen staan de
@@ -299,19 +282,16 @@ d_o2 = d_L/d_tot
 
 # 5. Load case 1 — Permanent
 
-'<i>Bij een raveelbalk is de belaste breedte niet de hart-op-hart afstand maar
-'de halve staartlengte: elke onderbroken balk zet zijn oplegreactie op de
-'raveelbalk af, wat per strekkende meter neerkomt op een vloerstrook van
-'l<sub>staart</sub>/2.</i>
-b_belast = if(schema ≡ 4; l_staart/2; hoh)', belaste breedte per meter balk'
+'<i>For a trimmer beam, loaded width is half the tail length rather than joist spacing. Each interrupted joist transfers its support reaction to the trimmer, equivalent to a floor strip of width l<sub>staart</sub>/2 per meter.</i>
+b_belast = if(schema ≡ 4; l_staart/2; hoh)', loaded width per meter of beam'
 
-P_g,k = b_belast*G_k + g_balk to kN/m', lijnlast permanent op de balk'
+P_g,k = b_belast*G_k + g_balk to kN/m', permanent line load on the beam'
 M_g,veld = c_M*P_g,k to kN*m', veldmoment'
 M_g,steun = c_Ms*P_g,k to kN*m', steunmoment'
-M_g,k = max(M_g,veld; M_g,steun) to kN*m', maatgevend — de doorsnede is prismatisch'
+M_g,k = max(M_g,veld; M_g,steun) to kN*m', governing — the section is prismatic'
 V_g,k = c_V*P_g,k to kN
-u_g,k = c_u*P_g,k/(E_mean*I_y) to mm', momentane doorbuiging permanent'
-ue_g,k = c_ue*P_g,k/(E_mean*I_y) to mm', idem, uiteinde van het overstek'
+u_g,k = c_u*P_g,k/(E_mean*I_y) to mm', instantaneous deflection from permanent loads'
+ue_g,k = c_ue*P_g,k/(E_mean*I_y) to mm', same, at the overhang tip'
 
 # 6. Load case 2 — Veranderlijk (gelijkmatig)
 
@@ -321,13 +301,11 @@ M_q,steun = c_Ms*q_q,k to kN*m
 M_q,k = max(M_q,veld; M_q,steun) to kN*m
 V_q,k = c_V*q_q,k to kN
 u_q,k = c_u*q_q,k/(E_mean*I_y) to mm
-ue_q,k = c_ue*q_q,k/(E_mean*I_y) to mm', uiteinde van het overstek'
+ue_q,k = c_ue*q_q,k/(E_mean*I_y) to mm', overhang tip'
 
 # 7. Load case 3 — Geconcentreerde load
 
-'<i>Een puntlast verdeelt zich via het beschot over meerdere balken. De
-'concentratiefactor k<sub>r</sub> bepaalt het deel dat op één balk komt
-'(NEN-EN 1995-1-1 NB). Stijver beschot (dikker) → kleinere k<sub>r</sub>.</i>
+'<i>Decking distributes a point load across several beams. Concentration factor k<sub>r</sub> gives the share carried by one beam (NEN-EN 1995-1-1 NB). Stiffer, thicker decking gives a smaller k<sub>r</sub>.</i>
 
 #hide
 a_ref = 1000 mm
@@ -339,25 +317,22 @@ t_ruw = t_vloer/(1 mm)
 E_vl = E_beschot/(1 N/mm^2)', E-modulus beschot, dimensieloos voor de deling'
 #show
 k_r_0 = 0.37 + 0.8*hoh/a_ref - E_vl*t_ruw^3/12/EI_ref
-'Bij een raveelbalk staat de puntlast rechtstreeks op de balk; er is dan geen
-'balklaag waarover hij zich verdeelt, dus k<sub>r</sub> = 1.
-k_r = if(schema ≡ 4; 1; min(1; k_r_0))', concentratiefactor, afgetopt op 1,0 (NEN-EN 1995-1-1 NB)'
-F_Q,k = F_k*k_r to kN', effectieve puntlast op één balk'
+'For a trimmer, the point load acts directly on the beam without distribution across floor joists, so k<sub>r</sub> = 1.
+k_r = if(schema ≡ 4; 1; min(1; k_r_0))', concentration factor, capped at 1.0 (NEN-EN 1995-1-1 NB)'
+F_Q,k = F_k*k_r to kN', effective point load on one beam'
 F_Q,k
-'<i>De puntlast wordt op twee plaatsen beschouwd: midden in het veld, en — bij
-'een overstek — op het uiteinde daarvan. Beide kunnen niet tegelijk optreden;
-'de toetsing neemt per grootheid de ongunstigste van de twee.</i>
-M_Q_veld = F_Q,k*L_th/4 to kN*m', puntlast midden in het veld'
-M_Q_eind = if(schema ≡ 2; F_Q,k*a_over; 0*kN*m)', puntlast op het overstekeinde'
+'<i>The point load is considered at mid-span and, where present, at the overhang tip. These positions do not act simultaneously; each check uses the more unfavorable result.</i>
+M_Q_veld = F_Q,k*L_th/4 to kN*m', point load at mid-span'
+M_Q_eind = if(schema ≡ 2; F_Q,k*a_over; 0*kN*m)', point load at the overhang tip'
 M_Q,k = max(M_Q_veld; M_Q_eind) to kN*m
-V_Q,k = F_Q,k to kN', puntlast bij oplegging → volledige dwarskracht op de balk'
+V_Q,k = F_Q,k to kN', point load at the support → full shear force on the beam'
 u_Q_veld = 1/48*F_Q,k*L_th^3/(E_mean*I_y) to mm
 u_Q_eind = if(schema ≡ 2; F_Q,k*a_over^2*(L_th + a_over)/(3*E_mean*I_y); 0*mm)
 u_Q,k = max(u_Q_veld; u_Q_eind) to mm
 
 # 8. Section of de floor joists
 
-'<i>Vloerhout (dikte t<sub>vloer</sub>) op de balken, hart-op-hart afstand hoh.</i>
+'<i>Floor decking of thickness t<sub>vloer</sub> on joists at center-to-center spacing hoh.</i>
 
 #hide
 'De doorsnede staat op schaal: balkbreedte, balkhoogte, beschotdikte en de
@@ -402,9 +377,7 @@ svgH = by + bh + 46
 # 8b. Structural model
 
 #if schema ≡ 4
-    '<i>Plattegrond van de sparing. De onderbroken balken eindigen op de
-    'raveelbalk; die draagt zijn last af op de twee wisselbalken ernaast. De
-    'tekening staat op schaal.</i>
+    '<i>Plan of the opening. Interrupted joists terminate at the trimmer, which transfers its load to the two adjacent trimming joists. The drawing is to scale.</i>
 
     #hide
     'Tekengebied: de sparing plus anderhalve balkafstand aan weerszijden, en in
@@ -462,14 +435,10 @@ svgH = by + bh + 46
     '  <text x="'p_x0 - 30'" y="'(p_y0 + p_rav)/2'" text-anchor="end" style="fill:#1E40AF; font-weight:700">l<tspan baseline-shift="sub" font-size="8">staart</tspan> = 'l_staart'</text>
     '</svg>'
 
-    '<i>De raveelbalk overspant de sparing en draagt per strekkende meter een
-    'vloerstrook ter breedte van l<sub>staart</sub>/2. Hieronder staat hij als
-    'gewone ligger op twee steunpunten.</i>
+    '<i>The trimmer spans the opening and carries a floor strip of width l<sub>staart</sub>/2 per meter. It is shown below as a beam on two supports.</i>
 #end if
 
-'<i>De ligger met de lijnlasten uit §5 en §6 en de geconcentreerde last uit §7.
-'De lasten zijn de karakteristieke waarden per balk — de rekenwaarden voor de
-'UGT volgen in §10. De tekening staat op schaal.</i>
+'<i>The beam carries the line loads from §5 and §6 and the concentrated load from §7. Loads are characteristic values per beam; §10 derives ULS design values. The drawing is to scale.</i>
 
 #hide
 'Totale lengte: bij een overstek of een tweede veld hoort daar meer bij dan
@@ -493,7 +462,7 @@ s_stap = (sx3 - sx1)/14', pijlafstand in de lastbanden
     '  <line x1="'sx1'" y1="'sy - 76'" x2="'sx3'" y2="'sy - 76'" style="stroke:#B45309; stroke-width:1"/>
     '  <text x="'sx1 + 50'" y="'sy - 80'" style="fill:#B45309; font-weight:700">q<tspan baseline-shift="sub" font-size="8">q,k</tspan> = 'q_q,k' kN/m</text>
 #end if
-'  <!-- permanente verdeelde last: band direct op de balk -->
+'<!-- permanent distributed load: band directly on the beam -->
 #for i = 0 : 14
 '  <line x1="'sx1 + i*s_stap'" y1="'sy - 46'" x2="'sx1 + i*s_stap'" y2="'sy - 8'" style="stroke:#475569; stroke-width:0.9"/>
 '  <polygon points="'sx1 + i*s_stap','sy - 4' 'sx1 + i*s_stap - 3.5','sy - 12' 'sx1 + i*s_stap + 3.5','sy - 12'" style="fill:#475569"/>
@@ -543,28 +512,15 @@ s_stap = (sx3 - sx1)/14', pijlafstand in de lastbanden
 '</svg>'
 '<span style="display:inline-block; width:14px; border-top:3px solid #475569; vertical-align:middle"></span>&nbsp;permanent &nbsp;&nbsp; <span style="display:inline-block; width:14px; border-top:3px solid #B45309; vertical-align:middle"></span>&nbsp;veranderlijk, verdeeld &nbsp;&nbsp; <span style="display:inline-block; width:14px; border-top:3px solid #B91C1C; vertical-align:middle"></span>&nbsp;veranderlijk, geconcentreerd
 
-'<i>Permanent en veranderlijk staan apart omdat ze met verschillende partiële
-'factoren de UGT-combinatie in gaan (1,20 tegen 1,50) en in de BGT-combinaties
-'elk hun eigen ψ-factor krijgen.</i>'
+'<i>Permanent and variable loads remain separate because the ULS combination uses different partial factors (1.20 and 1.50), and each has its own ψ factor in SLS combinations.</i>
 
-# 9. Toetsing SLS — deflection (§7.2)
+# 9. SLS checks — deflection (§7.2)
 
-'<i>De BGT kent twee combinaties die hier meedoen (EN 1990 §6.5.3):
-'<ul>
-'<li><b>Karakteristiek (6.14b)</b> — G<sub>k</sub> "+" Q<sub>k,1</sub> "+" Σψ<sub>0,i</sub>·Q<sub>k,i</sub>.
-'Dit is de momentane doorbuiging w<sub>inst</sub>, zonder kruip: het doorzakken
-'dat je meteen na het aanbrengen van de belasting ziet.</li>
-'<li><b>Quasi-blijvend (6.16b)</b> — G<sub>k</sub> "+" Σψ<sub>2,i</sub>·Q<sub>k,i</sub>.
-'Dit is het deel dat langdurig aanwezig blijft en dus kruipt. Met de kruipfactor
-'k<sub>def</sub> (Tabel 3.2) volgt de eindstand w<sub>fin</sub>.</li>
-'</ul>
-'De eindstand combineert beide: w<sub>fin</sub> = (1+k<sub>def</sub>)·u<sub>g</sub>
-'+ (1+ψ<sub>2</sub>·k<sub>def</sub>)·u<sub>var</sub> — de permanente last kruipt
-'volledig, de veranderlijke alleen voor het quasi-blijvende deel ψ<sub>2</sub>.</i>
+'<i>Two SLS combinations apply here (EN 1990 §6.5.3): <ul><li><b>Characteristic (6.14b)</b> — G<sub>k</sub> + Q<sub>k,1</sub> + Σψ<sub>0,i</sub>·Q<sub>k,i</sub>. This gives instantaneous deflection w<sub>inst</sub>, without creep, immediately after loading.</li><li><b>Quasi-permanent (6.16b)</b> — G<sub>k</sub> + Σψ<sub>2,i</sub>·Q<sub>k,i</sub>. This sustained portion causes creep. Deformation factor k<sub>def</sub> (Table 3.2) gives final deflection w<sub>fin</sub>.</li></ul>The final state combines both: w<sub>fin</sub> = (1+k<sub>def</sub>)·u<sub>g</sub> + (1+ψ<sub>2</sub>·k<sub>def</sub>)·u<sub>var</sub>. The full permanent load creeps; variable load contributes only its quasi-permanent share ψ<sub>2</sub>.</i>
 
 @select controleer "Check deflection"
-  Ja = 1
-  Nee = 0
+  Yes = 1
+  No = 0
 @end
 
 @select grensfactor "Permissible additional deflection"
@@ -574,35 +530,28 @@ s_stap = (sx3 - sx1)/14', pijlafstand in de lastbanden
 @end
 
 #if controleer ≡ 1
-    'Splitspunt — welke veranderlijke doorbuiging meetelt (register punt 9).
+    'Alternative assumption — which variable-load deflection contributes (register item 9).
     u_var_xc = u_q,k to mm', de referentie-uitwerking: alleen de gelijkmatig verdeelde variant'
-    u_var_nb = max(u_q,k; u_Q,k) to mm', de norm: de maatgevende van de twee'
+    u_var_nb = max(u_q,k; u_Q,k) to mm', code method: the governing of the two'
     u_var = if(rekenwijze ≡ 1; u_var_xc; u_var_nb) to mm', gehanteerd'
-    '<h6>9.1 Karakteristieke combinatie (6.14b) — momentane doorbuiging</h6>
-    'w<sub>inst</sub> = u<sub>g</sub> + u<sub>var</sub>, zonder kruip:
+    '<h6>9.1 Characteristic combination (6.14b) — instantaneous deflection</h6> w<sub>inst</sub> = u<sub>g</sub> + u<sub>var</sub>, without creep:
     w_inst = u_g,k + u_var to mm
 
-    '<h6>9.2 Quasi-blijvende combinatie (6.16b) — kruipdeel</h6>
-    'Alleen het deel dat langdurig blijft staan kruipt: de volledige permanente
-    'last plus ψ<sub>2</sub> maal de veranderlijke.
-    w_qp = u_g,k + ψ_2*u_var to mm', doorbuiging onder de quasi-blijvende combinatie'
-    w_kruip = k_def*w_qp to mm', bijkomende doorbuiging door kruip'
+    '<h6>9.2 Quasi-permanent combination (6.16b) — creep component</h6> Only sustained loading causes creep: the full permanent load plus ψ<sub>2</sub> times the variable load.
+    w_qp = u_g,k + ψ_2*u_var to mm', deflection under the quasi-permanent combination'
+    w_kruip = k_def*w_qp to mm', additional deflection due to creep'
 
     '<h6>9.3 Eindstand (§7.2, formule 7.2)</h6>
     w_fin = (1 + k_def)*u_g,k + (1 + ψ_2*k_def)*u_var to mm
     w_lim = grensfactor*L_th
     UC_doorbuiging = w_fin/w_lim
     #if UC_doorbuiging ≤ 1.0
-        'UC<sub>doorbuiging</sub> = w<sub>fin</sub>/w<sub>fin,max</sub> = 'UC_doorbuiging'<span style="color: green"> ≤ 1.0 → <b>voldoet</b></span>
+        'UC<sub>deflection</sub> = w<sub>fin</sub>/w<sub>fin,max</sub> = 'UC_doorbuiging'<span style="color: green"> ≤ 1.0 → <b>passes</b></span>
     #else
-        'UC<sub>doorbuiging</sub> = w<sub>fin</sub>/w<sub>fin,max</sub> = 'UC_doorbuiging'<span style="color: red"> > 1.0 → <b>voldoet niet</b></span>
+        'UC<sub>deflection</sub> = w<sub>fin</sub>/w<sub>fin,max</sub> = 'UC_doorbuiging'<span style="color: red"> > 1.0 → <b>fails</b></span>
     #end if
 
-    '<h6>9.4 Doorbuigingslijn</h6>
-    '<i>De onderbroken lijn is de momentane zakking (6.14b), de doorgetrokken
-    'de eindstand inclusief kruip (6.16b). Beide op dezelfde schaal, zodat het
-    'verschil laat zien wat de kruip er nog bovenop doet. De vorm volgt het
-    'gekozen statische schema.</i>
+    '<h6>9.4 Deflection curve</h6><i>The dashed curve shows instantaneous deflection (6.14b); the solid curve shows final deflection including creep (6.16b). Both use the same scale, so their difference shows the creep contribution. The shape follows the selected structural model.</i>
     #hide
     ux1 = 60
     ux2 = 420
@@ -638,89 +587,76 @@ s_stap = (sx3 - sx1)/14', pijlafstand in de lastbanden
     '  <text x="'ux1 + 8'" y="'uas + uamp + 38'" style="fill:#0EA5E9; font-weight:700">w<tspan baseline-shift="sub" font-size="8">inst</tspan> (6.14b) = 'w_inst'</text>
     '</svg>'
 #else
-    'Doorbuiging wordt niet getoetst (Controleer doorbuiging = Nee).
+    'Deflection is not checked (Check deflection = No).
     UC_doorbuiging = 0
 #end if
 
-# 9b. Toetsing SLS — trillingen (§7.3.3)
+# 9b. SLS checks — vibration (§7.3.3)
 
-'<i>De trillingstoets voor woonvloeren kent twee criteria naast de
-'frequentie-eis: de stijfheid onder een puntlast van 1 kN (formule 7.3) en
-'de responssnelheid op een eenheidsimpuls (formule 7.4). Beide gelden alleen
-'als f<sub>1</sub> ≥ 8 Hz; daaronder vraagt de norm een volledige
-'trillingsanalyse (§7.3.3(2)).</i>
+'<i>The residential floor vibration check adds two criteria to the frequency requirement: stiffness under a 1 kN point load (expression 7.3) and response velocity to a unit impulse (expression 7.4). Both apply only when f<sub>1</sub> ≥ 8 Hz; below that, §7.3.3(2) requires a full vibration analysis.</i>
 
 @select controleer_trilling "Controleer trilling"
-  Ja = 1
-  Nee = 0
+  Yes = 1
+  No = 0
 @end
 
-ζ = ?', dempingsratio (§7.3.1: 0,01 voor vloeren zonder afwerklaag)'
-a_tril = ?*(mm/kN)', grenswaarde stijfheid a (Tabel NB — 1,0 mm/kN)'
-b_tril = ?', parameter b bij de snelheidseis (Figuur 7.2, ca. 120)'
+ζ = ?', damping ratio (§7.3.1: 0.01 for floors without a finishing layer)'
+a_tril = ?*(mm/kN)', stiffness limit a (NB table — 1.0 mm/kN)'
+b_tril = ?', velocity criterion parameter b (Figure 7.2, approximately 120)'
 
 #if controleer_trilling ≡ 1
-    '<h6>9b.1 Stijfheden</h6>
-    'Beschot, per meter vloerbreedte — draagt loodrecht op de balken:
+    '<h6>9b.1 Stiffness</h6> Decking per meter of floor width — spanning perpendicular to the joists:
     I_beschot = 1 m*t_vloer^3/12 to m^4
     EI_l = E_beschot*I_beschot/(1 m) to N*m^2/m', (EI)_l — beschot'
-    'Balklaag, per meter vloerbreedte — de balken dragen in de overspanning:
+    'Floor joists per meter of floor width — spanning in the beam direction:
     EI_b = E_mean*I_y/hoh to N*m^2/m', (EI)_b — balken'
 
-    '<h6>9b.2 Eigenfrequentie (formule 7.5)</h6>
-    'Trillende massa per m² — alleen het permanente gewicht (§7.3.3): de
-    'veranderlijke belasting telt niet mee, want de vloer trilt in de staat
-    'waarin hij normaal wordt gebruikt, niet onder vol belastingsontwerp.
+    '<h6>9b.2 Natural frequency (expression 7.5)</h6> Vibrating mass per m² includes permanent weight only (§7.3.3). Variable load is excluded because the floor vibrates in its normal service condition rather than at full design loading.
     m_opp = (G_k + g_balk/hoh)/(9.81 m/s^2) to kg/m^2
     f_1 = π/(2*L_th^2)*sqrt(EI_b/m_opp) to Hz
     #if f_1 ≥ 8 Hz
-        'f<sub>1</sub> = 'f_1'<span style="color: green"> ≥ 8 Hz → de twee criteria hieronder zijn van toepassing</span>
+        'f<sub>1</sub> = 'f_1'<span style="color: green"> ≥ 8 Hz → the two criteria below apply</span>
     #else
-        'f<sub>1</sub> = 'f_1'<span style="color: red"> < 8 Hz → de vereenvoudigde toets vervalt; §7.3.3(2) vraagt een volledige trillingsanalyse</span>
+        'f<sub>1</sub> = 'f_1'<span style="color: red"> < 8 Hz → the simplified check does not apply; §7.3.3(2) requires full vibration analysis</span>
     #end if
 
-    '<h6>9b.3 Criterium 1 — stijfheid onder 1 kN (formule 7.3)</h6>
-    'De puntlast spreidt over meerdere balken; k<sub>r</sub> uit §7 geeft het
-    'deel dat op de zwaarst belaste balk komt.
-    F_tril = 1 kN*k_r to kN', effectieve puntlast op één balk'
+    '<h6>9b.3 Criterion 1 — stiffness under 1 kN (expression 7.3)</h6> The point load spreads across several joists; k<sub>r</sub> from §7 gives the share carried by the most heavily loaded joist.
+    F_tril = 1 kN*k_r to kN', effective point load on one beam'
     w_1kN = F_tril*L_th^3/(48*E_mean*I_y) to mm
     w_per_kN = w_1kN/(1 kN) to mm/kN
     UC_tril_a = w_per_kN/a_tril
     #if UC_tril_a ≤ 1.0
-        'UC<sub>w/F</sub> = 'UC_tril_a'<span style="color: green"> ≤ 1.0 → <b>voldoet</b></span>
+        'UC<sub>w/F</sub> = 'UC_tril_a'<span style="color: green"> ≤ 1.0 → <b>passes</b></span>
     #else
-        'UC<sub>w/F</sub> = 'UC_tril_a'<span style="color: red"> > 1.0 → <b>voldoet niet</b></span>
+        'UC<sub>w/F</sub> = 'UC_tril_a'<span style="color: red"> > 1.0 → <b>fails</b></span>
     #end if
 
-    '<h6>9b.4 Criterium 2 — responssnelheid (formules 7.4, 7.6, 7.7)</h6>
-    'Aantal eigenmodi onder 40 Hz (formule 7.7). Bij een zeer stijve vloer
-    'ligt f_1 al boven 40 Hz; dan is er geen enkele eigenmode onder de 40 Hz
-    'en wordt de term onder de wortel op nul afgekapt.
+    '<h6>9b.4 Criterion 2 — response velocity (expressions 7.4, 7.6, 7.7)</h6> Number of vibration modes below 40 Hz (expression 7.7). A very stiff floor may already have f_1 above 40 Hz, leaving no modes below 40 Hz; the square-root argument is then limited to zero.
     n_40_arg = max(0; (40 Hz/f_1)^2 - 1)
     n_40 = (n_40_arg*(b_vloer/L_th)^4*EI_l/EI_b)^0.25
-    'Responssnelheid op een eenheidsimpuls (formule 7.6):
+    'Response velocity to a unit impulse (expression 7.6):
     v_resp = 4*(0.4 + 0.6*n_40)/(m_opp*b_vloer*L_th + 200 kg) to m/(N*s^2)
     'Grenswaarde (formule 7.4): b^(f_1·ζ − 1)
     v_lim = b_tril^(f_1*ζ/(1 Hz) - 1)*1 m/(N*s^2)
     UC_tril_v = v_resp/v_lim
     #if UC_tril_v ≤ 1.0
-        'UC<sub>v</sub> = 'UC_tril_v'<span style="color: green"> ≤ 1.0 → <b>voldoet</b></span>
+        'UC<sub>v</sub> = 'UC_tril_v'<span style="color: green"> ≤ 1.0 → <b>passes</b></span>
     #else
-        'UC<sub>v</sub> = 'UC_tril_v'<span style="color: red"> > 1.0 → <b>voldoet niet</b></span>
+        'UC<sub>v</sub> = 'UC_tril_v'<span style="color: red"> > 1.0 → <b>fails</b></span>
     #end if
 
     UC_trilling = max(UC_tril_a; UC_tril_v)
     #if UC_trilling ≤ 1.0
         '<b>Trillingen voldoen</b> (maatgevende UC = 'UC_trilling')
     #else
-        '<b><span style="color: red">Trillingen voldoen niet</span></b> (maatgevende UC = 'UC_trilling')
+        '<b><span style="color: red">Vibration fails</span></b> (governing UC = 'UC_trilling')
     #end if
 #else
-    'Trilling wordt niet getoetst (Controleer trilling = Nee).
+    'Vibration is not checked (Check vibration = No).
     UC_trilling = 0
 #end if
 
-# 10. Toetsing ULS
+# 10. ULS checks
 
 '<h6>10.1 Maatgevende krachten</h6>
 'Permanent + veranderlijk (UDL):
@@ -730,19 +666,16 @@ V_zEd_1 = 1.20*V_g,k + 1.50*V_q,k to kN
 M_yEd_2 = 1.20*M_g,k + 1.50*M_Q,k to kN*m
 V_zEd_2 = 1.20*V_g,k + 1.50*V_Q,k to kN
 
-'<i>De gevolgklasse staat in de projectgegevens; K<sub>FI</sub> volgt daaruit
-'(Tabel NB.A1.1) en geldt voor alle bladen van dit project.</i>
+'<i>The consequence class is set in project settings. It determines K<sub>FI</sub> (Table NB.A1.1), which applies to every worksheet in the project.</i>
 K_FI', gevolgklasse-factor uit de projectgegevens (EN 1990)'
 M_y,Ed = K_FI*max(M_yEd_1; M_yEd_2) to kN*m', incl. K_FI'
 V_z,Ed = K_FI*max(V_zEd_1; V_zEd_2) to kN', incl. K_FI'
 M_y,Ed
 V_z,Ed
 
-'<h6>10.1b Momenten- en dwarskrachtenlijn (UGT)</h6>
+'<h6>10.1b Bending moment and shear force diagrams (ULS)</h6>
 
-'<i>Beide lijnen volgen het gekozen statische schema. Bij een overstek of een
-'tweede veld loopt het moment over de oplegging heen naar de andere kant — dat
-'is de trek aan de bóvenzijde die de doorsnede daar te verduren krijgt.</i>
+'<i>Both diagrams follow the selected structural model. An overhang or second span can reverse the bending moment over a support; this represents tension at the top of the section.</i>
 
 #hide
 mx1 = 60
@@ -767,9 +700,9 @@ vy2 = 195', as van de V-lijn
 #for i = 0 : 29
 '  <line x1="'mx1 + (mx2 - mx1)*i/30'" y1="'vy2 - mh*vz(i*d_tot/30)/d_Vp'" x2="'mx1 + (mx2 - mx1)*(i + 1)/30'" y2="'vy2 - mh*vz((i + 1)*d_tot/30)/d_Vp'" style="stroke:#15803D; stroke-width:1.3"/>
 #loop
-'  <text x="'mx1 - 10'" y="'vy2 - 8'" style="fill:#374151; font-weight:700">V-lijn</text>
+'  <text x="'mx1 - 10'" y="'vy2 - 8'" style="fill:#374151; font-weight:700">V diagram</text>
 '  <text x="'mx1 + 4'" y="'vy2 - mh - 6'" style="fill:#15803D; font-weight:700">+V<tspan baseline-shift="sub" font-size="8">z,Ed</tspan> = 'V_z,Ed'</text>
-'  <!-- opleggingen onder beide assen -->
+'  <!-- supports below both axes -->
 #for j = 0 : 1
 '  <polygon points="'mx1','my + j*(vy2 - my)' 'mx1 - 7','my + j*(vy2 - my) + 14' 'mx1 + 7','my + j*(vy2 - my) + 14'" style="fill:none; stroke:#6b7280; stroke-width:0.9"/>
 '  <line x1="'mx1 - 10'" y1="'my + j*(vy2 - my) + 14'" x2="'mx1 + 10'" y2="'my + j*(vy2 - my) + 14'" style="stroke:#6b7280; stroke-width:0.9"/>
@@ -793,18 +726,18 @@ vy2 = 195', as van de V-lijn
 σ_m,y,d
 UC_buiging = σ_m,y,d/f_m,d
 #if UC_buiging ≤ 1.0
-    'UC<sub>buiging</sub> = σ<sub>m,y,d</sub>/f<sub>m,d</sub> = 'UC_buiging'<span style="color: green"> ≤ 1.0 → <b>voldoet</b></span>
+    'UC<sub>bending</sub> = σ<sub>m,y,d</sub>/f<sub>m,d</sub> = 'UC_buiging'<span style="color: green"> ≤ 1.0 → <b>passes</b></span>
 #else
-    'UC<sub>buiging</sub> = σ<sub>m,y,d</sub>/f<sub>m,d</sub> = 'UC_buiging'<span style="color: red"> > 1.0 → <b>voldoet niet</b></span>
+    'UC<sub>bending</sub> = σ<sub>m,y,d</sub>/f<sub>m,d</sub> = 'UC_buiging'<span style="color: red"> > 1.0 → <b>fails</b></span>
 #end if
 
 '<h6>10.3 Afschuiving — §6.1.7 (6.13)</h6>
 τ_d = V_z,Ed*S_y/(b_balk*I_y) to N/mm^2
 UC_afsch = τ_d/f_v,d
 #if UC_afsch ≤ 1.0
-    'UC<sub>afschuiving</sub> = τ<sub>d</sub>/f<sub>v,d</sub> = 'UC_afsch'<span style="color: green"> ≤ 1.0 → <b>voldoet</b></span>
+    'UC<sub>shear</sub> = τ<sub>d</sub>/f<sub>v,d</sub> = 'UC_afsch'<span style="color: green"> ≤ 1.0 → <b>passes</b></span>
 #else
-    'UC<sub>afschuiving</sub> = τ<sub>d</sub>/f<sub>v,d</sub> = 'UC_afsch'<span style="color: red"> > 1.0 → <b>voldoet niet</b></span>
+    'UC<sub>shear</sub> = τ<sub>d</sub>/f<sub>v,d</sub> = 'UC_afsch'<span style="color: red"> > 1.0 → <b>fails</b></span>
 #end if
 
 # 11. Summary — all unity checks
@@ -849,16 +782,16 @@ oordeel_tril = if(UC_trilling ≤ 1; "voldoet"; "voldoet niet")
 '<td style="padding:5px 8px; color:'kleur_afsch'">'oordeel_afsch'</td></tr>
 #if controleer ≡ 1
 '<tr style="border-bottom:1px solid #e5e7eb;">
-'<td style="padding:5px 8px;">Doorbuiging</td>
+'<td style="padding:5px 8px;">Deflection</td>
 '<td style="padding:5px 8px;">§7.2 (7.2)</td>
 '<td style="padding:5px 8px; text-align:right; font-weight:700; color:'kleur_door'">'UC_doorbuiging'</td>
 '<td style="padding:5px 8px; color:'kleur_door'">'oordeel_door'</td></tr>
 #else
 '<tr style="border-bottom:1px solid #e5e7eb;">
-'<td style="padding:5px 8px;">Doorbuiging</td>
+'<td style="padding:5px 8px;">Deflection</td>
 '<td style="padding:5px 8px;">§7.2</td>
 '<td style="padding:5px 8px; text-align:right; color:#9ca3af;">—</td>
-'<td style="padding:5px 8px; color:#9ca3af;">niet getoetst</td></tr>
+'<td style="padding:5px 8px; color:#9ca3af;">not checked</td></tr>
 #end if
 #if controleer_trilling ≡ 1
 '<tr style="border-bottom:1px solid #e5e7eb;">
@@ -868,36 +801,18 @@ oordeel_tril = if(UC_trilling ≤ 1; "voldoet"; "voldoet niet")
 '<td style="padding:5px 8px; color:'kleur_tril'">'oordeel_tril'</td></tr>
 #else
 '<tr style="border-bottom:1px solid #e5e7eb;">
-'<td style="padding:5px 8px;">Trilling</td>
+'<td style="padding:5px 8px;">Vibration</td>
 '<td style="padding:5px 8px;">§7.3.3</td>
 '<td style="padding:5px 8px; text-align:right; color:#9ca3af;">—</td>
-'<td style="padding:5px 8px; color:#9ca3af;">niet getoetst</td></tr>
+'<td style="padding:5px 8px; color:#9ca3af;">not checked</td></tr>
 #end if
 '</table>
 
 #if UC_max ≤ 1.0
-    '<b>Maatgevende UC = 'UC_max'</b><span style="color: green"> ≤ 1.0 → <b>Balklaag voldoet</b></span>
+    '<b>Governing UC = 'UC_max'</b><span style="color: green"> ≤ 1.0 → <b>Floor joists passes</b></span>
 #else
-    '<b>Maatgevende UC = 'UC_max'</b><span style="color: red"> > 1.0 → <b>Balklaag voldoet niet</b></span>
+    '<b>Governing UC = 'UC_max'</b><span style="color: red"> > 1.0 → <b>Floor joists fails</b></span>
 #end if
 
-'<hr/>
-'<i>Aandachtspunten / vereenvoudigingen:
-'<ul>
-'<li>Eigengewicht balk met EN 338 ρ<sub>mean</sub> (C24 = 420 kg/m³) en
-'g = 9,81 m/s². de referentie-uitwerking hanteert een vaste 550 kg/m³ met g = 10; resultaten
-'hier daardoor iets gunstiger.</li>
-'<li>Concentratiefactor k<sub>r</sub> geverifieerd op vier referentiebladen
-'(beschot 18 en 25 mm, hoh 600 en 1000, twee profielen).</li>
-'<li>Hoogtefactor k<sub>h</sub> geverifieerd in beide takken: gelijmd
-'gelamineerd (GL24h, 221 mm → 1,10) en massief (71×146 → 1,005).</li>
-'<li>Afschuiving met volle balkbreedte b (geen k<sub>cr</sub>-reductie), conform
-'de referentie-uitwerking.</li>
-'<li>Trillingstoets (§7.3) en kip zijn niet opgenomen (vloerbalk zijdelings
-'gesteund door het beschot). Let op: bij overspanningen rond 5 m ligt f<sub>1</sub>
-'onder de 8 Hz en is §7.3.3 wél van toepassing.</li>
-'<li>Oplegdruk (§6.1.5) wordt niet getoetst, net zomin als in de referentie-uitwerking. Op het
-'basisgeval is die u.c. 0,89 met k<sub>c,90</sub> = 1,25 — krap genoeg om apart
-'na te lopen.</li>
-'</ul></i>
+'<hr/><i>Assumptions and limitations:<ul><li>Beam self-weight uses EN 338 ρ<sub>mean</sub> (C24 = 420 kg/m³) and g = 9.81 m/s². The reference calculation uses 550 kg/m³ and g = 10, so results here are slightly more favorable.</li><li>Concentration factor k<sub>r</sub> was verified against four reference sheets (18 and 25 mm decking, spacing 600 and 1000, two sections).</li><li>Depth factor k<sub>h</sub> was verified for glulam (GL24h, 221 mm → 1.10) and solid timber (71×146 → 1.005).</li><li>Shear uses full beam width b without k<sub>cr</sub> reduction, following the reference calculation.</li><li>The reference limitations exclude vibration (§7.3) and lateral-torsional buckling, assuming lateral restraint from decking. Near 5 m spans, f<sub>1</sub> can fall below 8 Hz and §7.3.3 applies.</li><li>Bearing compression (§6.1.5) is not checked, as in the reference calculation. The base case gives UC 0.89 with k<sub>c,90</sub> = 1.25, so assess it separately.</li></ul></i>
 `;

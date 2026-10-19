@@ -63,7 +63,7 @@ map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank
 
 const baseLayers = {
   'Map': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map),
-  'Netherlands': L.tileLayer('https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png', { maxZoom: 19, bounds: [[50.5,3],[54,7.5]], attribution: '&copy; PDOK / Kadaster' }),
+  'Regional topography (NL)': L.tileLayer('https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png', { maxZoom: 19, bounds: [[50.5,3],[54,7.5]], attribution: '&copy; PDOK / Kadaster' }),
   'Grayscale': L.tileLayer(
     'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/grijs/EPSG:3857/{z}/{x}/{y}.png',
     { maxZoom: 19, attribution: '&copy; PDOK / Kadaster' }),
@@ -734,9 +734,15 @@ window.addEventListener('resize',resizeVisibleMap);
 function renderBuildingList(){const list=$('building-list');list.replaceChildren();buildingLayer?.eachLayer(layer=>{const p=layer.feature.properties;const label=document.createElement('label');const input=document.createElement('input');input.type='checkbox';input.dataset.building=p.id;input.checked=project.hidden_building_ids.includes(p.id);input.onchange=()=>toggleHidden(p.id);label.append(input,document.createTextNode('Hide building '+p.id));list.append(label);});}
 function moveDesign(){const lon=Number($('design-lon').value),lat=Number($('design-lat').value);if(!Number.isFinite(lon)||!Number.isFinite(lat)||Math.abs(lon)>180||Math.abs(lat)>90){status('Enter valid longitude and latitude.','err');return;}project.design.anchor_lonlat=[lon,lat];ensureDesignMarker();save();status('Design position updated.','ok');}
 $('design-lon').onchange=moveDesign;$('design-lat').onchange=moveDesign;$('btn-design-center').onclick=()=>{const center=map.getCenter();project.design.anchor_lonlat=[center.lng,center.lat];ensureDesignMarker();save();status('Design placed at map center.','ok');};
-try{const stored=JSON.parse(localStorage.getItem('oststl.map')||'null');if(stored?.center&&stored.zoom)map.setView(stored.center,stored.zoom);if(stored?.layer&&baseLayers[stored.layer]){Object.values(baseLayers).forEach(layer=>map.removeLayer(layer));baseLayers[stored.layer].addTo(map);}}catch{}
+let hasSavedMapView = false;
+try{const stored=JSON.parse(localStorage.getItem('oststl.map')||'null');if(stored?.center?.length===2&&stored.center.every(Number.isFinite)&&Number.isFinite(stored.zoom)){map.setView(stored.center,stored.zoom);hasSavedMapView=true;}const layerName=stored?.layer==='Netherlands'?'Regional topography (NL)':stored?.layer;if(layerName&&baseLayers[layerName]){Object.values(baseLayers).forEach(layer=>map.removeLayer(layer));baseLayers[layerName].addTo(map);}}catch{}
 // Restore an existing workspace; locate new maps without a selected project area.
-window.SpanvisionLocation.attachMap(map,{autoLocate:!project.bbox_wgs84});
+window.addEventListener('spanvision:map-location', event => {
+  if(event.detail.map!==map.getContainer())return;
+  const place=[event.detail.city,event.detail.country].filter(Boolean).join(', ');
+  $('map-region-label').textContent=place ? 'YOUR AREA: '+place : 'YOUR LOCATION';
+});
+window.SpanvisionLocation.attachMap(map,{autoLocate:!project.bbox_wgs84&&!hasSavedMapView});
 function saveMapView(layerName){let previous={};try{previous=JSON.parse(localStorage.getItem('oststl.map')||'{}');const center=map.getCenter();localStorage.setItem('oststl.map',JSON.stringify({center:[center.lat,center.lng],zoom:map.getZoom(),layer:layerName||previous.layer||'Map'}));}catch{}}
 map.on('moveend',()=>saveMapView());map.on('baselayerchange',event=>saveMapView(event.name));
 if(project.design.filename){$('design-controls').classList.remove('hidden');$('design-info').classList.remove('hidden');$('design-info').textContent='Saved design: '+project.design.filename;ensureDesignMarker();}

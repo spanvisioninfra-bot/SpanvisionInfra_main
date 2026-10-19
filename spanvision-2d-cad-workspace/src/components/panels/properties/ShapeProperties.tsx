@@ -2462,7 +2462,7 @@ export function PileSymbolPicker({
           onClick={() => setExpanded(!expanded)}
           className="text-[9px] text-cad-accent hover:underline"
         >
-          {expanded ? 'Minder' : `Alle (${ALL_PILE_SYMBOLS.length})`}
+          {expanded ? 'Minder' : `All (${ALL_PILE_SYMBOLS.length})`}
         </button>
       </div>
       <div

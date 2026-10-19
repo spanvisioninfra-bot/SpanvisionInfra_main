@@ -206,19 +206,19 @@ log("\n[1] De melding: de BGT is doorgerekend");
   const u = bepaalEindstijfheidHout(tweeVelden());
   ok("hout + staal → doorrekenen", u.status === "doorrekenen");
   ok("tweede melding is de BGT, nu doorgerekend",
-    u.meldingen.length === 2 && u.meldingen[1].tekst.startsWith("Eindstijfheid hout doorgerekend (BGT)."),
+    u.meldingen.length === 2 && u.meldingen[1].tekst.startsWith("Timber final stiffness calculated (SLS)."),
     u.meldingen[1]?.tekst.slice(0, 60));
   ok("de oude melding \"niet doorgerekend (BGT)\" komt niet meer voor",
     u.meldingen.every((m) => !m.tekst.includes("niet doorgerekend (BGT)")));
   ok("de melding noemt 2.2.3(4), 2.7, w_qp,fin en de grens van de route (staal/beton)",
     /2\.2\.3\(4\)/.test(u.meldingen[1].tekst) && /2\.7/.test(u.meldingen[1].tekst) &&
-    /w_qp,fin − w_qp/.test(u.meldingen[1].tekst) && /staal- en betonstaven/.test(u.meldingen[1].tekst));
+    /w_qp,fin − w_qp/.test(u.meldingen[1].tekst) && /steel and concrete/.test(u.meldingen[1].tekst));
   const tweede = bepaalEindstijfheidHout(tweeVelden({ extra: { analysetype: "tweedeOrdeGeometrisch" } }));
   ok("tweede orde: de melding zegt dat ook 2.2.3(4) niet is berekend",
-    tweede.status === "alleenMelding" && /2\.2\.3\(4\)\) is niet berekend/.test(tweede.meldingen[0].tekst));
+    tweede.status === "alleenMelding" && /2\.2\.3\(4\)\) has also not been calculated/.test(tweede.meldingen[0].tekst));
   const clt = bepaalEindstijfheidHout(tweeVelden({ veld2: { material: "C24", profile: "CLT 40/20/40/20/40" } }));
   ok("hout zonder k_def: de melding zegt dat ook 2.2.3(4) niet is berekend",
-    clt.status === "alleenMelding" && /2\.2\.3\(4\)\) is niet berekend/.test(clt.meldingen[0].tekst));
+    clt.status === "alleenMelding" && /2\.2\.3\(4\)\) has also not been calculated/.test(clt.meldingen[0].tekst));
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -231,7 +231,7 @@ log("\n[2] De varianten");
   ok("twee BGT-eindtoestanden: de twee quasi-blijvende combinaties (7 en 8)",
     bgt.length === 2 && bgt[0].id === 7 + BGT_OFF && bgt[1].id === 8 + BGT_OFF, bgt.map((c) => c.id).join(","));
   ok("naam, kenmerk en factoren",
-    bgt[0].name === "BGT quasi-blijvend 6.16b (eindtoestand BGT)" &&
+    bgt[0].name === "BGT quasi-blijvend 6.16b (final state SLS)" &&
     bgt[0].eindtoestand.psi2 === 1 && bgt[0].eindtoestand.bgt === true &&
     bgt[0].factors === basis.find((c) => c.id === 7).factors);
   ok("elke variant staat direct achter zijn combinatie",
@@ -263,7 +263,7 @@ let rStaal;
   dicht("w_qp,fin = −8,7244 mm", h.deflection_quasi_perm_fin_mm, -H.qpFin, 1e-3);
   dicht("w₁ = −4,1484 mm (momentaan, niet uit de eindtoestand)", h.deflection_permanent_mm, -H.w1, 1e-3);
   ok("notitie: herkomst van w_qp en w_qp,fin uit dezelfde combinatie, 2.2.3(4)",
-    h.deflection_notes.some((n) => /w_qp,fin = -8,72 mm/.test(n) && /BGT quasi-blijvend 6\.16b \(eindtoestand BGT\)/.test(n) && /2\.2\.3\(4\)/.test(n)));
+    h.deflection_notes.some((n) => /w_qp,fin = -8,72 mm/.test(n) && /BGT quasi-blijvend 6\.16b \(final state SLS\)/.test(n) && /2\.2\.3\(4\)/.test(n)));
   ok("de oude w_qp-notitie (vereenvoudiging) is vervangen",
     !h.deflection_notes.some((n) => /Kruip volgens EN 1995-1-1 §7\.2: w_fin = w_inst \+ k_def · w_qp/.test(n)));
   ok("beide quasi-blijvende combinaties gemeten, maatgevend de grootste |w_fin|",
@@ -341,7 +341,7 @@ log("\n[4] Hout + beton met en zonder φ(∞,t₀)");
     zonderPhi.uitkomst.betonPhiPerStaaf.size === 0 &&
     eindstijfheidInvoer(zonderPhi.input, zonderPhi.uitkomst, "bgt").beams[1].E === 33000);
   ok("zonder φ: melding dat betonstaaf 2 E_cm houdt en de houtzakking te klein kan zijn",
-    /Betonstaaf 2 houdt E_cm/.test(zonderPhi.uitkomst.meldingen[1].tekst) && /te klein/.test(zonderPhi.uitkomst.meldingen[1].tekst));
+    /Concrete member 2 retains E_cm/.test(zonderPhi.uitkomst.meldingen[1].tekst) && /underestimated/.test(zonderPhi.uitkomst.meldingen[1].tekst));
   const hz = zonderPhi.hout.inputs.find((i) => i.beam_id === 1);
   dicht("zonder φ: w_qp,fin met E_cm voor beton = hand",
     hz.deflection_quasi_perm_fin_mm, -wVeld(2.9, EI_HOUT / 1.6, EI_BETON), 1e-3);
@@ -410,7 +410,7 @@ log("\n[7] De MCP-weg");
     ok("sidecar: identiek aan de app-gang", JSON.stringify(h) === JSON.stringify(rStaal.hout.inputs.find((i) => i.beam_id === 1)));
   }
   ok("sidecar: de BGT-melding in `warnings`",
-    (r.warnings ?? []).some((w) => w.startsWith("Eindstijfheid hout doorgerekend (BGT).")) &&
+    (r.warnings ?? []).some((w) => w.startsWith("Timber final stiffness calculated (SLS).")) &&
     !(r.warnings ?? []).some((w) => w.includes("niet doorgerekend (BGT)")));
 
   if (!existsSync(MCP_SERVER)) {

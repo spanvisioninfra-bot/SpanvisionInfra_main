@@ -171,7 +171,7 @@ export function applyActies(acties: AssistantActie[]): string[] {
             description: String(actie.omschrijving ?? "New chapter"),
           });
           useAppStore.getState().setItems([...useAppStore.getState().items, item]);
-          resultaten.push(`✔ Hoofdstuk ${item.code} "${item.description}" toegevoegd`);
+          resultaten.push(`✔ Chapter ${item.code} "${item.description}" toegevoegd`);
           break;
         }
         case 'add_post': {
@@ -183,7 +183,7 @@ export function applyActies(acties: AssistantActie[]): string[] {
             unit: (actie.eenheid as CostItem['unit']) ?? "st",
           });
           useAppStore.getState().setItems([...useAppStore.getState().items, item]);
-          resultaten.push(`✔ Post "${item.description}" toegevoegd onder ${actie.onderNr}`);
+          resultaten.push(`✔ Post "${item.description}" added under ${actie.onderNr}`);
           break;
         }
         case 'add_regel': {
@@ -216,7 +216,7 @@ export function applyActies(acties: AssistantActie[]): string[] {
                 }),
           });
           useAppStore.getState().setItems([...useAppStore.getState().items, item]);
-          resultaten.push(`✔ Regel "${item.description}" toegevoegd onder ${actie.onderNr}`);
+          resultaten.push(`✔ Regel "${item.description}" added under ${actie.onderNr}`);
           break;
         }
         case 'verwijder': {

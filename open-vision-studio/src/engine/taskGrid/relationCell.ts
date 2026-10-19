@@ -140,7 +140,7 @@ export function buildRelationCellItems(input: {
         ownerTaskId: input.ownerTaskId,
         direction: input.direction,
       });
-      if (!parsed.ok) throw new Error(`Bestaande externe relatie kan niet worden geprojecteerd: ${parsed.code}`);
+      if (!parsed.ok) throw new Error(`Existing external relation cannot be projected: ${parsed.code}`);
       const source = sourceFor(index, 0, clipboardText.length, clipboardText);
       return {
         key: `external:${entry.link.id}`,

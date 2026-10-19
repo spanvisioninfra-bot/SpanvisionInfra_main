@@ -154,7 +154,7 @@ export default function ReportShell({ onDetach }: ReportShellProps) {
     color: #666;
   }
   @bottom-right {
-    content: ${cssString(t("report.pagePrefix", "Pagina") + " ")} counter(page) " / " counter(pages);
+    content: ${cssString(t("report.pagePrefix", "Page") + " ")} counter(page) " / " counter(pages);
     font-family: "Segoe UI", system-ui, sans-serif;
     font-size: 8pt;
     color: #666;
@@ -167,7 +167,7 @@ export default function ReportShell({ onDetach }: ReportShellProps) {
   const kopRegels: Array<[string, string]> = [
     [t("report.kopProjectnummer", "Projectnummer"), info.projectNumber],
     [t("report.kopProject", "Project"), headerText],
-    [t("report.kopOmschrijving", "Omschrijving"), info.description],
+    [t("report.kopOmschrijving", "Description"), info.description],
   ].filter((r): r is [string, string] => !!r[1]);
   const kopRechts: Array<[string, string]> = [
     // Voluit en in de taal van de app, zoals op het titelblad en in de PDF
@@ -215,7 +215,7 @@ export default function ReportShell({ onDetach }: ReportShellProps) {
 
   const paginaLabel = useCallback(
     (nummer: number, totaal: number) =>
-      `${t("report.pagePrefix", "Pagina")} ${nummer} ${t("report.pageOf", "van")} ${totaal}`,
+      `${t("report.pagePrefix", "Page")} ${nummer} ${t("report.pageOf", "van")} ${totaal}`,
     [t],
   );
 
@@ -493,7 +493,7 @@ export default function ReportShell({ onDetach }: ReportShellProps) {
         </span>
         <label
           className="report-zoom-control"
-          title={t("report.zoomHint", "Ctrl ingedrukt houden en scrollen zoomt ook in het rapport.")}
+          title={t("report.zoomHint", "Hold Ctrl and scroll to zoom the report.")}
         >
           <span>{t("report.zoom", "Zoom")}</span>
           <input
@@ -510,7 +510,7 @@ export default function ReportShell({ onDetach }: ReportShellProps) {
           <button
             className="report-detach-btn"
             onClick={onDetach}
-            title={t("report.detachHint", "Opent het rapport in een eigen venster dat live met het model meebeweegt.")}
+            title={t("report.detachHint", "Open the report in a separate window that updates with the model.")}
           >
             {detachWindowIcon}
             {t("report.detach", "Naast je scherm")}
@@ -519,16 +519,16 @@ export default function ReportShell({ onDetach }: ReportShellProps) {
         <button
           className="report-print-btn"
           onClick={() => window.print()}
-          title={t("report.printHint", "Opent de printdialoog — kies daar 'Opslaan als PDF' voor een PDF.")}
+          title={t("report.printHint", "Open the print dialog. Choose \"Save as PDF\" to create a PDF.")}
         >
           {printIcon}
-          {t("report.print", "Afdrukken / PDF")}
+          {t("report.print", "Print / PDF")}
         </button>
       </div>
 
       {showStale && (
         <div className="report-stale-banner" role="status">
-          {t("report.staleBanner", "Model gewijzigd — druk op Berekenen om het rapport bij te werken.")}
+          {t("report.staleBanner", "Model changed. Click Calculate to update the report.")}
         </div>
       )}
 
@@ -575,7 +575,7 @@ export default function ReportShell({ onDetach }: ReportShellProps) {
           <div className="rpt-vellen" ref={vellenRef} />
           {sections.length === 0 && (
             <div className="report-no-sections">
-              {t("report.noSections", "Alle secties staan uit — zet een sectie aan in de zijbalk.")}
+              {t("report.noSections", "All sections are disabled — enable a section in the sidebar.")}
             </div>
           )}
         </div>

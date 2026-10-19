@@ -137,7 +137,7 @@ export function importBasCalcFile(arrayBuffer: ArrayBuffer): { schedule: CostSch
   // --- Read Kostprijs sheet ---
   const kostprijsSheet = sheetByName(wb, 'Kostprijs');
   if (!kostprijsSheet) {
-    throw new Error('Geen "Kostprijs" tabblad gevonden in het BasCalc bestand');
+    throw new Error('No "Kostprijs" worksheet found in the BasCalc file');
   }
 
   const data: unknown[][] = XLSX.utils.sheet_to_json(kostprijsSheet, { header: 1 });

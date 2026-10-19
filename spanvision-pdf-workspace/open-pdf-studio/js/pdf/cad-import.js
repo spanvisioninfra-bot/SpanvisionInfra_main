@@ -241,7 +241,7 @@ export async function openImportAlsNieuwDocument(pad, tekening) {
  */
 export async function voegImportToeAanDocument(pad) {
   const doc = getActiveDocument();
-  if (!doc?.pdfDoc) throw new Error('geen document open');
+  if (!doc?.pdfDoc) throw new Error('No document is open');
   const { insertPagesFromFile } = await import('./page-manager.js');
   let gelukt = false;
   try {
@@ -371,7 +371,7 @@ async function rasterBlad(pad, bladPt, vak, dpi) {
  */
 export async function legTekeningOpPagina(pad, o = {}) {
   const doc = getActiveDocument();
-  if (!doc?.pdfDoc) throw new Error('geen document open');
+  if (!doc?.pdfDoc) throw new Error('No document is open');
   try {
     const paginaNr = doc.currentPage || 1;
     const bladPt = { breedte: Number(o.blad?.widthMm) * PT_PER_MM, hoogte: Number(o.blad?.heightMm) * PT_PER_MM };

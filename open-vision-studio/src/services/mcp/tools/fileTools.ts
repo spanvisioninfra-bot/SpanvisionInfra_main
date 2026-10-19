@@ -404,7 +404,7 @@ export const fileTools: McpToolDef[] = [
       ]));
       const documents = opened.documentIds.map(documentId => {
         const payload = payloadById.get(documentId);
-        if (!payload) throw new Error(`Geopend document '${documentId}' ontbreekt na import`);
+        if (!payload) throw new Error(`Opened document '${documentId}' is missing after import`);
         return {
           documentId,
           projectId: payload.project.id,

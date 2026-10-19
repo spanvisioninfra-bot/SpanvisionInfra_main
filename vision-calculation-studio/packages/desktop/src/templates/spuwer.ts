@@ -31,20 +31,14 @@
 
 export const spuwer = `"Scupper — emergency overflow in de dakrand (EN 1991-1-3 NB art. 7.2)
 
-'<i>Een spuwer voert het regenwater af dat de reguliere hemelwaterafvoeren niet
-'aankunnen. De opening (b × h) zit met de onderzijde op h<sub>nd</sub> boven de
-'dakbedekking; bij de ontwerpbui stijgt het water d<sub>nd</sub> boven die
-'onderzijde, zodat op het dak een waterstand d<sub>hw</sub> = d<sub>nd</sub> +
-'h<sub>nd</sub> staat. Volgens §7.3(3) moet er bovenop de waterstand nog 30 mm
-'vrije hoogte in de spuwer zitten tegen verstopping — dat bepaalt de minimaal
-'benodigde spuwerhoogte.</i>
+'<i>An emergency roof outlet discharges rainwater that the normal drains cannot carry. The bottom of its b × h opening is h<sub>nd</sub> above the roof surface. During the design storm, water rises d<sub>nd</sub> above that edge, giving roof water depth d<sub>hw</sub> = d<sub>nd</sub> + h<sub>nd</sub>. Clause §7.3(3) requires another 30 mm of clear outlet height above the water to reduce blockage risk; this determines the minimum opening height.</i>
 
 # 1. Inputs
 
 A_afv = ?', oppervlakte afvoergebied A [m²]'
-n_sp = ?', aantal spuwers n'
-b_sp = ?*(mm)', breedte enkele spuwer b'
-h_sp = ?*(mm)', hoogte enkele spuwer h'
+n_sp = ?', number of emergency outlets n'
+b_sp = ?*(mm)', width of one outlet b'
+h_sp = ?*(mm)', height of one outlet h'
 h_nd = ?*(mm)', bovenzijde dakbedekking tot onderzijde spuwer h_nd'
 
 @select t_ref "Design working life (reference period t)"
@@ -65,27 +59,26 @@ A_afv
 n_sp
 b_sp
 h_sp
-b_tot = n_sp*b_sp', som van de spuwerbreedten'
+b_tot = n_sp*b_sp', total outlet width'
 b_tot
 h_nd
 t_ref', referentieperiode [jaar]'
-i_r', regenintensiteit uit Tabel NB.1 [m³/s]/m²
+i_r', rainfall intensity from NB Table NB.1 [m³/s]/m²
 
 # 2. Rainwater flow rate — (7.2)
 
 Q_h = A_afv*i_r', regenwaterdebiet [m³/s]'
 Q_h
 
-# 3. Waterhoogte above de bottom side van de emergency drain — (7.4)
+# 3. Water depth above the bottom of the emergency outlet — (7.4)
 
-'<i>d<sub>nd</sub> = 0,7·(Q<sub>h</sub>/(b·n))<sup>2/3</sup>, met de breedte in meters
-'en het resultaat in meters; hieronder omgerekend naar mm.</i>
+'<i>d<sub>nd</sub> = 0.7·(Q<sub>h</sub>/(b·n))<sup>2/3</sup>, with width and result in meters; the result below is converted to mm.</i>
 #hide
 'Breedte van één spuwer in meters — de formule is empirisch en rekent in SI.
 b_m = b_sp/(1000*mm)
 #show
-b_m', breedte van één spuwer [m]'
-d_nd = 0.7*(Q_h/(b_m*n_sp))^(2/3)*1000*mm', waterhoogte boven de onderzijde van de spuwer'
+b_m', width of one outlet [m]'
+d_nd = 0.7*(Q_h/(b_m*n_sp))^(2/3)*1000*mm', water depth above the outlet bottom'
 d_nd
 
 # 4. Waterstand en regenwaterbelasting — (7.8)
@@ -97,51 +90,34 @@ q_rw
 
 # 5. Minimum scupper height — §7.3(3)
 
-'<i>Conform §7.3(3) is er 30 mm extra hoogte in de spuwer nodig ter voorkoming van
-'verstopping: 30 + d<sub>hw</sub> = de benodigde hoogte boven de dakbedekking,
-'waarvan h<sub>nd</sub> al onder de spuwer zit.</i>
-h_30 = 30*mm + d_hw', benodigde hoogte boven de dakbedekking'
+'<i>Clause §7.3(3) requires 30 mm additional outlet height to reduce blockage: 30 + d<sub>hw</sub> is the required height above roofing, of which h<sub>nd</sub> is already below the outlet.</i>
+h_30 = 30*mm + d_hw', required height above the roof surface'
 h_30
-h_min = 30*mm + d_hw - h_nd', minimaal benodigde spuwerhoogte'
+h_min = 30*mm + d_hw - h_nd', minimum required outlet height'
 h_min
 UC = h_min/h_sp
 #if UC ≤ 1.0
-    'u.c. = h<sub>min</sub>/h = 'UC'<span style="color: green"> ≤ 1.0 → <b>voldoet</b></span>
+    'u.c. = h<sub>min</sub>/h = 'UC'<span style="color: green"> ≤ 1.0 → <b>passes</b></span>
 #else
-    'u.c. = h<sub>min</sub>/h = 'UC'<span style="color: red"> > 1.0 → <b>voldoet niet</b></span>
+    'u.c. = h<sub>min</sub>/h = 'UC'<span style="color: red"> > 1.0 → <b>fails</b></span>
 #end if
 
 # 6. Circular scupper at equal d_nd — (7.7)
 
-'<i>Omgekeerd toegepast: welke diameter geeft bij hetzelfde debiet per spuwer
-'dezelfde waterhoogte d<sub>nd</sub>? Uit d<sub>nd</sub> = 0,29·(Q<sub>h</sub>/d)<sup>2/3</sup>
-'volgt d = (Q<sub>h</sub>/n)/(d<sub>nd</sub>/0,29)<sup>1,5</sup>.</i>
+'<i>Inverse calculation: which diameter gives the same water depth d<sub>nd</sub> at the same flow per outlet? From d<sub>nd</sub> = 0.29·(Q<sub>h</sub>/d)<sup>2/3</sup>, d = (Q<sub>h</sub>/n)/(d<sub>nd</sub>/0.29)<sup>1.5</sup>.</i>
 #hide
 dnd_m = d_nd/(1000*mm)
 #show
-d_min = (Q_h/n_sp)/(dnd_m/0.29)^1.5*1000*mm', minimaal benodigde diameter ronde spuwer'
+d_min = (Q_h/n_sp)/(dnd_m/0.29)^1.5*1000*mm', minimum required round outlet diameter'
 d_min
 
 # 7. Summary
 
 #if UC ≤ 1.0
-    '<b>u.c. = 'UC'</b><span style="color: green"> ≤ 1.0 → <b>Spuwer voldoet</b></span>
+    '<b>u.c. = 'UC'</b><span style="color: green"> ≤ 1.0 → <b>Spuwer passes</b></span>
 #else
-    '<b>u.c. = 'UC'</b><span style="color: red"> > 1.0 → <b>Spuwer voldoet niet</b></span>
+    '<b>u.c. = 'UC'</b><span style="color: red"> > 1.0 → <b>Spuwer fails</b></span>
 #end if
 
-'<hr/>
-'<i>Aandachtspunten:
-'<ul>
-'<li>Gecalibreerd op 8 de referentie-uitwerking-referenties (A = 600 m², n = 2/3, b = 300/600 mm,
-'h = 80/100 mm, h<sub>nd</sub> = 30/50 mm, t = 5/15/50/100 jaar): d<sub>nd</sub>, d<sub>hw</sub>, q,
-'h<sub>min</sub>, de u.c. én de ronde-spuwerdiameter alle exact gereproduceerd.</li>
-'<li>De regenwaterbelasting rekent met 10 kN/m³ (d<sub>hw</sub> = 96 mm → 0,96 kN/m²).</li>
-'<li>h<sub>min</sub> = 30 + d<sub>hw</sub> − h<sub>nd</sub> komt neer op d<sub>nd</sub> + 30:
-'de drempelhoogte h<sub>nd</sub> valt weg. Een hogere drempel verlaagt de u.c. dus niet —
-'wél de waterstand d<sub>hw</sub> en daarmee de regenwaterbelasting.</li>
-'<li>De ronde-spuwerdiameter rekent met de onafgeronde d<sub>nd</sub>.</li>
-'<li>i<sub>r</sub> volgt uit de ontwerplevensduur (Tabel NB.1): 5 jaar → 0,000027 · 15 jaar → 0,000041 ·
-'50 jaar → 0,00005 · 100 jaar → 0,000056 [m³/s]/m². Alle vier geverifieerd tegen een referentieblad.</li>
-'</ul></i>
+'<hr/><i>Limitations:<ul><li>Eight reference cases were reproduced exactly (A=600 m², n=2/3, b=300/600 mm, h=80/100 mm, h<sub>nd</sub>=30/50 mm, t=5/15/50/100 years), including d<sub>nd</sub>, d<sub>hw</sub>, q, h<sub>min</sub>, UC, and round outlet diameter.</li><li>Rainwater load uses 10 kN/m³: d<sub>hw</sub>=96 mm gives 0.96 kN/m².</li><li>h<sub>min</sub> = 30 + d<sub>hw</sub> − h<sub>nd</sub> reduces to d<sub>nd</sub> + 30. A higher sill does not reduce UC, but does change water depth d<sub>hw</sub> and rainwater load.</li><li>Round outlet diameter uses unrounded d<sub>nd</sub>.</li><li>Rainfall intensity i<sub>r</sub> follows design working life (NB Table NB.1): 5 years → 0.000027; 15 → 0.000041; 50 → 0.00005; 100 → 0.000056 [m³/s]/m². All four were reference-verified.</li></ul></i>
 `;

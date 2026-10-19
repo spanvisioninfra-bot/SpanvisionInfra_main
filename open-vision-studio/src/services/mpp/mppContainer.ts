@@ -55,7 +55,7 @@ function readCompObjInfo(bytes: Uint8Array): { applicationName: string; fileForm
   };
   const readAsciiMinusTerminator = (length: number): string => {
     if (length <= 0 || pos + length > bytes.length) {
-      throw new Error(`MPP: CompObj-blok te kort voor een ${length}-byte string op offset ${pos}`);
+      throw new Error(`MPP: CompObj block is too short for a ${length}-byte string at offset ${pos}`);
     }
     const slice = bytes.subarray(pos, pos + length);
     pos += length;
@@ -148,7 +148,7 @@ function parsePropsBytes(bytes: Uint8Array, label: string): Map<number, Uint8Arr
   const ctx = `Props[${label}]`;
   const map = new Map<number, Uint8Array>();
   if (bytes.length < PROPS14_HEADER_SIZE) {
-    throw new Error(`MPP: Props[${label}] te klein voor header (${bytes.length} bytes, minimaal ${PROPS14_HEADER_SIZE})`);
+    throw new Error(`MPP: Props[${label}] too small for header (${bytes.length} bytes, minimum ${PROPS14_HEADER_SIZE})`);
   }
   const headerCount = getShort(bytes, 12, ctx);
   let pos = PROPS14_HEADER_SIZE;
@@ -243,7 +243,7 @@ const PROTECTION_PASSWORD_HASH = 893386756;
 function readPasswordProtection(cfb: CfbFile): { flagSet: boolean; hashPresent: boolean } {
   const rootProps14Bytes = cfb.getStream(['Props14']);
   if (!rootProps14Bytes) {
-    throw new Error('MPP: root-stream "Props14" ontbreekt — geen geldig MPP14-bestand');
+    throw new Error('MPP: root stream "Props14" is missing — invalid MPP14 file');
   }
   const rootProps = new Props(rootProps14Bytes, 'Props14');
   return {

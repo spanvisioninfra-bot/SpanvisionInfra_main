@@ -109,8 +109,8 @@ export function importSufx(xml: string): ImportResult {
     }
   }
 
-  if (builder.length === 0) warnings.push('Geen herkenbare STABU-besteksposten gevonden in het SUFX-bestand.');
-  warnings.push('SUFX-bestek geïmporteerd als prijsloze skelet-begroting (geen hoeveelheden/prijzen). Controleer tegen het bronbestand.');
+  if (builder.length === 0) warnings.push('No recognizable STABU specification items were found in the SUFX file.');
+  warnings.push('The SUFX specification was imported as an unpriced estimate outline (no quantities or prices). Check it against the source file.');
 
   return { schedule: { name: 'STABU-bestek (SUFX)' }, items: builder.items, warnings, format: 'sufx' };
 }

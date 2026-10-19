@@ -30,7 +30,7 @@ import { MS_PER_DAY } from '@/utils/dateUtils';
  *  bv. "FixedMeta[TBkndTask/FixedMeta]"). `ctx` is puur diagnostisch, nooit onderdeel van de
  *  bounds-logica. */
 function boundsError(kind: string, offset: number, length: number, dataLen: number, ctx?: string): Error {
-  const bits = [`MPP: ${kind} buiten grenzen (offset=${offset}, lengte=${length}, bufferlengte=${dataLen})`];
+  const bits = [`MPP: ${kind} out of bounds (offset=${offset}, length=${length}, buffer length=${dataLen})`];
   if (ctx) bits.push(`[${ctx}]`);
   return new Error(bits.join(' '));
 }
@@ -84,16 +84,16 @@ export class FixedMeta {
    *  door de aanroeper (bv. TBkndTask/FixedMeta met itemSize=47, MPP14Reader.java r. 993). */
   static withItemSize(bytes: Uint8Array, itemSize: number, label = 'FixedMeta'): FixedMeta {
     if (itemSize <= 0) {
-      throw new Error(`MPP: FixedMeta[${label}] ongeldige itemSize ${itemSize}`);
+      throw new Error(`MPP: FixedMeta[${label}] invalid itemSize ${itemSize}`);
     }
     if (bytes.length < FIXED_META_HEADER_SIZE) {
       throw new Error(
-        `MPP: FixedMeta[${label}] te klein voor header (${bytes.length} bytes, minimaal ${FIXED_META_HEADER_SIZE})`,
+        `MPP: FixedMeta[${label}] too small for header (${bytes.length} bytes, minimum ${FIXED_META_HEADER_SIZE})`,
       );
     }
     const magic = getInt(bytes, 0, `FixedMeta[${label}]`);
     if (magic !== BLOCK_MAGIC) {
-      throw new Error(`MPP: FixedMeta[${label}] ongeldig magic-getal (0x${(magic >>> 0).toString(16)})`);
+      throw new Error(`MPP: FixedMeta[${label}] invalid magic number (0x${(magic >>> 0).toString(16)})`);
     }
     const adjustedItemCount = Math.max(0, Math.floor((bytes.length - FIXED_META_HEADER_SIZE) / itemSize));
     // De RUWE headerwaarde niet ongeclampt blootstellen: MPXJ's `ConstraintFactory` gebruikt hem als
@@ -122,11 +122,11 @@ export class FixedMeta {
     label = 'FixedMeta',
   ): FixedMeta {
     if (itemSizes.length === 0) {
-      throw new Error(`MPP: FixedMeta[${label}] heuristiek heeft minstens één itemSize nodig`);
+      throw new Error(`MPP: FixedMeta[${label}] heuristic requires at least one itemSize`);
     }
     if (bytes.length < FIXED_META_HEADER_SIZE) {
       throw new Error(
-        `MPP: FixedMeta[${label}] te klein voor header (${bytes.length} bytes, minimaal ${FIXED_META_HEADER_SIZE})`,
+        `MPP: FixedMeta[${label}] too small for header (${bytes.length} bytes, minimum ${FIXED_META_HEADER_SIZE})`,
       );
     }
     // Puur een heuristiek-hint (vermenigvuldigd tegen kandidaat-groottes, nooit gebruikt voor
@@ -272,7 +272,7 @@ export class FixedData {
    *  TBkndAssn (assignments hebben geen eigen FixedMeta voor hun FixedData/Fixed2Data). */
   static withoutMeta(itemSize: number, bytes: Uint8Array, label = 'FixedData'): FixedData {
     if (itemSize <= 0) {
-      throw new Error(`MPP: FixedData[${label}].withoutMeta ongeldige itemSize ${itemSize}`);
+      throw new Error(`MPP: FixedData[${label}].withoutMeta invalid itemSize ${itemSize}`);
     }
     const itemCount = Math.floor(bytes.length / itemSize);
     const items: (Uint8Array | null)[] = new Array(itemCount);
@@ -329,14 +329,14 @@ export class VarMeta12 {
     const ctx = `VarMeta[${label}]`;
     if (bytes.length < VAR_META_HEADER_SIZE) {
       throw new Error(
-        `MPP: VarMeta[${label}] te klein voor header (${bytes.length} bytes, minimaal ${VAR_META_HEADER_SIZE})`,
+        `MPP: VarMeta[${label}] too small for header (${bytes.length} bytes, minimum ${VAR_META_HEADER_SIZE})`,
       );
     }
     // "Ik heb één voorbeeld waar een verder geldig VarMeta-blok nul heeft als magic-getal. MS
     // Project leest het bestand prima, dus we behandelen nul als geldige waarde." (VarMeta12.java)
     const magic = getInt(bytes, 0, ctx);
     if (magic !== 0 && magic !== BLOCK_MAGIC) {
-      throw new Error(`MPP: VarMeta[${label}] ongeldig magic-getal (0x${(magic >>> 0).toString(16)})`);
+      throw new Error(`MPP: VarMeta[${label}] invalid magic number (0x${(magic >>> 0).toString(16)})`);
     }
     // De RUWE headerwaarde niet ongeclampt gebruiken om `offsets` te dimensioneren: een geprepareerd
     // bestand kan tot 0x7FFFFFFF claimen (OOM, in de browser niet te vangen) of een negatief getal.

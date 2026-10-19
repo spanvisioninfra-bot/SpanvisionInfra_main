@@ -31,7 +31,7 @@ export async function toetsSpanning(
 ): Promise<SpanningBeamCheckResult> {
   const uit = await roepKern<SpanningBeamCheckResult[]>("check_stress_beams", [input], signal);
   if (!Array.isArray(uit) || uit.length === 0) {
-    throw new Error("De spanningskern gaf geen resultaat terug.");
+    throw new Error("The stress engine returned no result.");
   }
   return uit[0];
 }

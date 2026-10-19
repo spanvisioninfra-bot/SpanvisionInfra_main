@@ -131,7 +131,7 @@ for (const method of HELP_METHODS) {
     { ...article('tut-a', 1), body: { nl: 'x', en: '' } },
   ]), /body\.en ontbreekt/);
   throwsWith('7c order 0 gooit', () => api.help.registerArticles([article('tut-a', 0)]), /order moet een positief geheel getal/);
-  throwsWith('7d geen lijst gooit', () => api.help.registerArticles('x' as unknown as ExtHelpArticle[]), /verwacht een lijst/);
+  throwsWith('7d geen lijst gooit', () => api.help.registerArticles('x' as unknown as ExtHelpArticle[]), /expects a list/);
   eq('7e na fouten staat er niets in Help', getRegisteredHelpArticles().length, 0);
 
   const input = [article('tut-b', 2), article('tut-a', 1)];
@@ -174,8 +174,8 @@ for (const method of HELP_METHODS) {
   S().addTask({ name: 'Mijn eigen werk' });
   const originalId = S().activeDocumentId;
   const docsBefore = S().documents.length;
-  await rejectsWith('14a onbekende asset wordt afgewezen', () => api.help.openBundledProject('weg.ifc'), /bestaat niet/);
-  await rejectsWith('14b geen .ifc wordt afgewezen', () => api.help.openBundledProject('notities.txt'), /verwacht de naam van een \.ifc-asset/);
+  await rejectsWith('14a onbekende asset wordt afgewezen', () => api.help.openBundledProject('weg.ifc'), /does not exist/);
+  await rejectsWith('14b geen .ifc wordt afgewezen', () => api.help.openBundledProject('notities.txt'), /expects the name of an \.ifc asset/);
   eq('14c na weigeringen geen nieuw document', S().documents.length, docsBefore);
   await api.help.openBundledProject('start.ifc');
   eq('15a een nieuw document erbij', S().documents.length, docsBefore + 1);
@@ -192,19 +192,19 @@ for (const method of HELP_METHODS) {
   eq('16 een geldige begeleiding', validateGuide(guide([step('a', { anchor: 'ribbon:start:addTask', resetAsset: 'start.ifc', check: () => true, prepare: () => {} })]), has), []);
   const errs = (g: unknown) => validateGuide(g, has).join(' | ');
   const bad: Array<[string, unknown, RegExp]> = [
-    ['17a geen object', null, /moet een object zijn/],
-    ['17b ongeldig id', { ...guide([step('a')]), id: 'Tut 1' }, /ongeldig id/],
-    ['17c titel zonder en', { ...guide([step('a')]), title: { nl: 'x' } }, /title\.nl en title\.en/],
-    ['17d geen stappen', guide([]), /niet-lege lijst/],
-    ['17e dubbel stap-id', guide([step('a'), step('a')]), /dubbel id/],
-    ['17f lege body', guide([{ id: 'a', body: { nl: '', en: 'x' } }]), /body\.nl en body\.en/],
-    ['17g twee scheidingen', guide([{ id: 'a', body: { nl: 'a\n---\nb\n---\nc', en: 'x' } }]), /meer dan één scheidingsregel/],
-    ['17h alleen uitleg, geen opdracht', guide([{ id: 'a', body: { nl: '---\nuitleg', en: 'x' } }]), /geen opdracht/],
-    ['17i anker met aanhalingsteken', guide([step('a', { anchor: 'x"]' })]), /anchor moet een ankernaam/],
-    ['17j check is geen functie', guide([step('a', { check: true as unknown as () => boolean })]), /check moet een functie/],
-    ['17k prepare is geen functie', guide([step('a', { prepare: 'x' as unknown as () => void })]), /prepare moet een functie/],
-    ['17l resetAsset geen .ifc', guide([step('a', { resetAsset: 'notities.txt' })]), /\.ifc-asset/],
-    ['17m resetAsset bestaat niet', guide([step('a', { resetAsset: 'weg.ifc' })]), /zit niet in de assets/],
+    ['17a geen object', null, /must be an object/],
+    ['17b ongeldig id', { ...guide([step('a')]), id: 'Tut 1' }, /invalid ID/],
+    ['17c titel zonder en', { ...guide([step('a')]), title: { nl: 'x' } }, /title\.nl and title\.en/],
+    ['17d geen stappen', guide([]), /non-empty list/],
+    ['17e dubbel stap-id', guide([step('a'), step('a')]), /duplicate id/],
+    ['17f lege body', guide([{ id: 'a', body: { nl: '', en: 'x' } }]), /body\.nl and body\.en/],
+    ['17g twee scheidingen', guide([{ id: 'a', body: { nl: 'a\n---\nb\n---\nc', en: 'x' } }]), /more than one separator line/],
+    ['17h alleen uitleg, geen opdracht', guide([{ id: 'a', body: { nl: '---\nuitleg', en: 'x' } }]), /no task/],
+    ['17i anker met aanhalingsteken', guide([step('a', { anchor: 'x"]' })]), /anchor must be an anchor name/],
+    ['17j check is geen functie', guide([step('a', { check: true as unknown as () => boolean })]), /check must be a function/],
+    ['17k prepare is geen functie', guide([step('a', { prepare: 'x' as unknown as () => void })]), /prepare must be a function/],
+    ['17l resetAsset geen .ifc', guide([step('a', { resetAsset: 'notities.txt' })]), /\.ifc asset/],
+    ['17m resetAsset bestaat niet', guide([step('a', { resetAsset: 'weg.ifc' })]), /is not in the extension assets/],
   ];
   for (const [label, g, pattern] of bad) {
     checks++;
@@ -220,7 +220,7 @@ for (const method of HELP_METHODS) {
 {
   const { ctx, api } = setup('tutorials-guide', ['help']);
   const S = ctx.store.getState;
-  throwsWith('19a ongeldige begeleiding gooit met alle redenen', () => api.help.startGuide(guide([step('a', { resetAsset: 'weg.ifc' })])), /ongeldige begeleiding — .*zit niet in de assets/);
+  throwsWith('19a ongeldige begeleiding gooit met alle redenen', () => api.help.startGuide(guide([step('a', { resetAsset: 'weg.ifc' })])), /invalid guide — .*is not in the extension assets/);
   eq('19b en start niets', getGuideView(), null);
 
   let checkCalls = 0;
@@ -334,7 +334,7 @@ for (const method of HELP_METHODS) {
   api.help.startGuide(guide([step('a', { check: () => false })]));
   const { api: second } = setup('tweede-bron', ['help']);
   throwsWith('31b een andere extensie kan een lopende begeleiding niet vervangen',
-    () => second.help.startGuide({ ...guide([step('b')]), id: 'tut-2' }), /er loopt al een begeleiding van extensie "tutorials-async"/);
+    () => second.help.startGuide({ ...guide([step('b')]), id: 'tut-2' }), /a guide from extension "tutorials-async" is already running/);
   eq('31c de lopende begeleiding blijft staan', [getGuideView()?.extensionId, getGuideView()?.guideId], ['tutorials-async', 'tut-1']);
   api.help.startGuide({ ...guide([step('c')]), id: 'tut-eigen' });
   eq('31d de eigenaar mag zijn begeleiding wel vervangen', getGuideView()?.guideId, 'tut-eigen');
@@ -432,11 +432,11 @@ for (const method of HELP_METHODS) {
   const img = reg.resolveImage!('img/nl/stap.webp');
   api._cleanup();
   eq('35a opruimen stopt de begeleiding', getGuideView(), null);
-  throwsWith('35b registerArticles na uitschakelen gooit', () => api.help.registerArticles([article('tut-y', 1)]), /na uitschakelen/);
-  throwsWith('35c startGuide na uitschakelen gooit', () => api.help.startGuide(guide([step('a')])), /na uitschakelen/);
-  throwsWith('35d stopGuide na uitschakelen gooit', () => api.help.stopGuide(), /na uitschakelen/);
-  throwsWith('35e unregisterArticles na uitschakelen gooit', () => api.help.unregisterArticles(), /na uitschakelen/);
-  await rejectsWith('35f openBundledProject na uitschakelen wordt afgewezen', () => api.help.openBundledProject('start.ifc'), /na uitschakelen/);
+  throwsWith('35b registerArticles na uitschakelen gooit', () => api.help.registerArticles([article('tut-y', 1)]), /after disabling/);
+  throwsWith('35c startGuide na uitschakelen gooit', () => api.help.startGuide(guide([step('a')])), /after disabling/);
+  throwsWith('35d stopGuide na uitschakelen gooit', () => api.help.stopGuide(), /after disabling/);
+  throwsWith('35e unregisterArticles na uitschakelen gooit', () => api.help.unregisterArticles(), /after disabling/);
+  await rejectsWith('35f openBundledProject na uitschakelen wordt afgewezen', () => api.help.openBundledProject('start.ifc'), /after disabling/);
   eq('35g niets achtergebleven in Help of het paneel', [getRegisteredHelpArticles().length, getGuideView()], [0, null]);
   eq('35h de afbeeldingsresolver geeft niets meer', reg.resolveImage!('img/nl/stap.webp'), '');
   eq('35i de eerder uitgegeven blob-URL is ingetrokken', resolveObjectURL(img), undefined);

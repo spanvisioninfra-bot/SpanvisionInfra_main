@@ -32,7 +32,7 @@ const DEMO_PROPERTIES: IfcElementProperties = {
   tag: "W-001",
   predefinedType: "STANDARD",
   objectType: "Concrete 200 mm",
-  location: { storey: "Verdieping 1", building: "Kantoor", site: "Locatie A" },
+  location: { storey: "Floor 1", building: "Kantoor", site: "Locatie A" },
   materials: [
     { name: "Concrete C30/37", thickness: 150, category: "Concrete" },
     { name: "EPS insulation", thickness: 50, category: "Insulation" },

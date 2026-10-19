@@ -15,7 +15,7 @@ export const en1997Funderingsstrook = `# Draagvermogen Strip foundation — NEN 
 
 ## Consequence class en partiele factoren
 
-Partiele factoren grondweerstanden (Bijlage A, tabel A.3b):
+Partial factors for soil resistance (Annex A, Table A.3b):
 
 #if CC == 1
 gamma_Rv = 1.0
@@ -45,55 +45,55 @@ Effectieve cohesie (karakteristiek):
 
 c_k = 0 kPa
 
-Volumegewicht grond:
+Soil unit weight:
 
 gamma_grond = 18 kN/m^3
 
-Volumegewicht grond onder grondwaterniveau:
+Soil unit weight below groundwater level:
 
 gamma_grond_eff = 10 kN/m^3
 
 @select grondwater "Grondwaterniveau t.o.v. funderingszool"
-Boven funderingszool (droog) = 1
+Above foundation base (dry) = 1
 On funderingszool = 2
-Ter height top fundering = 3
+At the top of the foundation = 3
 @end
 
 ## Funderingsgeometrie
 
-Breedte funderingsstrook:
+Strip footing width:
 
 B = 600 mm
 
-Funderingsdiepte onder maaiveld:
+Foundation depth below ground:
 
 D = 800 mm
 
-Lengte funderingsstrook (per strekkende meter):
+Strip footing length (per meter):
 
 L_f = 1000 mm
 
 ## Effectieve afmetingen (art. 6.5.4)
 
-Excentriciteit belasting in breedte-richting:
+Load eccentricity across the width:
 
 e_B = 0 mm
 
-Effectieve breedte:
+Effective width:
 
 B_eff = B - 2 * e_B to mm
 
-Effectieve oppervlak per m':
+Effective area per meter:
 
 A_eff = B_eff * L_f to mm^2
 
 ## Design value grondparameters (DA3)
 
-Rekenwaarde wrijvingshoek:
+Design friction angle:
 
 phi_d_deg = atan(tan(phi_k * pi / 180) / gamma_phi) * 180 / pi
 
-Rekenwaarde cohesie:
+Design cohesion:
 
 c_d = c_k / gamma_c to kPa
 
@@ -129,7 +129,7 @@ Horizontale kracht H_d:
 
 H_d = 5 kN/m
 
-Verticale kracht V_d voor inclinatie:
+Vertical force V_d for inclination:
 
 V_d_incl = 80 kN/m
 
@@ -146,9 +146,9 @@ i_c = 1.0
 #end if
 #end if
 
-## Grondspanning naast fundering
+## Soil stress beside the foundation
 
-Effectieve grondspanning op funderingsniveau:
+Effective soil stress at foundation level:
 
 #if grondwater == 1
 q_eff = gamma_grond * D / 1000 to kPa
@@ -175,11 +175,11 @@ R_d = R_over_A * B_eff / 1000 to kN/m
 
 ## Load
 
-Verticale belasting per m' strook (rekenwaarde):
+Vertical load per meter of strip (design value):
 
 V_Ed = 80 kN/m
 
-## Toetsing (art. 6.5.2, formula 6.1)
+## Check (art. 6.5.2, expression 6.1)
 
 Unity check:
 
@@ -257,7 +257,7 @@ Schroefpaal = 3
 Boorpaal = 4
 @end
 
-Partiele factoren paaldraagvermogen (tabel 7.b NB):
+Partial factors for pile resistance (NB Table 7.b):
 
 #if CC == 1
 gamma_b = 1.2
@@ -276,7 +276,7 @@ gamma_s = 1.3
 
 ## Correlatiefactoren (table A.10 NB)
 
-Aantal sonderingen:
+Number of cone penetration tests:
 
 n_sond = 3
 
@@ -339,7 +339,7 @@ O_paal = pi * D_paal to mm
 
 ## Puntdraagvermogen (art. 7.6.2.3)
 
-Rekenwaarde conusweerstand gemiddeld aan paalpunt q_c;I;gem:
+Design mean cone resistance at pile tip q_c;I;gem:
 
 q_c_punt = 15 MPa
 
@@ -386,13 +386,13 @@ Karakteristiek draagvermogen per sondering:
 
 R_c_cal = R_b_cal + R_s_cal to kN
 
-Karakteristiek draagvermogen (met correlatiefactoren, formule 7.2/7.3):
+Characteristic resistance (with correlation factors, expressions 7.2/7.3):
 
 R_c_k_gem = R_c_cal / xi_3 to kN
 
 R_c_k_min = R_c_cal / xi_4 to kN
 
-Maatgevend karakteristiek draagvermogen (kleinste waarde):
+Governing characteristic resistance (smallest value):
 
 #if R_c_k_gem < R_c_k_min
 R_c_k = R_c_k_gem to kN
@@ -406,17 +406,17 @@ R_b_d = R_b_cal / (xi_3 * gamma_b) to kN
 
 R_s_d = R_s_cal / (xi_3 * gamma_s) to kN
 
-Totaal rekenwaarde draagvermogen:
+Total design resistance:
 
 R_c_d = R_b_d + R_s_d to kN
 
 ## Load
 
-Rekenwaarde drukbelasting op paal:
+Design compressive load on the pile:
 
 F_c_d = 300 kN
 
-## Toetsing (formula 7.1)
+## Check (expression 7.1)
 
 Unity check:
 
@@ -504,11 +504,11 @@ export const en1997Zetting = `# Zettingsberekening — NEN 9997-1 §6.6 / Bijlag
 
 ## Funderingsgeometrie
 
-Breedte fundering:
+Foundation width:
 
 B = 1000 mm
 
-Lengte fundering:
+Foundation length:
 
 L_f = 1000 mm
 
@@ -518,11 +518,11 @@ D = 800 mm
 
 ## Grondopbouw en parameters
 
-@select grondtype "Type soil below fundering"
+@select grondtype "Soil type below the foundation"
 Zand, los (E_s = 10 MPa) = 10
 Zand, matig dicht (E_s = 20 MPa) = 20
 Zand, fixed (E_s = 40 MPa) = 40
-Klei, slap (E_s = 2 MPa) = 2
+Soft clay (E_s = 2 MPa) = 2
 Klei, matig fixed (E_s = 5 MPa) = 5
 Klei, fixed (E_s = 10 MPa) = 10
 @end
@@ -531,17 +531,17 @@ Samendrukbaarheidsmodulus E_s (samendrukkingsmodulus):
 
 E_s = grondtype * 1 MPa
 
-Dikte samendrukbare laag onder fundering:
+Compressible layer thickness below the foundation:
 
 H_laag = 3000 mm
 
-Volumegewicht grond:
+Soil unit weight:
 
 gamma_grond = 18 kN/m^3
 
 ## Load (karakteristiek / quasi-permanent)
 
-Verticale kracht op fundering (karakteristiek):
+Vertical foundation force (characteristic):
 
 F_k = 100 kN
 
@@ -551,15 +551,15 @@ A_f = B * L_f to mm^2
 
 ## Grondspanning
 
-Contactspanning (additioneel, boven eigen grondgewicht):
+Contact stress (additional to soil self-weight):
 
 sigma_0 = F_k / A_f * 1000 to kPa
 
-Eigen grondspanning op funderingsniveau:
+Initial soil stress at foundation level:
 
 sigma_v0 = gamma_grond * D / 1000 to kPa
 
-## Settlement met elastische methode (Bijlage F)
+## Settlement using the elastic method (Annex F)
 
 @select zettingsmethode "Berekeningsmethode"
 1:2 methode (simplified) = 1
@@ -569,8 +569,8 @@ Boussinesq (invloedsfactor) = 2
 #if zettingsmethode == 1
 ## Vereenvoudigde 1:2 methode
 
-De spanning neemt af met de diepte. Bij de 1:2 methode wordt
-de extra spanning op diepte z geschat als:
+Stress decreases with depth. The 1:2 method estimates
+the additional stress at depth z as:
 
   delta_sigma(z) = F_k / ((B + z) * (L_f + z))
 
@@ -584,7 +584,7 @@ s = sigma_gem * H_laag / (E_s * 1000) to mm
 #else
 ## Boussinesq methode
 
-Invloedsfactor I_s (afhankelijk van B/L en H/B):
+Influence factor I_s (depending on B/L and H/B):
 
 I_s = 0.85
 
@@ -596,9 +596,9 @@ s = sigma_0 * B / (E_s * 1000) * I_s to mm
 ## Grenswaarde
 
 @select grenswaarde "Grenswaarde zetting"
-Fundering gebouw (25 mm) = 25
-Fundering machines (10 mm) = 10
-Fundering scheidingswand (15 mm) = 15
+Building foundation (25 mm) = 25
+Machine foundation (10 mm) = 10
+Partition wall foundation (15 mm) = 15
 @end
 
 s_max = grenswaarde * 1 mm
@@ -655,21 +655,21 @@ c_k = 0 kPa
 
 ## Design values
 
-Rekenwaarde wrijvingshoek:
+Design friction angle:
 
 phi_d_deg = atan(tan(phi_k * pi / 180) / gamma_phi) * 180 / pi
 
-Rekenwaarde cohesie:
+Design cohesion:
 
 c_d = c_k / gamma_c to kPa
 
 ## Funderingsgeometrie
 
-Breedte funderingsstrook:
+Strip footing width:
 
 B = 600 mm
 
-Lengte (per strekkende meter):
+Length (per meter):
 
 L_f = 1000 mm
 
@@ -679,11 +679,11 @@ A_f = B * L_f to mm^2
 
 ## Load
 
-Verticale belasting (rekenwaarde, gunstig):
+Vertical load (design value, favorable):
 
 V_Ed = 60 kN/m
 
-Horizontale belasting (rekenwaarde):
+Horizontal load (design value):
 
 H_Ed = 10 kN/m
 
@@ -701,7 +701,7 @@ Totale schuifweerstand:
 
 R_h = R_frictie + R_cohesie to kN/m
 
-## Toetsing (art. 6.5.3)
+## Check (art. 6.5.3)
 
 Unity check:
 

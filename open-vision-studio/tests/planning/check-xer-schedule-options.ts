@@ -626,7 +626,7 @@ eq('projecteindevlag true/false verandert binnen één project geen enkele taakd
     fallbacks: [{
       field: 'sched_use_project_end_date_for_float',
       token: 'Y',
-      fallback: 'N (geen projecteinddatum en geen taakeinddatum in de bron: projecteinde = max(EF))',
+      fallback: "N (no project or task finish date in the source: project finish = max(EF))",
     }],
   });
   eq('Y mét bruikbaar projecteinde (of onbekend) ⇒ optie blijft aan, geen terugval', [true, undefined].map(usable => {
@@ -1148,15 +1148,15 @@ eq('X5: het optieblok na lezen draagt alleen projectopties',
   });
   eq('nivellering: onbekende rsrc_id in RSRCLEVELLIST valt zichtbaar weg; een dubbele stil (zelfde resource)',
     p1.fallbacks.map(item => [item.field, item.token, item.fallback]),
-    [['RSRCLEVELLIST.rsrc_id', 'R9', 'weggelaten (geen RSRC-rij)']]);
+    [['RSRCLEVELLIST.rsrc_id', 'R9', "omitted (no RSRC row)"]]);
   const orphan = leveling(levelXer(
     { level_all_rsrc_flag: 'Y' },
     { list: [['1', '8', 'R1'], ['2', '', 'R2'], ['3', '77', 'R3']] },
   ));
   eq('nivellering: RSRCLEVELLIST-rij met lege of onbekende schedoptions_id valt zichtbaar weg (nooit stil)',
     orphan.fallbacks.map(item => [item.field, item.token, item.fallback]),
-    [['RSRCLEVELLIST.schedoptions_id', '(empty)', 'weggelaten (geen SCHEDOPTIONS-rij)'],
-      ['RSRCLEVELLIST.schedoptions_id', '77', 'weggelaten (geen SCHEDOPTIONS-rij)']]);
+    [['RSRCLEVELLIST.schedoptions_id', '(empty)', "omitted (no SCHEDOPTIONS row)"],
+      ['RSRCLEVELLIST.schedoptions_id', '77', "omitted (no SCHEDOPTIONS row)"]]);
   eq('nivellering: de verweesde rijen komen niet in de lijst van P1',
     orphan.schedulingOptions.leveling?.resources, [{ resourceId: 'xer-resource:R1' }]);
   eq('nivellering: elk project krijgt alleen de lijst van zijn eigen SCHEDOPTIONS-rij',

@@ -34,10 +34,10 @@ function _num(v) {
 
 function _variant(v, familyId) {
   const id = v && (v.id || v.label);
-  if (!id) throw new Error(`variant zonder id of label in familie '${familyId}'`);
+  if (!id) throw new Error(`variant without an id or label in family '${familyId}'`);
   const w = _num(v.w), h = _num(v.h);
   if (!(w > 0) || !(h > 0)) {
-    throw new Error(`variant '${id}' heeft geen bruikbare maat (w/h in mm)`);
+    throw new Error(`variant '${id}' has no usable size (w/h in mm)`);
   }
   const paths = Array.isArray(v.paths) ? v.paths : [];
   const schoon = [];
@@ -69,7 +69,7 @@ function _variant(v, familyId) {
     teksten.push({ x, y, t: tekst, s: s > 0 ? s : 2, bold: !!t.bold });
   }
   if (!schoon.length && !bogen.length && !teksten.length) {
-    throw new Error(`variant '${id}' bevat geen bruikbare geometrie`);
+    throw new Error(`variant '${id}' contains no usable geometry`);
   }
   return { id: String(id), label: String(v.label || id), w, h, paths: schoon, arcs: bogen, texts: teksten };
 }
@@ -85,15 +85,15 @@ function _variant(v, familyId) {
 export function parseLineworkCatalog(raw) {
   if (!raw || typeof raw !== 'object' || raw.format !== LINEWORK_FORMAT) return null;
   if (!SUPPORTED_VERSIONS.has(raw.formatVersion)) {
-    throw new Error(`onbekende formatVersion ${raw.formatVersion} voor ${LINEWORK_FORMAT}`);
+    throw new Error(`unknown formatVersion ${raw.formatVersion} for ${LINEWORK_FORMAT}`);
   }
   if (!Array.isArray(raw.families) || !raw.families.length) {
-    throw new Error('catalogus zonder families');
+    throw new Error('catalog without families');
   }
   const families = raw.families.map((f) => {
-    if (!f || !f.id) throw new Error('familie zonder id');
+    if (!f || !f.id) throw new Error('family without an id');
     const variants = (Array.isArray(f.variants) ? f.variants : []).map(v => _variant(v, f.id));
-    if (!variants.length) throw new Error(`familie '${f.id}' zonder varianten`);
+    if (!variants.length) throw new Error(`family '${f.id}' without variants`);
     return {
       id: String(f.id),
       name: f.name || f.id,

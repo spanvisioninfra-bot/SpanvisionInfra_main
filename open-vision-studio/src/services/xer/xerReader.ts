@@ -499,7 +499,7 @@ function assertUniqueId(
     if (firstLine !== undefined) {
       throw new XerImportError(
         'XER_DUPLICATE_ID',
-        `${table}.${field} bevat dubbele id '${id}' op regels ${firstLine} and ${row.line}.`,
+        `${table}.${field} contains duplicate id '${id}' on lines ${firstLine} and ${row.line}.`,
         { table, field, line: row.line, lines: [firstLine, row.line] },
       );
     }
@@ -522,7 +522,7 @@ function readXerProject(
   if (!projectRow) {
     throw new XerImportError(
       'XER_MISSING_REQUIRED_VALUE',
-      `PROJECT.proj_id '${projectId}' bestaat niet in de getokenized XER-invoer.`,
+      `PROJECT.proj_id '${projectId}' does not exist in the tokenized XER input.`,
       { table: 'PROJECT', field: 'proj_id' },
     );
   }
@@ -530,7 +530,7 @@ function readXerProject(
   if (activityRows.length === 0) {
     throw new XerImportError(
       'XER_EMPTY_PROJECT',
-      `XER-project ${projectId} bevat geen activiteiten.`,
+      `XER-project ${projectId} contains no activities.`,
       { table: 'TASK' },
     );
   }
@@ -553,7 +553,7 @@ function readXerProject(
     if (missingField) {
       throw new XerImportError(
         'XER_DANGLING_LOCAL_RELATION',
-        `TASKPRED op regel ${row.line} verwijst via ${missingField} naar een ontbrekende lokale activiteit.`,
+        `TASKPRED on line ${row.line} references a missing local activity via ${missingField}.`,
         { table: 'TASKPRED', field: missingField, line: row.line },
       );
     }
@@ -1074,13 +1074,13 @@ export function readXER(bytes: Uint8Array): XerOpenResult {
     if (unresolvedRelation.reason === 'dangling') {
       throw new XerImportError(
         'XER_DANGLING_LOCAL_RELATION',
-        `Ongescopeerde TASKPRED op regel ${unresolvedRelation.line} verwijst naar een ontbrekend endpoint via ${unresolvedRelation.field}.`,
+        `Unscoped TASKPRED on line ${unresolvedRelation.line} references a missing endpoint via ${unresolvedRelation.field}.`,
         { table: 'TASKPRED', field: unresolvedRelation.field, line: unresolvedRelation.line },
       );
     }
     throw new XerImportError(
       'XER_AMBIGUOUS_LOCAL_RELATION',
-      `Ongescopeerde TASKPRED op regel ${unresolvedRelation.line} is ambigu: activiteiten '${unresolvedRelation.predecessorTaskId}' en '${unresolvedRelation.taskId}' identificeren niet één uniek lokaal project.`,
+      `Unscoped TASKPRED on line ${unresolvedRelation.line} is ambiguous: activities '${unresolvedRelation.predecessorTaskId}' and '${unresolvedRelation.taskId}' do not identify a unique local project.`,
       { table: 'TASKPRED', field: 'proj_id', line: unresolvedRelation.line },
     );
   }
@@ -1142,7 +1142,7 @@ export function readXER(bytes: Uint8Array): XerOpenResult {
   }
   throw new XerImportError(
     'XER_EMPTY_PROJECT',
-    'Geen enkel XER-project bevat activiteiten om te openen.',
+    'None of the XER projects contains activities to open.',
     { table: 'TASK' },
   );
 }
@@ -1164,7 +1164,7 @@ export function reconstructXerSourceFromBytes(bytes: Uint8Array): XerSourceRecon
   const results = 'kind' in opened ? opened.results : [opened];
   const first = results[0];
   if (!first?.xerSourceArchive) {
-    throw new Error('De XER-bron leverde geen reconstruerbaar bronarchief op.');
+    throw new Error('The XER source did not produce a reconstructable source archive.');
   }
   const recordedTimesByProject: Record<string, Record<string, RecordedTime>> = {};
   for (const result of results) {

@@ -20,12 +20,12 @@
 export const en1990Fundamenteel = `# Belastingcombinatie ULS -- EN 1990 $6.4.3.2
 ## Fundamentele combinatie (STR/GEO) -- Bijlage A1, Table NB.4-A1.2(B)
 
-In Nederland worden voor STR/GEO de vergelijkingen (6.10a) en (6.10b) gebruikt
-(Tabel NB.4 - A1.2(B), groep B). De maatgevende van beide is bepalend.
+In the Netherlands, STR/GEO uses expressions (6.10a) and (6.10b)
+(NB Table NB.4 - A1.2(B), group B). The more unfavorable result governs.
 
 ### Partiele factoren (Table NB.4 en NB.5)
 
-Factor K_FI (tabel B3):
+Factor K_FI (Table B3):
 
 #if CC == 1
 K_FI = 0.9
@@ -103,7 +103,7 @@ psi_1 = 0.2
 psi_2 = 0
 #end if
 
-Partiele factoren voor CC2 (Tabel NB.4 - A1.2(B)):
+Partial factors for CC2 (NB Table NB.4 - A1.2(B)):
 
 gamma_Gsup_610a = 1.35
 gamma_Ginf = 0.9
@@ -111,7 +111,7 @@ gamma_Gsup_610b = 1.2
 xi = 0.89
 gamma_Q = 1.5
 
-Gecorrigeerde factoren voor de gevolgklasse uit de projectgegevens:
+Factors adjusted for the consequence class in project settings:
 
 #if CC == 1
 gamma_Gsup_610a_CC = 1.2
@@ -131,29 +131,29 @@ gamma_Q_CC = 1.65
 
 ### Inputs loads (characteristic values)
 
-Blijvende belasting (ongunstig):
+Permanent load (unfavorable):
 
 G_ksup = 10.0 kN
 
-Blijvende belasting (gunstig, indien verschillend):
+Permanent load (favorable, if different):
 
 G_kinf = 10.0 kN
 
-Overheersende veranderlijke belasting:
+Leading variable load:
 
 Q_k1 = 5.0 kN
 
-Gelijktijdig optredende veranderlijke belasting:
+Accompanying variable load:
 
 Q_k2 = 2.0 kN
 
-Psi_0 factor voor Q_k2 (handmatig aanpasbaar):
+Psi_0 factor for Q_k2 (manually adjustable):
 
 psi_0_2 = 0.0
 
 ---
 
-### Vergelijking 6.10a -- all gamma op G, Q met psi_0
+### Expression 6.10a -- full gamma on G, Q with psi_0
 
 Vgl. (6.10a): gamma_G,sup * G_k,sup "+" gamma_Q * psi_0 * Q_k,1 "+" gamma_Q * psi_0,i * Q_k,i
 
@@ -187,18 +187,18 @@ Rekenwaarde belastingseffect E_d = {{E_d}} kN.
 // ---------------------------------------------------------------------------
 
 /** EN 1990 $6.4.2 -- Statisch evenwicht (EQU) */
-export const en1990EQU = `# Toetsing Statisch Equilibrium (EQU) -- EN 1990 $6.4.2
+export const en1990EQU = `# Static equilibrium check (EQU) -- EN 1990 $6.4.2
 ## Table NB.3 - A1.2(A) -- Groep A
 
-Controle of het destabiliserend belastingseffect niet groter is dan
-het stabiliserend belastingseffect (formule 6.7):
+Check that the destabilizing action effect does not exceed
+its stabilizing counterpart (expression 6.7):
 
   E_d,dst <= E_d,stb
 
 ### Partiele factoren EQU (Table NB.3 - A1.2(A))
 
-Opmerking: waarden voor CC2 uit Tabel NB.3. Voor CC1 en CC3 zie
-Tabel NB.5 / Tabel B3.
+Note: CC2 values from NB Table NB.3. For CC1 and CC3, see
+NB Table NB.5 / Table B3.
 
 gamma_Gsup = 1.1
 gamma_Ginf = 0.9
@@ -206,11 +206,11 @@ gamma_Q = 1.5
 
 ### Inputs loads (characteristic values)
 
-Destabiliserende blijvende belasting:
+Destabilizing permanent load:
 
 G_k_dst = 5.0 kN
 
-Stabiliserende blijvende belasting:
+Stabilizing permanent load:
 
 G_k_stb = 8.0 kN
 
@@ -226,11 +226,11 @@ Wind load (psi_0 = 0) = 0
 
 psi_0 = belastingcategorie * 1
 
-Destabiliserende veranderlijke belasting (overheersend):
+Destabilizing variable load (leading):
 
 Q_k1_dst = 3.0 kN
 
-Overige gelijktijdige veranderlijke belasting:
+Other accompanying variable load:
 
 Q_ki_dst = 0.0 kN
 
@@ -246,7 +246,7 @@ E_d_stb = gamma_Ginf * G_k_stb to kN
 
 ---
 
-### Toetsing (formula 6.7): E_d,dst <= E_d,stb
+### Check (expression 6.7): E_d,dst <= E_d,stb
 
 UC_equ = E_d_dst / E_d_stb
 
@@ -272,7 +272,7 @@ Formule (6.11a/b):
 Alle partiele belastingsfactoren gamma = 1,0.
 
 @select type_buitengewoon "Type buitengewone situatie"
-Brand -- psi_1,1 * Q_k,1 (wind in combinatie met brand) = 1
+Fire -- psi_1,1 * Q_k,1 (wind combined with fire) = 1
 Schok/ontploffing -- psi_2,1 * Q_k,1 = 2
 Overige buitengewoon -- psi_1,1 * Q_k,1 = 3
 @end
@@ -318,19 +318,19 @@ psi_2_1 = 0
 
 ### Inputs loads
 
-Blijvende belasting (karakteristiek):
+Permanent load (characteristic):
 
 G_k = 10.0 kN
 
-Buitengewone belasting (rekenwaarde):
+Accidental action (design value):
 
 A_d = 20.0 kN
 
-Overheersende veranderlijke belasting (karakteristiek):
+Leading variable load (characteristic):
 
 Q_k1 = 5.0 kN
 
-Gelijktijdig optredende veranderlijke belasting:
+Accompanying variable load:
 
 Q_k2 = 2.0 kN
 
@@ -364,7 +364,7 @@ Formule (6.12a/b):
   G_k,j "+" P "+" A_Ed "+" SOM(psi_2,i * Q_k,i)
 
 Alle partiele belastingsfactoren gamma = 1,0.
-Alle veranderlijke belastingen met psi_2.
+All variable loads with psi_2.
 
 - A_Ed = aardbevingsbelasting (rekenwaarde), bepaald conform EN 1998.
 
@@ -382,19 +382,19 @@ psi_2_1 = belastingcategorie * 1
 
 ### Inputs loads
 
-Blijvende belasting (karakteristiek):
+Permanent load (characteristic):
 
 G_k = 10.0 kN
 
-Aardbevingsbelasting (rekenwaarde):
+Seismic action (design value):
 
 A_Ed = 15.0 kN
 
-Veranderlijke belasting 1 (karakteristiek):
+Variable load 1 (characteristic):
 
 Q_k1 = 5.0 kN
 
-Veranderlijke belasting 2 (karakteristiek):
+Variable load 2 (characteristic):
 
 Q_k2 = 2.0 kN
 
@@ -415,7 +415,7 @@ Rekenwaarde belastingseffect E_d = {{E_d}} kN.
 export const en1990BGT = `# Belastingcombinaties SLS -- EN 1990 $6.5.3
 ## Bruikbaarheidsgrenstoestanden -- Table A1.4
 
-Drie combinaties voor BGT:
+Three SLS combinations:
 - Karakteristieke combinatie (6.14b): onomkeerbare grenstoestanden
 - Frequente combinatie (6.15b): omkeerbare grenstoestanden
 - Quasi-blijvende combinatie (6.16b): langetermijneffecten
@@ -488,15 +488,15 @@ psi_2 = 0
 
 ### Inputs loads (characteristic values)
 
-Blijvende belasting:
+Permanent load:
 
 G_k = 10.0 kN
 
-Overheersende veranderlijke belasting:
+Leading variable load:
 
 Q_k1 = 5.0 kN
 
-Gelijktijdige veranderlijke belasting:
+Accompanying variable load:
 
 Q_k2 = 2.0 kN
 
@@ -509,7 +509,7 @@ psi_2_2 = 0.0
 
 G_k,j "+" Q_k,1 "+" SOM(psi_0,i * Q_k,i)
 
-Gebruikt voor onomkeerbare grenstoestanden.
+Used for irreversible limit states.
 
 E_kar = G_k + Q_k1 + psi_0_2 * Q_k2 to kN
 
@@ -517,7 +517,7 @@ E_kar = G_k + Q_k1 + psi_0_2 * Q_k2 to kN
 
 G_k,j "+" psi_1,1 * Q_k,1 "+" SOM(psi_2,i * Q_k,i)
 
-Gebruikt voor omkeerbare grenstoestanden.
+Used for reversible limit states.
 
 E_freq = G_k + psi_1 * Q_k1 + psi_2_2 * Q_k2 to kN
 
@@ -525,7 +525,7 @@ E_freq = G_k + psi_1 * Q_k1 + psi_2_2 * Q_k2 to kN
 
 G_k,j "+" SOM(psi_2,i * Q_k,i)
 
-Gebruikt voor langetermijneffecten en uiterlijk.
+Used for long-term effects and appearance.
 
 E_qp = G_k + psi_2 * Q_k1 + psi_2_2 * Q_k2 to kN
 
@@ -639,15 +639,15 @@ gamma_Ginf = 0.9
 
 ### Inputs loads (characteristic values)
 
-Blijvende belasting (ongunstig):
+Permanent load (unfavorable):
 
 G_ksup = 10.0 kN
 
-Overheersende veranderlijke belasting:
+Leading variable load:
 
 Q_k1 = 5.0 kN
 
-Gelijktijdige veranderlijke belasting 2:
+Accompanying variable load 2:
 
 Q_k2 = 2.0 kN
 
@@ -711,7 +711,7 @@ E_qp = G_ksup + psi_2 * Q_k1 + psi_2_2 * Q_k2 to kN
 
 ## Table psi-factoren (Table NB.2 - A1.1)
 
-| Belasting | psi_0 | psi_1 | psi_2 |
+| Load | psi_0 | psi_1 | psi_2 |
 |---|---|---|---|
 | Cat. A woon | 0,4 | 0,5 | 0,3 |
 | Cat. B kantoor | 0,5 | 0,5 | 0,3 |
@@ -745,12 +745,12 @@ E_qp = G_ksup + psi_2 * Q_k1 + psi_2_2 * Q_k2 to kN
 export const en1990GroepC = `# Belastingcombinatie ULS -- EN 1990 Table NB.6 - A1.2(C)
 ## STR/GEO group C -- Geotechnische loads
 
-Groep C wordt gebruikt voor geotechnische belastingen bij:
-- algemene stabiliteit van de fundering
+Group C is used for geotechnical actions involving:
+- overall foundation stability
 - taludstabiliteit
 - damwandberekening
 
-Vergelijking (6.10) met gereduceerde partiele factoren.
+Expression (6.10) with reduced partial factors.
 
 ### Partiele factoren group C (Table NB.6 - A1.2(C))
 
@@ -760,15 +760,15 @@ gamma_Q = 1.3
 
 ### Inputs loads (characteristic values)
 
-Blijvende belasting (ongunstig):
+Permanent load (unfavorable):
 
 G_ksup = 10.0 kN
 
-Overheersende veranderlijke belasting:
+Leading variable load:
 
 Q_k1 = 5.0 kN
 
-Gelijktijdige veranderlijke belasting:
+Accompanying variable load:
 
 Q_k2 = 0.0 kN
 
@@ -787,19 +787,19 @@ Rekenwaarde belastingseffect E_d = {{E_d}} kN.
 
 /** EN 1990 $6.3 -- Rekenwaarden van belastingen en weerstand */
 export const en1990Rekenwaarden = `# Design values -- EN 1990 $6.3
-## Design values van loads, effecten en resistance
+## Design values of loads, effects, and resistance
 
-### Design value van een load ($6.3.1, formula 6.1a)
+### Design value of an action ($6.3.1, expression 6.1a)
 
 - F_d = gamma_f · F_rep
 
-met:
+where:
 
 - F_rep = psi · F_k  (formule 6.1b)
 
 waarbij psi = 1,00 of psi_0, psi_1 of psi_2.
 
-### Design value van belastingseffecten ($6.3.2, formula 6.2)
+### Design value of action effects ($6.3.2, expression 6.2)
 
 - E_d = gamma_Sd · E{ gamma_f,i · F_rep,i ; a_d }
 
@@ -818,7 +818,7 @@ waarbij:
 - eta = omrekeningsfactor
 - gamma_m = partiele materiaalfactor
 
-### Design value van de resistance ($6.3.5, formula 6.6a)
+### Design value of resistance ($6.3.5, expression 6.6a)
 
 - R_d = R{ eta_i · X_k,i / gamma_M,i ; a_d }
 
@@ -844,15 +844,15 @@ BGT (formule 6.13):
 
 ### Inputs for checks
 
-Rekenwaarde belastingseffect:
+Design action effect:
 
 E_d = 100 kN
 
-Rekenwaarde weerstand:
+Design resistance:
 
 R_d = 120 kN
 
-### Toetsing (formula 6.8)
+### Check (expression 6.8)
 
 UC = E_d / R_d
 
@@ -871,8 +871,8 @@ UC = E_d / R_d
 export const en1990Referentieperiode = `# Reference period adjustment -- EN 1990 NB, formula NB.1
 ## Aanpassen characteristic value variable load
 
-Indien de ontwerplevensduur afwijkt van 50 jaar, moet de karakteristieke
-waarde van gelijkmatig verdeelde veranderlijke belastingen worden aangepast
+If the design working life differs from 50 years, the characteristic
+value of uniformly distributed variable loads must be adjusted
 (NEN-EN 1990 NB, art. A1.1(2)).
 
 Formule NB.1:
@@ -896,7 +896,7 @@ Category E -- opslag (psi_0 = 1.0) = 1.0
 
 psi_0 = belastingcategorie * 1
 
-Referentieperiode bij de gekozen ontwerplevensduur (in jaren):
+Reference period for the selected design working life (years):
 
 t = ontwerplevensduurklasse * 1
 
@@ -904,7 +904,7 @@ Basisreferentieperiode (standaard, in jaren):
 
 t_0 = 50
 
-Karakteristieke waarde bij basisreferentieperiode:
+Characteristic value for the base reference period:
 
 F_t0 = 5.0 kN/m^2
 
@@ -921,11 +921,11 @@ factor = F_t / F_t0
 #end if
 
 #if t < 50
-  De referentieperiode is korter dan 50 jaar: de belasting wordt verlaagd.
+  The reference period is shorter than 50 years: the load is reduced.
 #end if
 
 #if t > 50
-  De referentieperiode is langer dan 50 jaar: de belasting wordt verhoogd.
+  The reference period is longer than 50 years: the load is increased.
 #end if
 `;
 

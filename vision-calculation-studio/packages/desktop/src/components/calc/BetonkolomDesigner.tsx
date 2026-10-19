@@ -181,7 +181,7 @@ export default function BetonkolomDesigner() {
                 onChange={(e) => set("s_beugel", parseFloat(e.target.value))} />
             </span>
           </label>
-          <span className="gd-note">{nTot} staven Ø{fmt(dS)} → A<sub>s</sub> = {fmt(As)} mm² · ρ = {fmt(rho, 2)} %.</span>
+          <span className="gd-note">{nTot} bars Ø{fmt(dS)} → A<sub>s</sub> = {fmt(As)} mm² · ρ = {fmt(rho, 2)} %.</span>
 
           <span className="vd-ctrl-h">Buckling (mm)</span>
           <label>L<sub>0,y</sub>
@@ -285,7 +285,7 @@ export default function BetonkolomDesigner() {
           <br />Corner bars are counted once; stirrups are shown at their actual spacing.</span>
         <span className="vd-live">
           {BETONLABEL[fck]} · {STAALSOORT.find((o) => o.v === staal)?.label} ·
-          {vorm === 2 ? ` Ø${fmt(h)}` : ` ${fmt(b)}×${fmt(h)}`} mm · L = {fmt(L)} mm · dekking {fmt(c)} mm ·
+          {vorm === 2 ? ` Ø${fmt(h)}` : ` ${fmt(b)}×${fmt(h)}`} mm · L = {fmt(L)} mm · cover {fmt(c)} mm ·
           {nTot}Ø{fmt(dS)} → A<sub>s</sub> = {fmt(As)} mm² ({fmt(rho, 2)} %) · Ø{fmt(dBg)}-{fmt(sBg)} ·
           λ<sub>y</sub>/λ<sub>z</sub> = {fmt(lamY)}/{fmt(lamZ)} · N<sub>Ed</sub> = {fmt(NEd)} kN ·
           M<sub>y</sub>/M<sub>z</sub> = {fmt(MyEd)}/{fmt(MzEd)} kNm{insitu ? " · cast-in-place pile" : ""}

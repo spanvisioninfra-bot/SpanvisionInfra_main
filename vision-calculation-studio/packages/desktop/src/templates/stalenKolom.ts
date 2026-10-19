@@ -10,11 +10,7 @@
 
 export const stalenKolom = `"Steel column — buckling en bending (EN 1993-1-1 §6.3)
 
-'<i>Een op druk en buiging belaste kolom. De drie kniklengtes worden apart
-'ingevoerd: L<sub>cr,y</sub> en L<sub>cr,z</sub> voor buigknik om de sterke en de
-'zwakke as, en L<sub>cr</sub> voor de ongesteunde lengte die het kipgedrag
-'bepaalt. De knikvorm (wel of niet verplaatsbare knopen) bepaalt de
-'knikfactor.</i>
+'<i>A column under compression and bending. Enter three buckling lengths separately: L<sub>cr,y</sub> and L<sub>cr,z</sub> for flexural buckling about the strong and weak axes, and L<sub>cr</sub> for the unrestrained length governing lateral-torsional buckling. Sway or non-sway behavior determines the buckling factor.</i>
 
 # 1. Section en geometrie
 
@@ -62,17 +58,17 @@ export const stalenKolom = `"Steel column — buckling en bending (EN 1993-1-1 �
 L_kolom = ?*(mm)', kolomlengte L'
 L_cry = ?*(mm)', kniklengte om de y-as L_cr,y'
 L_crz = ?*(mm)', kniklengte om de z-as L_cr,z'
-L_cr = ?*(mm)', ongesteunde lengte L_cr (kip)'
+L_cr = ?*(mm)', unrestrained length L_cr (lateral-torsional buckling)'
 
 # 2. Loads
 
-N_Ed = ?*(kN)', normaalkracht N_Ed (druk positief)'
+N_Ed = ?*(kN)', axial force N_Ed (compression positive)'
 M_yA = ?*(kN*m)', moment aan de bovenzijde M_yA,Ed'
 M_yB = ?*(kN*m)', moment aan de onderzijde M_yB,Ed'
-q_z = ?*(kN/m)', verdeelde belasting loodrecht op de kolom q_z,Ed'
+q_z = ?*(kN/m)', distributed load perpendicular to the column q_z,Ed'
 z_aangrijp = ?*(mm)', aangrijpingspunt z, gemeten vanaf de bovenkant'
 
-'<h6>Overzicht van de invoer</h6>
+'<h6>Input summary</h6>
 L_kolom
 L_cry
 L_crz
@@ -82,10 +78,7 @@ M_yA
 M_yB
 q_z
 
-# 3. Toetsing
+# 3. Checks
 
-'<i><b>Nog niet uitgewerkt.</b> Dit blad legt voorlopig alleen de invoer en het
-'parametrische beeld vast. De doorsnedeklasse, N<sub>b,Rd</sub> met de
-'knikkrommen van tabel 6.2, het kipmoment M<sub>b,Rd</sub> en de
-'N-M-interactie (6.61)/(6.62) met de k-factoren uit bijlage B volgen.</i>
+'<i><b>Not yet implemented.</b> This sheet defines inputs and a parametric drawing only. Section class, N<sub>b,Rd</sub> with Table 6.2 buckling curves, lateral-torsional resistance M<sub>b,Rd</sub>, and N-M interaction (6.61)/(6.62) with Annex B k factors are planned.</i>
 `;

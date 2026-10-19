@@ -45,11 +45,11 @@ function assertUniqueSourceIds(rows: readonly XerRow[], table: 'RSRC' | 'ROLES',
   for (const row of rows) {
     const sourceId = row.cells[field]?.trim() ?? '';
     if (!sourceId) throw new XerImportError('XER_MISSING_REQUIRED_VALUE',
-      `${table}.${field} bevat een lege bronidentiteit op regel ${row.line}.`,
+      `${table}.${field} contains an empty source identity on line ${row.line}.`,
       { table, field, missingValues: [field], line: row.line });
     const firstLine = firstLineById.get(sourceId);
     if (firstLine !== undefined) throw new XerImportError('XER_DUPLICATE_ID',
-      `${table}.${field} bevat dubbele id '${sourceId}' op regels ${firstLine} and ${row.line}.`,
+      `${table}.${field} contains duplicate id '${sourceId}' on lines ${firstLine} and ${row.line}.`,
       { table, field, line: row.line, lines: [firstLine, row.line] });
     firstLineById.set(sourceId, row.line);
   }

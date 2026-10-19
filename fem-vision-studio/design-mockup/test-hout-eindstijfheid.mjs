@@ -144,10 +144,10 @@ log("\n[1] De bepaling");
   // test-hout-bgt-eindtoestand.mjs.
   ok("twee meldingen: UGT en BGT doorgerekend",
     u.meldingen.length === 2 &&
-    u.meldingen[0].tekst.startsWith("Eindstijfheid hout doorgerekend (UGT).") &&
-    u.meldingen[1].tekst.startsWith("Eindstijfheid hout doorgerekend (BGT).") &&
+    u.meldingen[0].tekst.startsWith("Timber final stiffness calculated (ULS).") &&
+    u.meldingen[1].tekst.startsWith("Timber final stiffness calculated (SLS).") &&
     u.meldingen.every((x) => x.caseId === null && x.niveau === "waarschuwing"));
-  ok("de melding noemt 2.2.3(5), 2.10 en de delen", /2\.2\.3\(5\)/.test(u.meldingen[0].tekst) && /2\.10/.test(u.meldingen[0].tekst) && /staaf 1/.test(u.meldingen[0].tekst) && /staaf 2/.test(u.meldingen[0].tekst));
+  ok("de melding noemt 2.2.3(5), 2.10 en de delen", /2\.2\.3\(5\)/.test(u.meldingen[0].tekst) && /2\.10/.test(u.meldingen[0].tekst) && /member 1/.test(u.meldingen[0].tekst) && /member 2/.test(u.meldingen[0].tekst));
 
   const scharnier = tweeVelden({ veld1: { material: "C24", profile: "100x300", releases: { endRy: true } } });
   const us = bepaalEindstijfheidHout(scharnier);
@@ -161,12 +161,12 @@ log("\n[1] De bepaling");
     klimaat.status === "doorrekenen" && klimaat.kDefPerStaaf.get(1) === 0.6 && klimaat.kDefPerStaaf.get(2) === 0.8);
 
   const clt = bepaalEindstijfheidHout(tweeVelden({ veld2: { material: "C24", profile: "CLT 40/20/40/20/40" } }));
-  ok("kruislaaghout zonder k_def → alleen melding, geen doorrekening", clt.status === "alleenMelding" && /k_def niet bekend/.test(clt.meldingen[0]?.tekst ?? ""), clt.reden);
+  ok("kruislaaghout zonder k_def → alleen melding, geen doorrekening", clt.status === "alleenMelding" && /k_def is unknown/.test(clt.meldingen[0]?.tekst ?? ""), clt.reden);
   const cltMet = bepaalEindstijfheidHout(tweeVelden({ veld2: { material: "C24", profile: "CLT 40/20/40/20/40", checkConfig: { cltKdef: 0.6, cltKdefBron: "ETA" } } }));
   ok("kruislaaghout met k_def = 0,6 naast C24 klimaatklasse 1 → één kruipgedrag → nvt", cltMet.status === "nvt", cltMet.reden);
 
   const tweede = bepaalEindstijfheidHout(tweeVelden({ extra: { analysetype: "tweedeOrdeGeometrisch" } }));
-  ok("tweede orde → alleen melding (2.2.2(1)P derde streepje)", tweede.status === "alleenMelding" && /derde streepje/.test(tweede.meldingen[0]?.tekst ?? ""));
+  ok("tweede orde → alleen melding (2.2.2(1)P derde streepje)", tweede.status === "alleenMelding" && /third bullet/.test(tweede.meldingen[0]?.tekst ?? ""));
 
   const enkel = tweeVelden();
   enkel.nodes = enkel.nodes.slice(0, 2); enkel.beams = enkel.beams.slice(0, 1); enkel.supports = [{ nodeId: 1, type: "pinned" }, { nodeId: 2, type: "zRoller" }];
@@ -175,7 +175,7 @@ log("\n[1] De bepaling");
 
   const beton = bepaalEindstijfheidHout(tweeVelden({ veld2: { material: "C30/37", profile: "300x500" } }));
   ok("hout + beton → doorrekenen, met de kanttekening dat beton E_cm houdt",
-    beton.status === "doorrekenen" && /Beton houdt in de eindtoestand E_cm/.test(beton.meldingen[0].tekst));
+    beton.status === "doorrekenen" && /Concrete retains E_cm/.test(beton.meldingen[0].tekst));
 
   const veren = bepaalEindstijfheidHout(tweeVelden({
     veld1: { material: "C24", profile: "100x300" },
@@ -189,7 +189,7 @@ log("\n[1] De bepaling");
 
   const vrij = bepaalEindstijfheidHout(tweeVelden({ veld2: { material: "VRIJ:steen E=20000 rho=2000 f=5", profile: "100x300" } }));
   ok("hout + vrij materiaal → doorrekenen, vrij materiaal houdt zijn E (gemeld)",
-    vrij.status === "doorrekenen" && /Vrij of niet herkend materiaal houdt zijn opgegeven E/.test(vrij.meldingen[0].tekst), vrij.reden);
+    vrij.status === "doorrekenen" && /Custom or unrecognized material retains its specified E/.test(vrij.meldingen[0].tekst), vrij.reden);
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -210,7 +210,7 @@ log("\n[2] ψ₂ en de varianten");
   ok("3 combinaties → 6: twee varianten voor combinatie 1, één voor 2, geen voor de BGT", lijst.length === 6);
   ok("volgorde en id's",
     alsJson(lijst.map((c) => c.id)) === alsJson([1, 1 + 30 * EINDTOESTAND_COMBO_OFFSET, 1 + 100 * EINDTOESTAND_COMBO_OFFSET, 2, 2 + 100 * EINDTOESTAND_COMBO_OFFSET, 3]));
-  ok("naam en kenmerk", lijst[1].name === "1,2G+1,5Q (eindtoestand ψ₂ = 0,3)" && lijst[1].eindtoestand?.psi2 === 0.3 && lijst[1].factors === lijst[0].factors);
+  ok("naam en kenmerk", lijst[1].name === "1,2G+1,5Q (final state ψ₂ = 0,3)" && lijst[1].eindtoestand?.psi2 === 0.3 && lijst[1].factors === lijst[0].factors);
   ok("grootste id past in een u32 van de rekenkern", Math.max(...lijst.map((c) => c.id)) < 2 ** 32);
 
   const nvt = { status: "nvt" };
@@ -281,7 +281,7 @@ log("\n[6] Een variant zonder eindtoestand is een fout");
   const { perCase } = solveAllCases(bouwMultiInput(tweeVelden()));
   let fout = null;
   try { combineResults(combos[1], perCase); } catch (e) { fout = String(e.message); }
-  ok("combineResults gooit met een Nederlandse reden", fout !== null && /niet doorgerekend/.test(fout), fout ?? "geen fout");
+  ok("combineResults gives an English reason", fout !== null && /has not been calculated/.test(fout), fout ?? "geen fout");
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -309,7 +309,7 @@ log("\n[8] De MCP-weg (sidecar `solve`)");
   const sleutel = String(1 + 100 * EINDTOESTAND_COMBO_OFFSET);
   ok("variant 1,2G+1,5Q ψ₂ = 1 in `combinations`", combos[sleutel] !== undefined, Object.keys(combos).join(","));
   const w = r.warnings ?? [];
-  ok("meldingen in `warnings`", w.some((x) => x.startsWith("Eindstijfheid hout doorgerekend (UGT).")) && w.some((x) => x.startsWith("Eindstijfheid hout doorgerekend (BGT).")), w.join(" | ").slice(0, 300));
+  ok("meldingen in `warnings`", w.some((x) => x.startsWith("Timber final stiffness calculated (ULS).")) && w.some((x) => x.startsWith("Timber final stiffness calculated (SLS).")), w.join(" | ").slice(0, 300));
 }
 
 log(`\n${passed} geslaagd, ${failed} mislukt`);

@@ -6,9 +6,9 @@ export const northTemplate = {
   category: 'NEN1414',
   defaultSize: { width: 80, height: 80 },
   params: [
-    { key: 'bearing', label: 'Hoek (°)', labelEn: 'Bearing (°)', type: 'number', default: 0, min: 0, max: 359, step: 1, unit: '°' },
-    { key: 'showCircle', label: 'Toon cirkel', labelEn: 'Show circle', type: 'boolean', default: true },
-    { key: 'showLabel', label: 'Toon N', labelEn: 'Show N label', type: 'boolean', default: true },
+    { key: 'bearing', label: "Angle (°)", labelEn: 'Bearing (°)', type: 'number', default: 0, min: 0, max: 359, step: 1, unit: '°' },
+    { key: 'showCircle', label: 'Show circle', labelEn: 'Show circle', type: 'boolean', default: true },
+    { key: 'showLabel', label: 'Show N', labelEn: 'Show N label', type: 'boolean', default: true },
   ],
   render(params, bbox) {
     const cmds = [];

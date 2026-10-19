@@ -52,7 +52,7 @@ export async function readPoolIFC(content: string): Promise<CompanyPool> {
   // (zie ImportLabels).
   const result = await readIFCWithXerReconstruction(content);
   if (!result.libraryPool) {
-    throw new Error('Dit IFC-bestand bevat geen bedrijfsbibliotheek (OPS_Library).');
+    throw new Error('This IFC file does not contain a company library (OPS_Library).');
   }
   const raw = result.libraryPool as Partial<CompanyPool>;
   const cid = typeof raw?.companyId === 'string' && raw.companyId ? raw.companyId : '';

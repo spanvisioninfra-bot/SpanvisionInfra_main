@@ -45,7 +45,7 @@ export function pickLocalized(nameObj, lang) {
 //     sectors: ['aec', …], collections: { id: meta } }
 export function parseLibraryIndex(raw) {
   if (!raw || raw.formatVersion !== 1 || !Array.isArray(raw.regions)) {
-    throw new Error('Onbekend indexformaat van de symboolbibliotheek');
+    throw new Error('Unknown symbol library index format');
   }
   const countries = [];
   const sectorIds = new Set();

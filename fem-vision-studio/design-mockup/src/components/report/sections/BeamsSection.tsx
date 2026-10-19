@@ -95,22 +95,22 @@ export default function BeamsSection() {
 
   return (
     <div className="rpt-block">
-      <h2 className="rpt-h2">{t("report.sectionBeams", "Staven")}</h2>
+      <h2 className="rpt-h2">{t("report.sectionBeams", "Members")}</h2>
 
       {sorted.length === 0 ? (
         <p className="rpt-empty-note">
-          {t("report.noBeams", "Geen staven in het model.")}
+          {t("report.noBeams", "No members in the model.")}
         </p>
       ) : (
         <table className="rpt-table">
           <thead>
             <tr>
               <th>{t("report.colId", "Id")}</th>
-              <th>{t("report.colNodes", "Knopen")}</th>
-              <th className="rpt-num">{t("report.colLength", "Lengte [m]")}</th>
-              <th>{t("report.colMaterial", "Materiaal")}</th>
-              <th>{t("report.colProfile", "Profiel")}</th>
-              <th>{t("report.colHinges", "Scharnieren")}</th>
+              <th>{t("report.colNodes", "Nodes")}</th>
+              <th className="rpt-num">{t("report.colLength", "Length [m]")}</th>
+              <th>{t("report.colMaterial", "Material")}</th>
+              <th>{t("report.colProfile", "Section")}</th>
+              <th>{t("report.colHinges", "Releases")}</th>
               {anyCheckConfig && (
                 <th>{t("report.colCheckConfig", "Toetsconfiguratie")}</th>
               )}

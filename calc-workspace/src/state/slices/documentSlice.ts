@@ -16,7 +16,7 @@ function makeEmptyDoc(overrides?: Partial<DocumentTab>): DocumentTab {
   return {
     id: crypto.randomUUID(),
     filePath: null,
-    fileName: 'Nieuwe begroting',
+    fileName: 'New estimate',
     isModified: false,
     items: [],
     schedule: createDefaultSchedule(),

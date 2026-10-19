@@ -96,7 +96,7 @@ function parseProjectXml(content: string): OpenedImport {
   const flavor = detectXmlFlavor(content);
   if (flavor === 'p6') return readP6XML(content);
   if (flavor === 'mspdi') return readMSPDI(content);
-  throw new Error('Onbekend XML-formaat: het root-element is geen MS Project- (Project) of Primavera P6-planning (APIBusinessObjects)');
+  throw new Error('Unknown XML format: the root element is neither MS Project (Project) nor a Primavera P6 schedule (APIBusinessObjects)');
 }
 
 /**

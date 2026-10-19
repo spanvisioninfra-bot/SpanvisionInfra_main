@@ -15,9 +15,9 @@
 /** EN 1991-1-1 -- Opgelegde belastingen op vloeren en daken */
 export const en1991Gebruiksbelasting = `# Opgelegde Loads -- EN 1991-1-1 NB Table NB.1-6.2
 
-## Gebruikscategorie
+## Occupancy category
 
-@select gebruikscategorie "Gebruikscategorie (Table 6.1 / NB.1-6.2)"
+@select gebruikscategorie "Occupancy category (Table 6.1 / NB.1-6.2)"
 A -- Woonfunctie, gemeenschappelijk (qk=3.0, Qk=3.0) = 1
 A -- Woonfunctie, not-gemeenschappelijk (qk=1.75, Qk=3.0) = 2
 A -- Trappen woonfunctie (qk=2.0, Qk=3.0) = 3
@@ -26,7 +26,7 @@ B -- Kantoorfunctie (qk=2.5, Qk=3.0) = 5
 B -- Omsloten verkeersruimte kantoor (qk=3.0, Qk=3.0) = 6
 C1 -- Tafels, stoelen, vrije loop (qk=4.0, Qk=3.0) = 7
 C2 -- Vaste zitplaatsen (qk=4.0, Qk=7.0) = 8
-C3 -- Vrij van obstakels, expositie (qk=5.0, Qk=7.0) = 9
+C3 -- Unobstructed areas, exhibitions (qk=5.0, Qk=7.0) = 9
 C4 -- Lichamelijke activiteiten (qk=5.0, Qk=7.0) = 10
 C5 -- Grote menigten (qk=5.0, Qk=7.0) = 11
 D -- Omsloten verkeersruimte winkel (qk=4.0, Qk=7.0) = 12
@@ -34,7 +34,7 @@ D1 -- Kleinhandel, detailhandel (qk=4.0, Qk=7.0) = 13
 D2 -- Warenhuizen (qk=4.0, Qk=7.0) = 14
 @end
 
-Gelijkmatig verdeelde belasting q_k (NB Tabel NB.1-6.2):
+Uniformly distributed load q_k (NB Table NB.1-6.2):
 
 #if gebruikscategorie == 1
 q_k = 3.0 kN/m^2
@@ -140,12 +140,12 @@ Q_dak = 0 kN
 
 ## Result
 
-Totale opgelegde belasting (vloer + scheidingswand):
+Total imposed load (floor + partition):
 
 q_totaal = q_k + q_sw to kN/m^2
 
 Opmerking: reductiefactor alpha_A (formule 6.1) is in de Nederlandse NB
-NIET toegestaan voor reductie van q_k.
+NOT permitted for reduction of q_k.
 `;
 
 // ---------------------------------------------------------------------------
@@ -155,22 +155,22 @@ NIET toegestaan voor reductie van q_k.
 /** EN 1991-1-3 -- Sneeuwbelasting (Nederland) */
 export const en1991Sneeuwbelasting = `# Snow load -- EN 1991-1-3 NB
 
-## Grondsneeuwbelasting (art. 4.1, NB)
+## Ground snow load (art. 4.1, NB)
 
-Karakteristieke waarde grondsneeuwbelasting voor Nederland:
+Characteristic ground snow load for the Netherlands:
 
 s_k = 0.7 kN/m^2
 
-Opmerking: voor alle locaties in Nederland geldt dezelfde waarde.
+Note: the same value applies throughout the Netherlands.
 - psi_0 = 0.50, psi_1 = 0.20, psi_2 = 0.00 (H <= 1000 m).
 
 ## Blootstellings- en warmtecoefficient (art. 5.2)
 
-Blootstellingscoefficient (NB: voor alle locaties in NL):
+Exposure coefficient (NB: all locations in NL):
 
 C_e = 1.0
 
-Warmtecoefficient (NB: voor alle gebouwen in NL):
+Thermal coefficient (NB: all buildings in NL):
 
 C_t = 1.0
 
@@ -191,7 +191,7 @@ Voer de dakhelling in:
 
 alpha = 40 graden
 
-Sneeuwbelastingsvormcoefficient (lineair, Tabel 5.2):
+Snow load shape coefficient (linear, Table 5.2):
 
 mu_1 = 0.8 * (60 - alpha) / 30
 #end if
@@ -200,7 +200,7 @@ mu_1 = 0.8 * (60 - alpha) / 30
 mu_1 = 0.0
 #end if
 
-## Snow load op het dak (formula 5.1)
+## Roof snow load (expression 5.1)
 
 Sneeuwbelasting (normale ontwerpsituatie):
 
@@ -209,7 +209,7 @@ s = mu_1 * C_e * C_t * s_k to kN/m^2
 ## Sneeuwophoping (meerzijdig dak, Table 5.2)
 
 @select ophoping "Sneeuwophoping (meerzijdig dak)"
-Not van application (enkelvoudig dak) = 0
+Not applicable (single-span roof) = 0
 Meerzijdig dak (mu_2 calculate) = 1
 @end
 
@@ -229,14 +229,14 @@ alpha_2 = 40 graden
 mu_2 = 0.8 * (60 - alpha_2) / 30
 #end if
 
-Sneeuwbelasting bij ophoping:
+Snow load with accumulation:
 
 s_2 = mu_2 * C_e * C_t * s_k to kN/m^2
 #end if
 
 ## Summary
 
-De maatgevende sneeuwbelasting op het dak bedraagt:
+The governing roof snow load is:
 
 s_maatgevend = s to kN/m^2
 `;
@@ -250,9 +250,9 @@ export const en1991Windbelasting = `# Wind load -- EN 1991-1-4 NB
 
 ## Wind region (Table NB.1)
 
-Het windgebied staat in de projectgegevens; het volgt uit de gemeente.
+The wind region is set in project settings, based on the municipality.
 
-Fundamentele waarde basiswindsnelheid (Tabel NB.1):
+Fundamental basic wind velocity (NB Table NB.1):
 
 #if windgebied == 1
 v_b0 = 29.5 m/s
@@ -289,7 +289,7 @@ q_b = 0.5 * rho * v_b^2 to kN/m^2
 ## Terreinruwheid (Table NB.3-4.1)
 
 De terreincategorie staat in de projectgegevens; die volgt uit de omgeving
-van het gebouw.
+of the building.
 
 Terreinparameters:
 
@@ -308,7 +308,7 @@ z_min = 7 m
 
 ## Referentiehoogte
 
-Hoogte boven maaiveld:
+Height above ground:
 
 z = 10 m
 
@@ -373,12 +373,12 @@ cs_cd = 1.05
 #if bouwwerkfactor == 3
 cs_cd = 1.0
 
-Opmerking: bepaal cs_cd volgens bijlage C van de NB.
+Note: determine cs_cd per Annex C of the NB.
 #end if
 
-## Winddruk op planes (art. 5.2)
+## Wind pressure on surfaces (art. 5.2)
 
-Uitwendige drukcoefficient (Hoofdstuk 7, afhankelijk van vlakindeling):
+External pressure coefficient (Chapter 7, depending on surface zones):
 
 @select zone_cpe "Zone uitwendige drukcoefficient c_pe"
 Wand: zone D loefzijde (c_pe = +0.8) = 0.8
@@ -410,7 +410,7 @@ w_i = q_p * c_pi to kN/m^2
 
 ## Netto winddruk
 
-Netto winddruk op het vlak (uitwendig - inwendig):
+Net surface wind pressure (external - internal):
 
 w_net = w_e - w_i to kN/m^2
 
@@ -426,7 +426,7 @@ F_w = cs_cd * q_p * c_pe * A_ref to kN
 
 ## Summary
 
-| Parameter | Waarde |
+| Parameter | Value |
 |---|---|
 | v_b0 | {{v_b0}} m/s |
 | v_b | {{v_b}} m/s |

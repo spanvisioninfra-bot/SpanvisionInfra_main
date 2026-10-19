@@ -112,7 +112,7 @@ export function deserializeProject(json: string): ProjectFile {
   const appMajor = parseInt(FILE_FORMAT_VERSION.split('.')[0], 10);
   if (!isNaN(fileMajor) && fileMajor > appMajor) {
     throw new Error(
-      `Dit bestand gebruikt een nieuwer .ifcCalc-formaat (${parsed.version}) dan deze app ondersteunt (t/m ${FILE_FORMAT_VERSION}). Werk ${BRAND.product} bij om het te openen.`
+      `This file uses a newer .ifcCalc format (${parsed.version}) than this app supports (up to ${FILE_FORMAT_VERSION}). Werk ${BRAND.product} to open it.`
     );
   }
 

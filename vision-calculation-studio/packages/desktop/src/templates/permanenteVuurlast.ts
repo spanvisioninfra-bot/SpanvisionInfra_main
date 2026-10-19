@@ -25,21 +25,17 @@
  *   Beton, staal, gips           0    MJ/kg (niet brandbaar)
  */
 
-export const permanenteVuurlast = `"Permanent fire load — bepaling NEN 6090
+export const permanenteVuurlast = `"Permanent fire load — assessment per NEN 6090
 
-'<i>De permanente vuurlast q<sub>f,k</sub> drukt de energie-inhoud uit
-'van vaste brandbare bouwdelen per m² gebruiksoppervlak. Inventaris
-'en gebruikersbelasting (variabele vuurlast) wordt apart bepaald.</i>
+'<i>Permanent fire load q<sub>f,k</sub> expresses the energy content of fixed combustible building components per m² of usable floor area. Contents and occupancy loads (variable fire load) are assessed separately.</i>
 
 # 1. Gebruiksoppervlak brandcompartiment
 
-A_v = ?*(m^2)', gebruiksoppervlak A_v (m²) van het brandcompartiment'
+A_v = ?*(m^2)', usable floor area A_v (m²) of the fire compartment'
 
 # 2. Brandbare materials — massa's
 
-'<i>Vul per materiaalcategorie de totale massa in (kg) die zich
-'permanent in het brandcompartiment bevindt. Een ruwe schatting via
-'volume × dichtheid is veelal voldoende — zie sectie 5.</i>
+'<i>Enter the total mass in kg permanently present in the fire compartment for each material category. A volume × density estimate is often sufficient; see section 5.</i>
 
 m_hout = ?*(kg)', constructiehout + houten finishes + plaatmateriaal (kg)'
 m_pir = ?*(kg)', PUR / PIR-isolatie (kg)'
@@ -49,7 +45,7 @@ m_pvc = ?*(kg)', PVC-houdende leidingen + kunststof afwerking (kg)'
 m_pe = ?*(kg)', PE / PP-leidingen + kunststof folie (kg)'
 
 m_overig = ?*(kg)', overige brandbare materialen (kg)'
-H_u_overig = ?*(MJ/kg)', calorische waarde overige (MJ/kg)'
+H_u_overig = ?*(MJ/kg)', calorific value of other materials (MJ/kg)'
 
 # 3. Calorische values (NEN 6090 Table A.1)
 
@@ -62,23 +58,11 @@ H_u_pvc = 17 MJ/kg
 H_u_pe = 43 MJ/kg
 #show
 
-'<table style="width:auto; border-collapse:collapse; font-size:0.9em;">
-'<tr><td style="padding:2px 12px;"><b>Materiaal</b></td><td style="padding:2px 12px;"><b>H<sub>u</sub> [MJ/kg]</b></td></tr>
-'<tr><td>Hout & cellulose</td><td>17,5</td></tr>
-'<tr><td>PUR / PIR</td><td>26</td></tr>
-'<tr><td>EPS / XPS</td><td>40</td></tr>
-'<tr><td>Bitumen</td><td>38</td></tr>
-'<tr><td>PVC</td><td>17</td></tr>
-'<tr><td>PE / PP</td><td>43</td></tr>
-'<tr><td>Steen-/glaswol, beton, staal, gips</td><td>0 (niet brandbaar)</td></tr>
-'</table>
+'<table style="width:auto; border-collapse:collapse; font-size:0.9em;"><tr><td style="padding:2px 12px;"><b>Material</b></td><td style="padding:2px 12px;"><b>H<sub>u</sub> [MJ/kg]</b></td></tr><tr><td>Timber and cellulose</td><td>17.5</td></tr><tr><td>PUR / PIR</td><td>26</td></tr><tr><td>EPS / XPS</td><td>40</td></tr><tr><td>Bitumen</td><td>38</td></tr><tr><td>PVC</td><td>17</td></tr><tr><td>PE / PP</td><td>43</td></tr><tr><td>Mineral/glass wool, concrete, steel, gypsum</td><td>0 (non-combustible)</td></tr></table>
 
 # 4. Verbrandingsfactor ψ
 
-'<i>De verbrandingsfactor ψ corrigeert voor onvolledige verbranding
-'(typisch ψ = 1.0 voor cellulose-houdende materialen). NEN 6090 staat
-'ψ = 0.8 toe voor matig brandbare materialen, maar voor permanente
-'vuurlast geldt veelal ψ = 1.0 conservatief.</i>
+'<i>Combustion factor ψ accounts for incomplete combustion, typically ψ = 1.0 for cellulose-containing materials. NEN 6090 permits ψ = 0.8 for moderately combustible materials; ψ = 1.0 is commonly adopted conservatively for permanent fire load.</i>
 
 #hide
 ψ = 1.0
@@ -102,14 +86,9 @@ Q_totaal = Q_hout + Q_pir + Q_eps + Q_bitumen + Q_pvc + Q_pe + Q_overig
 
 q_f,k = Q_totaal/A_v
 
-# 7. Toetsing aan grenswaarde
+# 7. Check against the limit
 
-'<i>De grenswaarde van q<sub>f,k</sub> volgt uit de
-'compartimenteringsgrootte en de vereiste brandwerendheid van de
-'scheidingsconstructies (Bouwbesluit / Bbl). Een veelgebruikte
-'praktijkdrempel voor lichte gebouwfuncties (wonen, kantoor): ca. 500
-'MJ/m². Voor industrie/opslag kunnen waarden tot 1000-3000 MJ/m²
-'voorkomen waarbij hogere brandwerendheidseisen nodig zijn.</i>
+'<i>The q<sub>f,k</sub> limit depends on compartment size and required fire resistance of separating construction under the Dutch Bouwbesluit/Bbl. The worksheet cites an approximate practical threshold of 500 MJ/m² for light residential/office use, and 1000–3000 MJ/m² for industrial/storage use with higher fire-resistance requirements.</i>
 
 @select gebouwfunctie "Gebouwfunctie (typische grenswaarde)"
   Wonen (≤ 500 MJ/m²) = 500
@@ -125,39 +104,14 @@ q_grens = gebouwfunctie*MJ/m^2
 UC_vuurlast = q_f,k/q_grens
 
 #if UC_vuurlast ≤ 1.0
-    'UC = q<sub>f,k</sub>/q<sub>grens</sub> = 'UC_vuurlast'<span style="color:green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC = q<sub>f,k</sub>/q<sub>grens</sub> = 'UC_vuurlast'<span style="color:green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC = q<sub>f,k</sub>/q<sub>grens</sub> = 'UC_vuurlast'<span style="color:red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC = q<sub>f,k</sub>/q<sub>grens</sub> = 'UC_vuurlast'<span style="color:red"> > 1.0 → <b>Fails</b></span>
 #end if
 
-# 8. Schatting van massa's (hulp)
+# 8. Mass estimates (helper)
 
-'<i>Vereenvoudigde schattingsregels voor gangbare bouwdelen:</i>
-'<ul>
-'<li><b>Hout</b> — dichtheid ρ ≈ 450 kg/m³. Een HSB-stijl 95×45 h.o.h.
-'600 mm in een wand van 2,5 m hoog: ca. 7 kg/m² wandoppervlak. Een
-'houten balklaag 50×200 h.o.h. 600 mm: ca. 7,5 kg/m² vloeroppervlak.
-'Triplex 18 mm: ca. 8 kg/m². Parket eiken 14 mm: ca. 10 kg/m².</li>
-'<li><b>PUR/PIR</b> — ρ ≈ 35 kg/m³. Per 100 mm isolatie: 3,5 kg/m².</li>
-'<li><b>EPS</b> — ρ ≈ 20 kg/m³. Per 100 mm: 2,0 kg/m².</li>
-'<li><b>Bitumen dakbedekking</b> — 2-laags APP: ca. 5-8 kg/m² dak.</li>
-'<li><b>PVC</b> — riolering Ø110 mm wanddikte 3,2 mm: ca. 1,7 kg/m¹.</li>
-'</ul>
+'<i>Simplified mass estimates for common building components:</i><ul><li><b>Timber</b>, ρ ≈ 450 kg/m³: 95×45 studs at 600 mm spacing in a 2.5 m wall give about 7 kg/m² of wall; 50×200 joists at 600 mm give about 7.5 kg/m² of floor; 18 mm plywood about 8 kg/m²; 14 mm oak parquet about 10 kg/m².</li><li><b>PUR/PIR</b>, ρ ≈ 35 kg/m³: 3.5 kg/m² per 100 mm insulation.</li><li><b>EPS</b>, ρ ≈ 20 kg/m³: 2.0 kg/m² per 100 mm.</li><li><b>Bitumen roofing</b>, two-layer APP: about 5–8 kg/m².</li><li><b>PVC</b> drainage pipe Ø110 mm, wall 3.2 mm: about 1.7 kg/m.</li></ul>
 
-'<hr/>
-'<i>Aandachtspunten:
-'<ul>
-'<li>Niet-brandbare materialen (beton, staal, steen-/glaswol, gips,
-'aluminium) leveren geen bijdrage aan de vuurlast — neem ze niet op
-'in m_hout etc.</li>
-'<li>Brandwerend gips (Promat, Knauf Brand) wordt formeel als
-'niet-brandbaar gerekend; de kartonlaag kan worden meegenomen onder
-'m_hout maar is veelal verwaarloosbaar (&lt; 0,5 kg/m²).</li>
-'<li>De gebruiksbelasting (inventaris, opslag) is de <i>variabele</i>
-'vuurlast — die wordt in NEN 6090 separaat behandeld (Tabel A.2).
-'Voor totale vuurlast: q<sub>f,k,tot</sub> = q<sub>f,k,perm</sub> + q<sub>f,k,var</sub>.</li>
-'<li>Voor formele BIO-rapportage (Bouwbesluit-equivalentie) altijd
-'NEN 6090 §6 raadplegen en correctiefactor δ<sub>q1</sub>/δ<sub>q2</sub>
-'voor compartimentgrootte + activeringsgevaar toepassen.</li>
-'</ul></i>
+'<hr/><i>Limitations:<ul><li>Non-combustible concrete, steel, mineral/glass wool, gypsum, and aluminum do not contribute to fire load; exclude them from m_hout and similar inputs.</li><li>Fire-resistant gypsum (Promat, Knauf Brand) is treated as non-combustible. Cardboard facing may be included under m_hout but is often negligible (&lt;0.5 kg/m²).</li><li>Contents and storage form the <i>variable</i> fire load, treated separately in NEN 6090 Table A.2. Total fire load is q<sub>f,k,tot</sub> = q<sub>f,k,perm</sub> + q<sub>f,k,var</sub>.</li><li>For formal BIO reporting under Dutch building-regulation equivalence, consult NEN 6090 §6 and apply δ<sub>q1</sub>/δ<sub>q2</sub> for compartment size and activation risk.</li></ul></i>
 `;

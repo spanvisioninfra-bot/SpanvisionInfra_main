@@ -220,7 +220,7 @@ export function DrawingGroups() {
             het vinkje in het eigenschappen-paneel — één bron van waarheid. */}
         <Show when={state.currentTool === 'line'}>
           <RibbonGroup label={t('comment.line') || "Line"}>
-            <label class="ribbon-checkbox-option" title={t('drawing.lineContinueTip') || 'Elke klik verbindt het volgende segment met het vorige'}>
+            <label class="ribbon-checkbox-option" title={t('drawing.lineContinueTip') || 'Each click connects the next segment to the previous one'}>
               <input
                 type="checkbox"
                 checked={state.preferences.lineContinue === true}

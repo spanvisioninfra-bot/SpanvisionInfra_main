@@ -24,18 +24,18 @@ const BASELINE_FIELDS = new Set<BaselineTaskColumnField>([
  * worden hier alsnog encoded zodat quotes en alle scheidingstekens nooit betekenis lekken. */
 export function encodeTaskColumnIdSegment(value: string): string {
   if (value.length === 0) {
-    throw new TypeError('TaskColumnId-segment mag niet leeg zijn');
+    throw new TypeError('TaskColumnId segment must not be empty');
   }
   for (let index = 0; index < value.length; index++) {
     const codeUnit = value.charCodeAt(index);
     if (codeUnit >= 0xD800 && codeUnit <= 0xDBFF) {
       const next = value.charCodeAt(index + 1);
       if (index + 1 >= value.length || next < 0xDC00 || next > 0xDFFF) {
-        throw new TypeError('TaskColumnId-segment bevat een losse UTF-16-surrogaat');
+        throw new TypeError("TaskColumnId segment contains an unpaired UTF-16 surrogate");
       }
       index++;
     } else if (codeUnit >= 0xDC00 && codeUnit <= 0xDFFF) {
-      throw new TypeError('TaskColumnId-segment bevat een losse UTF-16-surrogaat');
+      throw new TypeError("TaskColumnId segment contains an unpaired UTF-16 surrogate");
     }
   }
   return encodeURIComponent(value).replace(/[!'()*]/g, char =>

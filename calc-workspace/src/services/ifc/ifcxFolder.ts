@@ -85,7 +85,7 @@ export function analyzeIfcxFolder(files: { name: string; content?: string }[]): 
       continue;
     }
     if (f.content == null) {
-      summaries.push({ name: f.name, objectCount: 0, objectTypes: [], guids: [], error: 'niet geladen' });
+      summaries.push({ name: f.name, objectCount: 0, objectTypes: [], guids: [], error: 'not loaded' });
       continue;
     }
     try {

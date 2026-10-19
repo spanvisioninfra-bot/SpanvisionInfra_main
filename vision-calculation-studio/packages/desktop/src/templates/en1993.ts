@@ -25,7 +25,7 @@ S355 — f_y=355, f_u=490 = 355
 S450 — f_y=440, f_u=550 = 440
 @end
 
-Vloeigrens (tabel 3.1):
+Yield strength (Table 3.1):
 
 f_y = staalsoort * 1 N/mm^2
 
@@ -64,7 +64,7 @@ gamma_M2 = 1.25
 
 ## Design values
 
-Rekenwaarde vloeigrens:
+Design yield strength:
 
 f_yd = f_y / gamma_M0 to N/mm^2
 
@@ -74,7 +74,7 @@ epsilon = sqrt(235 / f_y * 1 N/mm^2)
 
 ## Summary
 
-| Eigenschap | Waarde |
+| Property | Value |
 |---|---|
 | f_y | {{f_y}} N/mm^2 |
 | f_u | {{f_u}} N/mm^2 |
@@ -112,15 +112,15 @@ r = 15 mm
 
 ## Classificatie lijf at bending (table 5.2, inwendig plaatveld)
 
-Hoogte lijf:
+Web depth:
 
 c_w = h - 2 * t_f - 2 * r to mm
 
-Slankheid lijf:
+Web slenderness:
 
 c_w_over_tw = c_w / t_w
 
-Grenswaarden lijf bij buiging (tabel 5.2):
+Web limits in bending (Table 5.2):
 - Klasse 1: c/t <= 72 * epsilon
 - Klasse 2: c/t <= 83 * epsilon
 - Klasse 3: c/t <= 124 * epsilon
@@ -149,11 +149,11 @@ Uitstekende flens:
 
 c_f = (b - t_w - 2 * r) / 2 to mm
 
-Slankheid flens:
+Flange slenderness:
 
 c_f_over_tf = c_f / t_f
 
-Grenswaarden flens bij druk (tabel 5.2):
+Flange limits in compression (Table 5.2):
 - Klasse 1: c/t <= 9 * epsilon
 - Klasse 2: c/t <= 10 * epsilon
 - Klasse 3: c/t <= 14 * epsilon
@@ -178,8 +178,8 @@ lim_f3 = 14 * epsilon
 
 ## Total classificatie section
 
-De doorsnedeklasse wordt bepaald door de ongunstigste klasse
-van lijf en flens (art. 5.5.2).
+The cross-section class is governed by the less favorable class
+of the web and flange (art. 5.5.2).
 `;
 
 // ---------------------------------------------------------------------------
@@ -218,11 +218,11 @@ gamma_M2 = 1.25
 
 ## Section
 
-Bruto oppervlak:
+Gross area:
 
 A = 5381 mm^2
 
-Netto oppervlak (met aftrek boutgaten):
+Net area (with bolt holes deducted):
 
 A_net = 4800 mm^2
 
@@ -245,7 +245,7 @@ N_tRd = N_plRd to kN
 Plastische weerstand is maatgevend (formule 6.6).
 #else
 N_tRd = N_uRd to kN
-Breukweerstand netto doorsnede is maatgevend (formule 6.7).
+Net section fracture resistance governs (expression 6.7).
 #end if
 
 ## Unity check
@@ -287,7 +287,7 @@ Klasse 3 = 3
 Klasse 4 (effectief area) = 4
 @end
 
-Bruto oppervlak:
+Gross area:
 
 A = 5381 mm^2
 
@@ -297,7 +297,7 @@ N_Ed = 500 kN
 
 ## Compression resistance (formula 6.10)
 
-Voor klasse 1, 2 en 3:
+For classes 1, 2, and 3:
 
 N_cRd = A * f_y / gamma_M0 to kN
 
@@ -414,7 +414,7 @@ A = 5381 mm^2
 
 eta = 1.0
 
-Hoogte lijf (hart-op-hart flenzen):
+Web depth (between flange centerlines):
 
 h_w = h - 2 * t_f to mm
 
@@ -463,7 +463,7 @@ UC_dwarskracht = V_Ed / V_plRd
 // ---------------------------------------------------------------------------
 
 /** EN 1993-1-1 art. 6.2.9 — Buiging met normaalkracht */
-export const ec3BuigingNormaalkracht = `# Bending met Normaalkracht — EN 1993-1-1 art. 6.2.9
+export const ec3BuigingNormaalkracht = `# Bending with axial force — EN 1993-1-1 art. 6.2.9
 
 ## Steel grade
 
@@ -507,7 +507,7 @@ M_plzRd = W_plz * f_y / gamma_M0 to kN*m
 
 ## Gereduceerde momentweerstand (art. 6.2.9.1, I/H-sections, formula 6.36)
 
-Verhouding normaalkracht:
+Axial force ratio:
 
 n = N_Ed / N_plRd
 
@@ -537,7 +537,7 @@ M_NzRd = M_plzRd to kN*m
 
 ## Interactie tweezijdige bending (formula 6.41)
 
-Exponenten (I/H-profiel, formule 6.41):
+Exponents (I/H section, expression 6.41):
 
 alpha_exp = 2
 beta_exp = 1
@@ -594,7 +594,7 @@ W_ply = 628400 mm^3
 E = 210000 N/mm^2
 G = 81000 N/mm^2
 
-## Systeem
+## System
 
 Kiplengte (afstand zijdelingse steunen):
 
@@ -619,7 +619,7 @@ Puntlast middle (C_1 = 1.35) = 1.35
 
 C_1 = C1_factor * 1
 
-Kritiek kipmoment (analytisch, dubbelzijdig symmetrisch profiel):
+Elastic critical lateral-torsional buckling moment (analytical, doubly symmetric section):
 
 M_cr = C_1 * pi^2 * E * I_z / L_cr^2 * sqrt(I_w / I_z + L_cr^2 * G * I_t / (pi^2 * E * I_z)) to kN*m
 
@@ -643,7 +643,7 @@ d - alpha_LT = 0.76 = 0.76
 
 alpha_LT = kipcurve * 1
 
-Tabel 6.5 (gewalste I-profielen):
+Table 6.5 (rolled I sections):
 - h/b <= 2: kipcurve b (alpha_LT = 0,34)
 - h/b > 2: kipcurve c (alpha_LT = 0,49)
 
@@ -675,7 +675,7 @@ chi_LT = 1.0
 #end if
 
 #if chi_LT > 1 / lambda_LT^2
-Begrensd op 1/lambda_LT^2.
+Limited to 1/lambda_LT^2.
 #end if
 
 #end if
@@ -700,7 +700,7 @@ UC_kip = M_Ed / M_bRd
 
 ## Summary
 
-| Parameter | Waarde |
+| Parameter | Value |
 |---|---|
 | M_cr | {{M_cr}} kN*m |
 | lambda_LT | {{lambda_LT}} |
@@ -740,7 +740,7 @@ Traagheidsstralen:
 i_y = sqrt(I_y / A) to mm
 i_z = sqrt(I_z / A) to mm
 
-## Systeem
+## System
 
 Kniklengte om sterke as (y-y):
 
@@ -779,11 +779,11 @@ Tabel 6.2 (gewalste I-profielen, t_f <= 40 mm):
 
 lambda1 = pi * sqrt(E / f_y)
 
-Slankheid y-y:
+Slenderness y-y:
 
 lambda_bar_y = L_cry / (i_y * lambda1)
 
-Slankheid z-z:
+Slenderness z-z:
 
 lambda_bar_z = L_crz / (i_z * lambda1)
 
@@ -863,7 +863,7 @@ Traagheidsmoment (sterke as):
 
 I_y = 83560000 mm^4
 
-## Systeem
+## System
 
 Overspanning:
 
@@ -871,11 +871,11 @@ L = 6000 mm
 
 ## Load (karakteristiek)
 
-Blijvende belasting:
+Permanent load:
 
 g_k = 5 kN/m
 
-Veranderlijke belasting:
+Variable load:
 
 q_k = 10 kN/m
 
@@ -887,19 +887,19 @@ psi_2 = 0.3
 
 ## Deflection below characteristic load
 
-Doorbuiging onder blijvende belasting:
+Deflection from permanent loads:
 
 delta_G = 5 * g_k * L^4 / (384 * E * I_y) to mm
 
-Doorbuiging onder veranderlijke belasting:
+Deflection from variable loads:
 
 delta_Q = 5 * q_k * L^4 / (384 * E * I_y) to mm
 
-Totale doorbuiging (frequente combinatie):
+Total deflection (frequent combination):
 
 delta_freq = delta_G + psi_1 * delta_Q to mm
 
-Totale doorbuiging (karakteristieke combinatie):
+Total deflection (characteristic combination):
 
 delta_kar = delta_G + delta_Q to mm
 
@@ -912,7 +912,7 @@ L/350 — draagconstructie below glas = 350
 L/500 — beperkende requirement = 500
 @end
 
-Toelaatbare doorbuiging:
+Allowable deflection:
 
 delta_lim = L / grenswaarde to mm
 
@@ -932,7 +932,7 @@ UC_doorbuiging = delta_kar / delta_lim
 // ---------------------------------------------------------------------------
 
 /** EN 1993-1-1 — Volledige toetsing stalen I/H-ligger */
-export const ec3StalenLigger = `# Volledige Toetsing Stalen Ligger — EN 1993-1-1
+export const ec3StalenLigger = `# Complete steel beam checks — EN 1993-1-1
 
 ## Steel grade
 
@@ -970,7 +970,7 @@ HEB 200 — h=200, b=200, A=7808 = 2200
 HEB 300 — h=300, b=300, A=14908 = 2300
 @end
 
-Profielgegevens (handmatig aanpassen bij ander profiel):
+Section properties (adjust manually for a different section):
 
 h_p = 300 mm
 b_p = 150 mm
@@ -989,7 +989,7 @@ W_elz = 80500 mm^3
 
 epsilon = sqrt(235 / f_y * 1 N/mm^2)
 
-## Systeem en load
+## System and loads
 
 Overspanning:
 
@@ -999,11 +999,11 @@ Kiplengte (afstand zijdelingse steunen):
 
 L_kip = 6000 mm
 
-Gelijkmatig verdeelde belasting (rekenwaarde UGT):
+Uniformly distributed load (ULS design value):
 
 q_d = 25 kN/m
 
-Karakteristieke belasting (BGT):
+Characteristic load (SLS):
 
 q_k = 17 kN/m
 
@@ -1015,7 +1015,7 @@ Maatgevend moment:
 
 M_Ed = q_d * L^2 / 8 to kN*m
 
-Maatgevende dwarskracht:
+Governing shear force:
 
 V_Ed = q_d * L / 2 to kN
 
@@ -1032,7 +1032,7 @@ lim_w1 = 72 * epsilon
 #if c_w_tw < lim_w1
   Lijf is Klasse 1 ({{c_w_tw}} < {{lim_w1}}).
 #else
-  Lijf voldoet niet aan Klasse 1.
+  The web does not meet Class 1.
 #end if
 
 Flens (uitwendig plaatveld):
@@ -1044,7 +1044,7 @@ lim_f1 = 9 * epsilon
 #if c_f_tf < lim_f1
   Flens is Klasse 1 ({{c_f_tf}} < {{lim_f1}}).
 #else
-  Flens voldoet niet aan Klasse 1.
+  The flange does not meet Class 1.
 #end if
 
 ---
@@ -1098,7 +1098,7 @@ UC_dwarskracht = V_Ed / V_plRd
 
 ## 5. Lateral torsional buckling (art. 6.3.2.3)
 
-Momentverdeling C_1 (q-belasting):
+Moment distribution factor C_1 (uniform load):
 
 C_1 = 1.13
 
@@ -1106,13 +1106,13 @@ Kritiek kipmoment:
 
 M_cr = C_1 * pi^2 * E * I_z / L_kip^2 * sqrt(I_w / I_z + L_kip^2 * G * I_t / (pi^2 * E * I_z)) to kN*m
 
-Relatieve slankheid:
+Relative slenderness:
 
 lambda_LT = sqrt(W_ply * f_y / M_cr)
 
 h_over_b = h_p / b_p
 
-Kipcurve (tabel 6.5, gewalste I-profielen):
+Lateral-torsional buckling curve (Table 6.5, rolled I sections):
 
 #if h_over_b < 2
   h/b <= 2: kipcurve b, alpha_LT = 0,34.
@@ -1151,11 +1151,11 @@ UC_kip = M_Ed / M_bRd
 
 ## 6. Deflection (art. 7.2 / NEN-EN 1990)
 
-Toelaatbare doorbuiging (L/250):
+Allowable deflection (L/250):
 
 delta_lim = L / 250 to mm
 
-Optredende doorbuiging (karakteristiek):
+Actual deflection (characteristic):
 
 delta = 5 * q_k * L^4 / (384 * E * I_y) to mm
 
@@ -1164,19 +1164,19 @@ UC_doorbuiging = delta / delta_lim
 #if UC_doorbuiging < 1
   [OK] Doorbuiging voldoet ({{delta}} mm < {{delta_lim}} mm).
 #else
-  [NIET OK] Doorbuiging voldoet NIET!
+  [FAIL] Deflection exceeds the limit!
 #end if
 
 ---
 
 ## Summary
 
-| Toetsing | UC | Referentie |
+| Check | UC | Reference |
 |---|---|---|
 | Buiging (6.2.5) | {{UC_buiging}} | formule 6.13 |
 | Dwarskracht (6.2.6) | {{UC_dwarskracht}} | formule 6.18 |
 | Kip (6.3.2) | {{UC_kip}} | formule 6.55 |
-| Doorbuiging (7.2) | {{UC_doorbuiging}} | NEN-EN 1990 |
+| Deflection (7.2) | {{UC_doorbuiging}} | NEN-EN 1990 |
 
 ## Overzicht
 
@@ -1289,7 +1289,7 @@ export const ec3Formules: { id: string; label: string; template: string }[] = [
   },
   {
     id: 'ec3-doorbuiging',
-    label: 'EC3: Doorbuiging (art. 7.2)',
+    label: "EC3: Deflection (clause 7.2)",
     template: ec3Doorbuiging,
   },
   {

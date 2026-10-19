@@ -267,7 +267,7 @@ export const IFC_LABELS = {
   IfcPile: 'Paal / fundering',
   IfcMechanicalFastener: 'Bout / anker / bevestiging',
   IfcSlab: 'Vloer / plaat',
-  IfcWall: 'Wand / muur',
+  IfcWall: 'Wall',
   IfcElectricAppliance: 'Elektrisch toestel / apparaat',
   IfcShadingDevice: 'Zonwering',
   IfcGrid: 'Stramien / raster',
@@ -275,7 +275,7 @@ export const IFC_LABELS = {
   IfcReinforcingBar: 'Wapening',
   IfcSanitaryTerminal: 'Sanitair toestel',
   IfcFurniture: 'Meubilair / keukenblok',
-  IfcBuildingElementProxy: 'Overig bouwelement',
+  IfcBuildingElementProxy: 'Other building element',
   // NEN 1414-klassen (nenIfcMap.js)
   IfcController: 'Centrale / paneel / regelaar',
   IfcActuator: 'Actuator (houdmagneet / dranger)',

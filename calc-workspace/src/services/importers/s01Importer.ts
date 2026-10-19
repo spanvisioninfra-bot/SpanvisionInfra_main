@@ -123,9 +123,9 @@ export function importS01(text: string): ImportResult {
   flushPost();
 
   if (builder.length === 0) {
-    warnings.push('S01-bestand bevat geen herkenbare besteksposten.');
+    warnings.push('The S01 file contains no recognizable specification items.');
   }
-  warnings.push('STABU-bestek geïmporteerd als prijsloze skelet-begroting (het bronbestand bevat geen hoeveelheden of prijzen).');
+  warnings.push('The STABU specification was imported as an unpriced estimate outline (the source has no quantities or prices).');
 
   return {
     schedule: { name: projectName || "STABU specification", projectName, author },

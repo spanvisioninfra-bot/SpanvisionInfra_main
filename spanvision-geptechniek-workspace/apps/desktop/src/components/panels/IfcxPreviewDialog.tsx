@@ -49,7 +49,7 @@ export default function IfcxPreviewDialog({ open, onClose }: IfcxPreviewDialogPr
     if (!open) return;
     if (!activeDoc) {
       setIfcxText("");
-      setError("No actief document — open of maak een project om een IFCX-preview te zien.");
+      setError("No active document — open or create a project to see an IFCX preview.");
       return;
     }
     if (activeDoc.kind !== "project") {

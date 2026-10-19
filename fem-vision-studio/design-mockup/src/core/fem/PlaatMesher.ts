@@ -285,7 +285,7 @@ export function genereerRasterMesh(inv: RasterMeshInvoer): RasterMesh {
   }
   const idx = (i: number, j: number): number => {
     const v = index.get(sleutel(i, j));
-    if (v === undefined) throw new Error(`rastermesh: knoop (${i}, ${j}) ontbreekt`);
+    if (v === undefined) throw new Error(`grid mesh: node (${i}, ${j}) is missing`);
     return v;
   };
 
@@ -381,33 +381,33 @@ export function keurPlatMesh(
   quads: unknown,
 ): PlatMeshKeuring {
   const n = points.length;
-  if (n < 3) throw new Error('het mesh heeft minder dan drie punten');
+  if (n < 3) throw new Error('The mesh has fewer than three points');
   const geldigeIndex = (i: unknown): i is number => Number.isInteger(i) && (i as number) >= 0 && (i as number) < n;
 
   const tris: [number, number, number][] = [];
   if (triangles !== undefined) {
-    if (!Array.isArray(triangles)) throw new Error('`triangles` is geen lijst');
+    if (!Array.isArray(triangles)) throw new Error('`triangles` is not a list');
     triangles.forEach((t, k) => {
       if (!Array.isArray(t) || t.length !== 3 || !t.every(geldigeIndex)) {
-        throw new Error(`driehoek ${k + 1} verwijst naar punten die niet bestaan`);
+        throw new Error(`triangle ${k + 1} references points that do not exist`);
       }
       const [a, b, c] = t as [number, number, number];
-      if (a === b || b === c || a === c) throw new Error(`driehoek ${k + 1} heeft twee gelijke hoekpunten`);
+      if (a === b || b === c || a === c) throw new Error(`triangle ${k + 1} has two identical vertices`);
       const opp2 = getekendeOppervlakte2([points[a], points[b], points[c]]);
-      if (Math.abs(opp2) < 1e-9) throw new Error(`driehoek ${k + 1} heeft geen oppervlakte`);
+      if (Math.abs(opp2) < 1e-9) throw new Error(`triangle ${k + 1} has no area`);
       tris.push(opp2 > 0 ? [a, b, c] : [a, c, b]);
     });
   }
 
   const qs: [number, number, number, number][] = [];
   if (quads !== undefined) {
-    if (!Array.isArray(quads)) throw new Error('`quads` is geen lijst');
+    if (!Array.isArray(quads)) throw new Error('`quads` is not a list');
     quads.forEach((q, k) => {
       if (!Array.isArray(q) || q.length !== 4 || !q.every(geldigeIndex)) {
-        throw new Error(`vierhoek ${k + 1} verwijst naar punten die niet bestaan`);
+        throw new Error(`quadrilateral ${k + 1} references points that do not exist`);
       }
       const ids = q as [number, number, number, number];
-      if (new Set(ids).size !== 4) throw new Error(`vierhoek ${k + 1} heeft twee gelijke hoekpunten`);
+      if (new Set(ids).size !== 4) throw new Error(`quadrilateral ${k + 1} has two identical vertices`);
       const p = ids.map((i) => points[i]);
       let pos = 0, neg = 0;
       for (let i = 0; i < 4; i++) {
@@ -425,7 +425,7 @@ export function keurPlatMesh(
     });
   }
 
-  if (tris.length + qs.length === 0) throw new Error('het mesh bevat geen elementen');
+  if (tris.length + qs.length === 0) throw new Error('The mesh contains no elements');
   const meshSoort: PlaatMeshSoort =
     qs.length === 0 ? 'driehoeken' : tris.length === 0 ? 'vierhoeken' : 'gemengd';
   return { triangles: tris, quads: qs, meshSoort };
@@ -442,7 +442,7 @@ export function keurRandKnopen(
   const n = points.length;
   if (!Array.isArray(rand) || rand.length < 2
       || !rand.every((k) => Number.isInteger(k) && k >= 0 && k < n)) {
-    throw new Error(`${wat} heeft geen geldige lijst randknopen (minstens de twee hoeken)`);
+    throw new Error(`${wat} has no valid list of edge nodes (at least the two corners are required)`);
   }
   const L = Math.hypot(b.x - a.x, b.z - a.z);
   let tMin = Infinity, tMax = -Infinity;
@@ -451,12 +451,12 @@ export function keurRandKnopen(
     const t = ((q.x - a.x) * (b.x - a.x) + (q.z - a.z) * (b.z - a.z)) / L;
     const d = Math.abs((q.x - a.x) * (b.z - a.z) - (q.z - a.z) * (b.x - a.x)) / L;
     if (!(d <= tolMm) || t < -tolMm || t > L + tolMm) {
-      throw new Error(`punt ${k} van ${wat} ligt niet op die rand`);
+      throw new Error(`point ${k} of ${wat} does not lie on that edge`);
     }
     tMin = Math.min(tMin, t);
     tMax = Math.max(tMax, t);
   }
   if (tMin > tolMm || tMax < L - tolMm) {
-    throw new Error(`de randknopen van ${wat} reiken niet van hoek tot hoek`);
+    throw new Error(`the edge nodes of ${wat} do not span from corner to corner`);
   }
 }

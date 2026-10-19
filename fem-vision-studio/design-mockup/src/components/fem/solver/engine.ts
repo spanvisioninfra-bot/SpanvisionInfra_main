@@ -189,7 +189,7 @@ function normaliseerSegmenten(
   const uit = segmenten.map((s, i) => {
     const t0 = s.tStart, t1 = s.tEnd, I_mm4 = s.I;
     if (!Number.isFinite(t0) || !Number.isFinite(t1) || !Number.isFinite(I_mm4)) {
-      throw new Error(`Staaf ${beamId}, segment ${i + 1}: tStart, tEnd en I moeten getallen zijn.`);
+      throw new Error(`Member ${beamId}, segment ${i + 1}: tStart, tEnd and I must be numbers.`);
     }
     if (t0 < -TOL || t1 > 1 + TOL) {
       throw new Error(
@@ -198,10 +198,10 @@ function normaliseerSegmenten(
     }
     if (t1 - t0 <= TOL) {
       throw new Error(
-        `Staaf ${beamId}, segment ${i + 1}: tEnd (${t1}) moet groter zijn dan tStart (${t0}).`);
+        `Member ${beamId}, segment ${i + 1}: tEnd (${t1}) must be greater than tStart (${t0}).`);
     }
     if (!(I_mm4 > 0)) {
-      throw new Error(`Staaf ${beamId}, segment ${i + 1}: I moet groter dan nul zijn (mm⁴).`);
+      throw new Error(`Member ${beamId}, segment ${i + 1}: I must be greater than zero (mm⁴).`);
     }
     // A per segment is optioneel (verlopend profiel); staat hij er, dan moet
     // hij net als I een positief getal zijn — een A van nul geeft een
@@ -209,7 +209,7 @@ function normaliseerSegmenten(
     const A_mm2 = s.A;
     if (A_mm2 !== undefined && !(Number.isFinite(A_mm2) && A_mm2 > 0)) {
       throw new Error(
-        `Staaf ${beamId}, segment ${i + 1}: A moet, als hij is opgegeven, groter dan nul zijn (mm²).`);
+        `Member ${beamId}, segment ${i + 1}: A, when specified, must be greater than zero (mm²).`);
     }
     // Ondergrens die het REKENMESH stelt, niet de nauwkeurigheid: twee
     // splitsposities binnen KNOOP_TOL_MM krijgen dezelfde mesh-knoop en het
@@ -486,7 +486,7 @@ export function buildMesh(input: SolverInput | MultiInput, loadFactor?: (caseId?
       }
       const corners = p.nodeIds.map((id) => nodeById.get(id));
       if (corners.some((c) => !c)) {
-        throw new Error(`Plaat ${p.id}: één of meer hoekknopen bestaan niet meer.`);
+        throw new Error(`Plate ${p.id}: one or more corner nodes no longer exist.`);
       }
       const punten = corners.map((c) => ({ x: c!.x, z: c!.z }));
       // Materiaal keuren vóór het meshen: een onbekende naam hoort hier te
@@ -603,7 +603,7 @@ export function buildMesh(input: SolverInput | MultiInput, loadFactor?: (caseId?
           oe.forEach((randen, k) => {
             const op = openingen[k];
             if (!Array.isArray(randen) || randen.length !== op.length) {
-              throw new Error(`opening ${k + 1} heeft ${op.length} randen, maar de cache beschrijft er ${Array.isArray(randen) ? randen.length : 0}`);
+              throw new Error(`opening ${k + 1} has ${op.length} edges, but the cache describes ${Array.isArray(randen) ? randen.length : 0}`);
             }
             randen.forEach((rand, j) => {
               keurRandKnopen(cache.points, rand, op[j], op[(j + 1) % op.length], TOL_MM, `rand ${j + 1} van opening ${k + 1}`);

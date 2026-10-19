@@ -90,7 +90,7 @@ const register = (id: string) => {
   try {
     (g.__traagApi as { ui: { addRibbonButton: (b: unknown) => void } }).ui.addRibbonButton({ id: 'x', label: 'x', onClick() {} });
   } catch (e) { late = String(e); }
-  eq('3 late addRibbonButton na verwijderen gooit (ingetrokken api)', late.includes('gedeactiveerd'), true);
+  eq('3 late addRibbonButton na verwijderen gooit (ingetrokken api)', late.includes('disabled'), true);
   eq('3 geen lintknop van de verwijderde extensie', useAppStore.getState().extensionRibbonButtons.some((b: { extensionId?: string }) => b.extensionId === 'traag.verwijderd'), false);
 }
 

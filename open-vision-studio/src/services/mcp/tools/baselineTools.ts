@@ -363,7 +363,7 @@ function deleteCore(ctx: McpContext, p: DeleteArgs): MutationOutcome {
   // gebeurd is in plaats van hem hier na te rekenen (twee waarheden zouden gaan divergeren).
   const after = ctx.app.store.getState();
   if (findBaseline(after, p.baselineId)) {
-    throw new McpStepError('INTERNAL', `baseline '${p.baselineId}' staat er na het verwijderen nog steeds`);
+    throw new McpStepError('INTERNAL', `baseline '${p.baselineId}' still exists after removal`);
   }
   const activeBaselineId = after.activeBaselineId;
   const activeBaselineName = nameOf(after, activeBaselineId);

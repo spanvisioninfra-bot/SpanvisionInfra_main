@@ -317,7 +317,7 @@ export default function GisLayerPanel() {
                   </label>
                   <div
                     className="gis-layer-opacity"
-                    title={`Transparantie: ${100 - pct}% — slider regelt zichtbaarheid`}
+                    title={`Opacity: ${100 - pct}% — slider regelt zichtbaarheid`}
                   >
                     <input
                       type="range"
@@ -329,7 +329,7 @@ export default function GisLayerPanel() {
                       onChange={(e) =>
                         changeOpacity(d.id, Number(e.currentTarget.value) / 100)
                       }
-                      aria-label={`Transparantie ${d.label}`}
+                      aria-label={`Opacity ${d.label}`}
                     />
                     <span className="gis-layer-opacity-val">{pct}%</span>
                   </div>
@@ -372,7 +372,7 @@ export default function GisLayerPanel() {
         {enabled["bro-boringen"] && (
           <span>{counts.bore} {t("boringen", "boringen")}</span>
         )}
-        <span> {t("loaded", "geladen")}</span>
+        <span> {t("loaded", "loaded")}</span>
       </div>
       <button
         type="button"
@@ -393,7 +393,7 @@ export default function GisLayerPanel() {
         </div>
         <div className="project-header-text">
           <div className="project-header-title">{t("layers", "Lagen")}</div>
-          <div className="project-header-sub">{t("gisLayers", "Kaartlagen + BRO")}</div>
+          <div className="project-header-sub">{t("gisLayers", "Map layers and BRO")}</div>
         </div>
       </div>
 

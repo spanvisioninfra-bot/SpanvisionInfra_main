@@ -207,7 +207,7 @@ export default function ReportPreview() {
               checked={sections.sbtLegend}
               onChange={(v) => setSections((s) => ({ ...s, sbtLegend: v }))}
               hint={t("report.section.sbtHint", "Separate page with the nine soil classification zones")} />
-            <SectionToggle label={t("report.section.metadata", "Metadata-overzicht")}
+            <SectionToggle label={t("report.section.metadata", "Metadata overview")}
               checked={sections.metadata}
               onChange={(v) => setSections((s) => ({ ...s, metadata: v }))}
               hint={t("report.section.metaHint", "Volledige #COMPANYID / #PROJECTID / kalibratie etc.")} />
@@ -251,7 +251,7 @@ export default function ReportPreview() {
           className="report-generate-btn-side"
           disabled={cpts.length === 0 || loading || !pdfUrl}
           onClick={handleOpenPdf}
-          title={t("report.openInNewWindow", "PDF openen in de systeem-viewer")}
+          title={t("report.openInNewWindow", "Open PDF in the system viewer")}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
@@ -259,7 +259,7 @@ export default function ReportPreview() {
             <line x1="9" y1="15" x2="15" y2="15" />
             <line x1="12" y1="12" x2="12" y2="18" />
           </svg>
-          <span>{t("report.openPdf", "PDF openen")}</span>
+          <span>{t("report.openPdf", "Open PDF")}</span>
         </button>
       </div>
     </aside>

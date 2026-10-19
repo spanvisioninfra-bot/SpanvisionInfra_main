@@ -865,7 +865,7 @@ function updateCalendarCore(ctx: McpContext, items: CalendarItem[]): MutationOut
       const existing = ctx.app.store.getState().calendars.find((c) => c.id === plan.targetId);
       if (!existing) {
         // Kan alleen bij een defect in de promotie — harde stap-fout i.p.v. stil doorgaan.
-        throw new McpStepError('NOT_FOUND', `kalender '${plan.targetId}' bestaat niet (na promotie)`);
+        throw new McpStepError('NOT_FOUND', `calendar '${plan.targetId}' does not exist after promotion`);
       }
       // Modus-ijkpunt vóór de mutatie; native taakduren worden nooit geconverteerd.
       const beforeMode = calendarMode(existing);
@@ -915,7 +915,7 @@ function updateCalendarCore(ctx: McpContext, items: CalendarItem[]): MutationOut
         if (hasAffectedHourTask) {
           throw new McpStepError(
             'VALIDATION',
-            `kan concrete werkblokken niet verwijderen: kalender '${plan.targetId}' wordt gebruikt door een urentaak`,
+            `cannot remove working-time blocks: calendar '${plan.targetId}' is used by an hourly task`,
           );
         }
       }
@@ -1659,7 +1659,7 @@ function parseLeveling(
 function levelResourcesCore(ctx: McpContext, p: { options: LevelingOptions; dryRun: boolean }): MutationOutcome {
   const fresh = ensureFreshSchedule(ctx.app);
   if (fresh.error) {
-    throw new McpStepError('VALIDATION', `planning kon niet worden herrekend vóór het nivelleren: ${fresh.error}`);
+    throw new McpStepError('VALIDATION', `schedule could not be recalculated before leveling: ${fresh.error}`);
   }
   const preview = ctx.app.store.getState().levelResources(p.options);
   // `dryRun` muteert per contract niets — binnen een batch dus een pure preview-stap.
@@ -1717,7 +1717,7 @@ const levelResources: BatchStepTool = {
 
     const fresh = ensureFreshSchedule(ctx.app);
     if (fresh.error) {
-      return toolError(ctx, 'VALIDATION', `planning kon niet worden herrekend vóór het nivelleren: ${fresh.error}`);
+      return toolError(ctx, 'VALIDATION', `schedule could not be recalculated before leveling: ${fresh.error}`);
     }
 
     if (dryRun) {
@@ -2134,13 +2134,13 @@ function moveProjectCore(ctx: McpContext, p: { newStartDate: string; shiftBaseli
   const s0 = ctx.app.store.getState();
   const delta = computeMoveDelta(s0.project.startDate, p.newStartDate);
   if (!Number.isFinite(delta)) {
-    throw new McpStepError('VALIDATION', `kan de verschuiving niet bepalen vanaf projectstart '${s0.project.startDate}'`);
+    throw new McpStepError('VALIDATION', `cannot determine the shift from project start '${s0.project.startDate}'`);
   }
   if (delta === 0) {
     return { data: { moved: false, deltaDays: 0, taskCount: s0.tasks.length, reason: 'de projectstart is al deze datum' } };
   }
   const out = ctx.app.store.getState().moveProject(p.newStartDate, { shiftBaselines: p.shiftBaselines });
-  if (!out.moved) throw new McpStepError('VALIDATION', `verschuiven naar '${p.newStartDate}' leverde geen wijziging op`);
+  if (!out.moved) throw new McpStepError('VALIDATION', `shifting to '${p.newStartDate}' did not produce a change`);
   return { data: out };
 }
 
@@ -2173,7 +2173,7 @@ const moveProject: BatchStepTool = {
     const s0 = ctx.app.store.getState();
     const delta = computeMoveDelta(s0.project.startDate, newStartDate);
     if (!Number.isFinite(delta)) {
-      return toolError(ctx, 'VALIDATION', `kan de verschuiving niet bepalen vanaf projectstart '${s0.project.startDate}'`);
+      return toolError(ctx, 'VALIDATION', `cannot determine the shift from project start '${s0.project.startDate}'`);
     }
     // No-op-snelpad: Δ=0 ⇒ `moveProject` muteert niets; dan ook geen transactie/undo-stap.
     if (delta === 0) {

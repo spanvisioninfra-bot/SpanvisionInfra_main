@@ -144,7 +144,7 @@ function parseXerClock(value: string, position: 'start' | 'finish'): number {
   if (!match) {
     throw new XerCalendarDataError(
       'XER_CALENDAR_INVALID_CLOCK',
-      'Een aanwezige kalenderband bevat geen geldige klokwaarde.',
+      'An existing calendar band contains an invalid time.',
     );
   }
   let hour = Number(match[1]);
@@ -154,27 +154,27 @@ function parseXerClock(value: string, position: 'start' | 'finish'): number {
   if (second !== 0) {
     throw new XerCalendarDataError(
       'XER_CALENDAR_NONZERO_SECONDS',
-      'Niet-nul seconden worden niet stil naar hele minuten afgerond.',
+      'Non-zero seconds cannot be silently rounded to whole minutes.',
     );
   }
   if (minute > 59) {
     throw new XerCalendarDataError(
       'XER_CALENDAR_INVALID_CLOCK',
-      'Een aanwezige kalenderband bevat geen geldige klokwaarde.',
+      'An existing calendar band contains an invalid time.',
     );
   }
   if (meridiem) {
     if (hour < 1 || hour > 12) {
       throw new XerCalendarDataError(
         'XER_CALENDAR_INVALID_CLOCK',
-        'Een aanwezige kalenderband bevat geen geldige klokwaarde.',
+        'An existing calendar band contains an invalid time.',
       );
     }
     hour = hour % 12 + (meridiem === 'PM' ? 12 : 0);
   } else if (hour > 24 || (hour === 24 && (minute !== 0 || position === 'start'))) {
     throw new XerCalendarDataError(
       'XER_CALENDAR_INVALID_CLOCK',
-      'Een aanwezige kalenderband bevat geen geldige klokwaarde.',
+      'An existing calendar band contains an invalid time.',
     );
   }
   return hour * 60 + minute;
@@ -197,7 +197,7 @@ function assertNoBandOverlap(bands: WorkTimeBands): void {
       if (dayBands[index - 1].end <= dayBands[index].start) continue;
       throw new XerCalendarDataError(
         'XER_CALENDAR_OVERLAPPING_BANDS',
-        'Overlappende kalenderbanden worden niet stil doorgegeven.',
+        'Overlapping calendar bands cannot be accepted silently.',
       );
     }
   }
@@ -207,14 +207,14 @@ function dateFromP6Epoch(raw: string): string {
   if (!/^-?\d+$/.test(raw.trim())) {
     throw new XerCalendarDataError(
       'XER_CALENDAR_INVALID_EPOCH',
-      'Een aanwezige kalenderuitzondering bevat geen geldige P6-epochdag.',
+      'An existing calendar exception contains an invalid P6 epoch day.',
     );
   }
   const days = Number(raw);
   if (!Number.isSafeInteger(days)) {
     throw new XerCalendarDataError(
       'XER_CALENDAR_INVALID_EPOCH',
-      'Een aanwezige kalenderuitzondering bevat geen geldige P6-epochdag.',
+      'An existing calendar exception contains an invalid P6 epoch day.',
     );
   }
   const date = new Date(Date.UTC(1899, 11, 30));
@@ -222,7 +222,7 @@ function dateFromP6Epoch(raw: string): string {
   if (!Number.isFinite(date.getTime())) {
     throw new XerCalendarDataError(
       'XER_CALENDAR_INVALID_EPOCH',
-      'Een aanwezige kalenderuitzondering bevat geen geldige P6-epochdag.',
+      'An existing calendar exception contains an invalid P6 epoch day.',
     );
   }
   return date.toISOString().slice(0, 10);
@@ -405,7 +405,7 @@ function periodHours(row: XerRow, field: string, tables: XerTables): number | un
   }
   throw new XerCalendarDataError(
     'XER_CALENDAR_INVALID_PERIOD_HOURS',
-    'Aanwezige uren-per-periode zijn ongeldig en worden niet stil afgeleid.',
+    'The supplied hours per period are invalid and cannot be inferred silently.',
   );
 }
 
@@ -455,7 +455,7 @@ class StructuredTextTokenizer {
     const record = this.readRecord('ROOT');
     this.skipFormatting();
     if (this.index !== this.text.length) {
-      throw new Error('Ongeldige XER-kalenderdata: onverwachte tekst na het hoofdrecord.');
+      throw new Error('Invalid XER calendar data: unexpected text after the main record.');
     }
     return record;
   }
@@ -473,7 +473,7 @@ class StructuredTextTokenizer {
       return { role: 'BAND', number: '', name: '', fields: { s: start, f: finish }, children: [] };
     }
     const number = this.readWhile(char => /\d/.test(char));
-    if (!number) throw new Error('Ongeldige XER-kalenderdata: recordnummer ontbreekt.');
+    if (!number) throw new Error('Invalid XER calendar data: record number is missing.');
     this.expect('||');
     if (this.allowCompactRecords && this.text.startsWith('d|', this.index)) {
       if (context !== 'EXCEPTION') this.invalidCompactContext();
@@ -531,7 +531,7 @@ class StructuredTextTokenizer {
   private invalidCompactContext(): never {
     throw new XerCalendarDataError(
       'XER_CALENDAR_INVALID_COMPACT_CONTEXT',
-      'Een compact kalenderrecord staat niet op zijn toegestane grammaticale positie.',
+      'A compact calendar record is not in its permitted grammatical position.',
     );
   }
 
@@ -547,7 +547,7 @@ class StructuredTextTokenizer {
     if (tokens.length % 2 !== 0) {
       throw new XerCalendarDataError(
         'XER_CALENDAR_ODD_FIELD_COUNT',
-        'Een kalenderrecord bevat geen volledige key/value-paren.',
+        'A calendar record contains incomplete key/value pairs.',
       );
     }
     for (let index = 0; index + 1 < tokens.length; index += 2) {
@@ -555,13 +555,13 @@ class StructuredTextTokenizer {
       if (!field) {
         throw new XerCalendarDataError(
           'XER_CALENDAR_INVALID_FIELD_PAIR',
-          'Een kalenderrecord bevat een key/value-paar zonder sleutel.',
+          "A calendar record contains a key/value pair without a key.",
         );
       }
       if (Object.prototype.hasOwnProperty.call(result, field)) {
         throw new XerCalendarDataError(
           'XER_CALENDAR_DUPLICATE_FIELD',
-          'Een kalenderrecord bevat dezelfde veldsleutel meer dan eenmaal.',
+          "A calendar record contains the same field key more than once.",
         );
       }
       result[field] = tokens[index + 1];
@@ -573,7 +573,7 @@ class StructuredTextTokenizer {
     const start = this.index;
     while (this.index < this.text.length && !stops.includes(this.text[this.index])) this.index++;
     if (this.index >= this.text.length) {
-      throw new Error('Ongeldige XER-kalenderdata: onverwacht einde van structured text.');
+      throw new Error('Invalid XER calendar data: unexpected end of structured text.');
     }
     return this.text.slice(start, this.index).trim();
   }
@@ -598,7 +598,7 @@ class StructuredTextTokenizer {
 
   private expect(token: string): void {
     if (!this.text.startsWith(token, this.index)) {
-      throw new Error(`Ongeldige XER-kalenderdata: ${JSON.stringify(token)} verwacht.`);
+      throw new Error(`Invalid XER calendar data: ${JSON.stringify(token)} verwacht.`);
     }
     this.index += token.length;
   }
@@ -637,7 +637,7 @@ function parseCalendarDataWithRecovery(text: string): {
     }
     throw new XerCalendarDataError(
       'XER_CALENDAR_INVALID_STRUCTURE',
-      strictError instanceof Error ? strictError.message : 'Ongeldige XER-kalenderdata.',
+      strictError instanceof Error ? strictError.message : 'Invalid XER calendar data.',
     );
   }
 }
@@ -672,20 +672,20 @@ export function decodeXerCalendarData(text: string): DecodedXerCalendarData {
     if (!/^\d+$/.test(day.name)) {
       throw new XerCalendarDataError(
         'XER_CALENDAR_INVALID_DAY',
-        'Een aanwezige weekdag is geen P6-dagnummer van 1 tot en met 7.',
+        'An existing weekday is not a P6 day number from 1 through 7.',
       );
     }
     const p6Day = Number(day.name);
     if (!WEEKDAYS.includes(p6Day as (typeof WEEKDAYS)[number])) {
       throw new XerCalendarDataError(
         'XER_CALENDAR_INVALID_DAY',
-        'Een aanwezige weekdag is geen P6-dagnummer van 1 tot en met 7.',
+        'An existing weekday is not a P6 day number from 1 through 7.',
       );
     }
     if (seenDays.has(p6Day)) {
       throw new XerCalendarDataError(
         'XER_CALENDAR_DUPLICATE_DAY',
-        'Een P6-weekdag komt meer dan eenmaal voor in dezelfde kalender.',
+        "A P6 weekday occurs more than once in the same calendar.",
       );
     }
     seenDays.add(p6Day);
@@ -913,7 +913,7 @@ export function readXerCalendars(tables: XerTables): XerCalendarReadResult {
         code: 'XER_CALENDAR_COMPACT_RECORD_RECOVERED',
         calendarId,
         line: row.line,
-        reason: 'De exact ondersteunde compacte band- en exceptionrecords zijn hersteld.',
+        reason: 'The supported compact band and exception records have been recovered.',
         resolution: 'RECOVERED',
       });
     }
@@ -922,7 +922,7 @@ export function readXerCalendars(tables: XerTables): XerCalendarReadResult {
         code: 'XER_CALENDAR_SURPLUS_CLOSE_RECOVERED',
         calendarId,
         line: row.line,
-        reason: 'Precies één surplus-sluithaak vóór het Exceptions-record is verwijderd.',
+        reason: "Exactly one extra closing parenthesis before the Exceptions record was removed.",
         resolution: 'RECOVERED',
       });
     }
@@ -931,7 +931,7 @@ export function readXerCalendars(tables: XerTables): XerCalendarReadResult {
         code: 'XER_CALENDAR_DUPLICATE_EXCEPTION',
         calendarId,
         line: row.line,
-        reason: 'Een werkende uitzondering wint van een vrije dag; binnen dezelfde klasse blijft de eerste staan.',
+        reason: "A working exception takes precedence over a day off; within the same class, the first entry is retained.",
         resolution: 'RECOVERED',
       });
     }
@@ -940,7 +940,7 @@ export function readXerCalendars(tables: XerTables): XerCalendarReadResult {
         code: 'XER_CALENDAR_MULTIPLE_EXCEPTIONS_MERGED',
         calendarId,
         line: row.line,
-        reason: 'Meerdere Exceptions-containers zijn deterministisch in bronvolgorde samengevoegd.',
+        reason: 'Multiple Exceptions containers were merged deterministically in source order.',
         resolution: 'RECOVERED',
       });
     }
@@ -949,7 +949,7 @@ export function readXerCalendars(tables: XerTables): XerCalendarReadResult {
         code: 'XER_CALENDAR_WEEKEND_CLAMP_RECONSTRUCTED',
         calendarId,
         line: row.line,
-        reason: 'Vrije weekenddagen die de P6-schrijver op de vrijdag ervóór of de maandag erná klemde, zijn als vrije dag gereconstrueerd; ze staan niet als record in het bestand.',
+        reason: 'Non-working weekend days clamped to the preceding Friday or following Monday by the P6 writer were reconstructed as non-working days; they are not stored as records in the file.',
         resolution: 'RECOVERED',
       });
     }
@@ -966,7 +966,7 @@ export function readXerCalendars(tables: XerTables): XerCalendarReadResult {
         code: 'XER_CALENDAR_SELF_BASE',
         calendarId: calendar.id,
         line,
-        reason: 'Een kalender kan zichzelf niet als basiskalender koppelen.',
+        reason: 'A calendar cannot reference itself as its base calendar.',
         resolution: 'UNLINKED',
       });
       continue;
@@ -977,7 +977,7 @@ export function readXerCalendars(tables: XerTables): XerCalendarReadResult {
         code: 'XER_CALENDAR_DANGLING_BASE',
         calendarId: calendar.id,
         line,
-        reason: 'De opgegeven basiskalender ontbreekt in het gelezen kalenderresultaat.',
+        reason: 'The specified base calendar is missing from the imported calendar result.',
         resolution: 'UNLINKED',
       });
       continue;
@@ -987,7 +987,7 @@ export function readXerCalendars(tables: XerTables): XerCalendarReadResult {
         code: 'XER_CALENDAR_BASE_CYCLE',
         calendarId: calendar.id,
         line,
-        reason: 'De basiskalenderverwijzing maakt deel uit van een cyclus en blijft ongekoppeld.',
+        reason: "The base calendar reference is part of a cycle and remains unlinked.",
         resolution: 'UNLINKED',
       });
       continue;

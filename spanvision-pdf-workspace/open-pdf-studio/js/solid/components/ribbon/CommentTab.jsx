@@ -135,15 +135,15 @@ export function CommentGroups() {
 
         <RibbonGroup label={t('measure.tools') || 'METEN'}>
           <RibbonButtonStack>
-            <RibbonButton size="small" id="tool-measure-distance" title={t('measure.measureDistance') || 'Afstand meten'} icon={measureDistanceIcon} label={t('measure.distance') || 'Afstand'}
+            <RibbonButton size="small" id="tool-measure-distance" title={t('measure.measureDistance') || "Measure distance"} icon={measureDistanceIcon} label={t('measure.distance') || "Distance"}
               disabled={noPdf() || isPdfAReadOnly()} active={state.currentTool === 'measureDistance'} onClick={() => setTool('measureDistance')} />
-            <RibbonButton size="small" id="tool-measure-area" title={t('measure.measureArea') || 'Oppervlakte meten'} icon={measureAreaIcon} label={t('measure.area') || 'Oppervlakte'}
+            <RibbonButton size="small" id="tool-measure-area" title={t('measure.measureArea') || "Measure area"} icon={measureAreaIcon} label={t('measure.area') || "Area"}
               disabled={noPdf() || isPdfAReadOnly()} active={state.currentTool === 'measureArea'} onClick={() => setTool('measureArea')} />
           </RibbonButtonStack>
           <RibbonButtonStack>
-            <RibbonButton size="small" id="tool-measure-perimeter" title={t('measure.measurePerimeter') || 'Omtrek meten'} icon={measurePerimeterIcon} label={t('measure.perimeter') || 'Omtrek'}
+            <RibbonButton size="small" id="tool-measure-perimeter" title={t('measure.measurePerimeter') || "Measure perimeter"} icon={measurePerimeterIcon} label={t('measure.perimeter') || "Perimeter"}
               disabled={noPdf() || isPdfAReadOnly()} active={state.currentTool === 'measurePerimeter'} onClick={() => setTool('measurePerimeter')} />
-            <RibbonButton size="small" id="tool-measure-angle" title={t('measure.measureAngle') || 'Hoek meten'} icon={measureAngleIcon} label={t('measure.angle') || 'Hoek'}
+            <RibbonButton size="small" id="tool-measure-angle" title={t('measure.measureAngle') || "Measure angle"} icon={measureAngleIcon} label={t('measure.angle') || "Angle"}
               disabled={noPdf() || isPdfAReadOnly()} active={state.currentTool === 'measureAngle'} onClick={() => setTool('measureAngle')} />
           </RibbonButtonStack>
         </RibbonGroup>

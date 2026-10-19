@@ -11,10 +11,7 @@
 
 export const brandwerendheid = `"Fire resistance — steel section (EN 1993-1-2)
 
-'<i>Bij brand loopt de staaltemperatuur op tot de sterkte onvoldoende wordt.
-'Hoe snel dat gaat volgt uit de profielfactor A<sub>m</sub>/V en de
-'eigenschappen van de bekleding; wanneer het kritiek wordt volgt uit de
-'benuttingsgraad μ<sub>0</sub> via de reductiefactor k<sub>y,θ</sub>.</i>
+'<i>During a fire, steel temperature rises until its strength becomes insufficient. The section factor A<sub>m</sub>/V and protection properties determine the heating rate; the utilization μ<sub>0</sub> and reduction factor k<sub>y,θ</sub> determine the critical condition.</i>
 
 # 1. Section
 
@@ -58,7 +55,7 @@ export const brandwerendheid = `"Fire resistance — steel section (EN 1993-1-2)
   Statically indeterminate = 2
 @end
 
-benutting = ?', benuttingsgraad μ_0 bij normale temperatuur'
+benutting = ?', utilization μ_0 at normal temperature'
 
 # 2. Protection
 
@@ -67,24 +64,24 @@ benutting = ?', benuttingsgraad μ_0 bij normale temperatuur'
   Bekleed = 1
 @end
 
-@select beklvorm "Vorm van de bekleding"
+@select beklvorm "Protection shape"
   Box protection = 1
   Contour protection = 2
 @end
 
-@select beklmateriaal "Material van de bekleding"
+@select beklmateriaal "Protection material"
   Gypsum board = 1
   Vermiculite/perlite board = 2
   Spray mortar = 3
   Mineral wool = 4
 @end
 
-d_p = ?*(mm)', dikte van de bekleding d_p'
+d_p = ?*(mm)', protection thickness d_p'
 lambda_p = ?', warmtegeleiding bekleding λ_p [W/mK]'
 rho_p = ?', volumieke massa bekleding ρ_p [kg/m³]'
-c_p = ?', soortelijke warmte bekleding c_p [J/kgK]'
+c_p = ?', protection specific heat c_p [J/kgK]'
 
-'<h6>Overzicht van de invoer</h6>
+'<h6>Input summary</h6>
 eis_min', brandwerendheidseis [min]'
 benutting
 d_p
@@ -92,11 +89,7 @@ lambda_p
 rho_p
 c_p
 
-# 3. Toetsing
+# 3. Checks
 
-'<i><b>Nog niet uitgewerkt.</b> Dit blad legt voorlopig alleen de invoer en het
-'parametrische beeld vast. De profielfactor A<sub>m</sub>/V, de incrementele
-'staaltemperatuur van §4.2.5.2 (onbekleed) resp. §4.2.5.3 (bekleed), de
-'kritieke staaltemperatuur θ<sub>a,cr</sub> uit μ<sub>0</sub> en de vergelijking
-'met de eis volgen.</i>
+'<i><b>Not yet implemented.</b> This sheet defines inputs and the parametric drawing only. The section factor A<sub>m</sub>/V, incremental steel temperature under §4.2.5.2 (unprotected) or §4.2.5.3 (protected), critical temperature θ<sub>a,cr</sub> from μ<sub>0</sub>, and comparison with the requirement are planned.</i>
 `;

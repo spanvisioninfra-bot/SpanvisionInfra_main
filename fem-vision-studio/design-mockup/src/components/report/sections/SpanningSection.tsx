@@ -49,11 +49,11 @@ function SpanningStaafBlok({ r }: { r: SpanningBeamCheckResult }) {
   return (
     <div className="rpt-spn-member">
       <h3 className="rpt-h3">
-        {t("report.colBeam", "Staaf")} {r.beam_id} — {r.section_name} ({r.material_name})
+        {t("report.colBeam", "Member")} {r.beam_id} — {r.section_name} ({r.material_name})
       </h3>
       <div className="rpt-chk-member-meta">
         <span>
-          {t("report.spanningGeenNorm", "vrije spanningstoets (geen norm)")} · f
+          {t("report.spanningGeenNorm", "Direct stress check (no design code)")} · f
           <sub>toel</sub> = {fmtValue(r.f_toel_mpa, 2)} N/mm² · γ<sub>M</sub> ={" "}
           {fmtValue(r.gamma_m, 2)} · f<sub>d</sub> = {fmtValue(r.f_d_mpa, 2)} N/mm²
         </span>
@@ -101,7 +101,7 @@ function SpanningStaafBlok({ r }: { r: SpanningBeamCheckResult }) {
           </div>
 
           <p className="rpt-spn-kopje">
-            {t("report.spanningDoorsnedeKop", "Doorsnede en maatgevende vezel")}
+            {t("report.spanningDoorsnedeKop", "Cross-section and governing fibre")}
           </p>
           <table className="rpt-table rpt-spn-tabel">
             <tbody>
@@ -167,16 +167,16 @@ export default function SpanningSection() {
       <style>{CHECK_REPORT_CSS}</style>
       <style>{SPANNING_REPORT_CSS}</style>
       <h2 className="rpt-h2">
-        {t("report.sectionSpanning", "Spanningstoets — doorsnede en spanningsverloop")}
+        {t("report.sectionSpanning", "Stress check — cross-section and stress distribution")}
       </h2>
 
       {spanning.length === 0 ? (
         <p className="rpt-empty-note">
           {results.length === 0
-            ? t("report.notChecked", "Nog niet getoetst — voer de normtoetsing uit via het tabblad Toetsing.")
+            ? t("report.notChecked", "Not checked yet. Run the code checks from the Checks tab.")
             : t(
                 "report.spanningGeen",
-                "Geen staven met een vrij materiaal in het model (materiaalnaam \"VRIJ:…\").",
+                "No members with a custom material in the model (material name \"VRIJ:…\").",
               )}
         </p>
       ) : (
@@ -185,7 +185,7 @@ export default function SpanningSection() {
             {checkedTime && `${t("report.checkedAt", "Toetsing uitgevoerd op")} ${checkedTime}. `}
             {t(
               "report.spanningMethodeNoot",
-              "Methode: de spanningen volgen rechtstreeks uit de snedekrachten — σx = N/A + My·(z − zc)/Iy en τ = Vz·S(z)/(Iy·b(z)) — en worden per vezel over de hoogte samengenomen tot de vergelijkspanning van von Mises voor een vlakke spanningstoestand: σeq = √(σx² + σz² − σx·σz + 3·τ²). Bij σz = 0 vereenvoudigt die tot √(σx² + 3·τ²), de vorm van NEN-EN 1993-1-1 6.2.1(5). Dit is uitdrukkelijk GEEN normtoetsing: er is geen doorsnedeklassificatie en geen knik-, kip- of doorbuigingstoets, en de toelaatbare spanning komt van de gebruiker.",
+              "Method: stresses follow directly from section forces — σx = N/A + My·(z − zc)/Iy and τ = Vz·S(z)/(Iy·b(z)) — and are combined at each fibre over the height into the von Mises equivalent stress for plane stress: σeq = √(σx² + σz² − σx·σz + 3·τ²). With σz = 0 this becomes √(σx² + 3·τ²), as in NEN-EN 1993-1-1 6.2.1(5). This is explicitly NOT a design-code check: no section classification, buckling, lateral-torsional buckling or deflection check is performed, and the allowable stress is supplied by the user.",
             )}{" "}
             {weggelaten > 0 &&
               t("report.spanningStaafKeuzeNoot", {

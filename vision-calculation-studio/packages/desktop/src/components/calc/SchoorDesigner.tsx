@@ -214,7 +214,7 @@ export default function SchoorDesigner() {
         <span className="vd-live">
           {prof.naam} {uitv === 2 ? "(double)" : "(single)"} A{fy} · {n}× M{M}–{KWAL.find((k) => k.v === kwal)?.label} ·
           e<sub>1</sub>/p<sub>1</sub> = {fmt(e1)}/{fmt(p1)} · schetsplaat {fmt(bS)}×{fmt(hS)}×{fmt(tS)} mm ·
-          a = {fmt(aLas)} mm · hoek {fmt(hoek)}° · F<sub>Ed</sub> = {fmt(F)} kN
+          a = {fmt(aLas)}  mm · angle {fmt(hoek)}° · F<sub>Ed</sub> = {fmt(F)} kN
         </span>
       </div>
     </div>

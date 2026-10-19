@@ -69,7 +69,7 @@ export function createActualAutoSaveController(deps: {
           } else {
             // Geen stille "opgeslagen"-indruk bij een verdwenen/vergrendeld doel. De UI-laag
             // dedupliceert deze fout, zodat een aanhoudend probleem geen notificatiestorm wordt.
-            deps.onFailure(candidate, new Error('Het bestaande projectbestand is niet schrijfbaar.'));
+            deps.onFailure(candidate, new Error('The existing project file is not writable.'));
           }
         } catch (error) {
           deps.onFailure(candidate, error);

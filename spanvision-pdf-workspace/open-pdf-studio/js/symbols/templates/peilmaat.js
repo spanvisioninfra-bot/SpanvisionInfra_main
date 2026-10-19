@@ -8,7 +8,7 @@ export const peilmaatTemplate = {
   category: 'NL',
   defaultSize: { width: 120, height: 48 },
   params: [
-    { key: 'value', label: 'Waarde', labelEn: 'Value', type: 'string', default: 'P = 0' },
+    { key: 'value', label: "Value", labelEn: 'Value', type: 'string', default: 'P = 0' },
     { key: 'filled', label: 'Gevuld driehoekje', labelEn: 'Filled triangle', type: 'boolean', default: false },
     { key: 'baseline', label: 'Basislijn', labelEn: 'Baseline', type: 'boolean', default: true },
   ],

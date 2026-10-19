@@ -139,7 +139,7 @@ function requireBool(v: unknown, name: string): void {
 function requireIsoDate(v: unknown, name: string): void {
   if (v === undefined) return;
   if (typeof v !== 'string' || !ISO_DATE_ONLY.test(v)) {
-    throw new McpStepError('VALIDATION', `\`${name}\` moet een ISO-datum zijn (JJJJ-MM-DD), kreeg '${String(v)}'.`);
+    throw new McpStepError('VALIDATION', `“${name}” must be an ISO date (YYYY-MM-DD); received '${String(v)}'.`);
   }
 }
 
@@ -151,12 +151,12 @@ function requireIsoDate(v: unknown, name: string): void {
 function requirePageArgs(args: PageArgs): void {
   if (args.limit !== undefined) {
     if (typeof args.limit !== 'number' || !Number.isInteger(args.limit) || args.limit < 1 || args.limit > 1000) {
-      throw new McpStepError('VALIDATION', `\`limit\` moet een geheel getal van 1 t/m 1000 zijn, kreeg '${String(args.limit)}'.`);
+      throw new McpStepError('VALIDATION', `“limit” must be an integer from 1 to 1000; received '${String(args.limit)}'.`);
     }
   }
   if (args.offset !== undefined) {
     if (typeof args.offset !== 'number' || !Number.isInteger(args.offset) || args.offset < 0) {
-      throw new McpStepError('VALIDATION', `\`offset\` moet een geheel getal ≥ 0 zijn, kreeg '${String(args.offset)}'.`);
+      throw new McpStepError('VALIDATION', `“offset” must be an integer ≥ 0; received '${String(args.offset)}'.`);
     }
   }
 }
@@ -357,7 +357,7 @@ function listTasks(s: AppState, args: ListTasksArgs) {
   requireBool(args.zonder_relaties, 'zonder_relaties');
   if (args.status !== undefined && !TASK_STATUSES.includes(args.status as string)) {
     throw new McpStepError('VALIDATION',
-      `\`status\` moet één van ${TASK_STATUSES.join(', ')} zijn (hoofdlettergevoelig), kreeg '${String(args.status)}'.`);
+      `“status” must be one of ${TASK_STATUSES.join(', ')} (case-sensitive); received '${String(args.status)}'.`);
   }
   requireIsoDate(args.van, 'van');
   requireIsoDate(args.tot, 'tot');
@@ -430,7 +430,7 @@ interface GetTaskArgs {
 function getTask(s: AppState, args: GetTaskArgs) {
   requireOnlyKeys(args, ['taskId'], 'get_task');
   if (typeof args.taskId !== 'string' || args.taskId === '') {
-    throw new McpStepError('VALIDATION', 'get_task vereist een `taskId` (string).');
+    throw new McpStepError('VALIDATION', "get_task requires a taskId string.");
   }
   const task = s.tasks.find((t) => t.id === args.taskId);
   if (!task) {
@@ -743,17 +743,17 @@ function getResourceHistogram(ctx: McpContext, args: HistogramArgs) {
   requireOnlyKeys(args, HISTOGRAM_KEYS, 'get_resource_histogram');
   if (args.bucket !== undefined && args.bucket !== "dag" && args.bucket !== "week" && args.bucket !== "maand") {
     throw new McpStepError('VALIDATION',
-      `\`bucket\` moet 'dag', 'week' of 'maand' zijn (Nederlandse waarden), kreeg '${String(args.bucket)}'.`);
+      `“bucket” must be 'dag', 'week' or 'maand' (API values for day, week or month); received '${String(args.bucket)}'.`);
   }
   requireIsoDate(args.van, 'van');
   requireIsoDate(args.tot, 'tot');
   let resourceIds: string[] | undefined;
   if (args.resourceIds !== undefined) {
     if (!Array.isArray(args.resourceIds)) {
-      throw new McpStepError('VALIDATION', "`resourceIds` moet een array van resource-id-strings zijn.");
+      throw new McpStepError('VALIDATION', "resourceIds must be an array of resource id strings.");
     }
     if (args.resourceIds.some((x) => typeof x !== 'string' || x === '')) {
-      throw new McpStepError('VALIDATION', '`resourceIds` mag alleen niet-lege resource-id-strings bevatten.');
+      throw new McpStepError('VALIDATION', "resourceIds must contain only non-empty resource id strings.");
     }
     const known = new Set(ctx.app.store.getState().resources.map((r) => r.id));
     const unknown = (args.resourceIds as string[]).filter((id) => !known.has(id));

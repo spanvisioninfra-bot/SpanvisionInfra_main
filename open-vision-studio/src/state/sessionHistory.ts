@@ -237,14 +237,14 @@ export function materializeHistoryTarget(
  */
 export function assertValidSessionHistoryEvent(event: SessionHistoryEvent): void {
   if (event.deltas.length === 0) {
-    throw new Error(`History-event ${event.id || '<zonder id>'} bevat geen deltas`);
+    throw new Error(`History event ${event.id || '<zonder id>'} contains no deltas`);
   }
   // `sequence` is een oplopende sessieteller, geen willekeurig ranggetal. Met NaN zouden zowel
   // hoogste-undo als laagste-redo stil afhankelijk worden van arrayvolgorde; onveilige integers
   // kunnen bij het ophogen bovendien gelijk gaan lijken door IEEE-754-afronding.
   if (!Number.isSafeInteger(event.sequence) || event.sequence <= 0) {
     throw new Error(
-      `History-event ${event.id || '<zonder id>'} heeft een ongeldige sequence: ${String(event.sequence)}`,
+      `History event ${event.id || '<zonder id>'} has an invalid sequence: ${String(event.sequence)}`,
     );
   }
 
@@ -428,7 +428,7 @@ export function appendSessionHistoryEvent(
 ): SessionHistoryEvent[] {
   assertValidSessionHistoryEvent(newEvent);
   if (newEvent.state !== 'applied') {
-    throw new Error(`Nieuw history-event ${newEvent.id || '<zonder id>'} moet toegepast zijn`);
+    throw new Error(`New history event ${newEvent.id || '<zonder id>'} must be applied`);
   }
   if (events.some(event => event.id === newEvent.id)) {
     // Alleen de actuele ledger hoeft uniek te zijn: een gepruned event is niet meer selecteerbaar
@@ -442,7 +442,7 @@ export function appendSessionHistoryEvent(
   const highestSequence = events.reduce((highest, event) => Math.max(highest, event.sequence), 0);
   if (newEvent.sequence <= highestSequence) {
     throw new Error(
-      `Nieuw history-event ${newEvent.id || '<zonder id>'} heeft geen oplopende sequence`,
+      `New history event ${newEvent.id || '<zonder id>'} does not have an increasing sequence`,
     );
   }
 
@@ -465,7 +465,7 @@ export function recordSessionHistoryDeltas(
   if (deltas.length === 0) return null;
   const sequence = state.nextHistorySequence;
   if (!Number.isSafeInteger(sequence) || sequence <= 0) {
-    throw new Error(`Ongeldige volgende history-sequence: ${String(sequence)}`);
+    throw new Error(`Invalid next history sequence: ${String(sequence)}`);
   }
   const event: SessionHistoryEvent = {
     id: `history-${sequence}`,

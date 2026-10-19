@@ -27,8 +27,8 @@ export function importRsu(text: string): ImportResult {
     schedule: { name: 'RSU-import' },
     items: [],
     warnings: [
-      'Dit lijkt het oudere, niet-XML RSU-formaat (RAW 2005 of ouder); dat recordformaat is niet publiek gespecificeerd.',
-      'Lever een voorbeeld-RSU aan (map verification-files) voor exacte ondersteuning, of converteer het bestand eerst naar RSX (XML).',
+      'This appears to be the older non-XML RSU format (RAW 2005 or earlier); its record format is not publicly documented.',
+      'Provide a sample RSU file in verification-files for exact support, or convert it to RSX (XML) first.',
     ],
     format: 'rsu',
   };

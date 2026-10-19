@@ -95,7 +95,7 @@ export default function DisplacementsSection() {
         <p className="rpt-note">
           {t(
             "report.governingDispNote",
-            "Omhullende gekozen — getoond is de maatgevende combinatie (grootste verplaatsing):",
+            "Envelope selected. The governing combination (greatest displacement) is shown:",
           )}{" "}
           <strong>{combo.name}</strong>.
         </p>
@@ -104,7 +104,7 @@ export default function DisplacementsSection() {
       {/* ── Knoopverplaatsingen ── */}
       <h3 className="rpt-h3">{t("report.nodalDispTitle", "Knoopverplaatsingen")}</h3>
       {sortedNodes.length === 0 ? (
-        <p className="rpt-empty-note">{t("report.noNodes", "Geen knopen in het model.")}</p>
+        <p className="rpt-empty-note">{t("report.noNodes", "No nodes in the model.")}</p>
       ) : (
         <table className="rpt-table">
           <thead>
@@ -135,12 +135,12 @@ export default function DisplacementsSection() {
       {fieldRows.length > 0 && (
         <>
           <h3 className="rpt-h3">
-            {t("report.fieldDeflTitle", "Veldzakking per staaf (max |w|)")}
+            {t("report.fieldDeflTitle", "Span deflection per member (max |w|)")}
           </h3>
           <table className="rpt-table">
             <thead>
               <tr>
-                <th>{t("report.colBeam", "Staaf")}</th>
+                <th>{t("report.colBeam", "Member")}</th>
                 <th className="rpt-num">w [mm]</th>
                 <th className="rpt-num">{t("report.colPosition", "x [m]")}</th>
                 <th className="rpt-num">x/L [—]</th>
@@ -162,7 +162,7 @@ export default function DisplacementsSection() {
           <p className="rpt-note" style={{ marginTop: "1.5mm" }}>
             {t(
               "report.fieldDeflNote",
-              "w = zakking loodrecht op de staafas, gerekend van links naar rechts (een staande staaf van voet naar kop): negatief = doorhangen, bij een staande staaf naar rechts; x gemeten vanaf het linker uiteinde of de voet.",
+              "w = deflection perpendicular to the member axis, measured from left to right (base to top for a vertical member): negative means sagging, or to the right for a vertical member; x is measured from the left end or base.",
             )}
           </p>
         </>

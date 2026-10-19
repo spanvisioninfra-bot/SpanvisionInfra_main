@@ -183,7 +183,7 @@ export default function ProjectSettingsDialog({ open, onClose }: ProjectSettings
                   </div>
                   <button type="button" className="ps-remove-btn"
                           onClick={() => void closeCpt(c.id)}
-                          aria-label={t("remove", "Verwijder")}>
+                          aria-label={t("remove", "Remove")}>
                     ×
                   </button>
                 </li>
@@ -218,7 +218,7 @@ export default function ProjectSettingsDialog({ open, onClose }: ProjectSettings
 
           {bores.length === 0 ? (
             <div className="ps-empty">
-              <p>{t("noBoresHint", "Nog geen boringen toegevoegd. Klik op 'Boring toevoegen' om BHR-GT XML te importeren.")}</p>
+              <p>{t("noBoresHint", "No boreholes added yet. Click \"Add borehole\" to import BHR-GT XML.")}</p>
             </div>
           ) : (
             <ul className="ps-cpt-list">
@@ -242,7 +242,7 @@ export default function ProjectSettingsDialog({ open, onClose }: ProjectSettings
                     </div>
                     <button type="button" className="ps-remove-btn"
                             onClick={() => removeBoreFromActiveProject(b.id)}
-                            aria-label={t("remove", "Verwijder")}>
+                            aria-label={t("remove", "Remove")}>
                       ×
                     </button>
                   </li>

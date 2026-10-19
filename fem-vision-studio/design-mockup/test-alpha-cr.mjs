@@ -106,13 +106,13 @@ log("\n[4] Meldingen: eerste orde met α_cr < 10 is een FOUT");
   const fout = stabiliteitsMeldingen(r, "eersteOrde", false);
   check("eerste orde: één FOUT met 5.2.1(3) en de combinatienaam", fout.length === 1 && fout[0].niveau === "fout" && /5\.2\.1\(3\)/.test(fout[0].tekst) && /1\.35G/.test(fout[0].tekst), JSON.stringify(fout));
   const w = stabiliteitsMeldingen(r, "tweedeOrdeGeometrisch", false);
-  check("tweede orde zonder scheefstand: waarschuwing", w.length === 1 && w[0].niveau === "waarschuwing" && /scheefstand/.test(w[0].tekst));
+  check("tweede orde zonder scheefstand: waarschuwing", w.length === 1 && w[0].niveau === "waarschuwing" && /out-of-plumb/.test(w[0].tekst));
   const i = stabiliteitsMeldingen(r, "tweedeOrdeGeometrisch", true);
   check("tweede orde met scheefstand: alleen info", i.length === 1 && i[0].niveau === "info");
   const ok = stabiliteitsMeldingen(reken(portaal("fixed", 20), combos), "eersteOrde", false);
   check("ingeklemd (α_cr 17,6): geen melding", ok.length === 0, JSON.stringify(ok));
-  const tekst = analyseToelichting("eersteOrde", "1e orde", "Eerste orde, lineair.", r, false);
-  check("toelichting: analysetype, α_cr-regel en een '!'-regel", /Analysetype: 1e orde/.test(tekst) && /α_cr = 4,\d\d/.test(tekst) && /\n! EERSTE ORDE NIET TOEGESTAAN/.test(tekst), tekst);
+  const tekst = analyseToelichting("eersteOrde", "First order", "First-order linear analysis.", r, false);
+  check("toelichting: analysetype, α_cr-regel en een '!'-regel", /Analysis type: First order/.test(tekst) && /α_cr = 4,\d\d/.test(tekst) && /\n! FIRST-ORDER ANALYSIS NOT PERMITTED/.test(tekst), tekst);
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -123,8 +123,8 @@ log("\n[5] Model met wandschijf: niet bepaald, met reden en waarschuwing");
     plates: [{ id: 1, nodeIds: [1, 2, 3, 4], thickness: 200, E: 30000, nu: 0.2, rho: 2.5e-6, meshSize: 2000 }],
   };
   const r = bepaalAlphaCr(input, [uls(1, "1.35G", [[1, 1.35]])], new Map());
-  check("niet_bepaald met reden 'wandschijven'", r[0].status === "niet_bepaald" && /wandschijven/.test(r[0].reden));
-  check("eerste orde: waarschuwing dat de voorwaarde niet is gecontroleerd", stabiliteitsMeldingen(r, "eersteOrde", false).some((m) => m.niveau === "waarschuwing" && /niet gecontroleerd/.test(m.tekst)));
+  check("niet_bepaald met reden 'wandschijven'", r[0].status === "niet_bepaald" && /wall plates/.test(r[0].reden));
+  check("eerste orde: waarschuwing dat de voorwaarde niet is gecontroleerd", stabiliteitsMeldingen(r, "eersteOrde", false).some((m) => m.niveau === "waarschuwing" && /not been checked/.test(m.tekst)));
 }
 
 log(`\n${"─".repeat(50)}`);

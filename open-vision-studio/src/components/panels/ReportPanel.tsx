@@ -170,7 +170,7 @@ function canvasToPngBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(blob => {
       if (blob) resolve(blob);
-      else reject(new Error('Rapportpreview kon niet naar PNG worden omgezet'));
+      else reject(new Error('Unable to convert the report preview to PNG'));
     }, 'image/png');
   });
 }
@@ -736,7 +736,7 @@ export function ReportPanel() {
     durationSuffixes,
     calendars,
     barColorsLegendLabels: {
-      criticalOutline: t('legend.criticalOutline', { defaultValue: 'Kritiek pad (rand)' }),
+      criticalOutline: t('legend.criticalOutline', { defaultValue: "Critical path (border)" }),
       categoriesMore: (n: number) => t('legend.categoriesMore', { count: n }),
     },
   }), [showCritical, showFloat, showDeps, showWeekends, showLegend, showTaskNames, showCompletion, showBaselineOverlay,
@@ -1144,7 +1144,7 @@ export function ReportPanel() {
 
     const exportTableRaster = async (): Promise<Uint8Array> => {
       const node = tableSpec ? tableReportRef.current : reportType === 'milestones' ? milestoneRef.current : varianceRef.current;
-      if (!node) throw new Error('exportTableRaster: DOM-node niet beschikbaar');
+      if (!node) throw new Error('exportTableRaster: DOM node is unavailable');
 
       // domToCanvas met scale=s levert een canvas van node.offsetWidth*s × node.offsetHeight*s
       // device-px; de LOGISCHE maat blijft node.offsetWidth/offsetHeight, dus srcScale =

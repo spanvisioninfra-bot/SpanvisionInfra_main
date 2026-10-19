@@ -8,17 +8,13 @@
  * Variabelenamen komen exact overeen met MomentverbindingDesigner.tsx.
  */
 
-export const momentverbinding = `"Moment connection — ligger op column met end plate
+export const momentverbinding = `"Moment connection — beam to column with end plate
 
-'<i>Een momentvaste ligger-kolomverbinding met een geboute kopplaat en
-'eventueel een console onder de ligger. De weerstand volgt uit de zwakste
-'component: de kopplaat op buiging, de kolomflens, het kolomlijf op druk,
-'trek en afschuiving, en de boutrijen. Het aantal boutrijen en de console
-'sturen zowel de tekening als de inwendige hefboomsarmen.</i>
+'<i>A moment-resisting beam-to-column connection with a bolted end plate and optional haunch beneath the beam. Resistance is governed by the weakest component: end plate bending, column flange, column web in compression, tension and shear, or bolt rows. Bolt rows and the haunch control both the drawing and internal lever arms.</i>
 
-# 1. Systeem
+# 1. System
 
-@select stabiliteit "Stability van het raamwerk"
+@select stabiliteit "Frame stability"
   Unbraced = 1
   Braced = 2
 @end
@@ -88,24 +84,24 @@ export const momentverbinding = `"Moment connection — ligger op column met end
 
 # 2. End plate en bouten
 
-n_boutrijen = ?', aantal boutrijen'
+n_boutrijen = ?', number of bolt rows'
 t_kp = ?*(mm)', dikte kopplaat'
-b_kp = ?*(mm)', breedte kopplaat'
+b_kp = ?*(mm)', end plate width'
 e_kp = ?*(mm)', randafstand bovenin de kopplaat'
-p_kp = ?*(mm)', steek tussen de boutrijen'
-w_kp = ?*(mm)', horizontale hart-op-hart afstand van de bouten'
-h_console = ?*(mm)', hoogte van de console'
-l_console = ?*(mm)', lengte van de console'
-a_flens = ?*(mm)', keeldikte las ligger­flens op kopplaat'
-a_lijf = ?*(mm)', keeldikte las liggerlijf op kopplaat'
+p_kp = ?*(mm)', bolt row pitch'
+w_kp = ?*(mm)', horizontal bolt center-to-center spacing'
+h_console = ?*(mm)', haunch height'
+l_console = ?*(mm)', haunch length'
+a_flens = ?*(mm)', weld throat thickness between beam flange and end plate'
+a_lijf = ?*(mm)', weld throat thickness between beam web and end plate'
 
 # 3. Loads
 
-L_b = ?*(mm)', overspanning van de ligger L_b'
+L_b = ?*(mm)', beam span L_b'
 M_Ed = ?*(kN*m)', moment in de verbinding M_Ed'
 V_Ed = ?*(kN)', dwarskracht in de verbinding V_Ed'
 
-'<h6>Overzicht van de invoer</h6>
+'<h6>Input summary</h6>
 n_boutrijen
 t_kp
 b_kp
@@ -114,11 +110,7 @@ w_kp
 M_Ed
 V_Ed
 
-# 4. Toetsing
+# 4. Checks
 
-'<i><b>Nog niet uitgewerkt.</b> Dit blad legt voorlopig alleen de invoer en het
-'parametrische beeld vast. De componentenmethode van EN 1993-1-8 §6 — de
-'T-stukken van kopplaat en kolomflens, het kolomlijf op druk/trek/afschuiving,
-'de effectieve trekkracht per boutrij, M<sub>j,Rd</sub>, de rotatiestijfheid
-'S<sub>j,ini</sub> en de classificatie — volgt.</i>
+'<i><b>Not yet implemented.</b> This sheet defines inputs and the parametric drawing only. The EN 1993-1-8 §6 component method is planned: end-plate and column-flange T stubs, column-web compression/tension/shear, effective tension per bolt row, M<sub>j,Rd</sub>, rotational stiffness S<sub>j,ini</sub>, and classification.</i>
 `;

@@ -113,7 +113,7 @@ function StaafBlok({ r }: { r: SegmentStiffnessResponse }) {
   return (
     <div className="rpt-eis-staaf">
       <p className="rpt-eis-staafkop">
-        {t("report.colBeam", "Staaf")} {r.beam_id} — {r.section_name} ({r.concrete_class},{" "}
+        {t("report.colBeam", "Member")} {r.beam_id} — {r.section_name} ({r.concrete_class},{" "}
         {r.reinforcement_grade}) · {r.reinforcement_summary}
       </p>
       <p className="rpt-eis-staafmeta">
@@ -230,15 +230,15 @@ function StaafBlok({ r }: { r: SegmentStiffnessResponse }) {
         {r.limit_state === "DesignValues"
           ? t(
               "report.eisUgtToelichting",
-              "In deze variant zegt de kolom Toestand alleen of |M_Ed| boven het scheurmoment |M_cr| ligt. De stijfheid zelf wordt in beide gevallen zonder betontrek bepaald (5.8.6(5)): zodra er trek in de doorsnede optreedt ligt EI daarom onder E_c·I_c, ook bij een segment dat als ongescheurd staat aangemerkt, terwijl een segment waarin de normaalkracht de hele doorsnede op druk houdt vlak bij E_c·I_c blijft.",
+              "In this variant, the State column only indicates whether |M_Ed| exceeds the cracking moment |M_cr|. Stiffness is calculated without concrete tension in both cases (5.8.6(5)). As soon as tension occurs, EI is therefore below E_c·I_c, even in a segment labelled uncracked. A segment whose entire section is in compression remains close to E_c·I_c.",
             )
           : t(
               "report.eisBgtToelichting",
-              "In deze variant interpoleert ζ van (7.19) tussen de ongescheurde en de volledig gescheurde toestand (7.4.3): ζ = 0 is ongescheurd, ζ → 1 volledig gescheurd.",
+              "In this variant, ζ from (7.19) interpolates between the uncracked and fully cracked states (7.4.3): ζ = 0 is uncracked and ζ → 1 is fully cracked.",
             )}{" "}
         {t(
           "report.eisRatioBoven1",
-          "Een verhouding boven 1 kan voorkomen: E_c·I_c is alleen de bruto betondoorsnede, terwijl de wapening in de ongescheurde toestand meedraagt.",
+          "A ratio above 1 is possible: E_c·I_c represents only the gross concrete section, whereas reinforcement also contributes in the uncracked state.",
         )}{" "}
         {t("report.eisM0Uitleg", {
           defaultValue:
@@ -309,7 +309,7 @@ function CombinatieBlok({ c, segmentLengteMm }: { c: StijfheidCombinatie; segmen
             </td>
           </tr>
           <tr>
-            <th>{t("report.eisRonden", "Aantal ronden")}</th>
+            <th>{t("report.eisRonden", "Number of iterations")}</th>
             <td>
               {t("report.eisRondenWaarde", {
                 defaultValue:
@@ -326,7 +326,7 @@ function CombinatieBlok({ c, segmentLengteMm }: { c: StijfheidCombinatie; segmen
               {" — "}
               <span className={conv ? "rpt-eis-ok" : "rpt-eis-nok"}>
                 {waarde === null
-                  ? t("report.eisGeenMaat", "geen maat beschikbaar")
+                  ? t("report.eisGeenMaat", "No dimensions available")
                   : t("report.eisGehaald", {
                       defaultValue:
                         "achieved: {{waarde}} % in the last round (member {{staaf}}, segment {{segment}})",
@@ -336,7 +336,7 @@ function CombinatieBlok({ c, segmentLengteMm }: { c: StijfheidCombinatie; segmen
                     })}
                 {conv
                   ? ` — ${t("report.eisGeconvergeerd", "geconvergeerd")}`
-                  : ` — ${t("report.eisNietGeconvergeerd", "NIET geconvergeerd")}`}
+                  : ` — ${t("report.eisNietGeconvergeerd", "NOT converged")}`}
               </span>
             </td>
           </tr>
@@ -405,7 +405,7 @@ function CombinatieBlok({ c, segmentLengteMm }: { c: StijfheidCombinatie; segmen
                 ? "—"
                 : c.staven.some((r) => r.phi_ef !== eerste.phi_ef)
                   ? c.staven
-                      .map((r) => `${nl(r.phi_ef, 2)} (${t("report.colBeam", "Staaf").toLowerCase()} ${r.beam_id})`)
+                      .map((r) => `${nl(r.phi_ef, 2)} (${t("report.colBeam", "Member").toLowerCase()} ${r.beam_id})`)
                       .join("; ")
                   : nl(eerste.phi_ef, 2)}
               {c.staven.some((r) => r.kruip_5_19) && (
@@ -464,14 +464,14 @@ export default function BetonStijfheidSection() {
       <style>{CHECK_REPORT_CSS}</style>
       <style>{EIS_REPORT_CSS}</style>
       <h2 className="rpt-h2">
-        {t("report.sectionBetonStijfheid", "Beton — fysisch niet-lineaire tweede orde")}
+        {t("report.sectionBetonStijfheid", "Concrete — physically nonlinear second-order analysis")}
       </h2>
 
       {combinaties.length === 0 ? (
         <p className="rpt-empty-note">
           {t(
             "report.eisNietGerekend",
-            'Er is niet fysisch niet-lineair gerekend. Dit hoofdstuk vult zich zodra het analysetype "2e orde + fysisch" is gekozen én het model betonstaven met een wapeningskorf bevat; de segmentstijfheden komen dan uit de rekenkern.',
+            'No physically nonlinear analysis was run. This chapter is populated when "2nd order + physical" is selected and the model contains concrete members with reinforcement cages; segment stiffnesses then come from the calculation engine.',
           )}
         </p>
       ) : (
@@ -480,11 +480,11 @@ export default function BetonStijfheidSection() {
             {berekendTijd && `${t("report.eisBerekendOp", "Berekend op")} ${berekendTijd}. `}
             {t(
               "report.eisMethodeNoot",
-              "Methode: de algemene methode van NEN-EN 1992-1-1 5.8.6. Elke betonstaaf is in segmenten geknipt en in het midden van elk segment (5.8.6(6)) is aan evenwicht en compatibiliteit voldaan; daaruit volgt per segment de kromming κ bij de gevonden (N_Ed, M_Ed) en de secante buigstijfheid EI = (M_Ed − M₀)/κ, waarmee het raamwerk opnieuw wordt opgelost tot de stijfheden niet meer veranderen. Tekenconventie: N positief is trek, M positief is trek in de onderste vezel.",
+              "Method: the general method of NEN-EN 1992-1-1 5.8.6. Each concrete member is divided into segments. Equilibrium and compatibility are satisfied at the midpoint of each segment (5.8.6(6)), giving curvature κ at the calculated (N_Ed, M_Ed) and secant bending stiffness EI = (M_Ed − M₀)/κ. The frame is solved again until stiffnesses stop changing. Sign convention: positive N is tension; positive M produces tension in the bottom fibre.",
             )}{" "}
             {t(
               "report.eisGeenOmhullende",
-              "De stijfheid volgt uit de krachten van één belastingtoestand, dus elke combinatie heeft haar eigen EI-verdeling en er bestaat geen omhullende stijfheid: superpositie is in dit pad geometrisch én fysisch ongeldig.",
+              "Stiffness follows the forces of one load state, so each combination has its own EI distribution. There is no envelope stiffness: superposition is geometrically and physically invalid in this analysis.",
             )}{" "}
             {alle &&
               t("report.eisAlleCombinaties", {
@@ -510,7 +510,7 @@ export default function BetonStijfheidSection() {
                 </span>{" "}
                 {t(
                   "report.eisZonderKruipUitleg",
-                  "Art. 5.8.6(4) laat kruip in rekening brengen door alle rekwaarden van het spanning-rekdiagram met (1 + φ_ef) te vermenigvuldigen, wat voor de beginhelling neerkomt op de effectieve elasticiteitsmodulus E_c,eff = E_cm/(1 + φ) van (7.20). Zonder die verlaging is de buigstijfheid te hoog: de berekende zakking is TE KLEIN, en in een statisch onbepaalde constructie trekken de te stijve betonstaven bovendien te veel moment naar zich toe. Beide staan aan de onveilige kant. Geef φ(∞,t₀) op, of laat hem volgens bijlage B berekenen uit de relatieve vochtigheid, de ouderdom t₀ bij belasten en de cementklasse (h₀ volgt uit de doorsnede).",
+                  "Clause 5.8.6(4) allows creep to be included by multiplying all strains in the stress-strain diagram by (1 + φ_ef). For the initial slope this corresponds to E_c,eff = E_cm/(1 + φ) in (7.20). Without that reduction, bending stiffness is too high and calculated deflection is TOO SMALL. In a statically indeterminate structure, the overly stiff concrete members also attract too much moment. Both effects are unsafe. Enter φ(∞,t₀), or calculate it using Annex B from relative humidity, age t₀ at loading, and cement class (h₀ follows from the section).",
                 )}
               </p>
             </div>
@@ -528,7 +528,7 @@ export default function BetonStijfheidSection() {
               <ul>
                 {overgeslagen.map((o) => (
                   <li key={o.beamId}>
-                    {t("report.colBeam", "Staaf")} {o.beamId} — {o.reason}
+                    {t("report.colBeam", "Member")} {o.beamId} — {o.reason}
                   </li>
                 ))}
               </ul>

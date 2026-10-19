@@ -19,7 +19,7 @@ export function isDemoMode(): boolean {
 /** Fake spatial tree */
 const DEMO_SPATIAL_TREE: SpatialNode = {
   globalId: "0001",
-  name: "Kantoorgebouw Zwolle",
+  name: "Office building Zwolle",
   type: "IfcProject",
   elementCount: 2847,
   children: [
@@ -51,14 +51,14 @@ const DEMO_SPATIAL_TREE: SpatialNode = {
             },
             {
               globalId: "0012",
-              name: "Eerste verdieping (1)",
+              name: "First floor (1)",
               type: "IfcBuildingStorey",
               elementCount: 756,
               children: [],
             },
             {
               globalId: "0013",
-              name: "Tweede verdieping (2)",
+              name: "Second floor (2)",
               type: "IfcBuildingStorey",
               elementCount: 634,
               children: [],
@@ -276,7 +276,7 @@ const DEMO_VALIDATION_RESULT: ValidationResult = {
       ],
     },
     {
-      specification_name: "Verdieping-toewijzing compleet",
+      specification_name: "Floor assignment complete",
       status: "pass",
       severity: "info",
       total_requirements: 1,
@@ -305,7 +305,7 @@ export function useDemoMode(): void {
     // Create project
     const project: Project = {
       id: "demo-project-001",
-      name: "Kantoorgebouw Zwolle",
+      name: "Office building Zwolle",
       createdAt: new Date().toISOString(),
       models: [
         {

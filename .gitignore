@@ -121,3 +121,10 @@ node_modules.audit-incomplete/
 # Generated QA artifacts
 /qa/readiness/browser-temp/node-compile-cache/
 /qa/modes/planner-smoke-build/
+
+/spanvision-post-*.png
+*.mp4
+*.mov
+*.webm
+*.avi
+/output/spanvision-promo/

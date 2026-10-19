@@ -76,7 +76,7 @@ function revokeApi(api: Record<string, unknown>, extensionId: string): void {
     for (const [name, value] of Object.entries(group as Record<string, unknown>)) {
       if (typeof value !== 'function') continue;
       (group as Record<string, unknown>)[name] = () => {
-        throw new Error(`Extensie "${extensionId}" is gedeactiveerd; ${groupName}.${name} is na uitschakelen of verwijderen niet meer beschikbaar`);
+        throw new Error(`Extension "${extensionId}" is disabled; ${groupName}.${name} is unavailable after disabling or removing it`);
       };
     }
   }
@@ -97,24 +97,24 @@ export function createExtensionApi(
   ): { id: string; name: string } | undefined => {
     if (!type) return undefined;
     const id = type.id.trim();
-    if (!id) throw new Error(`Extensie "${extensionId}": customTaskType.id mag niet leeg zijn`);
+    if (!id) throw new Error(`Extension "${extensionId}": customTaskType.id must not be empty`);
     const state = document.store.getState();
     const existing = state.customTaskTypes.find(candidate => candidate.id === id);
     const name = type.name?.trim();
     if (existing) {
       if (name && existing.name !== name) {
-        throw new Error(`Extensie "${extensionId}": customTaskType-id '${id}' heeft al projectsnapshot '${existing.name}'`);
+        throw new Error(`Extension "${extensionId}": customTaskType id '${id}' already has project snapshot '${existing.name}'`);
       }
       return undefined;
     }
     if (!name) {
-      throw new Error(`Extensie "${extensionId}": onbekend customTaskType-id '${id}' vereist ook een naam`);
+      throw new Error(`Extension "${extensionId}": unknown customTaskType id '${id}' also requires a name`);
     }
     const sameName = state.customTaskTypes.find(candidate => candidate.name.localeCompare(
       name, undefined, { sensitivity: 'accent' },
     ) === 0);
     if (sameName) {
-      throw new Error(`Extensie "${extensionId}": customTaskType-naam '${name}' bestaat al met id '${sameName.id}'`);
+      throw new Error(`Extension "${extensionId}": customTaskType name '${name}' already exists with id '${sameName.id}'`);
     }
     return { id, name };
   };
@@ -136,7 +136,7 @@ export function createExtensionApi(
     }
     if (taskId !== undefined && isSelfOrDescendant(tasks, parentId, taskId)) {
       throw new Error(
-        `Extensie "${extensionId}": taak '${taskId}' kan niet onder zichzelf of een eigen afstammeling ('${parentId}') worden geplaatst`,
+        `Extension "${extensionId}": task '${taskId}' cannot be placed under itself or its descendant ('${parentId}')`,
       );
     }
   };
@@ -360,10 +360,10 @@ export function createExtensionApi(
         // Valideer de provider-vorm vóór registratie — een extensie-fout mag de export-registry
         // niet met een half object vervuilen.
         if (!provider || typeof provider !== 'object') {
-          throw new Error(`Extensie "${extensionId}": pdfFonts.register vereist een provider-object`);
+          throw new Error(`Extension "${extensionId}": pdfFonts.register requires a provider object`);
         }
         if (typeof provider.id !== 'string' || provider.id.length === 0) {
-          throw new Error(`Extensie "${extensionId}": font-provider mist een geldige 'id'`);
+          throw new Error(`Extensie "${extensionId}": font provider is missing a valid 'id'`);
         }
         if (typeof provider.covers !== 'function') {
           throw new Error(`Extensie "${extensionId}": font-provider mist 'covers(codepoint)'`);
@@ -372,7 +372,7 @@ export function createExtensionApi(
           throw new Error(`Extensie "${extensionId}": font-provider mist 'getRegularBytes()'`);
         }
         if (provider.getBoldBytes !== undefined && typeof provider.getBoldBytes !== 'function') {
-          throw new Error(`Extensie "${extensionId}": font-provider 'getBoldBytes' moet een functie zijn`);
+          throw new Error(`Extension "${extensionId}": font provider 'getBoldBytes' must be a function`);
         }
         // registerCjkFontProvider geeft een uitschrijf-functie terug; hang 'm aan cleanupFns zodat
         // disable/unload de provider automatisch verwijdert (net als importers/ribbon-knoppen).

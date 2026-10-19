@@ -46,16 +46,16 @@ export function createDefaultResourceLibrary(): ResourceLibraryItem[] {
     res('M.012', 'Wals handgeleid', 'dgn', 'materieel', 55.00, 'Materieel'),
 
     // ── Materiaal — Beton & Metselwerk ──
-    res('B.001', 'Beton C20/25 (gestort)', 'm³', 'materiaal', 95.00, 'Beton & Metselwerk'),
-    res('B.002', 'Beton C30/37 (gestort)', 'm³', 'materiaal', 110.00, 'Beton & Metselwerk'),
-    res('B.003', 'Wapeningsstaal B500B', 'kg', 'materiaal', 1.20, 'Beton & Metselwerk'),
-    res('B.004', 'Waalformaat baksteen', 'st', 'materiaal', 0.35, 'Beton & Metselwerk'),
-    res('B.005', 'Kalkzandsteen 150mm', 'm²', 'materiaal', 22.00, 'Beton & Metselwerk'),
-    res('B.006', 'Cellenbeton 100mm', 'm²', 'materiaal', 16.00, 'Beton & Metselwerk'),
-    res('B.007', 'Metselmortel', 'kg', 'materiaal', 0.12, 'Beton & Metselwerk'),
-    res('B.008', 'Kanaalplaatvloer 200mm', 'm²', 'materiaal', 55.00, 'Beton & Metselwerk'),
-    res('B.009', 'Spouwankers RVS', 'st', 'materiaal', 0.85, 'Beton & Metselwerk'),
-    res('B.010', 'Prefab heipaal 250x250', 'm', 'materiaal', 42.00, 'Beton & Metselwerk'),
+    res('B.001', 'Concrete C20/25 (cast in place)', 'm³', 'materiaal', 95.00, 'Concrete & masonry'),
+    res('B.002', 'Concrete C30/37 (cast in place)', 'm³', 'materiaal', 110.00, 'Concrete & masonry'),
+    res('B.003', 'Wapeningsstaal B500B', 'kg', 'materiaal', 1.20, 'Concrete & masonry'),
+    res('B.004', 'Waalformaat baksteen', 'st', 'materiaal', 0.35, 'Concrete & masonry'),
+    res('B.005', 'Kalkzandsteen 150mm', 'm²', 'materiaal', 22.00, 'Concrete & masonry'),
+    res('B.006', 'Cellenbeton 100mm', 'm²', 'materiaal', 16.00, 'Concrete & masonry'),
+    res('B.007', 'Metselmortel', 'kg', 'materiaal', 0.12, 'Concrete & masonry'),
+    res('B.008', 'Kanaalplaatvloer 200mm', 'm²', 'materiaal', 55.00, 'Concrete & masonry'),
+    res('B.009', 'Spouwankers RVS', 'st', 'materiaal', 0.85, 'Concrete & masonry'),
+    res('B.010', 'Prefab heipaal 250x250', 'm', 'materiaal', 42.00, 'Concrete & masonry'),
 
     // ── Materiaal — Isolatie ──
     res('I.001', 'PIR isolatie 100mm (spouw)', 'm²', 'materiaal', 18.50, 'Isolatie'),
@@ -66,13 +66,13 @@ export function createDefaultResourceLibrary(): ResourceLibraryItem[] {
     res('I.006', 'Onderdak folie', 'm²', 'materiaal', 3.50, 'Isolatie'),
 
     // ── Materiaal — Hout & Dakwerk ──
-    res('H.001', 'Constructiehout C24 (dakspant)', 'm³', 'materiaal', 550.00, 'Hout & Dakwerk'),
-    res('H.002', 'Multiplex 18mm (dakbeschot)', 'm²', 'materiaal', 14.00, 'Hout & Dakwerk'),
-    res('H.003', 'Dakpannen keramisch', 'm²', 'materiaal', 28.00, 'Hout & Dakwerk'),
-    res('H.004', 'Dakpannen beton', 'm²', 'materiaal', 18.00, 'Hout & Dakwerk'),
-    res('H.005', 'Dakgoot zink (mastgoot)', 'm', 'materiaal', 35.00, 'Hout & Dakwerk'),
-    res('H.006', 'HWA zink 80mm', 'm', 'materiaal', 22.00, 'Hout & Dakwerk'),
-    res('H.007', 'EPDM dakbedekking', 'm²', 'materiaal', 18.00, 'Hout & Dakwerk'),
+    res('H.001', 'Constructiehout C24 (dakspant)', 'm³', 'materiaal', 550.00, 'Timber & roofing'),
+    res('H.002', 'Multiplex 18mm (dakbeschot)', 'm²', 'materiaal', 14.00, 'Timber & roofing'),
+    res('H.003', 'Dakpannen keramisch', 'm²', 'materiaal', 28.00, 'Timber & roofing'),
+    res('H.004', 'Concrete roof tiles', 'm²', 'materiaal', 18.00, 'Timber & roofing'),
+    res('H.005', 'Dakgoot zink (mastgoot)', 'm', 'materiaal', 35.00, 'Timber & roofing'),
+    res('H.006', 'HWA zink 80mm', 'm', 'materiaal', 22.00, 'Timber & roofing'),
+    res('H.007', 'EPDM dakbedekking', 'm²', 'materiaal', 18.00, 'Timber & roofing'),
 
     // ── Materiaal — Kozijnen ──
     res('K.001', 'Kozijn kunststof (standaard)', 'st', 'materiaal', 380.00, 'Kozijnen & Beglazing'),

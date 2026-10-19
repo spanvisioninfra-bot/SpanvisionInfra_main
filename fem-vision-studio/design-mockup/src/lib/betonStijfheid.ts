@@ -237,13 +237,13 @@ export function betonStavenUitModel(
       overgeslagen.push({
         beamId: beam.id,
         reason:
-          "geen wapeningskorf opgegeven — zonder korf is er geen M-N-κ-relatie en dus geen segmentstijfheid",
+          "No reinforcement cage specified. Without a cage there is no M-N-κ relationship or segment stiffness.",
       });
       continue;
     }
     const lengteMm = beamLengthMm(beam, data.nodes);
     if (!(lengteMm > 0)) {
-      overgeslagen.push({ beamId: beam.id, reason: "staaflengte is 0 — knopen ontbreken" });
+      overgeslagen.push({ beamId: beam.id, reason: "Member length is 0 — nodes are missing" });
       continue;
     }
     staven.push({

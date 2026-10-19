@@ -525,7 +525,7 @@ export function readTasks(ctx: ReadTasksContext): ReadTasksResult {
   const fixedDataBytes = cfb.getStream(['   114', 'TBkndTask', 'FixedData']);
   const varMetaBytes = cfb.getStream(['   114', 'TBkndTask', 'VarMeta']);
   if (!fixedMetaBytes || !fixedDataBytes || !varMetaBytes) {
-    throw new Error('MPP: "   114"/TBkndTask mist een vereiste stream (FixedMeta/FixedData/VarMeta)');
+    throw new Error("MPP: \"   114\"/TBkndTask is missing a required stream (FixedMeta/FixedData/VarMeta)");
   }
   const var2DataBytes = cfb.getStream(['   114', 'TBkndTask', 'Var2Data']); // legitiem afwezig (zie mppPrimitives.ts)
 
@@ -595,7 +595,7 @@ export function readTasks(ctx: ReadTasksContext): ReadTasksResult {
   // (fixed-data) is geen leesbaar bestand maar een mis-parse (bv. de verkeerde
   // `TASK_FIELD_MAP`/`TASK_FIELD_MAP2`-sleutel) — beter hard falen dan taken zonder naam/datum.
   if (uniqueIdOffset === null || idOffset === null || nameKey === null || scheduledStartOffset === null || scheduledFinishOffset === null) {
-    throw new Error('MPP: taak-veldmap mist UNIQUE_ID/ID/NAME/SCHEDULED_START/SCHEDULED_FINISH — kan taken niet betrouwbaar lezen');
+    throw new Error('MPP: task field map lacks UNIQUE_ID/ID/NAME/SCHEDULED_START/SCHEDULED_FINISH — tasks cannot be read reliably');
   }
 
   const validIndices = collectValidTaskIndices(fixedMeta, fixedData, varMeta, uniqueIdOffset);
@@ -1022,7 +1022,7 @@ export function openMppProject(bytes: Uint8Array): OpenMppProject {
 
   const projectPropsBytes = cfb.getStream(['   114', 'Props']);
   if (!projectPropsBytes) {
-    throw new Error('MPP: "   114"/Props ontbreekt — geen geldig MPP14-bestand');
+    throw new Error('MPP: "   114"/Props is missing — invalid MPP14 file');
   }
   const projectProps = new Props(projectPropsBytes, '   114/Props');
 

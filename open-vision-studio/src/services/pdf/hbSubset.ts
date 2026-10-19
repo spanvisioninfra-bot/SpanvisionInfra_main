@@ -98,7 +98,7 @@ export async function subsetFont(ttf: Uint8Array, codepoints: Iterable<number>):
 
     // 4) Subset uitvoeren en de resulterende face-blob teruglezen.
     subFace = hb.hb_subset_or_fail(face, inputPtr);
-    if (!subFace) throw new Error('hbSubset: hb_subset_or_fail gaf null (onparsebaar/leeg font?)');
+    if (!subFace) throw new Error('hbSubset: hb_subset_or_fail returned null (unreadable or empty font?)');
     subBlob = hb.hb_face_reference_blob(subFace);
     const len = hb.hb_blob_get_length(subBlob);
     const dataPtr = hb.hb_blob_get_data(subBlob, 0);

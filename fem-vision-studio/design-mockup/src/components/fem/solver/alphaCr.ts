@@ -120,8 +120,8 @@ export function bepaalAlphaCr(
 
   if (input.plates && input.plates.length > 0) {
     return nietBepaald(
-      "het model bevat wandschijven; de kritieke lastfactor van het gemengde staaf-schijfstelsel " +
-        "wordt hier niet bepaald",
+      "the model contains wall plates; the critical load factor of the mixed member/plate system " +
+        "is not determined here",
     );
   }
 
@@ -150,7 +150,7 @@ export function bepaalAlphaCr(
   for (const combo of uls) {
     const res = combinationResults.get(combo.id);
     if (!res) {
-      uit.push({ combinatieId: combo.id, naam: combo.name, alphaCr: null, status: "niet_bepaald", reden: "geen combinatieresultaat" });
+      uit.push({ combinatieId: combo.id, naam: combo.name, alphaCr: null, status: "niet_bepaald", reden: "no combination result" });
       continue;
     }
     // N per rekenelement, in de tekenafspraak die de assemblage verwacht
@@ -185,7 +185,7 @@ export function bepaalAlphaCr(
     if (instabiel(1e-9)) {
       uit.push({
         combinatieId: combo.id, naam: combo.name, alphaCr: null, status: "niet_bepaald",
-        reden: "het stelsel is zonder normaalkracht al niet positief definiet (mechanisme of ontbrekende oplegging)",
+        reden: "the system is not positive definite even without axial force (mechanism or missing support)",
       });
       continue;
     }
@@ -220,8 +220,8 @@ export function alphaCrLabel(u: AlphaCrUitkomst): string {
   switch (u.status) {
     case "bepaald": return `α_cr = ${nl(u.alphaCr ?? NaN)}`;
     case "boven_grens": return `α_cr > ${u.grens ?? ALPHA_CR_ZOEKGRENS}`;
-    case "geen_druk": return "geen staaf onder druk";
-    default: return `α_cr niet bepaald (${u.reden ?? "onbekende reden"})`;
+    case "geen_druk": return "no member in compression";
+    default: return `α_cr not determined (${u.reden ?? "unknown reason"})`;
   }
 }
 
@@ -252,45 +252,45 @@ export function stabiliteitsMeldingen(
       meldingen.push({
         niveau: "fout",
         tekst:
-          `EERSTE ORDE NIET TOEGESTAAN: α_cr = ${nl(laagste.alphaCr ?? NaN)} in combinatie ` +
-          `"${laagste.naam}" is kleiner dan ${ALPHA_CR_GRENS_EERSTE_ORDE}` +
-          (teLaag.length > 1 ? ` (alle combinaties onder de grens: ${lijst})` : "") +
-          ". NEN-EN 1993-1-1 5.2.1(3) staat een eerste-orde-berekening dan niet toe: de " +
-          "tweede-orde-effecten (P-Δ) zijn niet verwaarloosbaar, en de terugval van de " +
-          "kniklengte op de systeemlengte in de staaftoets veronderstelt juist krachten uit een " +
-          "tweede-orde-berekening met imperfecties (5.2.2(7)b). De krachten en de unity checks " +
-          "van deze berekening zijn daarom NIET bruikbaar als toetsing. Kies het analysetype " +
-          "tweede orde (P-Δ) met de scheefstand aan, of geef per op druk belaste staaf de " +
-          "kniklengte uit de zijdelingse knikvorm op (5.2.2(8)).",
+          `FIRST-ORDER ANALYSIS NOT PERMITTED: α_cr = ${nl(laagste.alphaCr ?? NaN)} in combination ` +
+          `"${laagste.naam}" is less than ${ALPHA_CR_GRENS_EERSTE_ORDE}` +
+          (teLaag.length > 1 ? ` (all combinations below the limit: ${lijst})` : "") +
+          ". NEN-EN 1993-1-1 5.2.1(3) does not permit first-order analysis in this case: " +
+          "second-order effects (P-Δ) are not negligible, and using the system length " +
+          "as the member buckling length assumes forces from a second-order analysis " +
+          "with imperfections (5.2.2(7)b). The forces and unity checks from this " +
+          "calculation are therefore NOT suitable for verification. Select " +
+          "second-order analysis (P-Δ) with out-of-plumb imperfections enabled, or specify " +
+          "the buckling length from the lateral buckling mode for each member in compression (5.2.2(8)).",
       });
     } else if (!scheefstandAan) {
       meldingen.push({
         niveau: "waarschuwing",
         tekst:
-          `α_cr = ${nl(laagste.alphaCr ?? NaN)} in combinatie "${laagste.naam}" (< ${ALPHA_CR_GRENS_EERSTE_ORDE}): ` +
-          "de tweede-orde-berekening dekt de vergroting, maar zij rekent ZONDER scheefstand. " +
-          "NEN-EN 1993-1-1 5.2.2(3) en 5.3.2 eisen de imperfecties in de tweede-orde-berekening; " +
-          "zet de scheefstand aan.",
+          `α_cr = ${nl(laagste.alphaCr ?? NaN)} in combination "${laagste.naam}" (< ${ALPHA_CR_GRENS_EERSTE_ORDE}): ` +
+          "second-order analysis accounts for amplification, but runs WITHOUT out-of-plumb imperfections. " +
+          "NEN-EN 1993-1-1 5.2.2(3) and 5.3.2 require imperfections in second-order analysis; " +
+          "enable out-of-plumb imperfections.",
       });
     } else {
       meldingen.push({
         niveau: "info",
         tekst:
-          `α_cr = ${nl(laagste.alphaCr ?? NaN)} in combinatie "${laagste.naam}" (< ${ALPHA_CR_GRENS_EERSTE_ORDE}): ` +
-          "tweede orde met scheefstand — de route van NEN-EN 1993-1-1 5.2.2(3)a/5.2.2(7)b; de " +
-          "kniklengte-terugval op de systeemlengte in de staaftoets is dan toegestaan.",
+          `α_cr = ${nl(laagste.alphaCr ?? NaN)} in combination "${laagste.naam}" (< ${ALPHA_CR_GRENS_EERSTE_ORDE}): ` +
+          "second order with out-of-plumb imperfections — the approach in NEN-EN 1993-1-1 5.2.2(3)a/5.2.2(7)b; " +
+          "using the system length as the member buckling length is then permitted.",
       });
     }
   }
   const nietBepaald = uitkomsten.filter((u) => u.status === "niet_bepaald");
   if (nietBepaald.length > 0 && eersteOrde) {
-    const redenen = [...new Set(nietBepaald.map((u) => u.reden ?? "onbekende reden"))].join("; ");
+    const redenen = [...new Set(nietBepaald.map((u) => u.reden ?? "unknown reason"))].join("; ");
     meldingen.push({
       niveau: "waarschuwing",
       tekst:
-        `α_cr is voor ${nietBepaald.length} combinatie(s) niet bepaald (${redenen}). De voorwaarde ` +
-        `α_cr ≥ ${ALPHA_CR_GRENS_EERSTE_ORDE} voor een eerste-orde-berekening (NEN-EN 1993-1-1 ` +
-        "5.2.1(3)) is daar dus niet gecontroleerd.",
+        `α_cr was not determined for ${nietBepaald.length} combination(s) (${redenen}). The condition ` +
+        `α_cr ≥ ${ALPHA_CR_GRENS_EERSTE_ORDE} for first-order analysis (NEN-EN 1993-1-1 ` +
+        "5.2.1(3)) has therefore not been checked for those combinations.",
     });
   }
   return meldingen;
@@ -309,21 +309,21 @@ export function analyseToelichting(
   scheefstandAan: boolean,
 ): string {
   const regels: string[] = [];
-  regels.push(`Analysetype: ${label}. ${omschrijving}`);
+  regels.push(`Analysis type: ${label}. ${omschrijving}`);
   regels.push("");
   if (uitkomsten.length === 0) {
-    regels.push("Kritieke lastfactor α_cr: geen UGT-combinaties doorgerekend.");
+    regels.push("Critical load factor α_cr: no ULS combinations have been calculated.");
   } else {
     regels.push(
-      "Kritieke lastfactor α_cr per UGT-combinatie (NEN-EN 1993-1-1 5.2.1(3)): de factor op de " +
-        "belasting van de combinatie waarbij K_e + α·K_g(N_Ed) singulier wordt — de laagste " +
-        "knikvorm van het vlakke raamwerk met de normaalkrachten van die combinatie, elke staaf in " +
-        "twee elementen. Alleen knik in het vlak; knik uit het vlak blijft de zaak van de staaftoets.",
+      "Critical load factor α_cr per ULS combination (NEN-EN 1993-1-1 5.2.1(3)): the factor on " +
+        "the combination loads at which K_e + α·K_g(N_Ed) becomes singular — the lowest " +
+        "buckling mode of the plane frame with that combination's axial forces and two elements " +
+        "per member. Only in-plane buckling is covered; out-of-plane buckling remains a member check.",
     );
     for (const u of uitkomsten) regels.push(`    ${alphaCrLabel(u)}   [${u.naam}]`);
     regels.push(
-      `Eerste orde is toegestaan wanneer α_cr ≥ ${ALPHA_CR_GRENS_EERSTE_ORDE} (5.2.1(3)); daaronder ` +
-        "moeten de tweede-orde-effecten in de berekening zitten, met de imperfecties van 5.3.",
+      `First-order analysis is permitted when α_cr ≥ ${ALPHA_CR_GRENS_EERSTE_ORDE} (5.2.1(3)); below this limit, ` +
+        "the calculation must include second-order effects and the imperfections of 5.3.",
     );
   }
   const meldingen = stabiliteitsMeldingen(uitkomsten, analysetype, scheefstandAan);

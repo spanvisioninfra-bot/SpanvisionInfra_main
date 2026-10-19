@@ -185,7 +185,7 @@ export function buildOnlv(schedule: CostSchedule, items: CostItem[], opts: OnlvB
     list.push(it);
     byParent.set(it.parentId, list);
   }
-  if (staartCount > 0) warnings.push(`${staartCount} staartregel(s) niet geëxporteerd — ÖNORM A 2063 kent geen opslagen per LV; de ontvanger rekent zijn eigen indirecte kosten.`);
+  if (staartCount > 0) warnings.push(`${staartCount} summary line(s) were not exported — ÖNORM A 2063 does not support surcharges per bill of quantities; the recipient calculates their own indirect costs.`);
 
   // ── Aantal niveaus: 2 (lg/ulg) t/m 4 (hg/og/lg/ulg) ──
   const chapterDepth = (parentId: string | null): number => {
@@ -280,7 +280,7 @@ export function buildOnlv(schedule: CostSchedule, items: CostItem[], opts: OnlvB
       roots.push(g);
     }
   }
-  if (flattened > 0) warnings.push(`${flattened} hoofdstuk(ken) dieper dan ${L} niveaus zijn in hun Unterleistungsgruppe platgeslagen; de kop staat er als wählbare Vorbemerkung.`);
+  if (flattened > 0) warnings.push(`${flattened} chapter(s) deeper than ${L} levels were flattened into their Unterleistungsgruppe; the heading is retained as a selectable preliminary note.`);
 
   // ── Prijzen ──
 
@@ -506,7 +506,7 @@ export function buildOnlv(schedule: CostSchedule, items: CostItem[], opts: OnlvB
   };
 
   const hgNode = (g: Group, lvVorbemerkung: string): { node: XmlNode; sum: Sum } => {
-    if (g.notes) warnings.push(`Notities van hoofdgroep '${g.title}' niet geëxporteerd — een hg kent in A 2063 alleen een kop.`);
+    if (g.notes) warnings.push(`Notes for main group '${g.title}' were not exported — A 2063 main groups support only a heading.`);
     const { node, sum } = ogListe(g.groups, lvVorbemerkung);
     const children = [el('hg-eigenschaften', [text('ueberschrift', t60(g.title, g.nr))]), node];
     if (priced) children.push(gruppensumme('hg-summe', sum));
@@ -531,9 +531,9 @@ export function buildOnlv(schedule: CostSchedule, items: CostItem[], opts: OnlvB
     lvSum = sum;
   }
 
-  if (foldedRegels > 0) warnings.push(`${foldedRegels} rekenregel(s) zijn in de eenheidsprijs van hun post opgegaan — A 2063 kent geen samenstelling per positie.`);
-  if (truncated > 0) warnings.push(`${truncated} omschrijving(en) langer dan 60 tekens zijn in het stichwort ingekort; de volledige tekst staat in de langtext.`);
-  if (unknownUnits > 0) warnings.push(`${unknownUnits} positie(s) met een eenheid die A 2063 niet kent zijn als Stk geëxporteerd.`);
+  if (foldedRegels > 0) warnings.push(`${foldedRegels} calculation line(s) were incorporated into the item unit price — A 2063 does not support a breakdown per item.`);
+  if (truncated > 0) warnings.push(`${truncated} description(s) longer than 60 characters were shortened in stichwort; the full text is retained in langtext.`);
+  if (unknownUnits > 0) warnings.push(`${unknownUnits} item(s) with a unit unsupported by A 2063 were exported as Stk.`);
 
   // ── Kop en kenndaten ──
 

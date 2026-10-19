@@ -92,7 +92,7 @@ export default function DwarskrachtDesigner() {
       <div className="vd-head">
         <strong>Parametric view — shear connection</strong>
         <span className={`vd-uc ${past ? "ok" : "bad"}`}>
-          {past ? `✓ plate ${fmt(hKp)} mm past in het lijf` : `✗ plate ${fmt(hKp)} mm hoger dan het lijf`}
+          {past ? `✓ plate ${fmt(hKp)} mm fits within the web` : `✗ plate ${fmt(hKp)} mm taller than the web`}
         </span>
       </div>
 

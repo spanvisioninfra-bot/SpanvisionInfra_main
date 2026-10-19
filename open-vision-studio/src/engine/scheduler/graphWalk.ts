@@ -39,7 +39,7 @@ export function detectCycleInEdges(edges: readonly DirectedRelationEdge[]): stri
       const successor = adjacent[frame.nextSuccessor++];
       if (color.get(successor) === 1) {
         const cycleStart = stack.findIndex(candidate => candidate.node === successor);
-        if (cycleStart < 0) throw new Error('Interne DFS-invariant geschonden: grijze knoop ontbreekt');
+        if (cycleStart < 0) throw new Error('Internal DFS invariant violated: gray node is missing');
         return [...stack.slice(cycleStart).map(candidate => candidate.node), successor];
       }
       if ((color.get(successor) ?? 0) === 0) {

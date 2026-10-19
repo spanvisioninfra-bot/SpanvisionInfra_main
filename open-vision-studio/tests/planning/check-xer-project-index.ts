@@ -155,7 +155,7 @@ if (!(ambiguousError instanceof XerImportError)
     || ambiguousError.xerCode !== 'XER_AMBIGUOUS_LOCAL_RELATION'
     || ambiguousError.table !== 'TASKPRED'
     || ambiguousError.field !== 'proj_id'
-    || !ambiguousError.message.includes('niet één uniek lokaal project')) {
+    || !ambiguousError.message.includes('do not identify a unique local project')) {
   throw new Error(`ambigue ongescopeerde relatie moet gericht typed falen: ${String(ambiguousError)}`);
 }
 

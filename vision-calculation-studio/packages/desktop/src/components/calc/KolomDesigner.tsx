@@ -350,7 +350,8 @@ export default function KolomDesigner() {
       <div className="vd-foot">
         <span>Click a blue dimension or red force to edit it and update the calculation sheet.</span>
         <span className="vd-live">
-          profiel {prof.name} · λ<sub>rel,y</sub> {fmt(lamRelY, 2)} · λ<sub>rel,z</sub> {fmt(lamRelZ, 2)} · k<sub>c,y</sub> {fmt(kcy, 2)} · k<sub>c,z</sub> {fmt(kcz, 2)} · k<sub>crit</sub> {fmt(kcrit, 2)} · compression (6.2) {fmt(UC_62, 2)} · (6.19) {fmt(UC_619, 2)} · afschuiving {fmt(UC_613, 2)} · knik (6.23) {fmt(UC_623, 2)} · (6.24) {fmt(UC_624, 2)} · kip (6.35) {fmt(UC_635, 2)}
+
+          section {prof.name} · λ<sub>rel,y</sub> {fmt(lamRelY, 2)} · λ<sub>rel,z</sub> {fmt(lamRelZ, 2)} · k<sub>c,y</sub> {fmt(kcy, 2)} · k<sub>c,z</sub> {fmt(kcz, 2)} · k<sub>crit</sub> {fmt(kcrit, 2)} · compression (6.2) {fmt(UC_62, 2)} · (6.19) {fmt(UC_619, 2)} · afschuiving {fmt(UC_613, 2)} · knik (6.23) {fmt(UC_623, 2)} · (6.24) {fmt(UC_624, 2)} · kip (6.35) {fmt(UC_635, 2)}
         </span>
       </div>
     </div>

@@ -960,7 +960,7 @@ factor = F_t / F_t0
 export const en1990Formules: { id: string; label: string; template: string }[] = [
   {
     id: 'en1990-compleet',
-    label: 'EN 1990: Belastingcombinaties compleet',
+    label: "EN 1990: Complete load combinations",
     template: en1990Compleet,
   },
   {
@@ -985,12 +985,12 @@ export const en1990Formules: { id: string; label: string; template: string }[] =
   },
   {
     id: 'en1990-bgt',
-    label: 'EN 1990: BGT combinaties (SLS)',
+    label: "EN 1990: SLS combinations",
     template: en1990BGT,
   },
   {
     id: 'en1990-groep-c',
-    label: 'EN 1990: Geotechnisch (groep C)',
+    label: "EN 1990: Geotechnical (group C)",
     template: en1990GroepC,
   },
   {

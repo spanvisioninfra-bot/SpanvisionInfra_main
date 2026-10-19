@@ -116,7 +116,7 @@ export interface IfcSourceStructure {
 }
 
 export function extractStructure(name: string, content: string | undefined): IfcSourceStructure {
-  if (content == null) return { name, roots: [], objectCount: 0, error: 'niet geladen' };
+  if (content == null) return { name, roots: [], objectCount: 0, error: 'not loaded' };
   try {
     const json = JSON.parse(content);
     const roots: IfcStructureNode[] = [];

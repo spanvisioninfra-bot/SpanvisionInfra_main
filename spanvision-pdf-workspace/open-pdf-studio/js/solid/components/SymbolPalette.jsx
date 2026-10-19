@@ -435,15 +435,15 @@ export function SymbolSettingsDialog() {
         const maten = catalog.families.reduce((n, f) => n + f.variants.length, 0);
         const zonderPreview = catalog.families.filter(f => !f.preview).length;
         updateStatusMessage(
-          `Catalogus '${collectionId}' geladen: ${catalog.families.length} families, ${maten} maten`
-          + (zonderPreview ? ` — ${zonderPreview} zonder preview in het bestand` : '')
+          `Catalogus '${collectionId}' loaded: ${catalog.families.length} families, ${maten} maten`
+          + (zonderPreview ? ` — ${zonderPreview} without a preview in the file` : '')
         );
         return;
       }
 
       if (!data.name || !Array.isArray(data.symbols)) {
         console.warn('Invalid symbol group file: missing name or symbols array');
-        updateStatusMessage('Bestand niet herkend: geen symboolgroep en geen catalogus');
+        updateStatusMessage('Unrecognized file: neither a symbol collection nor a catalog');
         return;
       }
       const groupId = addCustomGroup(data.name);
@@ -458,7 +458,7 @@ export function SymbolSettingsDialog() {
       // Een catalogus die zichzelf wel als linework-variants aankondigt maar
       // niet klopt, gooit uit parseLineworkCatalog. Die reden hoort de
       // gebruiker te zien in plaats van alleen in de console te belanden.
-      updateStatusMessage(`Import mislukt: ${err?.message || err}`, 6000);
+      updateStatusMessage(`Import failed: ${err?.message || err}`, 6000);
     }
     e.target.value = '';
   }
@@ -508,8 +508,8 @@ export function SymbolSettingsDialog() {
               }>
                 <span class="sp-settings-download-label">
                   {dlInfo().toFetch.length > 0
-                    ? `${dlInfo().toFetch.length} collectie${dlInfo().toFetch.length === 1 ? '' : 's'} online beschikbaar (${dlInfo().symbolCount} symbolen)`
-                    : `${dlInfo().tagOnly.length} gedownloade collectie${dlInfo().tagOnly.length === 1 ? '' : 's'} activeren voor dit land`}
+                    ? `${dlInfo().toFetch.length} collection${dlInfo().toFetch.length === 1 ? '' : 's'} available online (${dlInfo().symbolCount} symbols)`
+                    : `Activate ${dlInfo().tagOnly.length} downloaded collection${dlInfo().tagOnly.length === 1 ? '' : 's'} for this country`}
                 </span>
                 <button class="sp-settings-btn-add"
                   onClick={() => downloadCountrySector(selectedCountry(), selectedIndustry())}>

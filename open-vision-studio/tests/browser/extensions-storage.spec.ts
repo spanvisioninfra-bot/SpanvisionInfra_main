@@ -296,7 +296,7 @@ test('extension storage: scant vier echte IndexedDB-records zonder code uit te v
   await expect(legacyReadyCard).toHaveCount(0);
   await expect(page.getByTestId('extension-quarantine-card')).toHaveCount(2);
   await expect(page.getByTestId('extension-quarantine-card').filter({
-    hasText: 'manifest moet een object zijn',
+    hasText: "manifest must be an object",
   })).toHaveCount(1);
   expect(await page.evaluate(() => (
     window as unknown as { __opsExtensionStorageOnLoad: number }

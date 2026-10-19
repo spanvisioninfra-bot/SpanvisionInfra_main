@@ -786,7 +786,7 @@ export default function BalklaagDesigner() {
 
           <span className="vd-ctrl-h">Deflection</span>
           <JaNee
-            label="Controleer doorbuiging"
+            label="Check deflection"
             waarde={controleer === 1}
             onChange={(v) => setVal("controleer", v ? 1 : 0)}
           />
@@ -798,7 +798,7 @@ export default function BalklaagDesigner() {
 
           <span className="vd-ctrl-h">Vibration (§7.3.3)</span>
           <JaNee
-            label="Controleer trilling"
+            label="Check vibration"
             waarde={tril === 1}
             onChange={(v) => setVal("controleer_trilling", v ? 1 : 0)}
           />

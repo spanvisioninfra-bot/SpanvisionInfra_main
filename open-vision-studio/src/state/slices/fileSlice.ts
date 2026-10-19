@@ -556,7 +556,7 @@ export const createFileSlice: AppSliceFactory<FileSlice> = (runtime) => (set, ge
 
     applyOpenedImport: (parsed, opts) => {
       const results = isMultiDocumentImport(parsed) ? parsed.results : [parsed];
-      if (results.length === 0) throw new Error('Openroute ontving geen projectdocumenten');
+      if (results.length === 0) throw new Error('The open route received no project documents');
 
       const reusedActiveTab = isActivePristine(get());
       const openedDocumentIds: string[] = [];

@@ -177,7 +177,7 @@ export function BcfIssueQueue() {
       <div className="bcf-queue bcf-queue--empty">
         <p className="bcf-queue__empty-text">
           No BCF issues yet. Create them from the validation results using the
-          <strong> +BCF</strong> buttons or the <strong>Alle failures → BCF</strong> knop.
+          <strong> +BCF</strong> buttons or the <strong>All failures → BCF</strong>  button.
         </p>
       </div>
     );

@@ -125,14 +125,14 @@ log("\n[2] beoordeelPaginering — het klaar-signaal van de opmaakproef");
   check("alles in orde → klaar met het aantal vellen", o0.soort === "klaar" && o0.aantalVellen === 12, JSON.stringify(o0));
 
   const gevallen = [
-    ["niet gemonteerd", met({}, { gemonteerd: false }), /niet in beeld/],
-    ["projectgegevens laden nog", met({ projectInfoLaadt: true }), /projectgegevens/],
-    ["fonts niet binnen", met({}, { fontsBinnen: false }), /lettertypen/],
-    ["slag gepland", met({}, { timerGepland: true }), /gepland/],
-    ["nog nooit gepagineerd", met({}, { slagen: 0 }), /nog niet gepagineerd/],
-    ["verzoek nog niet beantwoord", met({ verzoek: 4 }), /nieuwe rapportinstellingen/],
-    ["inhoudsopgave stelt zich bij", met({ toc: { slag: 2, bevroren: false, eigenSlagVerwacht: true, stabiel: false } }), /inhoudsopgave/],
-    ["laatste slag te recent", met({}, { laatsteSlagOp: nu - STILTE_NA_SLAG_MS + 1 }), /net gedaan/],
+    ["niet gemonteerd", met({}, { gemonteerd: false }), /not visible/],
+    ["projectgegevens laden nog", met({ projectInfoLaadt: true }), /project details/],
+    ["fonts niet binnen", met({}, { fontsBinnen: false }), /fonts/],
+    ["slag gepland", met({}, { timerGepland: true }), /scheduled/],
+    ["nog nooit gepagineerd", met({}, { slagen: 0 }), /pagination has not run yet/],
+    ["verzoek nog niet beantwoord", met({ verzoek: 4 }), /new report settings/],
+    ["inhoudsopgave stelt zich bij", met({ toc: { slag: 2, bevroren: false, eigenSlagVerwacht: true, stabiel: false } }), /table of contents/],
+    ["laatste slag te recent", met({}, { laatsteSlagOp: nu - STILTE_NA_SLAG_MS + 1 }), /just completed/],
   ];
   for (const [naam, invoer, reden] of gevallen) {
     const o = beoordeelPaginering(invoer);
@@ -141,7 +141,7 @@ log("\n[2] beoordeelPaginering — het klaar-signaal van de opmaakproef");
   const bevroren = beoordeelPaginering(met({ toc: { slag: 4, bevroren: true, eigenSlagVerwacht: false, stabiel: true } }));
   check("bevroren inhoudsopgave telt als stabiel → klaar", bevroren.soort === "klaar", JSON.stringify(bevroren));
   const leeg = beoordeelPaginering(met({}, { aantalVellen: 0 }));
-  check("geen enkel vel → weigeren (niet eeuwig wachten)", leeg.soort === "weiger" && /geen enkel vel/.test(leeg.reden), JSON.stringify(leeg));
+  check("geen enkel vel → weigeren (niet eeuwig wachten)", leeg.soort === "weiger" && /no sheets/.test(leeg.reden), JSON.stringify(leeg));
   // Een geplande slag gaat vóór "geen vellen": het rapport kan nog vol lopen.
   const geplandLeeg = beoordeelPaginering(met({}, { aantalVellen: 0, timerGepland: true }));
   check("geen vellen maar een slag gepland → eerst wachten", geplandLeeg.soort === "wacht", JSON.stringify(geplandLeeg));
@@ -174,13 +174,13 @@ log("\n[3] beoordeelRekenVoorwaarden — wachten, weigeren of printen");
   }
 
   const weigeren = [
-    ["geen model", { heeftModel: false }, /geen model/],
-    ["rekenfout", { rekenfout: "kolom knikt", heeftResultaten: false }, /mislukte: kolom knikt/],
-    ["geen resultaten", { heeftResultaten: false }, /geen resultaten.*`rekenen`/],
-    ["toetsfout", { toetsfout: "kern onbereikbaar" }, /toetsing gaf een fout: kern onbereikbaar/],
-    ["fysisch zonder volledige rekengang", { analysetype: "tweedeOrdeFysisch", resultatenUitVolledigeRekengang: false }, /fysisch niet-lineaire ronde/],
-    ["toetsbare staven, geen toetsing", { toetsingGedraaid: false }, /toetsing ontbreekt/],
-    ["toetsing hoort bij een andere berekening", { toetsingHoortBijResultaten: false }, /verouderd/],
+    ["geen model", { heeftModel: false }, /no model/],
+    ["rekenfout", { rekenfout: "kolom knikt", heeftResultaten: false }, /failed: kolom knikt/],
+    ["geen resultaten", { heeftResultaten: false }, /no results.*`rekenen`/],
+    ["toetsfout", { toetsfout: "kern onbereikbaar" }, /verification returned an error: kern onbereikbaar/],
+    ["fysisch zonder volledige rekengang", { analysetype: "tweedeOrdeFysisch", resultatenUitVolledigeRekengang: false }, /physically nonlinear iteration/],
+    ["toetsbare staven, geen toetsing", { toetsingGedraaid: false }, /verification is missing/],
+    ["toetsing hoort bij een andere berekening", { toetsingHoortBijResultaten: false }, /outdated/],
   ];
   for (const [naam, p, reden] of weigeren) {
     const o = beoordeelRekenVoorwaarden(met(p));
@@ -222,10 +222,10 @@ log("\n[4] leesExportOpties — strikte argumenten, kop zonder lekken");
     leesExportOpties({ tijdslimiet_ms: 1 }).tijdslimietMs === 1_000
       && leesExportOpties({ tijdslimiet_ms: 9e9 }).tijdslimietMs === 600_000);
   const fouten = [
-    ["onbekend argument", { rapporttype: "beperkt" }, /onbekend argument `rapporttype`/],
-    ["onbekend type", { type: "kort" }, /`type` moet een van volledig \| beperkt/],
-    ["onbekend formaat", { formaat: "A5" }, /`formaat`/],
-    ["onbekende oriëntatie", { orientatie: "staand" }, /`orientatie`/],
+    ["onbekend argument", { rapporttype: "beperkt" }, /unknown argument “rapporttype”/],
+    ["onbekend type", { type: "kort" }, /“type” must be one of volledig \| beperkt/],
+    ["onbekend formaat", { formaat: "A5" }, /“formaat”/],
+    ["onbekende oriëntatie", { orientatie: "staand" }, /“orientatie”/],
     ["onbekend projectveld", { project: { name: "Engels" } }, /project\.name/],
     ["project geen object", { project: "Loods" }, /object/],
     ["projectveld geen tekst", { project: { nummer: 12 } }, /project\.nummer/],
@@ -242,11 +242,11 @@ log("\n[5] vergelijkExportMoment — veranderde er iets tussen klaar en afdruk?"
   const voor = { generatie: 7, slagen: 12, aantalVellen: 9, toetsingOp: 1234, weergave: "report" };
   check("niets veranderd → null", vergelijkExportMoment(voor, { ...voor }) === null);
   const gevallen = [
-    ["weergave gewisseld", { weergave: "default" }, /weergave/],
-    ["model gewijzigd", { generatie: 8 }, /model of de rekengang/],
-    ["toetsing opnieuw", { toetsingOp: 5678 }, /toetsing/],
-    ["opnieuw gepagineerd", { slagen: 13 }, /opnieuw gepagineerd \(slag 12 → 13\)/],
-    ["ander aantal vellen", { aantalVellen: 10 }, /aantal vellen/],
+    ["weergave gewisseld", { weergave: "default" }, /view/],
+    ["model gewijzigd", { generatie: 8 }, /model or calculation/],
+    ["toetsing opnieuw", { toetsingOp: 5678 }, /verification/],
+    ["opnieuw gepagineerd", { slagen: 13 }, /repaginated during printing \(pass 12 → 13\)/],
+    ["ander aantal vellen", { aantalVellen: 10 }, /sheet count/],
   ];
   for (const [naam, p, reden] of gevallen) {
     const r = vergelijkExportMoment(voor, { ...voor, ...p });

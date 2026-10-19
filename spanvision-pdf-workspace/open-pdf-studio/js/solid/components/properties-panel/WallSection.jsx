@@ -18,16 +18,16 @@ export default function WallSection() {
   const zetJoin = (sleutel, toegestaan) => updateAnnotProp(sleutel, toegestaan ? undefined : true);
   return (
     <Show when={annotProps.annotationType === 'wall'}>
-      <CollapsibleSection title="Wand" name="wall" id="prop-wall-section">
+      <CollapsibleSection title="Wall" name="wall" id="prop-wall-section">
         <div class="property-group">
-          <label>Dikte (mm)</label>
+          <label>Thickness (mm)</label>
           <input type="number" min="10" max="1000" step="5"
             value={annotProps.dikteMm ?? 100}
             onChange={(e) => updateAnnotProp('dikteMm', Math.max(10, parseFloat(e.target.value) || 100))}
           />
         </div>
         <div class="property-group">
-          <label>Materiaal</label>
+          <label>Material</label>
           <select
             value={(annotProps.hatchPattern || '').startsWith('iso-') ? 'isolatie' : (annotProps.hatchPattern || 'nen47-metselwerk-baksteen')}
             onChange={(e) => updateAnnotProp('hatchPattern', e.target.value)}

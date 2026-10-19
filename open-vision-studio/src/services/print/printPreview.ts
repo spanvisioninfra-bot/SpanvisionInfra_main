@@ -1715,7 +1715,7 @@ export function renderPrintPreviewPage(
   canvas.width = pageWidth;
   canvas.height = pageHeight;
   const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('renderPrintPreviewPage: kon 2D-context niet verkrijgen');
+  if (!ctx) throw new Error('renderPrintPreviewPage: unable to obtain a 2D context');
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, pageWidth, pageHeight);
 

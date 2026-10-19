@@ -11,7 +11,7 @@ export const stairsTemplate = {
         { value: 'up', label: "Move Up" },
         { value: 'down', label: "Move Down" }
       ], default: 'up' },
-    { key: 'showOutline', label: 'Toon kader', labelEn: 'Show outline', type: 'boolean', default: true },
+    { key: 'showOutline', label: 'Show frame', labelEn: 'Show outline', type: 'boolean', default: true },
   ],
   render(params, bbox) {
     const cmds = [];

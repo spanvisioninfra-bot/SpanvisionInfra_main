@@ -132,7 +132,7 @@ export const cpt = {
     if (looksLikeGef(content)) return parseGef(content, filename);
     if (looksLikeBroCptXml(content)) return parseBroCptXml(content, filename);
     throw new Error(
-      `Onbekend CPT-formaat (${filename}). Verwacht GEF of BRO CPT XML.`,
+      `Unknown CPT format (${filename}). Verwacht GEF of BRO CPT XML.`,
     );
   },
 };

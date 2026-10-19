@@ -11,7 +11,7 @@ const defaultBetalingstermijnen: BetalingsTermijn[] = [
   { id: genId(), beschrijving: 'Bij tekenen intentieovereenkomst', percentage: 4, toelichting: '' },
   { id: genId(), beschrijving: 'Bij opdracht', percentage: 21, toelichting: '' },
   { id: genId(), beschrijving: 'Bij start werkzaamheden', percentage: 25, toelichting: '' },
-  { id: genId(), beschrijving: 'Bij gereed ruwbouw', percentage: 25, toelichting: '' },
+  { id: genId(), beschrijving: 'Upon completion of the structural shell', percentage: 25, toelichting: '' },
   { id: genId(), beschrijving: 'Bij wind- en waterdicht', percentage: 10, toelichting: '' },
   { id: genId(), beschrijving: 'Bij oplevering', percentage: 12, toelichting: '' },
   { id: genId(), beschrijving: 'Na onderhoudstermijn (3 maanden)', percentage: 3, toelichting: '' },
@@ -19,13 +19,13 @@ const defaultBetalingstermijnen: BetalingsTermijn[] = [
 
 const defaultGaranties: Garantie[] = [
   { id: genId(), onderdeel: 'Betonwerk', termijn: '20 jaar', toelichting: '', linkedCostItemIds: [] },
-  { id: genId(), onderdeel: 'Kozijnen en ramen (werking)', termijn: '3 jaar', toelichting: '', linkedCostItemIds: [] },
+  { id: genId(), onderdeel: 'Frames and windows (operation)', termijn: '3 jaar', toelichting: '', linkedCostItemIds: [] },
   { id: genId(), onderdeel: 'Dakbedekking', termijn: '10 jaar', toelichting: '', linkedCostItemIds: [] },
   { id: genId(), onderdeel: 'Schilderwerk', termijn: '3 jaar', toelichting: '', linkedCostItemIds: [] },
   { id: genId(), onderdeel: 'Installaties', termijn: '2 jaar', toelichting: '', linkedCostItemIds: [] },
 ];
 
-const defaultVoorwaarden = 'Op al onze aanbiedingen zijn de UAV 2012 en onze algemene voorwaarden van toepassing.';
+const defaultVoorwaarden = 'The UAV 2012 and our general terms and conditions apply to all our quotations.';
 
 export function getBuiltInTemplates(): OfferteTemplate[] {
   return [

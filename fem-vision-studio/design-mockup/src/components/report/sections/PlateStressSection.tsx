@@ -196,7 +196,7 @@ export default function PlateStressSection() {
       <div className="rpt-block">
         <h2 className="rpt-h2">{title}</h2>
         <p className="rpt-empty-note">
-          {t("report.noPlates", "Geen platen in het model.")}
+          {t("report.noPlates", "No plates in the model.")}
         </p>
       </div>
     );
@@ -350,7 +350,7 @@ export default function PlateStressSection() {
 
       {/* ── Tabel 2: omhullende min/max over alle combinaties ── */}
       <h3 className="rpt-h3">
-        {t("report.envelopePlatesTitle", "Omhullende (min/max over alle combinaties)")}
+        {t("report.envelopePlatesTitle", "Envelope (min/max across all combinations)")}
       </h3>
       <table className="rpt-table">
         <thead>
@@ -430,7 +430,7 @@ export default function PlateStressSection() {
       <p className="rpt-note" style={{ marginTop: "1.5mm" }}>
         {t(
           "report.plateStressNote",
-          "Spanningen in N/mm², elementgemiddeld over het rekenmesh; min/max per plaat — dezelfde waarden als de contourlegenda op het canvas. Het maatgevende element is het element met de grootste von Mises-spanning.",
+          "Stresses in N/mm², averaged per element over the analysis mesh; min/max per plate — the same values as the canvas contour legend. The governing element has the highest von Mises stress.",
         )}
       </p>
     </div>

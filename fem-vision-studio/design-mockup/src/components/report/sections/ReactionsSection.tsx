@@ -99,7 +99,7 @@ export default function ReactionsSection() {
 
       {sortedIds.length === 0 ? (
         <p className="rpt-empty-note">
-          {t("report.noReactions", "Geen opleggingen met reacties in het model.")}
+          {t("report.noReactions", "No supports with reactions in the model.")}
         </p>
       ) : (
         <>
@@ -136,7 +136,7 @@ export default function ReactionsSection() {
 
           {/* ── Tabel 2: omhullende min/max over alle combinaties ── */}
           <h3 className="rpt-h3">
-            {t("report.envelopeReactionsTitle", "Omhullende (min/max over alle combinaties)")}
+            {t("report.envelopeReactionsTitle", "Envelope (min/max across all combinations)")}
           </h3>
           <table className="rpt-table">
             <thead>
@@ -171,7 +171,7 @@ export default function ReactionsSection() {
           <p className="rpt-note" style={{ marginTop: "1.5mm" }}>
             {t(
               "report.reactionSignNote",
-              "Tekenconventie: Fx positief naar rechts, Fz positief omhoog (reactie op de constructie).",
+              "Sign convention: Fx is positive to the right, Fz is positive upwards (reaction on the structure).",
             )}
           </p>
         </>

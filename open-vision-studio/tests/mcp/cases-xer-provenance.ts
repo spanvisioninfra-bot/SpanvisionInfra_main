@@ -454,7 +454,7 @@ test('rawSource: alleen opt-in, hard begrensd en paginaerbaar over grote payload
   attachArchive();
   const denied = err(TOOL, { section: 'rawSource' });
   assertEq(denied.code, 'VALIDATION', 'opt-in verplicht');
-  assert(/vrije notities|bronbytes/.test(denied.error), 'privacyhint');
+  assert(/free-text notes|source bytes/.test(denied.error), 'privacyhint');
   const first = ok(TOOL, { section: 'rawSource', includeRawSource: true, limit: 8 });
   assertEq(first.chunks.length, 8, 'harde eerste pagina');
   assertEq(first.totalChunks, 10, 'alle chunks geteld');

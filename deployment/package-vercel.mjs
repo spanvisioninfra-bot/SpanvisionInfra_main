@@ -33,6 +33,12 @@ if (id === 'cad') routes.push({ src: '/app(?:/.*)?', dest: '/app/index.html' });
 else routes.push({ src: '/(.*)', dest: '/index.html' });
 if (id === 'hub') {
   await packageCommerce(path.join(output,'.vercel/output'));
+  const locationFunction = path.join(vercelOutput, 'functions/api/location.func');
+  await fs.mkdir(locationFunction, { recursive: true });
+  await fs.copyFile(path.join(root, 'deployment/visitor-location.mjs'), path.join(locationFunction, 'server.mjs'));
+  await fs.writeFile(path.join(locationFunction, 'package.json'), JSON.stringify({ type: 'module' }));
+  await fs.writeFile(path.join(locationFunction, '.vc-config.json'), JSON.stringify({ runtime: 'nodejs22.x', handler: 'server.mjs', launcherType: 'Nodejs', shouldAddHelpers: false, maxDuration: 10 }));
+  routes.splice(1,0,{src:'/__suite/location',dest:'/api/location',headers:{'Cache-Control':'private, no-store'}});
   routes.splice(1,0,{src:'/api/((?:account|billing|admin)(?:/.*)?)',dest:'/api/commerce?__route=$1'});
   const manifest = JSON.parse(await fs.readFile(path.join(root, 'deployment/production.json'), 'utf8'));
   for (const tool of brand.modules) {

@@ -104,12 +104,12 @@ export default function StatusBar({
               className="status-item status-bediening"
               title={t(
                 "remoteControlHint",
-                "De app is gestart met OPENAEC_GUI_CONTROL=1 en wordt via het bedieningskanaal aangestuurd.",
+                "The app started with OPENAEC_GUI_CONTROL=1 and is controlled through the automation channel.",
               )}
             >
               <span className="status-bediening-dot" aria-hidden="true" />
               <span className="status-item-label">
-                {t("remoteControlActive", "bediening op afstand actief")}
+                {t("remoteControlActive", "remote control active")}
               </span>
             </div>
           </>
@@ -158,8 +158,8 @@ export default function StatusBar({
                 aria-pressed={snap[soort]}
                 title={`${t(`snap.${soort}`, SNAP_LABELS[soort].kort)} — ${
                   t(`statusBar.snapExplain.${soort}`)
-                } ${snap[soort] ? t("snapClickOff", "Klik om uit te zetten.")
-                                : t("snapClickOn", "Klik om aan te zetten.")}`}
+                } ${snap[soort] ? t("snapClickOff", "Click to disable.")
+                                : t("snapClickOn", "Click to enable.")}`}
                 onClick={() => wisselSnap(soort)}
               >
                 {t(`snap.${soort}`, SNAP_LABELS[soort].kort)}

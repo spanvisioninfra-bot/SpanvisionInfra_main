@@ -190,7 +190,7 @@ export default function SysteemrasterSection() {
                   : annotProps.sgSelectedSub.kind === 'strook'
                     ? `Onderdeel: strook #${annotProps.sgSelectedSub.index}`
                     : annotProps.sgSelectedSub.kind === 'sparing'
-                      ? 'Onderdeel: sparing'
+                      ? 'Component: opening'
                       : `Onderdeel: rasterlijn ${annotProps.sgSelectedSub.as === 'v' ? 'verticaal' : 'horizontaal'} #${annotProps.sgSelectedSub.index}`}
             </label>
             <div style={{ 'font-size': '11px', opacity: '0.75' }}>
@@ -311,7 +311,7 @@ export default function SysteemrasterSection() {
             <div class="property-group">
               <label>Grid line</label>
               <div style={{ 'font-size': '11px', 'line-height': '1.5' }}>
-                <div>Orientation: {annotProps.sgSelectedSub.as === 'v' ? 'verticaal' : 'horizontaal'}</div>
+                <div>Orientation: {annotProps.sgSelectedSub.as === 'v' ? "vertical" : "horizontal"}</div>
                 <div>Index: {annotProps.sgSelectedSub.index}</div>
                 <div>Position: {Math.round(annotProps.sgSelectedSub.posMm || 0)} mm from the origin</div>
               </div>

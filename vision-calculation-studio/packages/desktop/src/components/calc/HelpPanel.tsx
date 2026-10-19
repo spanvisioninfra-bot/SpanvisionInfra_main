@@ -93,7 +93,7 @@ const SECTIONS: Section[] = [
     items: [
       { label: "#repeat n … #end repeat", insert: "#repeat 10\n\t…\n#end repeat" },
       { label: "#for var = lo : hi … #loop", insert: "#for i = 1 : 9\n\t…\n#loop" },
-      { label: "#break (vroegtijdig stoppen)", insert: "#break" },
+      { label: "#break (stop early)", insert: "#break" },
     ],
   },
   {

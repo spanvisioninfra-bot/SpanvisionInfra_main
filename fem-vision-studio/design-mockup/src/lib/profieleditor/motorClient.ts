@@ -90,7 +90,7 @@ export async function roepMotor(
       return await invoke<MotorUitvoer[]>(TAURI_COMMAND, { invoer });
     } catch (e) {
       throw new Error(
-        `De doorsnedemotor is in de desktop-app nog niet aangesloten (command "${TAURI_COMMAND}"): ${String(e)}`,
+        `The section engine is not connected in the desktop app yet (command "${TAURI_COMMAND}"): ${String(e)}`,
       );
     }
   }

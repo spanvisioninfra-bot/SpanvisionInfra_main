@@ -109,7 +109,7 @@ export default function Backstage({ open, onClose, onOpenSettings, onOpenFile }:
   // op schijf belandt.
   const saveProject = useCallback(async () => {
     if (!activeDoc || activeDoc.kind !== "project") {
-      alert("No project actief — open of maak een .ifcgeo project.");
+      alert("No active project — open or create an .ifcgeo project.");
       return;
     }
     const defaultName = `${activeDoc.meta.title || "project"}.ifcgeo`;
@@ -627,7 +627,7 @@ function OpenPanel({
   return (
     <div className="bs-export-panel">
       <h2 className="bs-export-title" style={{ marginTop: 0, marginBottom: 16 }}>
-        {t("openPanel.openTitle", "Openen")}
+        {t("openPanel.openTitle", "Open")}
       </h2>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12, marginBottom: 28 }}>
@@ -638,7 +638,7 @@ function OpenPanel({
             </svg>
           </div>
           <div className="bs-open-card-text">
-            <strong>{t("openPanel.openTitle", "Openen")}</strong>
+            <strong>{t("openPanel.openTitle", "Open")}</strong>
             <span>{t("openPanel.openAnyHint", "CPT (GEF / BRO XML) or project (.ifcgeo) — each file opens in its own tab")}</span>
           </div>
         </button>

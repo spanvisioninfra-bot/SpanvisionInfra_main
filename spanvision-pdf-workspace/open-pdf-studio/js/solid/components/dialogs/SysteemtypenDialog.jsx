@@ -125,7 +125,7 @@ export default function SysteemtypenDialog() {
     const basis = current() || normalizeSysteemType({
       id: newSysteemTypeId(), naam: "System type", celXMm: 600, celYMm: 600,
     });
-    const copy = duplicateSysteemType(basis, 'Nieuw systeemtype');
+    const copy = duplicateSysteemType(basis, 'New system type');
     werk().typen.push(copy);
     setSelectedId(copy.id);
     setRev(rev() + 1);
@@ -395,7 +395,7 @@ export default function SysteemtypenDialog() {
                 id="st-paneeltype-toevoegen"
                 onClick={() => {
                   muteer({ paneelTypen: [...(current().paneelTypen || []),
-                    { id: newPaneelTypeId(), naam: 'Nieuw paneeltype', renderStijl: 'tegel' }] });
+                    { id: newPaneelTypeId(), naam: 'New panel type', renderStijl: 'tegel' }] });
                 }}>Add panel type</button>
             </div>
           </Show>

@@ -11,7 +11,7 @@ export const wandarceringTemplate = {
   category: 'NL',
   defaultSize: { width: 260, height: 18 },
   params: [
-    { key: 'dikte', label: 'Dikte', labelEn: 'Thickness', type: 'number', default: 18, min: 2, max: 400, step: 1, unit: 'pt' },
+    { key: 'dikte', label: "Thickness", labelEn: 'Thickness', type: 'number', default: 18, min: 2, max: 400, step: 1, unit: 'pt' },
     { key: 'hoek', label: 'Arceerhoek (°)', labelEn: 'Hatch angle (°)', type: 'number', default: 60, min: 15, max: 165, step: 5, unit: '°' },
     { key: 'afstand', label: 'Arceerafstand', labelEn: 'Hatch spacing', type: 'number', default: 7, min: 2, max: 60, step: 1, unit: 'pt' },
     { key: 'rand', label: 'Randlijnen', labelEn: 'Outline', type: 'boolean', default: true },

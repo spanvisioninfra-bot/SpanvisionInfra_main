@@ -113,12 +113,12 @@ export default function ProjectList({
   return (
     <div className="project-list">
       <h2 className="project-list__title">
-        {t("projectsPanel.title", "Projecten")}
+        {t("projectsPanel.title", "Projects")}
       </h2>
       <p className="project-list__desc">
         {t(
           "projectsPanel.description",
-          "Beheer je BIM validatie projecten."
+          "Manage your BIM validation projects."
         )}
       </p>
 
@@ -134,7 +134,7 @@ export default function ProjectList({
         <button
           className="project-list__btn project-list__btn--icon"
           onClick={() => loadProjects()}
-          title={t("projectsPanel.refresh", "Vernieuwen")}
+          title={t("projectsPanel.refresh", "Refresh")}
         >
           <svg
             width="14"
@@ -156,12 +156,12 @@ export default function ProjectList({
         <form onSubmit={handleCreate} className="project-list__create-form">
           <div className="project-list__field">
             <label className="project-list__label">
-              {t("projectsPanel.projectName", "Naam")}
+              {t("projectsPanel.projectName", "Name")}
             </label>
             <input
               className="project-list__input"
               type="text"
-              placeholder="Kantoorgebouw X"
+              placeholder="Office building X"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               disabled={creating}
@@ -170,12 +170,12 @@ export default function ProjectList({
           </div>
           <div className="project-list__field">
             <label className="project-list__label">
-              {t("projectsPanel.projectDesc", "Beschrijving")}
+              {t("projectsPanel.projectDesc", "Description")}
             </label>
             <input
               className="project-list__input"
               type="text"
-              placeholder="BIM validatie project"
+              placeholder="BIM validation project"
               value={newDesc}
               onChange={(e) => setNewDesc(e.target.value)}
               disabled={creating}
@@ -188,8 +188,8 @@ export default function ProjectList({
               disabled={!newName.trim() || creating}
             >
               {creating
-                ? t("projectsPanel.creating", "Aanmaken...")
-                : t("projectsPanel.create", "Aanmaken")}
+                ? t("projectsPanel.creating", "Creating...")
+                : t("projectsPanel.create", "Create")}
             </button>
             <button
               type="button"

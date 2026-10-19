@@ -602,14 +602,14 @@ export function buildBetonCheckInputs(ruweData: BetonBuildData): BetonBuildResul
     if (!cfg) {
       skipped.push({
         beamId: beam.id,
-        reason: "geen wapeningskorf opgegeven — vul dekking, beugel en hoofdwapening in bij de staafeigenschappen",
+        reason: "No reinforcement cage specified. Enter cover, stirrups and longitudinal reinforcement in member properties.",
       });
       continue;
     }
 
     const lengthMm = beamLengthMm(beam, data.nodes);
     if (lengthMm <= 0) {
-      skipped.push({ beamId: beam.id, reason: "staaflengte is 0 — knopen ontbreken" });
+      skipped.push({ beamId: beam.id, reason: "Member length is 0 — nodes are missing" });
       continue;
     }
 
@@ -619,7 +619,7 @@ export function buildBetonCheckInputs(ruweData: BetonBuildData): BetonBuildResul
     if (!hasAnyResult) {
       skipped.push({
         beamId: beam.id,
-        reason: "geen krachtsverloop in de UGT-combinaties — reken het model eerst door",
+        reason: "No force diagrams in the ULS combinations. Solve the model first.",
       });
       continue;
     }

@@ -162,29 +162,29 @@ export type PagineerOordeel =
  */
 export function beoordeelPaginering(i: GereedheidInvoer): PagineerOordeel {
   const p = i.pagineer;
-  if (!p.gemonteerd) return { soort: "wacht", reden: "de rapportweergave staat nog niet in beeld" };
-  if (i.projectInfoLaadt) return { soort: "wacht", reden: "de projectgegevens worden nog geladen" };
-  if (!p.fontsBinnen) return { soort: "wacht", reden: "de lettertypen zijn nog niet geladen" };
+  if (!p.gemonteerd) return { soort: "wacht", reden: "the report view is not visible yet" };
+  if (i.projectInfoLaadt) return { soort: "wacht", reden: "project details are still loading" };
+  if (!p.fontsBinnen) return { soort: "wacht", reden: "fonts have not loaded yet" };
   if (p.timerGepland) {
     return {
       soort: "wacht",
-      reden: `er staat een pagineerslag gepland (aanleiding: ${p.aanleiding || "onbekend"}; ${p.slagen} slagen gedaan)`,
+      reden: `a pagination pass is scheduled (reason: ${p.aanleiding || "unknown"}; ${p.slagen} passes completed)`,
     };
   }
-  if (p.slagen === 0) return { soort: "wacht", reden: "er is nog niet gepagineerd" };
+  if (p.slagen === 0) return { soort: "wacht", reden: "pagination has not run yet" };
   if (p.beantwoordVerzoek < i.verzoek) {
-    return { soort: "wacht", reden: "de paginering heeft de nieuwe rapportinstellingen nog niet verwerkt" };
+    return { soort: "wacht", reden: "pagination has not processed the new report settings yet" };
   }
   if (!i.toc.stabiel) {
-    return { soort: "wacht", reden: `de inhoudsopgave stelt zich nog bij (slag ${i.toc.slag})` };
+    return { soort: "wacht", reden: `the table of contents is still updating (pass ${i.toc.slag})` };
   }
   if (i.nu - p.laatsteSlagOp < STILTE_NA_SLAG_MS) {
-    return { soort: "wacht", reden: "de laatste pagineerslag is net gedaan" };
+    return { soort: "wacht", reden: "the last pagination pass just completed" };
   }
   if (p.aantalVellen <= 0) {
     return {
       soort: "weiger",
-      reden: "het rapport heeft geen enkel vel — alle secties staan uit of geen sectie is van toepassing",
+      reden: "the report has no sheets — all sections are disabled or no section applies",
     };
   }
   return { soort: "klaar", aantalVellen: p.aantalVellen };
