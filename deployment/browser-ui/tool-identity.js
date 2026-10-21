@@ -6,7 +6,7 @@
   if (!tool.icon || !/^\d+\.\d+$/.test(tool.version)) return;
   const root = document.documentElement;
   const adapters = {
-    cad2d: { header: '.sv-cad2d-titlebar', logo: 'button[aria-label="Project start"] img', release: '.flex-1' },
+    cad2d: { header: '.sv-cad2d-titlebar, .web-start-brand', logo: 'button[aria-label="Project start"] img, :scope > img', release: '.flex-1' },
     bim: { header: '.brand-header, .titlebar', logo: '.brand-lockup > svg, .titlebar-brand > svg', release: '.brand-lockup, .titlebar-title' },
     pdf: { header: '.title-bar', logo: '.app-icon', release: '.app-title', legacy: '.app-title small' },
     ifc: { header: 'header', logo: 'img[class*="appIcon"]', release: '[class*="dragRegion"]' },
@@ -71,7 +71,9 @@
       badge.className = 'sv-tool-release';
       badge.textContent = `v${tool.version}`;
       badge.setAttribute('aria-label', `${tool.label} v${tool.version}`);
-      host.append(badge);
+      const edition = host.matches('.web-start-brand') && host.querySelector('.web-edition');
+      if (edition) edition.before(badge);
+      else host.append(badge);
     }
     badge.style.setProperty('--sv-tool-ink', inkOnSurface(host));
   }

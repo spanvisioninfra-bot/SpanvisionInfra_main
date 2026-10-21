@@ -2,13 +2,6 @@
 .brand-name small { display:block; font:500 10px/1.4 var(--font-body); letter-spacing:.06em; color:#999; }
 .logo img { width:32px; height:32px; flex:none; }
 .title-bar-icon img { width:22px; height:22px; }
-.about-button { width:32px; height:32px; border:1px solid rgba(255,255,255,.32); border-radius:6px; background:transparent; color:#eee; cursor:pointer; font:600 16px var(--font-body); }
-.field-notices { margin:auto; width:min(640px,calc(100vw - 32px)); max-height:calc(100dvh - 32px); overflow:auto; padding:28px; border:1px solid rgba(255,255,255,.32); border-radius:12px; background:#121212; color:#eee; }
-.field-notices::backdrop { background:rgba(0,0,0,.78); }
-.field-notices h2 { color:#fff; margin-bottom:12px; }
-.field-notices p { margin:12px 0; }
-.field-notices a { color:#eee; text-underline-offset:3px; }
-.field-notices .notices-close { min-height:44px; padding:8px 18px; background:#eee; color:#000; border:1px solid #eee; border-radius:6px; cursor:pointer; }
 :focus-visible { outline:2px solid rgba(255,255,255,.58); outline-offset:3px; }
 [data-theme="light"] :focus-visible { outline-color:rgba(0,0,0,.65); }
 [data-theme="spanvision-mono"] .title-bar,
@@ -50,7 +43,7 @@
 [data-theme="spanvision-mono"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
 [data-theme="spanvision-mono"] textarea:focus,
 [data-theme="spanvision-mono"] select:focus { border-color:rgba(255,255,255,.58); box-shadow:0 0 0 3px rgba(255,255,255,.1); }
-[data-theme="spanvision-mono"] :is(.theme-toggle-btn,.about-button,.quick-access-btn,.tb-lang-toggle,.tb-lang-option,.tool-btn,.btn-secondary,.btn-outline,.checklist-choice,.modal-close,.verdict-btn):hover { background:#333; color:#fff; border-color:rgba(255,255,255,.58); }
+[data-theme="spanvision-mono"] :is(.theme-toggle-btn,.quick-access-btn,.tb-lang-toggle,.tb-lang-option,.tool-btn,.btn-secondary,.btn-outline,.checklist-choice,.modal-close,.verdict-btn):hover { background:#333; color:#fff; border-color:rgba(255,255,255,.58); }
 [data-theme="spanvision-mono"] :is(.verdict-btn.selected,.checklist-btn.active) { background:#eee; color:#000; border-color:#fff; }
 [data-theme="spanvision-mono"] :is(.checklist-btn.selected,.nen-score.selected) { background:#eee; color:#000; border-color:#fff; }
 [data-theme="spanvision-mono"] .tb-lang-menu { background:#121212; border-color:var(--sv-border); }
@@ -92,8 +85,8 @@ button:disabled { opacity:.45; cursor:not-allowed; }
   .canvas-wrapper { width:100%; }
   .main-content { overflow-x:hidden; }
   .tab-content { padding:16px; }
-  :is(.btn,.tool-btn,.verdict-btn,.checklist-choice,.tb-lang-toggle,.tb-lang-option,.theme-toggle-btn,.about-button,.tab-strip .nav-btn) { min-height:44px; }
-  :is(.theme-toggle-btn,.about-button) { min-width:44px; }
+  :is(.btn,.tool-btn,.verdict-btn,.checklist-choice,.tb-lang-toggle,.tb-lang-option,.theme-toggle-btn,.tab-strip .nav-btn) { min-height:44px; }
+  .theme-toggle-btn { min-width:44px; }
   .canvas-toolbar { flex-wrap:wrap; }
   .handover-card { flex-wrap:wrap; gap:12px; }
   .handover-card-info { width:100%; flex:1 0 100%; }
@@ -109,7 +102,5 @@ button:disabled { opacity:.45; cursor:not-allowed; }
   :is(.form-grid,.dashboard-grid,.dashboard-panels,.export-options,.ho-participant-row) { grid-template-columns:minmax(0,1fr); }
   :is(.section-header,.export-actions,.modal-footer,.floor-selector,.ticket-filters) { flex-wrap:wrap; gap:8px; }
   .floor-selector :is(input,select),.ticket-filters :is(input,select) { width:100%; min-width:0; }
-  .field-notices { padding:20px; }
-  .field-notices h2 { font-size:24px; }
   :is(.select-btn,.delete-btn,.remove-btn,.modal-close,.checklist-btn) { min-height:44px; min-width:44px; }
 }
