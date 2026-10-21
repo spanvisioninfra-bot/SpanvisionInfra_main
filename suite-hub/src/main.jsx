@@ -7,6 +7,7 @@ import {AuthGateway,OnlineAccount} from './AccountGateway';
 import {createAccountState} from './account-client';
 import AdminPanel from './AdminPanel';
 import ToolIcon from './ToolIcon';
+import release from '../../branding/release.json';
 import { isLocalPreview, moduleUrl, toolLaunchUrl } from './module-url';
 import './preview.css';
 import './palette.css';
@@ -169,7 +170,7 @@ function App() {
   }
   function Modules() {
     return <div class="module-grid"><For each={brand.modules}>{module=><article class="module-card" data-module={module.id}>
-      <div class="module-top"><span class="tool-glyph"><ToolIcon id={module.id}/></span></div>
+      <div class="module-top"><span class="tool-glyph"><ToolIcon id={module.id}/></span><span class="module-release">v{release.version}</span></div>
       <h3>{module.label}</h3><p>{module.description}</p>
       <div class="module-bottom"><ToolLink module={module}/><small>{status()[module.id]?.available?'Opens in a new tab':status()[module.id]?.message||'Checking the local preview…'}</small></div>
     </article>}</For></div>;

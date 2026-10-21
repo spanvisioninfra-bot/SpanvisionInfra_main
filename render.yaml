@@ -31,6 +31,9 @@ services:
         - deployment/browser-icons/**
         - deployment/browser-ui/**
         - vision-bim-validator/**
+        - branding/brand.json
+        - branding/release.json
+        - branding/tool-icons.json
     envVars:
       - key: SPANVISION_SERVICE
         value: bim
@@ -52,6 +55,9 @@ services:
         - deployment/browser-icons/**
         - deployment/browser-ui/**
         - spanvision-stl-3d-map-workspace/**
+        - branding/brand.json
+        - branding/release.json
+        - branding/tool-icons.json
     envVars:
       - key: SPANVISION_SERVICE
         value: stl

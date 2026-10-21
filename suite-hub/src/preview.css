@@ -152,3 +152,4 @@
   .scan-preview-dialog .modal-header { padding:16px; }.scan-preview-dialog .modal-header h2 { font-size:17px; }.scan-preview-dialog .modal-body { padding:16px; }.scan-preview-dialog .modal-footer { padding:16px; flex-direction:column; align-items:stretch; }.scan-footer { justify-content:flex-end; }.scan-options { grid-template-columns:1fr; gap:18px; }.scan-upload { padding:16px; }
 }
 @media(prefers-reduced-motion:reduce) { .preview-body * { transition:none !important; scroll-behavior:auto !important; } }
+.module-release{display:inline-flex;align-items:center;min-height:24px;padding:2px 8px;border:1px solid var(--sv-border);border-radius:6px;color:var(--sv-muted);font-size:11px;white-space:nowrap}

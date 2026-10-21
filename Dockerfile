@@ -8,6 +8,7 @@ COPY deployment/browser-identity.mjs /browser-identity.mjs
 COPY deployment/browser-icons/ /browser-icons/
 COPY deployment/browser-ui.mjs /browser-ui.mjs
 COPY deployment/browser-ui/ /browser-ui/
+COPY branding/brand.json branding/release.json branding/tool-icons.json /branding/
 RUN if [ "$SPANVISION_SERVICE" = "bim" ]; then npm run build && node /browser-identity.mjs dist; else mkdir -p dist; fi
 COPY spanvision-stl-3d-map-workspace/web/ /build-stl/
 RUN node /browser-identity.mjs /build-stl /static/__spanvision-brand/

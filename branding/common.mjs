@@ -32,6 +32,9 @@ export function files(directory) {
 }
 export function fingerprint(module, brandingDigest=digest(module)) {
   const hash = createHash('sha256').update(brandingDigest);
+  if (module.id === 'hub') {
+    for (const name of ['release.json', 'tool-icons.json']) hash.update(name).update(fs.readFileSync(path.join(root, 'branding', name)));
+  }
   if (['hub', 'fem'].includes(module.id)) {
     for (const name of ['backend-services.mjs', 'service-readiness.mjs']) {
       hash.update(name).update(fs.readFileSync(path.join(root, 'deployment', name)));

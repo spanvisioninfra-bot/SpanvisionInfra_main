@@ -7,6 +7,15 @@
 @font-face{font-family:"Spanvision Display";src:url("SpaceGrotesk-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
 
 @media screen {
+  :root[data-sv-tool] [data-sv-legacy-logo],:root[data-sv-tool] [data-sv-engine-version]{display:none!important}
+  :root[data-sv-tool] img[data-sv-tool-logo]{object-fit:contain;flex-shrink:0}
+  :root[data-sv-tool] .sv-tool-logo-replacement{display:inline-block;object-fit:contain;flex-shrink:0;vertical-align:middle}
+  :root[data-sv-tool] .sv-tool-release{display:inline-flex;align-items:center;flex:none;margin-inline-start:8px;padding:1px 6px;min-height:20px;border:1px solid var(--sv-border,#8885);border-radius:5px;color:var(--sv-tool-ink,var(--sv-muted,#999));font:11px/1.4 var(--sv-font-ui,system-ui);white-space:nowrap;letter-spacing:0;vertical-align:middle}
+  :root[data-sv-tool="stl"] .sv-tool-release{font-size:12px;padding:3px 7px}
+  :root[data-sv-tool="cad"] body[data-sv-canvas-branding]{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+  :root[data-sv-tool="cad"] .sv-canvas-brandbar{display:flex;align-items:center;gap:8px;flex:none;height:40px;padding:4px 12px;background:var(--sv-surface);color:var(--sv-text);border-bottom:1px solid var(--sv-border);font:13px/1.4 var(--sv-font-ui);padding-inline-end:115px}
+  :root[data-sv-tool="cad"] body[data-sv-canvas-branding]>canvas{flex:1;min-height:0;width:100%!important;height:calc(100dvh - 40px)!important}
+  :root[data-sv-tool="cad"] .sv-appearance-control{top:4px}
   :root[data-sv-tool]{
     --sv-font-ui:"Spanvision Sans",Inter,system-ui,sans-serif;
     --sv-font-display:"Spanvision Display","Spanvision Sans",system-ui,sans-serif;
