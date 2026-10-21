@@ -38,7 +38,10 @@
    <section><h2><i>7</i> Filament slots (CFS)</h2><p class="hint">Assign each layer a slot. CFS-C has 4; additional slots need a manual change.</p><div id="slots" class="slots"></div><div id="slot-warn" class="slot-warn" role="status"></div></section>
    <section><h2><i>8</i> Generate</h2><label for="export-dir">Export folder</label><div class="row pathrow"><input id="export-dir" type="text" readonly><button id="btn-pick-dir" class="ghost" aria-label="Choose export folder">…</button></div><div class="row split"><button id="btn-build" class="primary">Generate</button><button id="btn-build-as" class="ghost">Save as…</button></div><div id="build-result" class="hidden"></div><div class="row"><button id="btn-reveal" class="ghost hidden">Open folder in Explorer</button></div></section>
   </aside>
-  <main id="map" aria-label="Map canvas" tabindex="0"><div id="map-guidance">SELECT AN AREA <span>Search a location or draw a boundary to begin.</span></div></main>
+  <div class="map-workspace">
+   <main id="map" aria-label="Map canvas" tabindex="0"><div id="map-guidance">SELECT AN AREA <span>Search a location or draw a boundary to begin.</span></div></main>
+   <div id="map-location-toolbar" role="group" aria-label="Map location"></div>
+  </div>
  </div>
  <div id="statusbar"><span id="status" role="status" aria-live="polite">Ready. Select a location to begin.</span><span class="status-brand">STL / SPANVISION INFRA</span></div>
 </div>

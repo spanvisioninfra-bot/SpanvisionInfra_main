@@ -213,7 +213,12 @@ function fitAreaBounds() {
 
 function resizeVisibleMap() {
   if (!$('map').getClientRects().length) return;
-  map.invalidateSize({ pan: false });
+  const size=map.getSize(),container=map.getContainer();
+  if(size.x!==container.clientWidth||size.y!==container.clientHeight){
+    const center=map.getCenter();
+    map.invalidateSize({ pan: false, animate: false });
+    map.setView(center,map.getZoom(),{reset:true,animate:false});
+  }
   if (pendingAreaFit) fitAreaBounds();
 }
 
@@ -743,11 +748,14 @@ window.addEventListener('spanvision:map-location', event => {
   $('map-region-label').textContent=place ? 'YOUR AREA: '+place : 'YOUR LOCATION';
 });
 window.SpanvisionLocation.attachMap(map,{autoLocate:!project.bbox_wgs84&&!hasSavedMapView});
+// Keep location actions outside the canvas so they cannot cover map guidance.
+$('map-location-toolbar').append(map.getContainer().querySelector('.sv-map-location'));
 function saveMapView(layerName){let previous={};try{previous=JSON.parse(localStorage.getItem('oststl.map')||'{}');const center=map.getCenter();localStorage.setItem('oststl.map',JSON.stringify({center:[center.lat,center.lng],zoom:map.getZoom(),layer:layerName||previous.layer||'Map'}));}catch{}}
 map.on('moveend',()=>saveMapView());map.on('baselayerchange',event=>saveMapView(event.name));
 if(project.design.filename){$('design-controls').classList.remove('hidden');$('design-info').classList.remove('hidden');$('design-info').textContent='Saved design: '+project.design.filename;ensureDesignMarker();}
 // Leaflet mouse events retain the desktop workflow; these provide touch drawing.
 const mapElement=$('map');
+new ResizeObserver(resizeVisibleMap).observe(mapElement);
 mapElement.addEventListener('touchstart',event=>{if(!mode||event.touches.length!==1)return;event.preventDefault();dragStart=map.mouseEventToLatLng(event.touches[0]);dragRect=L.rectangle(L.latLngBounds(dragStart,dragStart),{color:mode==='area'?'#4f9be0':'#d9604a',weight:2,fillOpacity:.08}).addTo(map);},{passive:false});
 mapElement.addEventListener('touchmove',event=>{if(!dragStart||!dragRect)return;event.preventDefault();dragRect.setBounds(L.latLngBounds(dragStart,map.mouseEventToLatLng(event.touches[0])));},{passive:false});
 mapElement.addEventListener('touchend',event=>{if(!dragStart||!dragRect)return;event.preventDefault();const bounds=dragRect.getBounds(),wasMode=mode;map.removeLayer(dragRect);dragStart=null;dragRect=null;if(bounds.getNorth()-bounds.getSouth()<1e-5){setMode(null);return;}if(wasMode==='area'){applyBbox([bounds.getWest(),bounds.getSouth(),bounds.getEast(),bounds.getNorth()]);setMode(null);}else hideInBounds(bounds,true);},{passive:false});
