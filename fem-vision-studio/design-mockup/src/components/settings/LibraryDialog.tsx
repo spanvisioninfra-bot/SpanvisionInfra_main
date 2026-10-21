@@ -28,7 +28,7 @@ interface LibraryDialogProps {
 
 /** Format een getal compact met NL-notatie (punt = duizendtal, komma = decimaal). */
 const fmt = (v: number, decimals = 0) =>
-  v.toLocaleString("nl-NL", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  v.toLocaleString("en-GB", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 
 export default function LibraryDialog({ open, onClose, initialTab = "sections" }: LibraryDialogProps) {
   const { t } = useTranslation("settings");

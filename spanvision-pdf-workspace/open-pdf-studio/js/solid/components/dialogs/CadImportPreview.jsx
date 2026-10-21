@@ -72,10 +72,10 @@ export default function CadImportPreview(props) {
       pad = verslag?.outputPath || null;
       if (weg || dezeJob !== job) return;
       const blad = verslag?.pages?.[0];
-      if (!blad) throw new Error('geen pagina');
+      if (!blad) throw new Error('No page available');
       const vakPx = { breedte: vak?.clientWidth || 280, hoogte: vak?.clientHeight || 360 };
       const m = voorbeeldMaat({ breedte: blad.widthMm, hoogte: blad.heightMm }, vakPx);
-      if (!m) throw new Error('geen maat');
+      if (!m) throw new Error('No dimensions available');
       const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
       const bmp = await tekenPdfNaarBitmap(
         pad,
@@ -87,7 +87,7 @@ export default function CadImportPreview(props) {
         beelden.sluit(bmp);
         return;
       }
-      if (!bmp) throw new Error('geen beeld');
+      if (!bmp) throw new Error('No image available');
       getoond = { blad, ...stand };
       // Maat en beeld in één keer: het venster tekent dan één keer, met het
       // nieuwe beeld. Het oude gaat daarna pas dicht — een maat zetten tekent

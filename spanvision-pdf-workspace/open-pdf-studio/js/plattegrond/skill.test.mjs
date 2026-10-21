@@ -50,13 +50,13 @@ test('de instructie voor het model noemt de opdracht, de eenheden en de volgorde
   assert.ok(SKILLS_SYSTEM_PROMPT.endsWith(PLATTEGROND_PROMPT), 'achteraan toegevoegd');
   for (const stuk of [
     'app_floorplan', 'app_set_measure_scale', 'app_get_viewport_state',
-    'paginapunten', 'MILLIMETERS',
+    'page points', 'MILLIMETERS',
     'alongMm', 'openTo', 'openEnds', 'refresh:true', 'undo',
   ]) assert.ok(PLATTEGROND_PROMPT.includes(stuk), `de instructie noemt ${stuk}`);
   // #477: maten aan het wandvlak en de buitenhoek, ruimtetag in plaats van een
   // los tekstvak, ruimten achter de wanden, alleen het getal.
-  for (const stuk of ['WANDVLAK', 'buitenhoek', 'buitenste laag', 'ruimtetag', 'los tekstvak', 'ACHTER', 'showUnit', 'number',
-    'chainOf', 'addPoints', 'removePoints', '2 mm', 'names:', 'tagIds', 'RUIMTE zelf']) {
+  for (const stuk of ['WALL FACE', 'outer corner', 'outermost layer', 'room tag', 'separate text box', 'BEHIND', 'showUnit', 'number',
+    'chainOf', 'addPoints', 'removePoints', '2 mm', 'names:', 'tagIds', 'ROOM itself']) {
     assert.ok(PLATTEGROND_PROMPT.includes(stuk), `de instructie noemt ${stuk}`);
   }
   assert.ok(!PLATTEGROND_PROMPT.includes('offsetMm:500'), 'geen vaste offset meer voorgeschreven: de standaard groeit mee met de schaal');
@@ -69,7 +69,7 @@ test('de instructie voor het model noemt de opdracht, de eenheden en de volgorde
 test('de instructie beschrijft het gevelelement (vliesgevel, kozijn) en al zijn acties', () => {
   for (const stuk of [
     'app_facade_element', 'curtainWall', 'windowFrame', 'wallId', 'fromMm', 'lengthMm',
-    'fieldWidthsMm', 'hinge', 'swing', 'kader',
+    'fieldWidthsMm', 'hinge', 'swing', 'frame',
   ]) assert.ok(PLATTEGROND_PROMPT.includes(stuk), `de instructie noemt ${stuk}`);
   for (const a of FACADE_ACTIES) {
     assert.ok(PLATTEGROND_PROMPT.includes(`action:"${a}"`), `actie ${a}`);
@@ -77,10 +77,10 @@ test('de instructie beschrijft het gevelelement (vliesgevel, kozijn) en al zijn 
 });
 
 test('de instructie heeft een eigen blok over kozijnen en spouwmuren', () => {
-  const blok = PLATTEGROND_PROMPT.slice(PLATTEGROND_PROMPT.indexOf('KOZIJNEN EN SPOUWMUREN'));
+  const blok = PLATTEGROND_PROMPT.slice(PLATTEGROND_PROMPT.indexOf('FRAMES AND CAVITY WALLS'));
   assert.ok(blok.length > 100, 'het blok staat in de instructie');
   for (const stuk of [
-    'layers', 'insideSide', 'BUITENVLAK', 'KOZIJNMAAT', 'aanslag', 'speling',
+    'layers', 'insideSide', 'OUTER FACE', 'OVERALL FRAME SIZE', 'overlap', 'clearance',
     'framePositionMm', 'overlapMm', 'clearanceMm', 'stileWidthMm', 'frameDepthMm', 'leafThicknessMm',
     'layerOpeningsMm', 'corners', 'windowType', 'turn', '67 x 114',
   ]) assert.ok(blok.includes(stuk), `het kozijnblok noemt ${stuk}`);

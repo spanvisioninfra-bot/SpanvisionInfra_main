@@ -1,3 +1,4 @@
+import { backendFetch } from "./request";
 /**
  * API client for the IFC Validator async job endpoints
  *
@@ -61,7 +62,8 @@ async function parseErrorResponse(response: Response): Promise<string> {
 export async function submitValidation(
   ifcFile: File,
   idsStandard?: IdsStandard,
-  idsFile?: File
+  idsFile?: File,
+  signal?: AbortSignal
 ): Promise<SubmitValidationResponse> {
   const formData = new FormData();
   formData.append('ifc_file', ifcFile);
@@ -75,9 +77,10 @@ export async function submitValidation(
 
   let response: Response;
   try {
-    response = await fetch(`${API_BASE}/validate`, {
+    response = await backendFetch(`${API_BASE}/validate`, {
       method: 'POST',
       body: formData,
+      signal,
     });
   } catch (error) {
     // Network error (no response received)
@@ -113,14 +116,16 @@ export async function submitValidation(
  *   console.log('Results:', status.result);
  * }
  */
-export async function pollJobStatus(jobId: string): Promise<JobStatusResponse> {
+export async function pollJobStatus(jobId: string, signal?: AbortSignal): Promise<JobStatusResponse> {
   if (!jobId) {
     throw new ApiError('Job ID is required', undefined, 'Missing job_id parameter');
   }
 
   let response: Response;
   try {
-    response = await fetch(`${API_BASE}/jobs/${encodeURIComponent(jobId)}`);
+    response = await backendFetch(`${API_BASE}/jobs/${encodeURIComponent(jobId)}`, {
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000),
+    });
   } catch (error) {
     // Network error (no response received)
     throw new ApiError(
@@ -193,7 +198,7 @@ export async function downloadBcf(jobId: string): Promise<Blob> {
 
   let response: Response;
   try {
-    response = await fetch(`${API_BASE}/jobs/${encodeURIComponent(jobId)}/bcf`);
+    response = await backendFetch(`${API_BASE}/jobs/${encodeURIComponent(jobId)}/bcf`);
   } catch (error) {
     throw new ApiError(
       'Network error: Unable to download BCF file.',

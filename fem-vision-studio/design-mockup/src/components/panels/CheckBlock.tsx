@@ -68,7 +68,7 @@ function VariableLine({ vars }: { vars: NamedValue[] }) {
           <span className="var-eq">=</span>
           <span>
             <span className="var-value">
-              {v.value.toLocaleString("nl-NL", { maximumFractionDigits: 3 })}
+              {v.value.toLocaleString("en-GB", { maximumFractionDigits: 3 })}
             </span>
             {v.unit && v.unit !== "-" && <span className="var-unit"> {v.unit}</span>}
           </span>
@@ -80,7 +80,7 @@ function VariableLine({ vars }: { vars: NamedValue[] }) {
 
 /** nl-notatie, gelijk aan het rapport (decimaalkomma). */
 function nl(v: number, digits: number): string {
-  return v.toLocaleString("nl-NL", {
+  return v.toLocaleString("en-GB", {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   });

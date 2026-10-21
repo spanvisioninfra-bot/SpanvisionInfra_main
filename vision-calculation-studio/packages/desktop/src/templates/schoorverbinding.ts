@@ -8,12 +8,9 @@
  * Variabelenamen komen exact overeen met SchoorDesigner.tsx.
  */
 
-export const schoorverbinding = `"Brace connection — hoekstaal op een gusset plate
+export const schoorverbinding = `"Brace connection — angle to gusset plate
 
-'<i>Een windverbandschoor van hoekstaal, met bouten door één been op een
-'schetsplaat. Doordat maar één been is aangesloten werkt de kracht excentrisch;
-'EN 1993-1-8 §3.10.3 verrekent dat met β<sub>2</sub>/β<sub>3</sub> op de netto
-'doorsnede. De hoek van de schoor stuurt de vorm van de schetsplaat.</i>
+'<i>An angle brace bolted through one leg to a gusset plate. Connecting only one leg produces eccentric loading; EN 1993-1-8 §3.10.3 accounts for it using β<sub>2</sub>/β<sub>3</sub> on the net section. The brace angle controls the gusset geometry.</i>
 
 # 1. Inputs
 
@@ -53,17 +50,17 @@ export const schoorverbinding = `"Brace connection — hoekstaal op een gusset p
   M24 = 24
 @end
 
-n_bouten = ?', aantal bouten in de rij'
+n_bouten = ?', number of bolts in the row'
 t_schets = ?*(mm)', dikte schetsplaat'
-hoek = ?', hoek van de schoor met de horizontaal [graden]'
+hoek = ?', brace angle to the horizontal [degrees]'
 e_1 = ?*(mm)', randafstand e_1'
 p_1 = ?*(mm)', steek p_1'
-b_schets = ?*(mm)', breedte schetsplaat'
-h_schets = ?*(mm)', hoogte schetsplaat'
+b_schets = ?*(mm)', gusset plate width'
+h_schets = ?*(mm)', gusset plate height'
 a_las = ?*(mm)', keeldikte las schetsplaat'
-F_Ed = ?*(kN)', rekenwaarde van de schoorkracht F_Ed'
+F_Ed = ?*(kN)', design brace force F_Ed'
 
-'<h6>Overzicht van de invoer</h6>
+'<h6>Input summary</h6>
 n_bouten
 t_schets
 hoek
@@ -71,10 +68,7 @@ e_1
 p_1
 F_Ed
 
-# 2. Toetsing
+# 2. Checks
 
-'<i><b>Nog niet uitgewerkt.</b> Dit blad legt voorlopig alleen de invoer en het
-'parametrische beeld vast. De toetsing van het hoekstaal op trek (bruto en netto,
-'met β<sub>2</sub>/β<sub>3</sub> uit §3.10.3), de bouten op afschuiving en stuik,
-'de schetsplaat en de lassen volgt.</i>
+'<i><b>Not yet implemented.</b> This sheet defines inputs and a parametric drawing only. Angle tension checks on gross/net sections with β<sub>2</sub>/β<sub>3</sub> from §3.10.3, bolt shear and bearing, gusset plate, and weld checks are planned.</i>
 `;

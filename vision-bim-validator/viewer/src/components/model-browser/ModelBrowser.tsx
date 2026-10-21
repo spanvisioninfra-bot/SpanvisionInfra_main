@@ -157,11 +157,11 @@ function ModelItem({ model }: { model: ModelInfo }) {
             !model.visible ? "model-item__visibility--hidden" : ""
           }`}
           onClick={() => toggleVisibility(model.id)}
-          title={model.visible ? "Verberg model" : "Toon model"}
+          title={model.visible ? "Hide model" : "Show model"}
           aria-label={
             model.visible
-              ? `Verberg ${model.fileName}`
-              : `Toon ${model.fileName}`
+              ? `Hide ${model.fileName}`
+              : `Show ${model.fileName}`
           }
         >
           {model.visible ? "V" : "-"}

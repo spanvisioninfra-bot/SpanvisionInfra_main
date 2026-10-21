@@ -13,7 +13,7 @@
     try {
       data = await invoke("get_project_plausibility", { windPressurePa: windKnm2 * 1000 });
     } catch (e) {
-      console.error("Plausibiliteit laden mislukt:", e);
+      console.error("Failed to load plausibility results:", e);
     }
     loading = false;
   }

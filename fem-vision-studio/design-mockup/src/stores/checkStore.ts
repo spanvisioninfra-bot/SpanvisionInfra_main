@@ -24,6 +24,7 @@
  * unity check leeg bleef — in het canvas én in het rapport.
  */
 import { create } from "zustand";
+import { engineRequest } from "../lib/engineApi";
 import { invoke } from "@tauri-apps/api/core";
 import type { Beam, Node, Plate, Support } from "../components/fem/femTypes";
 import type { SolverResult } from "../components/fem/solver/types";
@@ -100,32 +101,7 @@ export async function roepKern<T>(opdracht: string, inputs?: unknown): Promise<T
   if (isTauriApp()) {
     return invoke<T>(opdracht, inputs !== undefined ? { inputs } : undefined);
   }
-  const antwoord = await fetch("/api/toetsing", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ opdracht, inputs }),
-  });
-  const ruw = await antwoord.text();
-  let data: unknown = null;
-  let isJson = true;
-  try {
-    data = JSON.parse(ruw);
-  } catch {
-    isJson = false;
-  }
-  if (!isJson) {
-    throw new Error(
-      `The calculation service did not return JSON (HTTP ${antwoord.status}). ` +
-        `The browser requires a running calculation API. Try again or use the Windows app.`,
-    );
-  }
-  if (!antwoord.ok || (data && typeof data === "object" && "fout" in data)) {
-    throw new Error(
-      (data as { fout?: string; detail?: string })?.fout ?? (data as { detail?: string })?.detail ??
-        `The calculation engine returned HTTP ${antwoord.status}.`,
-    );
-  }
-  return data as T;
+  return engineRequest<T>("toetsing", { opdracht, inputs });
 }
 
 export interface CheckRunData {

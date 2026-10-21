@@ -358,7 +358,7 @@ export default function OplegMetselwerkDesigner() {
           <label>N<sub>Edc</sub> (kN)
             <input type="number" step={10} value={N_Edc} onChange={(e) => setVal("N_Edc", parseFloat(e.target.value))} />
           </label>
-          <label>q<sub>Edc</sub> wand (kN/m)
+          <label>q<sub>Edc</sub> wall (kN/m)
             <input type="number" step={0.5} value={q_Edc} onChange={(e) => setVal("q_Edc", parseFloat(e.target.value))} />
           </label>
 

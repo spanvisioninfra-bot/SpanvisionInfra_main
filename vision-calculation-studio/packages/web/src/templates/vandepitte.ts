@@ -963,7 +963,7 @@ export const vandepitteFormules: { id: string; label: string; template: string }
   },
   {
     id: 'vdp-mohr',
-    label: 'Vandepitte: Doorbuiging (Mohr)',
+    label: "Vandepitte: Deflection (Mohr)",
     template: vandepitteMohr,
   },
   {

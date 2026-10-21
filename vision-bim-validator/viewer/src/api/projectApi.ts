@@ -1,3 +1,4 @@
+import { backendFetch } from "./request";
 /**
  * Project API client — v2 endpoints for multi-model BIM platform.
  *
@@ -85,7 +86,7 @@ export interface ModelResponse {
  * List all projects.
  */
 export async function listProjects(): Promise<ProjectSummary[]> {
-  const response = await fetch(`${API_V2}/projects`);
+  const response = await backendFetch(`${API_V2}/projects`);
   const data = await handleResponse<{ projects: ProjectSummary[] }>(response);
   return data.projects;
 }
@@ -103,7 +104,7 @@ export async function createProject(
     formData.append("description", description);
   }
 
-  const response = await fetch(`${API_V2}/projects`, {
+  const response = await backendFetch(`${API_V2}/projects`, {
     method: "POST",
     body: formData,
   });
@@ -116,7 +117,7 @@ export async function createProject(
 export async function getProject(
   projectId: string
 ): Promise<ProjectDetailResponse> {
-  const response = await fetch(`${API_V2}/projects/${projectId}`);
+  const response = await backendFetch(`${API_V2}/projects/${projectId}`);
   return handleResponse<ProjectDetailResponse>(response);
 }
 
@@ -132,7 +133,7 @@ export async function updateProject(
   if (data.description !== undefined)
     formData.append("description", data.description);
 
-  const response = await fetch(`${API_V2}/projects/${projectId}`, {
+  const response = await backendFetch(`${API_V2}/projects/${projectId}`, {
     method: "PUT",
     body: formData,
   });
@@ -143,7 +144,7 @@ export async function updateProject(
  * Delete a project and all its files.
  */
 export async function deleteProject(projectId: string): Promise<void> {
-  const response = await fetch(`${API_V2}/projects/${projectId}`, {
+  const response = await backendFetch(`${API_V2}/projects/${projectId}`, {
     method: "DELETE",
   });
   await handleResponse(response);
@@ -163,7 +164,7 @@ export async function uploadFile(
   formData.append("file", file);
   formData.append("file_type", fileType);
 
-  const response = await fetch(`${API_V2}/projects/${projectId}/files`, {
+  const response = await backendFetch(`${API_V2}/projects/${projectId}/files`, {
     method: "POST",
     body: formData,
   });
@@ -178,7 +179,7 @@ export async function listFiles(
   fileType?: "ifc" | "bcf" | "ids"
 ): Promise<ProjectFileResponse[]> {
   const params = fileType ? `?file_type=${fileType}` : "";
-  const response = await fetch(
+  const response = await backendFetch(
     `${API_V2}/projects/${projectId}/files${params}`
   );
   const data = await handleResponse<{ files: ProjectFileResponse[] }>(
@@ -194,7 +195,7 @@ export async function downloadFile(
   projectId: string,
   fileId: string
 ): Promise<Blob> {
-  const response = await fetch(
+  const response = await backendFetch(
     `${API_V2}/projects/${projectId}/files/${fileId}`
   );
   if (!response.ok) {
@@ -213,7 +214,7 @@ export async function deleteFile(
   projectId: string,
   fileId: string
 ): Promise<void> {
-  const response = await fetch(
+  const response = await backendFetch(
     `${API_V2}/projects/${projectId}/files/${fileId}`,
     { method: "DELETE" }
   );
@@ -232,7 +233,7 @@ export async function uploadModel(
   const formData = new FormData();
   formData.append("ifc_file", file);
 
-  const response = await fetch(`${API_V2}/projects/${projectId}/models`, {
+  const response = await backendFetch(`${API_V2}/projects/${projectId}/models`, {
     method: "POST",
     body: formData,
   });
@@ -245,7 +246,7 @@ export async function uploadModel(
 export async function listModels(
   projectId: string
 ): Promise<{ projectId: string; models: ModelResponse[] }> {
-  const response = await fetch(`${API_V2}/projects/${projectId}/models`);
+  const response = await backendFetch(`${API_V2}/projects/${projectId}/models`);
   return handleResponse(response);
 }
 
@@ -256,7 +257,7 @@ export async function removeModel(
   projectId: string,
   modelId: string
 ): Promise<void> {
-  const response = await fetch(
+  const response = await backendFetch(
     `${API_V2}/projects/${projectId}/models/${modelId}`,
     { method: "DELETE" }
   );
@@ -267,7 +268,7 @@ export async function removeModel(
  * Get the spatial tree for a model.
  */
 export async function getSpatialTree(modelId: string): Promise<SpatialNode> {
-  const response = await fetch(`${API_V2}/models/${modelId}/spatial-tree`);
+  const response = await backendFetch(`${API_V2}/models/${modelId}/spatial-tree`);
   return handleResponse<SpatialNode>(response);
 }
 
@@ -278,7 +279,7 @@ export async function getElementProperties(
   modelId: string,
   globalId: string
 ): Promise<ElementProperties> {
-  const response = await fetch(
+  const response = await backendFetch(
     `${API_V2}/models/${modelId}/elements/${encodeURIComponent(globalId)}/properties`
   );
   return handleResponse<ElementProperties>(response);
@@ -293,7 +294,7 @@ export async function getElementProperties(
 export async function readProjectWefc(
   projectId: string
 ): Promise<Record<string, unknown> | null> {
-  const response = await fetch(`${API_V2}/projects/${projectId}/wefc`);
+  const response = await backendFetch(`${API_V2}/projects/${projectId}/wefc`);
   if (response.status === 404) {
     return null;
   }
@@ -309,7 +310,7 @@ export async function saveProjectWefc(
   projectId: string,
   manifest: Record<string, unknown>
 ): Promise<void> {
-  const response = await fetch(`${API_V2}/projects/${projectId}/wefc`, {
+  const response = await backendFetch(`${API_V2}/projects/${projectId}/wefc`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(manifest),

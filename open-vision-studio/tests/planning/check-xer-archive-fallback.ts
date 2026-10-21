@@ -41,7 +41,7 @@ const damaged = readFileSync(join(HERE, 'fixtures', 'xer-archief-herschreven.ifc
 
 // ── A. productie-ingang ────────────────────────────────────────────────────────────────────────
 const parsed = await readIFCWithXerReconstruction(damaged);
-const verdict = archiveDropped(() => parsed, { code: 'bytes-missing', fragment: 'geen enkele' });
+const verdict = archiveDropped(() => parsed, { code: 'bytes-missing', fragment: 'none is present' });
 expect('A1 echt herschreven bestand opent via de productie-ingang: archief weg, signaal bytes-missing',
   verdict.ok, verdict.why);
 expect('A2 het project zelf is volledig: beide taken en de relatie uit het IFC',

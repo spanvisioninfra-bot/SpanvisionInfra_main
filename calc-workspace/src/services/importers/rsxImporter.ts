@@ -65,7 +65,7 @@ function importSimpleRsx(doc: Document): ImportResult {
     });
   });
 
-  if (items.length === 0) warnings.push('RSX bevat geen deelramingen.');
+  if (items.length === 0) warnings.push('The RSX file contains no sub-estimates.');
 
   return { schedule: { name }, items, warnings, format: 'rsx' };
 }
@@ -183,7 +183,7 @@ function importRealRaw(doc: Document): ImportResult {
               parentId: parentChapterId, sortOrder: sortOrder++, code: postNr, description,
               unit, quantity, depth: parentDepth, rowType: 'begrotingspost',
               notes: [
-                qtyKenmerk ? `Hoeveelheid: ${qtyKenmerk === 'V' ? "Chargeable" : qtyKenmerk === 'N' ? 'Niet verrekenbaar' : 'Ter inlichting'}` : '',
+                qtyKenmerk ? `Hoeveelheid: ${qtyKenmerk === 'V' ? "Chargeable" : qtyKenmerk === 'N' ? 'Not billable' : 'Ter inlichting'}` : '',
                 notes,
               ].filter(Boolean).join('\n'),
             });
@@ -211,7 +211,7 @@ function importRealRaw(doc: Document): ImportResult {
     }
   }
 
-  if (items.length === 0) warnings.push('RSX bevat geen besteksposten.');
+  if (items.length === 0) warnings.push('The RSX file contains no specification items.');
 
   return {
     schedule: {

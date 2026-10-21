@@ -33,8 +33,8 @@ export async function savePdfReport(
 ): Promise<string | null> {
   if (!isTauriEnv()) {
     alert(
-      "PDF rapportgeneratie werkt alleen in de Tauri desktop app, " +
-        "niet in de browser preview. Open via `tauri dev` of de gebouwde executable.",
+      "PDF report generation is available only in the Tauri desktop app, " +
+        "rather than the browser preview. Open the desktop app using `tauri dev` or its built executable.",
     );
     return null;
   }

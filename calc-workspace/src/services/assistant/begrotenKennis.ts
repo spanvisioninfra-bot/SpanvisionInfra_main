@@ -5,40 +5,38 @@
  * de system prompt aan het taalmodel meegegeven.
  */
 export const BEGROTEN_KENNIS = `
-## Vakkennis: zo werkt een bouwbegroting
+## Domain knowledge: construction estimating
 
-Structuur (geld zit ALLEEN op rekenregels, nooit op posten of hoofdstukken):
-- Hoofdstuk (NL-SfB-achtig: 00 Algemeen, 05 Bouwplaats, 21 Betonwerk, … 90 Terrein)
-  └─ Begrotingspost (omschrijving van het werk — container zonder eigen prijs)
-     └─ Rekenregel (hoeveelheid × eenheidsprijs — hier zit het geld)
-Boven de kostprijs komt de staart (cascade van opslagen: AK over OA → ABK →
-garanties → werkvoorbereiding → risico → winst → verzekering → btw → afronding)
-tot de aanneemsom. Staartpercentages zijn bedrijfsspecifiek: nooit verzinnen,
-alleen de bestaande percentages in het document gebruiken.
+Structure: costs belong ONLY to calculation rows, never directly to items or chapters.
+- Chapter (NL-SfB style: 00 General, 05 Site setup, 21 Concrete work, … 90 External works)
+  └─ Estimate item: a work description containing rows, without its own price
+     └─ Calculation row: quantity × unit price
+The contract sum adds the existing cascade of overheads and markups to direct cost:
+subcontract overheads → general site costs → guarantees → work preparation → risk →
+profit → insurance → VAT → rounding. Percentages are company-specific; never invent
+them. Use only percentages already present in the document.
 
-Kostensoorten (resourceType) — bepalen de kolom én de staartgrondslag:
-- arbeid: uren × tariefgroep-tarief (A/B/C). Uren-regels: eenheid "uur",
-  norm = uren per eenheid (bij eenheid uur is de norm 1), het loon volgt uit
-  de tariefgroep. Een uurtarief is NOOIT een materiaalprijs.
-- materiaal: inkoop per eenheid (prijs op de regel).
-- materieel: machinehuur/inzet (kraan, container) — prijs per eenheid, geen loon.
-- onderaannemer: uitbesteed werk — altijd zo markeren, want de staartpost
-  "AK over onderaanneming" rekent alléén over dit deel.
-- overig: stelposten en restposten.
+Resource categories retain their protocol identifiers:
+- arbeid (labor): hours × the A/B/C rate-group rate. Hourly rows use unit "uur",
+  with norm = hours per unit (1 for an hourly unit). Wages follow from the rate
+  group. An hourly labor rate is NEVER a material price.
+- materiaal (materials): purchase cost per unit, using the row's price.
+- materieel (equipment): machine hire or deployment, priced per unit without wages.
+- onderaannemer (subcontractor): outsourced work; preserve this category because
+  subcontract overheads apply only to these costs.
+- overig (other): provisional sums and other allowances.
 
-Norm-gedreven werk (bijv. per m²): hoeveelheid = m², norm = uren/m² en
-daarnaast een materiaalprijs per m². Stelposten splits je in een
-leveringsregel (bedrag, onderaanneming/overig) plus een aparte montage-regel
-in uren; één rond bedrag mag alleen als échte stelpost en heet dan ook zo.
+For work measured in m², use quantity in m², labor norm in hours/m² and a separate
+material unit price per m². Separate supply allowances from installation labor.
+A lump sum is appropriate only for a real provisional allowance, clearly labelled.
 
-Vuistregels:
-- Geen ronde fantasie-bedragen (€10.000 → €9.875), behalve letterlijke
-  offertebedragen of stelposten.
-- Hoeveelheden herleidbaar opbouwen (2 × 37 m × 3 m à 40% = 88,8 m²) en die
-  herleiding in de omschrijving of toelichting benoemen.
-- Eenheidsprijzen baseren op vergelijkbare regels die al in het document
-  staan; pas indexeren of afwijken als de gebruiker daarom vraagt.
-- Kengetallen toetsen op €/m² BVO excl. btw; grote afwijkingen benoemen.
-- Na wijzigingen kloppen totalen automatisch (de app herrekent) — noem in je
-  antwoord het effect op het totaal als dat relevant is.
+Rules:
+- Never invent arbitrary prices; retain quoted amounts and actual allowances.
+- Make quantities traceable, e.g. 2 × 37 m × 3 m × 40% = 88.8 m², and explain
+  the derivation in the description or notes.
+- Base unit prices on comparable rows already in the document. Apply indexation
+  or deviations only when the user requests them.
+- Compare benchmarks in €/m² gross floor area, excluding VAT; flag large deviations.
+- The application recalculates totals after edits. Explain the effect on the total
+  when relevant. Write all generated descriptions and explanations in English.
 `;

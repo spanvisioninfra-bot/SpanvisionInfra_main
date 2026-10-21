@@ -31,7 +31,7 @@ export default function MaatgevendMarkering({ nodes, beams, worldToScreen, activ
   const punt = puntOpStaaf(beams.find((b) => b.id === m.beamId), nodes, m.positieMm);
   if (!punt) return null;
   const p = worldToScreen(punt.x, punt.z);
-  const x = m.positieMm.toLocaleString("nl-NL", { maximumFractionDigits: 0 });
+  const x = m.positieMm.toLocaleString("en-GB", { maximumFractionDigits: 0 });
   // Een afgeleide combinatie (scheefstand, eindtoestand) heeft een verschoven id
   // dat de gebruiker niet kent; dan alleen de maat. Het tekenvlak toont de
   // combinatie zelf al.

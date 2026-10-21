@@ -68,7 +68,7 @@ describe('FIEBDC-3 (.bc3) import', () => {
       '~C|A2|m|Otro concepto|7.50||3|',
     ].join('\r\n');
     const result = importBc3(boek);
-    expect(result.warnings.some(w => w.includes('prijzenboek') || w.includes('Prijzenboek'))).toBe(true);
+    expect(result.warnings.some(w => w.includes('price book') || w.includes('Prijzenboek'))).toBe(true);
     expect(result.items.filter(i => i.rowType === 'begrotingspost')).toHaveLength(2);
   });
 
@@ -85,13 +85,13 @@ describe('FIEBDC-3 (.bc3) import', () => {
       '~M|CAP1#\\P001||25.00||',
     ].join('\r\n');
     const result = importBc3(zonderPrijzen);
-    expect(result.warnings.some(w => w.includes('geen prijzen'))).toBe(true);
+    expect(result.warnings.some(w => w.includes('no prices'))).toBe(true);
     // De structuur en hoeveelheden komen wél gewoon binnen.
     expect(result.items.find(i => i.code === 'P001')?.quantity).toBe(25);
   });
 
   it('meldt niets over prijzen wanneer die er wél zijn', () => {
-    expect(importBc3(SAMPLE).warnings.some(w => w.includes('geen prijzen'))).toBe(false);
+    expect(importBc3(SAMPLE).warnings.some(w => w.includes('no prices'))).toBe(false);
   });
 
   it('round-trip: export → import behoudt structuur en kostprijs', () => {

@@ -102,11 +102,11 @@ export default function SectionsSection() {
 
   return (
     <div className="rpt-block">
-      <h2 className="rpt-h2">{t("report.sectionSections", "Profielen & doorsneden")}</h2>
+      <h2 className="rpt-h2">{t("report.sectionSections", "Sections & cross-sections")}</h2>
 
       {profiles.length === 0 ? (
         <p className="rpt-empty-note">
-          {t("report.noBeams", "Geen staven in het model.")}
+          {t("report.noBeams", "No members in the model.")}
         </p>
       ) : (
         profiles.map(({ profile, profileEnd, material, beamIds }) => {
@@ -122,7 +122,7 @@ export default function SectionsSection() {
               <p className="rpt-note">
                 {t("report.verloopSectieNoot", {
                   defaultValue:
-                    "Verlopend profiel: deze staven verlopen van {{begin}} naar {{eind}}. De eigenschappen hieronder zijn die van het beginprofiel; de doorsneden langs de staaf staan bij de toetsing van elke staaf.",
+                    "Tapered member: these members vary from {{begin}} to {{eind}}. The properties below are those of the starting profile; the cross-sections along the member are given with the check of each member.",
                   begin: profile,
                   eind: profileEnd,
                 })}
@@ -155,22 +155,22 @@ export default function SectionsSection() {
             return (
               <div className="rpt-profile-block" key={profile || "(geen profiel)"}>
                 <h3 className="rpt-h3">
-                  {profile || t("report.noProfileTitle", "Geen profiel toegewezen")}
+                  {profile || t("report.noProfileTitle", "No profile assigned")}
                 </h3>
                 <p className="rpt-empty-note">
                   {profile
                     ? t(
                         "report.unknownSection",
-                        "Doorsnede onbekend — dit profiel staat niet in de profieldatabase en is geen rechthoek b×h. De solver rekent met de default (HEA 160 / S235).",
+                        "Unknown section: this profile is not in the profile database and is not a rectangle b×h. The solver uses the default (HEA 160 / S235).",
                       )
                     : t(
                         "report.noProfileNote",
-                        "Aan deze staven is nog geen profiel toegewezen. De solver rekent ze door met de default (HEA 160 / S235) en de normtoetsing slaat ze over. Wijs een profiel toe via de staafeigenschappen.",
+                        "These members have no assigned profile. The solver uses the default (HEA 160 / S235), and the code checks skip them. Assign a profile in member properties.",
                       )}
                 </p>
                 <p className="rpt-note">
-                  {t("report.propUsedBy", "Toegepast op staaf")}:{" "}
-                  {beamIdsText(beamIds, t("report.beamsWord", "staven"))}
+                  {t("report.propUsedBy", "Applied to member")}:{" "}
+                  {beamIdsText(beamIds, t("report.beamsWord", "members"))}
                 </p>
                 {verloopNoot}
               </div>
@@ -183,7 +183,7 @@ export default function SectionsSection() {
 
           // --- Bovendeel: materiaal + hoofdafmetingen + A (+ G bij staal) ---
           const kopRijen: EnkelRij[] = [
-            { label: t("report.propMaterial", "Materiaal"), value: material },
+            { label: t("report.propMaterial", "Material"), value: material },
           ];
           if (steelDims) {
             // Eén wanddikte in plaats van lijf en flens: bij een koker en een
@@ -318,13 +318,13 @@ export default function SectionsSection() {
               label: "Iw [×10⁹ mm⁶]",
               value: eigen.motor.iw_bepaald
                 ? fmtGroep(eigenProps.iw_mm6 / 1e9, eigenProps.iw_mm6 >= 1e11 ? 0 : 2)
-                : t("report.notDetermined", "niet bepaald"),
+                : t("report.notDetermined", "Not determined"),
             });
           }
           slotRijen.push({ label: "E [N/mm²]", value: fmtGroep(sec.E) });
           slotRijen.push({
-            label: t("report.propUsedBy", "Toegepast op staaf"),
-            value: beamIdsText(beamIds, t("report.beamsWord", "staven")),
+            label: t("report.propUsedBy", "Applied to member"),
+            value: beamIdsText(beamIds, t("report.beamsWord", "members")),
           });
 
           return (
@@ -345,7 +345,7 @@ export default function SectionsSection() {
                     <>
                       <EigenDoorsnedeTekening doorsnede={eigen} stijl="rapport" />
                       <div className="rpt-figuur-bijschrift">
-                        {t("report.figSection", "Doorsnede")} {eigen.naam}
+                        {t("report.figSection", "Cross-section")} {eigen.naam}
                       </div>
                       {eigen.motor.meldingen.length > 0 && (
                         <p className="rpt-note">{eigen.motor.meldingen.join(" ")}</p>
@@ -355,12 +355,12 @@ export default function SectionsSection() {
                     <>
                       <SectionSketch shape={shape} />
                       <div className="rpt-figuur-bijschrift">
-                        {t("report.figSection", "Doorsnede")} {profile}
+                        {t("report.figSection", "Cross-section")} {profile}
                       </div>
                     </>
                   ) : (
                     <p className="rpt-note">
-                      {t("report.noSketch", "Geen tekening beschikbaar voor deze profielvorm.")}
+                      {t("report.noSketch", "No drawing available for this profile shape.")}
                     </p>
                   )}
                 </div>

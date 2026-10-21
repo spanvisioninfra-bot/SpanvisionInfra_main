@@ -19,13 +19,13 @@ function assertUniqueCurveIds(rows: readonly XerRow[]): void {
     const sourceId = row.cells.curv_id?.trim() ?? '';
     if (!sourceId) {
       throw new XerImportError('XER_MISSING_REQUIRED_VALUE',
-        `RSRCCURVDATA.curv_id bevat een lege bronidentiteit op regel ${row.line}.`,
+        `RSRCCURVDATA.curv_id contains an empty source identity on line ${row.line}.`,
         { table: 'RSRCCURVDATA', field: 'curv_id', missingValues: ['curv_id'], line: row.line });
     }
     const firstLine = firstLineById.get(sourceId);
     if (firstLine !== undefined) {
       throw new XerImportError('XER_DUPLICATE_ID',
-        `RSRCCURVDATA.curv_id bevat dubbele id '${sourceId}' op regels ${firstLine} and ${row.line}.`,
+        `RSRCCURVDATA.curv_id contains duplicate id '${sourceId}' on lines ${firstLine} and ${row.line}.`,
         { table: 'RSRCCURVDATA', field: 'curv_id', line: row.line, lines: [firstLine, row.line] });
     }
     firstLineById.set(sourceId, row.line);

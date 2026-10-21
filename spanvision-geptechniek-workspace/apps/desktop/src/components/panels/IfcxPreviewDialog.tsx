@@ -49,7 +49,7 @@ export default function IfcxPreviewDialog({ open, onClose }: IfcxPreviewDialogPr
     if (!open) return;
     if (!activeDoc) {
       setIfcxText("");
-      setError("No actief document — open of maak een project om een IFCX-preview te zien.");
+      setError("No active document — open or create a project to see an IFCX preview.");
       return;
     }
     if (activeDoc.kind !== "project") {
@@ -154,7 +154,7 @@ export default function IfcxPreviewDialog({ open, onClose }: IfcxPreviewDialogPr
         <div className="ifcx-preview-footer">
           <span className="ifcx-preview-info">
             {ifcxText
-              ? `${ifcxText.length.toLocaleString("nl-NL")} bytes IFCX (IFC4X3_ADD2)`
+              ? `${ifcxText.length.toLocaleString("en-GB")} bytes IFCX (IFC4X3_ADD2)`
               : ""}
           </span>
           <button

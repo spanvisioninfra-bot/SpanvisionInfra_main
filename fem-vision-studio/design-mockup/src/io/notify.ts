@@ -10,12 +10,12 @@ export function comingSoon(label: string, note?: string): void {
   try {
     pushToast({
       kind: "soon",
-      title: `${label} — binnenkort`,
-      body: note ?? "Deze functie zit op de roadmap voor een volgende release.",
+      title: `${label} — coming soon`,
+      body: note ?? "This feature is planned for a future release.",
       duration: 5500,
     });
   } catch {
-    alert(`${label} is nog niet beschikbaar in v2.\n\n${note ?? ""}`);
+    alert(`${label} is not available in v2 yet.\n\n${note ?? ""}`);
   }
 }
 

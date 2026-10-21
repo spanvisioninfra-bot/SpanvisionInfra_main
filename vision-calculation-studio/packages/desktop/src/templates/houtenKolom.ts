@@ -13,9 +13,7 @@
 
 export const houtenKolom = `"Houten column — knikcheck EN 1995-1-1 §6.3.2
 
-'<i>Massief-houten kolom onder centrische normaalkracht en optionele
-'tweezijdige buiging. Toetsing volgt §6.1.4 (druk) gecombineerd met
-'§6.3.2 (knikinstabiliteit). De kolom-knikgrafiek wordt apart geplot.</i>
+'<i>A solid timber column under concentric axial compression and optional biaxial bending. Checks combine §6.1.4 (compression) with §6.3.2 (buckling instability). The column buckling curve is plotted separately.</i>
 
 # 1. Geometry en material
 
@@ -137,11 +135,11 @@ k_m = 0.7', §6.1.6(2) — rechthoekige doorsnede'
 k_h = if(h_p < 150 mm; min(1.3; (150 mm/h_p)^0.2); 1.0)
 #show
 
-'<b>Doorsnede:</b> b × h = 'b_p' × 'h_p
+'<b>Section:</b> b × h = 'b_p' × 'h_p
 'A = 'A
 'I_y = 'I_y'    i_y = 'i_y
 'I_z = 'I_z'    i_z = 'i_z
-'<b>Materiaal:</b> f<sub>c,0,k</sub> = 'f_c,0,k', f<sub>m,k</sub> = 'f_m,k', E<sub>0,05</sub> = 'E_0,05
+'<b>Material:</b> f<sub>c,0,k</sub> = 'f_c,0,k', f<sub>m,k</sub> = 'f_m,k', E<sub>0,05</sub> = 'E_0,05
 'k<sub>mod</sub> = 'k_mod'    k<sub>def</sub> = 'k_def'    γ<sub>M</sub> = 'γ_M
 
 # 2. Member length en kniklengtes
@@ -150,15 +148,15 @@ L = ?*(m)', staaflengte (m)'
 
 @select randvoorw_y "Randvoorwaarden y-y-as (strong axis)"
   Both einden scharnierend, L_cr = 1.0·L = 100
-  Boven scharnier, below ingeklemd, L_cr = 0.7·L = 70
-  Boven ingeklemd, below vrij (kraagkolom), L_cr = 2.0·L = 200
+  Top pinned, bottom fixed, L_cr = 0.7·L = 70
+  Top fixed, bottom free (cantilever column), L_cr = 2.0·L = 200
   Both einden ingeklemd, L_cr = 0.5·L = 50
 @end
 
 @select randvoorw_z "Randvoorwaarden z-z-as (weak axis)"
   Both einden scharnierend, L_cr = 1.0·L = 100
-  Boven scharnier, below ingeklemd, L_cr = 0.7·L = 70
-  Boven ingeklemd, below vrij (kraagkolom), L_cr = 2.0·L = 200
+  Top pinned, bottom fixed, L_cr = 0.7·L = 70
+  Top fixed, bottom free (cantilever column), L_cr = 2.0·L = 200
   Both einden ingeklemd, L_cr = 0.5·L = 50
 @end
 
@@ -190,9 +188,9 @@ k_c,z = if(λ_rel,z ≤ 0.3; 1.0; 1/(k_z + sqrt(k_z^2 - λ_rel,z^2)))
 
 # 3. Loads (ontwerpwaarden)
 
-N_Ed = ?*(kN)', drukkracht N_Ed (kN, positief = druk)'
-M_y,Ed = ?*(kN m)', buigmoment om y-as (sterke as) M_y,Ed (kNm) — 0 als geen'
-M_z,Ed = ?*(kN m)', buigmoment om z-as (zwakke as) M_z,Ed (kNm) — 0 als geen'
+N_Ed = ?*(kN)', compressive force N_Ed (kN, compression positive)'
+M_y,Ed = ?*(kN m)', bending moment about y (strong axis) M_y,Ed (kNm) — 0 if absent'
+M_z,Ed = ?*(kN m)', bending moment about z (weak axis) M_z,Ed (kNm) — 0 if absent'
 
 # 4. Design values sterkten
 
@@ -211,9 +209,7 @@ f_m,d = k_mod*k_h*f_m,k/γ_M
 
 # 5. Knikcheck §6.3.2.3
 
-'<i>Combineerformules 6.23/6.24 (kolom op druk + 2× buiging):
-'  rond y-as: σ<sub>c,0,d</sub>/(k<sub>c,y</sub>·f<sub>c,0,d</sub>) + σ<sub>m,y,d</sub>/f<sub>m,d</sub> + k<sub>m</sub>·σ<sub>m,z,d</sub>/f<sub>m,d</sub> ≤ 1
-'  rond z-as: σ<sub>c,0,d</sub>/(k<sub>c,z</sub>·f<sub>c,0,d</sub>) + k<sub>m</sub>·σ<sub>m,y,d</sub>/f<sub>m,d</sub> + σ<sub>m,z,d</sub>/f<sub>m,d</sub> ≤ 1</i>
+'<i>Interaction expressions 6.23/6.24 for column compression and biaxial bending: about y, σ<sub>c,0,d</sub>/(k<sub>c,y</sub>·f<sub>c,0,d</sub>) + σ<sub>m,y,d</sub>/f<sub>m,d</sub> + k<sub>m</sub>·σ<sub>m,z,d</sub>/f<sub>m,d</sub> ≤ 1; about z, σ<sub>c,0,d</sub>/(k<sub>c,z</sub>·f<sub>c,0,d</sub>) + k<sub>m</sub>·σ<sub>m,y,d</sub>/f<sub>m,d</sub> + σ<sub>m,z,d</sub>/f<sub>m,d</sub> ≤ 1.</i>
 
 UC_y = σ_c,0,d/(k_c,y*f_c,0,d) + σ_m,y,d/f_m,d + k_m*σ_m,z,d/f_m,d
 UC_z = σ_c,0,d/(k_c,z*f_c,0,d) + k_m*σ_m,y,d/f_m,d + σ_m,z,d/f_m,d
@@ -224,9 +220,9 @@ UC_max = max(UC_y; UC_z)
 'UC<sub>z</sub> (knik om z-as) = 'UC_z
 
 #if UC_max ≤ 1.0
-    '<b>UC<sub>max</sub> = 'UC_max'<span style="color:green"> ≤ 1.0 → Voldoet</span></b>
+    '<b>UC<sub>max</sub> = 'UC_max'<span style="color:green"> ≤ 1.0 → Passes</span></b>
 #else
-    '<b>UC<sub>max</sub> = 'UC_max'<span style="color:red"> > 1.0 → Voldoet NIET</span></b>
+    '<b>UC<sub>max</sub> = 'UC_max'<span style="color:red"> > 1.0 → Fails</span></b>
 #end if
 
 # 6. Model
@@ -290,16 +286,5 @@ UC_max = max(UC_y; UC_z)
 </svg>
 @end
 
-'<hr/>
-'<i>Aannames:
-'<ul>
-'<li>k<sub>m</sub> = 0.7 voor rechthoekige doorsnede (§6.1.6(2)). Voor andere
-'profielen of gelijmd-gelamineerd hout: zie norm.</li>
-'<li>β<sub>c</sub> = 0.2 voor gezaagd hout, 0.1 voor gelijmd-gelamineerd (§6.3.2(1)).</li>
-'<li>k<sub>mod</sub> volgt klimaatklasse + belasting-duur (Tabel 3.1, gezaagd hout).
-'Voor andere materiaal-categorieën: tabel-keuze in code aanpassen.</li>
-'<li>Hier wordt de kolom belast door N + M zonder 2e-orde effecten;
-'§5.4.4 vervangt deze sheet voor kolommen met δ<sub>2</sub>·N<sub>Ed</sub>/E·I-effecten.</li>
-'<li>Kipcontrole bij grote M<sub>y</sub> in een slanke kolom: §6.3.3 separaat toepassen.</li>
-'</ul></i>
+'<hr/><i>Assumptions:<ul><li>k<sub>m</sub> = 0.7 for rectangular sections (§6.1.6(2)). Consult the code for other sections or glulam.</li><li>β<sub>c</sub> = 0.2 for sawn timber and 0.1 for glulam (§6.3.2(1)).</li><li>k<sub>mod</sub> follows service class and load duration (Table 3.1, sawn timber). Other material categories require a different table in the code.</li><li>This sheet applies N + M without second-order effects. Section §5.4.4 supersedes it where δ<sub>2</sub>·N<sub>Ed</sub>/E·I effects apply.</li><li>Assess lateral-torsional buckling separately under §6.3.3 for large M<sub>y</sub> in slender columns.</li></ul></i>
 `;

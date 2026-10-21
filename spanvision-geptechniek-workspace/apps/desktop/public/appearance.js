@@ -90,8 +90,25 @@
 (() => {
   let cached;
   let pending;
+  let approximate;
+  let approximatePending;
   const controllers = new WeakMap();
   const valid = p => Number.isFinite(p?.latitude) && Number.isFinite(p?.longitude) && Math.abs(p.latitude) <= 90 && Math.abs(p.longitude) <= 180;
+  async function approximateLocation() {
+    if (approximate && Date.now() - approximate.time < 300000) return approximate;
+    if (approximatePending) return approximatePending;
+    approximatePending = (async () => {
+      try {
+        const response = await fetch('https://www.spanvisioninfra.com/__suite/location', { cache: 'no-store', credentials: 'omit', signal: AbortSignal.timeout(6000) });
+        if (!response.ok) return null;
+        const data = await response.json();
+        if (!data.available) return null;
+        approximate = { ...data, time: Date.now() };
+        return approximate;
+      } catch { return null; }
+    })().finally(() => { approximatePending = undefined; });
+    return approximatePending;
+  }
   function currentPosition() {
     if (!window.isSecureContext) return Promise.reject(new Error('Location needs HTTPS or localhost. Search or pan to a location.'));
     if (!navigator.geolocation) return Promise.reject(new Error('Location is unavailable in this browser. Search or pan to a location.'));
@@ -111,7 +128,7 @@
     }).finally(() => { pending = undefined; });
     return pending;
   }
-  function attachMap(map, { autoLocate = true, zoom = 14 } = {}) {
+  function attachMap(map, { autoLocate = true, zoom = 14, controlContainer } = {}) {
     controllers.get(map)?.destroy();
     const container = map.getContainer();
     const bar = document.createElement('div');
@@ -120,8 +137,14 @@
     button.type = 'button'; button.textContent = 'Use my location';
     const status = document.createElement('span');
     status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
-    bar.append(button, status); container.append(bar);
+    bar.append(button, status); (controlContainer || container).append(bar);
     let alive = true, request = 0, locating = false;
+    function publish(kind, position) {
+      container.dataset.locationSource = kind;
+      container.dataset.mapCountry = position.country || '';
+      container.dataset.mapCountryCode = position.countryCode || '';
+      window.dispatchEvent(new CustomEvent('spanvision:map-location', { detail: { map: container, source: kind, ...position } }));
+    }
     function report(state, message) { bar.dataset.locationState = state; status.textContent = message; button.disabled = state === 'locating'; }
     function cancel() {
       request++;
@@ -139,6 +162,7 @@
         if (Math.abs(start.lat - center.lat) > 0.0001 || Math.abs(start.lng - center.lng) > 0.0001) { cancel(); return; }
         locating = false;
         map.setView([position.latitude, position.longitude], zoom, { animate: false });
+        publish('precise', { latitude: position.latitude, longitude: position.longitude });
         report('located', `Your location: ${position.latitude.toFixed(5)}, ${position.longitude.toFixed(5)}`);
       } catch (error) { if (alive && id === request) { locating = false; report('unavailable', error.message); } }
     }
@@ -156,8 +180,22 @@
       map.off('moveend', trackCenter); map.off('unload', controller.destroy); bar.remove(); controllers.delete(map);
     } };
     controllers.set(map, controller); map.on('unload', controller.destroy);
-    report('ready', autoLocate ? '' : 'Saved or project location kept.');
-    if (autoLocate) void locate();
+    report('ready', autoLocate ? 'Use my location, search or pan to choose an area.' : 'Saved or project location kept.');
+    async function locateAutomatically() {
+      const id = request, start = map.getCenter();
+      try {
+        if (navigator.permissions && (await navigator.permissions.query({ name: 'geolocation' })).state === 'granted') { if (alive && id === request) await locate(); return; }
+      } catch { /* Use approximate metadata without opening a permission prompt. */ }
+      const position = await approximateLocation();
+      if (!alive || id !== request || !position) return;
+      const center = map.getCenter();
+      if (Math.abs(start.lat - center.lat) > 0.0001 || Math.abs(start.lng - center.lng) > 0.0001) return;
+      const label = [position.city, position.country].filter(Boolean).join(', ') || 'your region';
+      if (valid(position)) map.setView([position.latitude, position.longitude], 10, { animate: false });
+      publish('approximate', position);
+      report('approximate', `Approximate area: ${label}. Use my location for a precise position.`);
+    }
+    if (autoLocate) void locateAutomatically();
     return controller;
   }
   window.SpanvisionLocation = { currentPosition, attachMap, cancelMap: map => controllers.get(map)?.cancel() };

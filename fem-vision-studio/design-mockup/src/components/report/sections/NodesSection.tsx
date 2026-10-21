@@ -15,11 +15,11 @@ export default function NodesSection() {
 
   return (
     <div className="rpt-block">
-      <h2 className="rpt-h2">{t("report.sectionNodes", "Knopen")}</h2>
+      <h2 className="rpt-h2">{t("report.sectionNodes", "Nodes")}</h2>
 
       {sorted.length === 0 ? (
         <p className="rpt-empty-note">
-          {t("report.noNodes", "Geen knopen in het model.")}
+          {t("report.noNodes", "No nodes in the model.")}
         </p>
       ) : (
         <table className="rpt-table">
@@ -28,7 +28,7 @@ export default function NodesSection() {
               <th>{t("report.colId", "Id")}</th>
               <th className="rpt-num">X [mm]</th>
               <th className="rpt-num">Z [mm]</th>
-              <th>{t("report.colSupport", "Oplegging")}</th>
+              <th>{t("report.colSupport", "Support")}</th>
             </tr>
           </thead>
           <tbody>

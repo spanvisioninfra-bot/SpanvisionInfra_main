@@ -2165,7 +2165,7 @@ async function handleAiComplete(params) {
   let key = '';
   try { key = localStorage.getItem('opds-anthropic-key') || ''; } catch { /* no localStorage */ }
   // Claude (Anthropic) direct — uses the personal key set via the 🔑 button.
-  if (!key) return { ok: false, error: 'geen Claude-key gezet (🔑)' };
+  if (!key) return { ok: false, error: 'No Claude API key configured (🔑)' };
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },

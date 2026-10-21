@@ -15,8 +15,7 @@
 
 export const houtenBalklaag = `"Houten floor joists — checks EN 1995-1-1
 
-'<i>Enkelvoudig opgelegde balk onder gelijkmatige belasting (vloer, dak)
-'plus optioneel een puntlast (Q_k). Inclusief kipcontrole en doorbuiging.</i>
+'<i>A simply supported beam under a uniformly distributed floor or roof load and an optional point load Q_k. Includes lateral-torsional buckling and deflection checks.</i>
 
 # 1. Geometry en material
 
@@ -106,17 +105,17 @@ A
 W_y
 I_y
 'Materiaal C-klasse: f<sub>m,k</sub> = 'f_m,k', E<sub>0,mean</sub> = 'E_0,mean
-'k<sub>def</sub> = 'k_def' (Tabel 3.2)'
+'k<sub>def</sub> = 'k_def' (Table 3.2)'
 'k<sub>h</sub> = 'k_h' (§3.2 hoogtefactor)'
 
-l_ov = ?*(m)', overspanning van de balk (m)'
-hoh = ?*(m)', hart-op-hart afstand tussen balken (m)'
+l_ov = ?*(m)', beam span (m)'
+hoh = ?*(m)', joist center-to-center spacing (m)'
 
 # 2. Loads
 
 G_k,vlak = ?*(kN/m^2)', eigen gewicht + permanente afwerking (kN/m²)'
 q_k,vlak = ?*(kN/m^2)', gebruikersbelasting (kN/m²)'
-Q_k = ?*(kN)', puntlast in midden — 0 als niet relevant (kN)'
+Q_k = ?*(kN)', mid-span point load — 0 if not applicable (kN)'
 
 'Eigen gewicht balk per m¹: g = b·h·ρ
 g_eigen = b_p*h_p*ρ_k*9.81 m/s^2
@@ -150,7 +149,7 @@ F_d,b = γ_Q,6.10b*Q_k*k_r
 q_sls = G_k + q_k
 F_sls = Q_k*k_r
 
-'BGT 6.16b (quasi-permanent met kruip):
+'SLS 6.16b (quasi-permanent with creep):
 q_qp = (1 + k_def)*G_k + (ψ_0 + k_def*ψ_2)*q_k
 F_qp = (ψ_0 + k_def*ψ_2)*Q_k*k_r
 
@@ -186,16 +185,16 @@ R_Ed = V_Ed', oplegreactie (zelfde grootte als V max)'
 #end if
 #show
 
-'k<sub>mod</sub> = 'k_mod' (klimaatklasse, belasting-duur middellang)'
+'k<sub>mod</sub> = 'k_mod' (service class, medium-term load duration)'
 
 f_m,d = k_mod*k_h*f_m,k/γ_M
 σ_m,d = M_Ed/W_y
 UC_M = σ_m,d/f_m,d
 
 #if UC_M ≤ 1.0
-    'UC<sub>M</sub> = σ<sub>m,d</sub>/f<sub>m,d</sub> = 'UC_M'<span style="color:green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>M</sub> = σ<sub>m,d</sub>/f<sub>m,d</sub> = 'UC_M'<span style="color:green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>M</sub> = σ<sub>m,d</sub>/f<sub>m,d</sub> = 'UC_M'<span style="color:red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>M</sub> = σ<sub>m,d</sub>/f<sub>m,d</sub> = 'UC_M'<span style="color:red"> > 1.0 → <b>Fails</b></span>
 #end if
 
 # 6. ULS — dwarskracht §6.1.7
@@ -209,14 +208,14 @@ f_v,d = k_mod*f_v,k/γ_M
 UC_V = τ_d/f_v,d
 
 #if UC_V ≤ 1.0
-    'UC<sub>V</sub> = τ<sub>d</sub>/f<sub>v,d</sub> = 'UC_V'<span style="color:green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>V</sub> = τ<sub>d</sub>/f<sub>v,d</sub> = 'UC_V'<span style="color:green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>V</sub> = τ<sub>d</sub>/f<sub>v,d</sub> = 'UC_V'<span style="color:red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>V</sub> = τ<sub>d</sub>/f<sub>v,d</sub> = 'UC_V'<span style="color:red"> > 1.0 → <b>Fails</b></span>
 #end if
 
-# 7. ULS — compression loodrecht op de vezels (support) §6.1.5
+# 7. ULS — compression perpendicular to grain at the support §6.1.5
 
-l_opl = ?*(mm)', opleglengte van de balk (mm)'
+l_opl = ?*(mm)', beam bearing length (mm)'
 
 #hide
 'f_c,90,k volgt uit dezelfde C-klasse — vereenvoudigd 2.4 N/mm² voor C16-C30
@@ -230,16 +229,16 @@ f_c,90,d = k_mod*f_c,90,k/γ_M
 UC_C90 = σ_c,90,d/(k_c,90*f_c,90,d)
 
 #if UC_C90 ≤ 1.0
-    'UC<sub>c,90</sub> = σ<sub>c,90,d</sub>/(k<sub>c,90</sub>·f<sub>c,90,d</sub>) = 'UC_C90'<span style="color:green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>c,90</sub> = σ<sub>c,90,d</sub>/(k<sub>c,90</sub>·f<sub>c,90,d</sub>) = 'UC_C90'<span style="color:green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>c,90</sub> = σ<sub>c,90,d</sub>/(k<sub>c,90</sub>·f<sub>c,90,d</sub>) = 'UC_C90'<span style="color:red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>c,90</sub> = σ<sub>c,90,d</sub>/(k<sub>c,90</sub>·f<sub>c,90,d</sub>) = 'UC_C90'<span style="color:red"> > 1.0 → <b>Fails</b></span>
 #end if
 
 # 8. Kipcontrole §6.3.3
 
-n_kipsteunen = ?', aantal tussenliggende kipsteunen (0 = geen)'
+n_kipsteunen = ?', number of intermediate lateral restraints (0 = none)'
 
-l_ef = l_ov/(n_kipsteunen + 1)*0.9', effectieve lengte (k_ef ≈ 0.9 voor UDL)'
+l_ef = l_ov/(n_kipsteunen + 1)*0.9', effective length (k_ef ≈ 0.9 for UDL)'
 
 σ_m,crit = 0.78*b_p^2*E_0,05/(h_p*l_ef)
 λ_rel,m = sqrt(f_m,k/σ_m,crit)
@@ -257,20 +256,18 @@ UC_kip = σ_m,d/f_m,kip,d
 
 'λ̄<sub>rel,m</sub> = 'λ_rel,m'    k<sub>crit</sub> = 'k_crit
 #if UC_kip ≤ 1.0
-    'UC<sub>kip</sub> = σ<sub>m,d</sub>/(k<sub>crit</sub>·f<sub>m,d</sub>) = 'UC_kip'<span style="color:green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>kip</sub> = σ<sub>m,d</sub>/(k<sub>crit</sub>·f<sub>m,d</sub>) = 'UC_kip'<span style="color:green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>kip</sub> = σ<sub>m,d</sub>/(k<sub>crit</sub>·f<sub>m,d</sub>) = 'UC_kip'<span style="color:red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>kip</sub> = σ<sub>m,d</sub>/(k<sub>crit</sub>·f<sub>m,d</sub>) = 'UC_kip'<span style="color:red"> > 1.0 → <b>Fails</b></span>
 #end if
 
 # 9. SLS — deflection §7.2
 
-'<i>u<sub>inst</sub> = 5qL⁴/(384·EI) + FL³/(48·EI)
-'u<sub>fin</sub> = u<sub>inst</sub>·(1 + k<sub>def</sub>) (kruip)
-'Grens u<sub>max</sub> = L/250 (algemeen); u<sub>bij</sub> = L/333 (bijkomend)</i>
+'<i>u<sub>inst</sub> = 5qL⁴/(384·EI) + FL³/(48·EI). With creep, u<sub>fin</sub> = u<sub>inst</sub>·(1 + k<sub>def</sub>). Limits: u<sub>max</sub> = L/250 (general), u<sub>bij</sub> = L/333 (additional deflection).</i>
 
 u_inst,kar = 5*q_sls*l_ov^4/(384*E_0,mean*I_y) + F_sls*l_ov^3/(48*E_0,mean*I_y)
 u_fin = (1 + k_def)*u_inst,kar
-u_bij = u_inst,kar', alleen variabele deel zou strikt u_bij zijn; vereenvoudigd'
+u_bij = u_inst,kar', strictly, only the variable component is u_bij; simplified here'
 
 @select doorbuigGrensFin "Doorbuigingsgrens u_fin (Table 7.2)"
   L/250 (vloer/dak default) = 250
@@ -291,25 +288,15 @@ UC_u,fin = u_fin/u_fin,lim
 UC_u,bij = u_bij/u_bij,lim
 
 #if UC_u,fin ≤ 1.0
-    'UC<sub>u,fin</sub> = u<sub>fin</sub>/u<sub>lim</sub> = 'UC_u,fin'<span style="color:green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>u,fin</sub> = u<sub>fin</sub>/u<sub>lim</sub> = 'UC_u,fin'<span style="color:green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>u,fin</sub> = u<sub>fin</sub>/u<sub>lim</sub> = 'UC_u,fin'<span style="color:red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>u,fin</sub> = u<sub>fin</sub>/u<sub>lim</sub> = 'UC_u,fin'<span style="color:red"> > 1.0 → <b>Fails</b></span>
 #end if
 #if UC_u,bij ≤ 1.0
-    'UC<sub>u,bij</sub> = u<sub>bij</sub>/u<sub>lim</sub> = 'UC_u,bij'<span style="color:green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>u,bij</sub> = u<sub>bij</sub>/u<sub>lim</sub> = 'UC_u,bij'<span style="color:green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>u,bij</sub> = u<sub>bij</sub>/u<sub>lim</sub> = 'UC_u,bij'<span style="color:red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>u,bij</sub> = u<sub>bij</sub>/u<sub>lim</sub> = 'UC_u,bij'<span style="color:red"> > 1.0 → <b>Fails</b></span>
 #end if
 
-'<hr/>
-'<i>Vereenvoudigingen:
-'<ul>
-'<li>Belasting-duur "middellang" hardcoded. Bij andere categorieën (kort/zeer kort/permanent)
-'wijkt k<sub>mod</sub> af; pas dan §3.1.3 + Tabel 3.1 toe.</li>
-'<li>Eigen gewicht balk via ρ<sub>k</sub>·b·h·g (zonder veiligheid). De aansluitende afwerking
-'(plafond, vloer-finish) verdisconteer je in G<sub>k,vlak</sub>.</li>
-'<li>Lastreductie k<sub>r</sub> voor puntlast op 0.5×0.5 m belastingvlak gefixeerd op 0.7.</li>
-'<li>Trillingscontrole §7.3 (vloer-resonantie f<sub>1</sub> ≥ 8 Hz) niet in deze sheet.</li>
-'<li>Kniklengte = staaflengte; k_ef ≈ 0.9 voor UDL. Voor andere ondersteuningstype 6.3.3.3.</li>
-'</ul></i>
+'<hr/><i>Simplifications:<ul><li>Load duration is fixed to medium-term. For short-term, very short-term, or permanent loads, adjust k<sub>mod</sub> using §3.1.3 and Table 3.1.</li><li>Beam self-weight uses ρ<sub>k</sub>·b·h·g without safety factors. Include ceilings and floor finishes in G<sub>k,vlak</sub>.</li><li>Point-load reduction k<sub>r</sub> for a 0.5×0.5 m load area is fixed at 0.7.</li><li>Vibration under §7.3 (floor resonance f<sub>1</sub> ≥ 8 Hz) is excluded.</li><li>Buckling length equals member length; k_ef ≈ 0.9 for UDL. For other support conditions, see 6.3.3.3.</li></ul></i>
 `;

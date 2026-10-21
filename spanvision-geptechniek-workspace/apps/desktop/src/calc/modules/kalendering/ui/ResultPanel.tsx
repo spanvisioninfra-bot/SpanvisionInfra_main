@@ -149,7 +149,7 @@ export function ResultPanel({ input, result }: Props) {
       />
 
       <p className="kalendering-visual-footnote" style={{ marginTop: 12 }}>
-        Source formula: <code>=AFRONDEN.BOVEN.EXCEL(slag-set / (E<sub>blok</sub> / (D<sub>eq</sub>² · q<sub>c</sub>)); 1)</code>
+        Source formula: <code>=CEILING(set / (E<sub>block</sub> / (D<sub>eq</sub>² · q<sub>c</sub>)), 1)</code>
         <br />
         Units: penetration per set in mm · D<sub>eq</sub> in m · q<sub>c</sub> in MPa · E<sub>blok</sub> in kNm.
       </p>

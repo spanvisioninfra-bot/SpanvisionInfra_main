@@ -104,36 +104,36 @@ export default function OffertesDialog({
     const to = companies.map((c) => c.email).join(",");
     const projectLine = projectName
       ? `${projectName}${projectNumber ? ` (${projectNumber})` : ""}`
-      : "geotechnisch grondonderzoek";
+      : "geotechnical site investigation";
     const subject = `CPT quotation request —${projectLine}`;
     const greeting = companies.length === 1
-      ? `Beste ${companies[0].contactPerson || "heer/mevrouw"},`
+      ? `Dear ${companies[0].contactPerson || "Sir or Madam"},`
       : "Dear Sir or Madam,";
     const aantalLine = aantalSonderingen != null
       ? `Number of CPTs:${aantalSonderingen}`
       : "";
     const adresLine = projectAddress
-      ? `\nProjectadres: ${projectAddress}`
+      ? `\nProject address: ${projectAddress}`
       : "";
     const body = `${greeting}
 
-Hierbij verzoek ik u vrijblijvend een offerte uit te brengen voor het uitvoeren van een sondeerwerkzaamheden voor het volgende project:
+Please provide a quotation for cone penetration testing for the following project:
 
-Project: ${projectName || "[projectnaam]"}${
-      projectNumber ? `\nProjectnummer: ${projectNumber}` : ""
+Project: ${projectName || "[project name]"}${
+      projectNumber ? `\nProject number: ${projectNumber}` : ""
     }${adresLine}${aantalLine}
 
-Graag ontvang ik van u een offerte voor:
-- Uitvoeren van de sonderingen tot voldoende diepte (regel afstemmen)
-- Eventueel kleefmetingen
-- Rapportage in BRO-XML + GEF + PDF
-- Verwachte doorlooptijd
+Please include:
+- CPTs to the agreed investigation depth
+- Sleeve friction measurements, if applicable
+- Reports in BRO-XML, GEF and PDF formats
+- Expected turnaround time
 
-Voor vragen ben ik bereikbaar via deze mail.
+Please contact me by email if you have any questions.
 
-Met vriendelijke groet,
-[uw naam]
-[uw bedrijf]`;
+Kind regards,
+[your name]
+[your company]`;
     // RFC 2368: %0A voor newlines, %20 voor spaties, etc.
     // Gebruik encodeURIComponent maar daarna `+` terug naar `%20`
     // zodat Outlook het correct interpreteert.

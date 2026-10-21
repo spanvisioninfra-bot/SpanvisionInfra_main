@@ -1098,7 +1098,7 @@ export function TaskGridSurface({
                   buildImportLabels(tCommon),
                 );
                 if (!result && useAppStore.getState().activeDocumentId === activeDocumentId) {
-                  setSurfaceError(tTask('externalLinks.notAvailableWeb', { defaultValue: 'Verversen is hier niet beschikbaar.' }));
+                  setSurfaceError(tTask('externalLinks.notAvailableWeb', { defaultValue: "Refresh is not available here." }));
                 }
                 })();
               }}

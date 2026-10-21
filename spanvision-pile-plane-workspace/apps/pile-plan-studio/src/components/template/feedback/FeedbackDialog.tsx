@@ -208,7 +208,7 @@ export default function FeedbackDialog({
       setSubmitted(true);
     } catch (err) {
       console.error(err);
-      setError(t("errorGeneric", "Er ging iets mis. Probeer het later opnieuw."));
+      setError(t("errorGeneric", "Something went wrong. Please try again later."));
     } finally {
       setSubmitting(false);
     }

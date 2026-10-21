@@ -72,7 +72,7 @@ export const TaskGridContext = createContext<TaskGridContextValue | null>(null);
 
 export function useTaskGridContext(): TaskGridContextValue {
   const value = useContext(TaskGridContext);
-  if (!value) throw new Error('TaskGridContext ontbreekt rond een gridcel');
+  if (!value) throw new Error('TaskGridContext is missing around a grid cell');
   return value;
 }
 

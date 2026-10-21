@@ -210,7 +210,7 @@ export default function SonderingstekeningTab() {
   return (
     <div className="ribbon-content">
       <div className="ribbon-groups">
-        <RibbonGroup label={t("tekening.selectGroup", "Selecteer")}>
+        <RibbonGroup label={t("tekening.selectGroup", "Select")}>
           <RibbonButton
             icon={selectIcon}
             label={t("tekening.selectMode", "Selecteren")}
@@ -225,11 +225,11 @@ export default function SonderingstekeningTab() {
             Kolom 2: Trim / Extend / Mirror / Offset (de CAD-edit-tools
             die voorheen in een aparte "Tekenen"-groep zaten — verzoek
             gebruiker: bij elkaar onder Bewerken). */}
-        <RibbonGroup label={t("tekening.editGroup", "Bewerken")}>
+        <RibbonGroup label={t("tekening.editGroup", "Edit")}>
           <RibbonButtonStack>
             <RibbonButton
               icon={moveIcon}
-              label={t("tekening.moveSelection", "Verplaatsen")}
+              label={t("tekening.moveSelection", "Move")}
               size="small"
               title={t(
                 "tekening.moveHint",
@@ -239,9 +239,9 @@ export default function SonderingstekeningTab() {
             />
             <RibbonButton
               icon={copyIcon}
-              label={t("tekening.copySelection", "Kopiëren")}
+              label={t("tekening.copySelection", "Copy")}
               size="small"
-              title={t("tekening.copyHint", "Dupliceer naast het geselecteerde object (Ctrl+D)")}
+              title={t("tekening.copyHint", "Duplicate beside the selected object (Ctrl+D)")}
               onClick={() => dispatch("ogs:tekening-copy")}
             />
             <RibbonButton
@@ -250,7 +250,7 @@ export default function SonderingstekeningTab() {
               size="small"
               title={t(
                 "tekening.rotateHint",
-                "Vraag de gewenste hoek in graden (negatief = tegen de klok in).",
+                "Enter the angle in degrees (negative = counterclockwise).",
               )}
               onClick={() => {
                 const raw = window.prompt(
@@ -265,7 +265,7 @@ export default function SonderingstekeningTab() {
             />
             <RibbonButton
               icon={deleteIcon}
-              label={t("tekening.deleteSelection", "Verwijderen")}
+              label={t("tekening.deleteSelection", "Delete")}
               size="small"
               title={t("tekening.deleteHint", "Delete the selected object (Delete)")}
               onClick={() => dispatch("ogs:tekening-delete")}
@@ -308,7 +308,7 @@ export default function SonderingstekeningTab() {
               size="small"
               title={t(
                 "tekening.cadOffsetHint",
-                "Klik een lijn, geef de afstand in m, klik aan de zijde waar de parallel-kopie moet komen.",
+                "Click a line, enter the distance in metres, then click the side for the parallel copy.",
               )}
               onClick={() => dispatch("ogs:tekening-cad-offset")}
             />
@@ -360,7 +360,7 @@ export default function SonderingstekeningTab() {
           />
           <RibbonButton
             icon={noteIcon}
-            label={t("tekening.addNote", "Opmerking")}
+            label={t("tekening.addNote", "Note")}
             size="large"
             onClick={() => dispatch("ogs:tekening-add-note")}
           />

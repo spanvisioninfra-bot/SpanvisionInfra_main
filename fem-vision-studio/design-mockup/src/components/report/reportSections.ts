@@ -127,7 +127,7 @@ export const REPORT_SECTIONS: ReportSectionDef[] = [
   {
     id: "nodes",
     titleKey: "report.sectionNodes",
-    defaultTitle: "Knopen",
+    defaultTitle: "Nodes",
     inBeperkt: false,
     beperktReden:
       "Uitgebreide invoertabel: coördinaten per knoop zijn controlemateriaal, " +
@@ -262,7 +262,7 @@ export const REPORT_SECTIONS: ReportSectionDef[] = [
   {
     id: "checkDetail",
     titleKey: "report.sectionCheckDetail",
-    defaultTitle: "Toetsing per staaf",
+    defaultTitle: "Checks per member",
     inBeperkt: false,
     beperktReden:
       "De formule-afleidingen per staaf: verantwoording voor de " +
@@ -304,7 +304,7 @@ export const REPORT_SECTIONS: ReportSectionDef[] = [
   {
     id: "beton",
     titleKey: "report.sectionBeton",
-    defaultTitle: "Beton — doorsnede, M-κ-diagram en N-M-interactiediagram",
+    defaultTitle: "Concrete — section, M-κ diagram, and N-M interaction diagram",
     inBeperkt: true,
     beperktReden:
       "Het beperkingenblok hoort in ELK betonrapport: de toetsing dekt alleen " +

@@ -15,7 +15,7 @@
     try {
       energyData = await invoke("get_project_energy", { maxUw });
     } catch (e) {
-      console.error("Energie laden mislukt:", e);
+      console.error("Failed to load energy data:", e);
     }
     loading = false;
   }

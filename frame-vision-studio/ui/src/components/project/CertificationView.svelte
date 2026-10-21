@@ -22,8 +22,8 @@
     try {
       dop = await invoke("generate_dop_for_kozijn", { id: k.id });
     } catch (e) {
-      console.error("DoP genereren mislukt:", e);
-      toast.error?.("Prestatieverklaring genereren mislukt");
+      console.error("Failed to generate declaration of performance:", e);
+      toast.error?.("Failed to generate declaration of performance");
     }
     dopLoading = false;
   }
@@ -38,7 +38,7 @@
       skhChecks = result?.skhKomo?.checks || [];
       perfClass = result?.performanceClass || null;
     } catch (e) {
-      console.error("Certificatie-check mislukt:", e);
+      console.error("Certification check failed:", e);
     }
     loading = false;
   }

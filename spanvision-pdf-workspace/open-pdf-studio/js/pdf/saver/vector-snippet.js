@@ -164,12 +164,12 @@ export async function registreerBron(doelDoc, sleutel, bytes) {
  */
 export async function bouwKnipselAppearance(doelDoc, opdracht) {
   const { bronBytes, srcBox, rect, sleutel, paginaIndex = 0, paginaRot = 0, bewaarBron = true } = opdracht;
-  if (!bronBytes) throw new Error(`geen bronbytes voor knipsel ${sleutel}`);
+  if (!bronBytes) throw new Error(`no source bytes for clipping ${sleutel}`);
   const { ingebed, breedte, hoogte } = await bedKnipselIn(doelDoc, bronBytes, srcBox, paginaIndex);
   const naam = 'OPSK0';
   const plaatsing = knipselPlaatsing(rect, breedte, hoogte, paginaRot);
   const content = knipselApOps(rect, breedte, hoogte, naam, paginaRot);
-  if (!content || !plaatsing) throw new Error('knipsel of doelvak heeft geen oppervlak');
+  if (!content || !plaatsing) throw new Error('The snippet or target area has no surface area');
   // Een vastgezet knipsel is na opslaan gewone pagina-inhoud: de kopie van de
   // bronpagina is dan alleen nog ballast (bij een zware tekening megabytes).
   const bronRef = bewaarBron ? await registreerBron(doelDoc, sleutel, bronBytes) : null;

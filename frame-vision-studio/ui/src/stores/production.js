@@ -8,6 +8,6 @@ export async function loadProductionDataProject() {
     const data = await invoke("get_production_data_project", {});
     productionDataProject.set(data);
   } catch (e) {
-    console.error("Projectproductiedata laden mislukt:", e);
+    console.error("Failed to load project production data:", e);
   }
 }

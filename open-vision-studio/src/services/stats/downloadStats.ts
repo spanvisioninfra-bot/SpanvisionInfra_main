@@ -84,16 +84,16 @@ function parseOsMap(v: unknown, where: string): Record<StatsOs, OsBucket> | stri
 
 /** Puur en defensief: de JSON komt van buiten, dus elk veld wordt gecontroleerd, niets aangenomen. */
 export function parseDownloadStats(input: unknown): ParseResult {
-  if (!isRecord(input)) return { ok: false, error: 'geen object' };
+  if (!isRecord(input)) return { ok: false, error: 'not an object' };
   if (input.schemaVersion !== DOWNLOAD_STATS_SCHEMA_VERSION) {
     return { ok: false, error: `onbekende schemaVersion ${String(input.schemaVersion)}` };
   }
   if (typeof input.generatedAt !== 'string' || Number.isNaN(Date.parse(input.generatedAt))) {
-    return { ok: false, error: 'generatedAt ontbreekt of is geen datum' };
+    return { ok: false, error: 'generatedAt is missing or is not a date' };
   }
   const totals = parseOsMap(input.totals, 'totals');
   if (typeof totals === 'string') return { ok: false, error: totals };
-  if (!Array.isArray(input.releases)) return { ok: false, error: 'releases is geen lijst' };
+  if (!Array.isArray(input.releases)) return { ok: false, error: 'releases is not a list' };
   const releases: ReleaseStats[] = [];
   for (const [i, r] of input.releases.entries()) {
     if (!isRecord(r) || typeof r.tag !== 'string' || r.tag === '') return { ok: false, error: `releases[${i}]: tag ontbreekt` };

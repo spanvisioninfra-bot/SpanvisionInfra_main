@@ -20,7 +20,7 @@ export const paalpuntniveauTemplate = {
   category: 'NL Constructie',
   defaultSize: { width: 360, height: 62 },
   params: [
-    { key: 'niveau', label: 'Niveau (m)', labelEn: 'Level (m)', type: 'number', default: 14, step: 0.1 },
+    { key: 'niveau', label: 'Level (m)', labelEn: 'Level (m)', type: 'number', default: 14, step: 0.1 },
     { key: 'decimalen', label: 'Decimalen', labelEn: 'Decimals', type: 'number', default: 1, min: 0, max: 3, step: 1 },
     { key: 'referentie', label: 'Referentie', labelEn: 'Reference', type: 'string', default: 'N.A.P.' },
   ],

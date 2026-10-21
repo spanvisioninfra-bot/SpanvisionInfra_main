@@ -562,7 +562,7 @@
           <!-- Library browser -->
           <div class="psection">
             <button class="library-btn" onclick={() => showLibrary = !showLibrary}>
-              📚 {showLibrary ? "Verberg bibliotheek" : "Load from library"}
+              📚 {showLibrary ? "Hide library" : "Load from library"}
             </button>
             {#if showLibrary}
               <div class="library-list">

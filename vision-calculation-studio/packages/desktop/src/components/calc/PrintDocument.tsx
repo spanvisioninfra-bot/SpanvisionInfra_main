@@ -77,7 +77,7 @@ export function useUitdraai(): Uitdraai {
           scope,
         );
       } catch (err) {
-        html = `<p class="calc-text" style="color:#b91c1c">Dit blad kon niet worden doorgerekend: ${
+        html = `<p class="calc-text" style="color:#b91c1c">This worksheet could not be calculated: ${
           (err as Error).message
         }</p>`;
       }
@@ -111,7 +111,7 @@ export function useUitdraai(): Uitdraai {
     projectNaam,
     bladen,
     kopregels: kop.filter((r): r is [string, string] => !!r[1]),
-    datum: new Date().toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" }),
+    datum: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }),
     onderdeel: gegevens.onderdeel,
     projectNummer: gegevens.project_nummer,
   };

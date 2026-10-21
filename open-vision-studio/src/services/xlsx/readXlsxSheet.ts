@@ -149,13 +149,13 @@ export function* scanXml(xml: string): Generator<XmlEvent> {
 
     if (xml.startsWith('<!--', lt)) {
       const end = xml.indexOf('-->', lt + 4);
-      if (end < 0) throw new XlsxReadError('malformed', 'niet-afgesloten commentaar');
+      if (end < 0) throw new XlsxReadError('malformed', 'unterminated comment');
       i = end + 3;
       continue;
     }
     if (xml.startsWith('<![CDATA[', lt)) {
       const end = xml.indexOf(']]>', lt + 9);
-      if (end < 0) throw new XlsxReadError('malformed', 'niet-afgesloten CDATA');
+      if (end < 0) throw new XlsxReadError('malformed', 'unterminated CDATA');
       yield { kind: 'text', value: xml.slice(lt + 9, end) };
       i = end + 3;
       continue;
@@ -163,17 +163,17 @@ export function* scanXml(xml: string): Generator<XmlEvent> {
     if (xml.startsWith('<!', lt)) {
       // `<!DOCTYPE`/`<!ENTITY`: entiteitsdeclaraties worden nooit geïnterpreteerd (XXE /
       // billion-laughs). Weigeren is hier het hele verweer.
-      throw new XlsxReadError('malformed', 'entiteitsdeclaratie in het XML-part');
+      throw new XlsxReadError('malformed', "entity declaration in the XML part");
     }
     if (xml.startsWith('<?', lt)) {
       const end = xml.indexOf('?>', lt + 2);
-      if (end < 0) throw new XlsxReadError('malformed', 'niet-afgesloten processing instruction');
+      if (end < 0) throw new XlsxReadError('malformed', 'unterminated processing instruction');
       i = end + 2;
       continue;
     }
     if (xml.startsWith('</', lt)) {
       const gt = xml.indexOf('>', lt);
-      if (gt < 0) throw new XlsxReadError('malformed', 'niet-afgesloten sluittag');
+      if (gt < 0) throw new XlsxReadError('malformed', 'unterminated closing tag');
       yield { kind: 'close', name: xml.slice(lt + 2, gt).trim() };
       i = gt + 1;
       continue;
@@ -183,12 +183,12 @@ export function* scanXml(xml: string): Generator<XmlEvent> {
     let p = lt + 1;
     while (p < xml.length && !NAME_END.test(xml[p]!)) p++;
     const name = xml.slice(lt + 1, p);
-    if (name.length === 0) throw new XlsxReadError('malformed', 'tag zonder naam');
+    if (name.length === 0) throw new XlsxReadError('malformed', 'unnamed tag');
     const attrs: Record<string, string> = {};
     let selfClosing = false;
     for (;;) {
       while (p < xml.length && /\s/.test(xml[p]!)) p++;
-      if (p >= xml.length) throw new XlsxReadError('malformed', 'niet-afgesloten opentag');
+      if (p >= xml.length) throw new XlsxReadError('malformed', 'unterminated opening tag');
       if (xml[p] === '/') {
         selfClosing = true;
         p++;
@@ -201,7 +201,7 @@ export function* scanXml(xml: string): Generator<XmlEvent> {
       while (p < xml.length && /\s/.test(xml[p]!)) p++;
       if (xml[p] !== '=') {
         // Attribuut zonder waarde bestaat niet in XML; alles wat er zo uitziet is kapot.
-        throw new XlsxReadError('malformed', `attribuut zonder waarde: ${attrName}`);
+        throw new XlsxReadError('malformed', `attribute without a value: ${attrName}`);
       }
       p++;
       while (p < xml.length && /\s/.test(xml[p]!)) p++;
@@ -210,7 +210,7 @@ export function* scanXml(xml: string): Generator<XmlEvent> {
         throw new XlsxReadError('malformed', `ongequote attribuutwaarde: ${attrName}`);
       }
       const valueEnd = xml.indexOf(quote, p + 1);
-      if (valueEnd < 0) throw new XlsxReadError('malformed', 'niet-afgesloten attribuutwaarde');
+      if (valueEnd < 0) throw new XlsxReadError('malformed', 'unterminated attribute value');
       attrs[attrName] = unescapeXml(xml.slice(p + 1, valueEnd));
       p = valueEnd + 1;
     }
@@ -381,12 +381,12 @@ function parseWorksheet(xml: string, shared: readonly string[], styles: StyleTab
     if (col < nextCol) {
       throw new XlsxReadError(
         'malformed',
-        `kolomindex ${col} is niet oplopend binnen rij ${row.rowNumber}`,
+        `kolomindex ${col} is not increasing within row ${row.rowNumber}`,
       );
     }
     nextCol = col + 1;
     if (col >= limits.maxCols) {
-      throw new XlsxReadError('malformed', `kolomindex ${col} boven de grens`);
+      throw new XlsxReadError('malformed', `column index ${col} exceeds the limit`);
     }
     const raw = vText;
     let text = '';
@@ -454,13 +454,13 @@ function parseWorksheet(xml: string, shared: readonly string[], styles: StyleTab
         if (rowNumber <= lastRowNumber) {
           throw new XlsxReadError(
             'malformed',
-            `rijnummer ${rowNumber} is niet oplopend (na ${lastRowNumber})`,
+            `rijnummer ${rowNumber} is not increasing (after ${lastRowNumber})`,
           );
         }
         lastRowNumber = rowNumber;
         nextRowNumber = rowNumber + 1;
         if (rows.length >= limits.maxRows) {
-          throw new XlsxReadError('tooManyRows', 'te veel rijen in het werkblad');
+          throw new XlsxReadError('tooManyRows', "too many rows in the worksheet");
         }
         row = { rowNumber, cells: [] };
         rows.push(row);
@@ -608,7 +608,7 @@ export async function readXlsxSheetWith(
 ): Promise<XlsxSheet> {
   // Grens vóór allocatie: geen kopie, geen view, niets — eerst de weegschaal.
   if (bytes.byteLength > limits.maxBytes) {
-    throw new XlsxReadError('tooLarge', 'bestand boven de bytegrens');
+    throw new XlsxReadError('tooLarge', 'file exceeds the byte limit');
   }
   if (startsWithCfbMagic(bytes)) {
     // Een met een wachtwoord beveiligde werkmap is een CFB/OLE2-container met een
@@ -616,7 +616,7 @@ export async function readXlsxSheetWith(
     throw new XlsxReadError('encrypted', 'wachtwoordbeveiligde werkmap');
   }
   if (bytes.byteLength < 4 || bytes[0] !== 0x50 || bytes[1] !== 0x4b) {
-    throw new XlsxReadError('notAZip', 'geen ZIP-magic');
+    throw new XlsxReadError('notAZip', 'missing ZIP magic bytes');
   }
 
   const buffer = toArrayBuffer(bytes);
@@ -631,7 +631,7 @@ export async function readXlsxSheetWith(
 
   if (textOf(meta, '[Content_Types].xml') === undefined) {
     // Geen OOXML-pakket: wel een ZIP, maar niet er een die een werkmap kan bevatten.
-    throw new XlsxReadError('notAZip', 'geen [Content_Types].xml');
+    throw new XlsxReadError('notAZip', 'missing [Content_Types].xml');
   }
 
   const rootRels = textOf(meta, '_rels/.rels');
@@ -640,12 +640,12 @@ export async function readXlsxSheetWith(
     if (workbookTarget !== undefined && resolveTarget('', workbookTarget) !== 'xl/workbook.xml') {
       // Deze lezer pakt in pass 1 uitsluitend de standaardpaden uit; een werkmap die ergens anders
       // woont zou een derde pass vragen. Weigeren is eerlijker dan een leeg blad opleveren.
-      throw new XlsxReadError('noSheet', `werkmap op een onverwacht pad: ${workbookTarget}`);
+      throw new XlsxReadError('noSheet', `workbook at an unexpected path: ${workbookTarget}`);
     }
   }
 
   const workbookXml = textOf(meta, 'xl/workbook.xml');
-  if (workbookXml === undefined) throw new XlsxReadError('noSheet', 'geen xl/workbook.xml');
+  if (workbookXml === undefined) throw new XlsxReadError('noSheet', 'missing xl/workbook.xml');
   const workbook = parseWorkbook(workbookXml);
 
   const workbookRels = textOf(meta, 'xl/_rels/workbook.xml.rels');
@@ -658,7 +658,7 @@ export async function readXlsxSheetWith(
     const target = relationshipTargetByType(workbookRels, '/worksheet');
     if (target !== undefined) sheetPath = resolveTarget('xl/', target);
   }
-  if (sheetPath === undefined) throw new XlsxReadError('noSheet', 'geen werkblad in de relaties');
+  if (sheetPath === undefined) throw new XlsxReadError('noSheet', 'no worksheet in the relationships');
 
   const stylesXml = textOf(meta, 'xl/styles.xml');
   const styles: StyleTable = stylesXml !== undefined ? parseStyles(stylesXml) : { isDate: [], isPercent: [] };
@@ -673,7 +673,7 @@ export async function readXlsxSheetWith(
     throw asXlsxReadError(err);
   }
   const sheetXml = textOf(sheetEntries, sheetPath);
-  if (sheetXml === undefined) throw new XlsxReadError('noSheet', `bladpart ontbreekt: ${sheetPath}`);
+  if (sheetXml === undefined) throw new XlsxReadError('noSheet', `worksheet part is missing: ${sheetPath}`);
 
   return { rows: parseWorksheet(sheetXml, shared, styles, limits), epoch1904: workbook.epoch1904 };
 }

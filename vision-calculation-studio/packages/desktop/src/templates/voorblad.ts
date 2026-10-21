@@ -31,10 +31,7 @@ status_doc = "concept"
 '<tr><td style="padding:10px 12px; border-bottom:1px solid #ddd; color:#888;">Status</td><td style="padding:10px 12px; border-bottom:1px solid #ddd; font-weight:600;">'status_doc'</td></tr>
 '</table>
 
-'<div style="margin-top:50px; padding:20px; background:#F8FAFC; border-left:4px solid #D97706; border-radius:0 8px 8px 0;">
-'  <h3 style="margin:0 0 8px; color:#525252;">Scope &amp; uitgangspunten</h3>
-'  <p style="margin:0; color:#525252; line-height:1.6;">Korte beschrijving van de scope, het besproken bouwdeel, en de uitgangspunten die in de berekening zijn aangenomen.</p>
-'</div>
+'<div style="margin-top:50px; padding:20px; background:#F8FAFC; border-left:4px solid #D97706; border-radius:0 8px 8px 0;"><h3 style="margin:0 0 8px; color:#525252;">Scope and assumptions</h3><p style="margin:0; color:#525252; line-height:1.6;">Briefly describe the scope, structural component, and assumptions used in this calculation.</p></div>
 
-'<div style="margin-top:80px; text-align:center; color:#888; font-size:11px;">Onderdeel van het Vision Calculation Studio document — 'project_nummer'</div>
+'<div style="margin-top:80px; text-align:center; color:#888; font-size:11px;">Part of the Vision Calculation Studio document — 'project_nummer'</div>
 `;

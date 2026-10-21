@@ -34,7 +34,7 @@ export function registerToolModules(defs: McpToolDef[][]): void {
         throw new Error(`Dubbele MCP-toolnaam bij registratie: '${def.name}'`);
       }
       if (def.description.trim() === '') {
-        throw new Error(`MCP-tool '${def.name}' mist een (niet-lege) description`);
+        throw new Error(`MCP tool '${def.name}' requires a non-empty description`);
       }
       byName.set(def.name, def);
       flat.push(def);

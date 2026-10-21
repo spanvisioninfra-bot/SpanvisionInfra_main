@@ -63,10 +63,10 @@ function parseString(
   maxLength: number,
   allowEmpty = false,
 ): ParseResult<string> {
-  if (typeof value !== 'string') return fail(`${field} moet een string zijn`);
-  if (!allowEmpty && value.length === 0) return fail(`${field} mag niet leeg zijn`);
+  if (typeof value !== 'string') return fail(`${field} must be a string`);
+  if (!allowEmpty && value.length === 0) return fail(`${field} must not be empty`);
   if (value.length > maxLength) {
-    return fail(`${field} mag maximaal ${maxLength} tekens bevatten`);
+    return fail(`${field} may contain at most ${maxLength} characters`);
   }
   return { ok: true, value, warnings: [] };
 }
@@ -75,7 +75,7 @@ function parseVersion(value: unknown, field: string): ParseResult<string> {
   const parsed = parseString(value, field, EXTENSION_LIMITS.version);
   if (!parsed.ok) return parsed;
   if (!VERSION_PATTERN.test(parsed.value)) {
-    return fail(`${field} moet uit één tot vier numerieke delen bestaan`);
+    return fail(`${field} must contain one to four numeric parts`);
   }
   return parsed;
 }
@@ -84,7 +84,7 @@ function parseExtensionId(value: unknown): ParseResult<string> {
   const parsed = parseString(value, 'id', EXTENSION_LIMITS.id);
   if (!parsed.ok) return parsed;
   if (!EXTENSION_ID_PATTERN.test(parsed.value) || RESERVED_IDS.has(parsed.value)) {
-    return fail('id heeft geen geldige extensie-identiteit');
+    return fail("id is not a valid extension identity");
   }
   return parsed;
 }
@@ -93,11 +93,11 @@ function parseMainPath(value: unknown): ParseResult<string> {
   const parsed = parseString(value, 'main', EXTENSION_LIMITS.main);
   if (!parsed.ok) return parsed;
   if (parsed.value.includes('\\') || parsed.value.includes('\0')) {
-    return fail('main moet een veilig relatief pad met /-scheiding zijn');
+    return fail("main must be a safe relative path using / separators");
   }
   const segments = parsed.value.split('/');
   if (segments.some((segment) => segment === '' || segment === '.' || segment === '..')) {
-    return fail('main moet een veilig relatief pad zonder lege, .- of ..-segmenten zijn');
+    return fail("main must be a safe relative path without empty, . or .. segments");
   }
   return parsed;
 }
@@ -110,16 +110,16 @@ function isSafeRelativePath(value: string): boolean {
 }
 
 function parseStoredAssets(input: unknown): ParseResult<Record<string, Uint8Array>> {
-  if (!isPlainRecord(input)) return fail('assets moet een gewoon object zijn');
+  if (!isPlainRecord(input)) return fail("assets must be a plain object");
 
   const assets: Record<string, Uint8Array> = Object.create(null);
   let totalBytes = 0;
   for (const [name, value] of Object.entries(input)) {
     if (!isSafeRelativePath(name)) {
-      return fail(`assetnaam ${JSON.stringify(name)} is geen veilig relatief pad`);
+      return fail(`asset name ${JSON.stringify(name)} is not a safe relative path`);
     }
     if (!(value instanceof Uint8Array)) {
-      return fail(`asset "${name}" moet een Uint8Array zijn`);
+      return fail(`asset "${name}" must be a Uint8Array`);
     }
     if (value.byteLength > EXTENSION_LIMITS.assetBytes) {
       return fail(
@@ -129,7 +129,7 @@ function parseStoredAssets(input: unknown): ParseResult<Record<string, Uint8Arra
     totalBytes += value.byteLength;
     if (totalBytes > EXTENSION_LIMITS.assetTotalBytes) {
       return fail(
-        `assets overschrijden samen de limiet van ${EXTENSION_LIMITS.assetTotalBytes} bytes`,
+        `assets together exceed the limit of ${EXTENSION_LIMITS.assetTotalBytes} bytes`,
       );
     }
     assets[name] = new Uint8Array(value);
@@ -148,7 +148,7 @@ function isExtensionPermission(value: unknown): value is ExtensionPermission {
 
 function parseCategory(value: unknown): ParseResult<ExtensionCategory> {
   if (typeof value !== 'string' || !isExtensionCategory(value)) {
-    return fail('category is geen bekende extensiecategorie');
+    return fail("category is not a known extension category");
   }
   return { ok: true, value, warnings: [] };
 }
@@ -157,13 +157,13 @@ function parsePermissions(
   value: unknown,
   mode: ManifestParseMode,
 ): ParseResult<ExtensionPermission[]> {
-  if (!Array.isArray(value)) return fail('permissions moet een array zijn');
+  if (!Array.isArray(value)) return fail("permissions must be an array");
 
   const permissions: ExtensionPermission[] = [];
   let removed = 0;
   for (const candidate of value) {
     if (!isExtensionPermission(candidate)) {
-      if (mode === 'fresh') return fail('permissions bevat een onbekende permission');
+      if (mode === 'fresh') return fail("permissions contains an unknown permission");
       removed++;
       continue;
     }
@@ -180,9 +180,9 @@ function parsePermissions(
 }
 
 function parseTags(value: unknown): ParseResult<string[]> {
-  if (!Array.isArray(value)) return fail('tags moet een array zijn');
+  if (!Array.isArray(value)) return fail("tags must be an array");
   if (value.length > EXTENSION_LIMITS.tags) {
-    return fail(`tags mag maximaal ${EXTENSION_LIMITS.tags} waarden bevatten`);
+    return fail(`tags may contain at most ${EXTENSION_LIMITS.tags} values`);
   }
 
   const tags: string[] = [];
@@ -196,34 +196,34 @@ function parseTags(value: unknown): ParseResult<string[]> {
 
 function parseHttpUrl(value: unknown, field: string): ParseResult<string> {
   if (typeof value !== 'string' || value.length === 0) {
-    return fail(`${field} moet een niet-lege http(s)-URL zijn`);
+    return fail(`${field} must be a non-empty http(s) URL`);
   }
   try {
     const url = new URL(value);
     if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-      return fail(`${field} moet een http(s)-URL zijn`);
+      return fail(`${field} must be an http(s) URL`);
     }
   } catch {
-    return fail(`${field} moet een geldige http(s)-URL zijn`);
+    return fail(`${field} must be a valid http(s) URL`);
   }
   return { ok: true, value, warnings: [] };
 }
 
 function parseLastUpdated(value: unknown): ParseResult<string> {
-  if (typeof value !== 'string') return fail('lastUpdated moet een ISO-datumstring zijn');
+  if (typeof value !== 'string') return fail("lastUpdated must be an ISO date string");
   const isoPattern = /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z)?$/;
-  if (!isoPattern.test(value)) return fail('lastUpdated moet een geldige ISO-datum zijn');
+  if (!isoPattern.test(value)) return fail("lastUpdated must be a valid ISO date");
   const parsed = new Date(value.length === 10 ? `${value}T00:00:00Z` : value);
   if (!Number.isFinite(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value.slice(0, 10)) {
-    return fail('lastUpdated moet een bestaande ISO-datum zijn');
+    return fail("lastUpdated must be an existing ISO date");
   }
   return { ok: true, value, warnings: [] };
 }
 
 function parseIcon(value: unknown): ParseResult<string> {
-  if (typeof value !== 'string') return fail('icon moet een string zijn');
+  if (typeof value !== 'string') return fail("icon must be a string");
   if (new TextEncoder().encode(value).byteLength > EXTENSION_LIMITS.iconBytes) {
-    return fail(`icon mag maximaal ${EXTENSION_LIMITS.iconBytes} UTF-8-bytes bevatten`);
+    return fail(`icon may contain at most ${EXTENSION_LIMITS.iconBytes} UTF-8 bytes`);
   }
   return { ok: true, value, warnings: [] };
 }
@@ -271,7 +271,7 @@ export function parseExtensionManifest(
   input: unknown,
   mode: ManifestParseMode,
 ): ParseResult<ExtensionManifest> {
-  if (!isRecord(input)) return fail('manifest moet een object zijn');
+  if (!isRecord(input)) return fail("manifest must be an object");
 
   const identity = parseIdentity(input);
   if (!identity.ok) return identity;
@@ -283,7 +283,7 @@ export function parseExtensionManifest(
   let minAppVersion: string;
   if (input.minAppVersion === undefined && mode === 'stored-legacy') {
     minAppVersion = '0.0.0';
-    warnings.push('minAppVersion ontbreekt; legacydefault 0.0.0 toegepast');
+    warnings.push('minAppVersion is missing; legacy default 0.0.0 applied');
   } else {
     const parsed = parseVersion(input.minAppVersion, 'minAppVersion');
     if (!parsed.ok) return parsed;
@@ -341,29 +341,29 @@ export function parseStoredExtension(
   input: unknown,
   storageKey: IDBValidKey,
 ): ParseResult<ReadyStoredExtension> {
-  if (!isRecord(input)) return fail('opgeslagen extensie moet een object zijn');
+  if (!isRecord(input)) return fail("stored extension must be an object");
 
   const id = parseExtensionId(input.id);
   if (!id.ok) return id;
   if (storageKey !== id.value) {
-    return fail('opslagsleutel en record-id moeten exact gelijk zijn');
+    return fail("storage key and record id must match exactly");
   }
 
   const manifest = parseExtensionManifest(input.manifest, 'stored-legacy');
   if (!manifest.ok) return manifest;
   if (manifest.value.id !== id.value) {
-    return fail('manifest-id en record-id moeten exact gelijk zijn');
+    return fail("manifest id and record id must match exactly");
   }
 
-  if (typeof input.mainCode !== 'string') return fail('mainCode moet een string zijn');
-  if (input.mainCode.length === 0) return fail('mainCode mag niet leeg zijn');
+  if (typeof input.mainCode !== 'string') return fail("mainCode must be a string");
+  if (input.mainCode.length === 0) return fail("mainCode must not be empty");
   const mainCodeBytes = new TextEncoder().encode(input.mainCode).byteLength;
   if (mainCodeBytes > EXTENSION_LIMITS.storedMainCodeBytes) {
     return fail(
       `mainCode overschrijdt de limiet van ${EXTENSION_LIMITS.storedMainCodeBytes} UTF-8-bytes`,
     );
   }
-  if (typeof input.enabled !== 'boolean') return fail('enabled moet een boolean zijn');
+  if (typeof input.enabled !== 'boolean') return fail("enabled must be a boolean");
 
   let assets: Record<string, Uint8Array> | undefined;
   if (input.assets !== undefined) {
@@ -416,7 +416,7 @@ function manifestJsonFromComment(code: string): ParseResult<unknown> | null {
 
     const tail = comment.slice(marker.index + marker[0].length).trimStart();
     if (!tail.startsWith('{')) {
-      found = fail('@manifest moet direct door een JSON-object worden gevolgd');
+      found = fail("@manifest must be followed immediately by a JSON object");
       continue;
     }
 
@@ -447,18 +447,18 @@ function manifestJsonFromComment(code: string): ParseResult<unknown> | null {
     }
 
     if (end < 0 || depth !== 0 || inString) {
-      found = fail('@manifest bevat geen afgesloten JSON-object');
+      found = fail("@manifest does not contain a closed JSON object");
       continue;
     }
     if (tail.slice(end + 1).trim().length > 0) {
-      found = fail('@manifest bevat tekst na het JSON-object');
+      found = fail("@manifest contains text after the JSON object");
       continue;
     }
 
     try {
       found = { ok: true, value: JSON.parse(tail.slice(0, end + 1)) as unknown, warnings: [] };
     } catch (error) {
-      found = fail(`@manifest bevat ongeldige JSON: ${error instanceof Error ? error.message : String(error)}`);
+      found = fail(`@manifest contains invalid JSON: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -479,7 +479,7 @@ export function manifestFromJavaScript(
 }
 
 function parseCatalogEntry(input: unknown): ParseResult<CatalogEntry> {
-  if (!isRecord(input)) return fail('catalogusentry moet een object zijn');
+  if (!isRecord(input)) return fail("catalog entry must be an object");
 
   const identity = parseIdentity(input);
   if (!identity.ok) return identity;
@@ -498,7 +498,7 @@ function parseCatalogEntry(input: unknown): ParseResult<CatalogEntry> {
   let sha256: string | undefined;
   if (input.sha256 !== undefined) {
     if (typeof input.sha256 !== 'string' || !/^[0-9a-fA-F]{64}$/.test(input.sha256)) {
-      return fail('sha256 moet exact 64 hextekens bevatten');
+      return fail("sha256 must contain exactly 64 hexadecimal characters");
     }
     sha256 = input.sha256;
   }
@@ -536,12 +536,12 @@ export function parseCatalog(input: unknown): ParseResult<{
   catalog: ExtensionCatalog;
   issues: CatalogIssue[];
 }> {
-  if (!isRecord(input)) return fail('catalogus moet een object zijn');
+  if (!isRecord(input)) return fail("catalog must be an object");
   const version = parseVersion(input.version, 'catalogus.version');
   if (!version.ok) return version;
   const lastUpdated = parseLastUpdated(input.lastUpdated);
   if (!lastUpdated.ok) return lastUpdated;
-  if (!Array.isArray(input.extensions)) return fail('catalogus.extensions moet een array zijn');
+  if (!Array.isArray(input.extensions)) return fail("catalog.extensions must be an array");
 
   const extensions: CatalogEntry[] = [];
   const issues: CatalogIssue[] = [];

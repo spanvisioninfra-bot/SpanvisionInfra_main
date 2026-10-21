@@ -1,6 +1,9 @@
 import {createCipheriv,createDecipheriv,createHash,createHmac,randomBytes,timingSafeEqual} from 'node:crypto';
 import {plans,regions,selection} from './catalog.mjs';
-import {publicUser,planAccess,SUPER_ADMIN_EMAIL} from './access.mjs';
+import {publicUser,planAccess,SUPER_ADMIN_EMAIL,signInDestination} from './access.mjs';
+import {neonAuthUrl,neonSelected,neonAuth,neonRequest} from './neon-auth.mjs';
+import {databaseConfigured,neonStore,bindNeonStore} from './neon-store.mjs';
+import {passwordPolicy} from './password-policy.mjs';
 
 const cookieName='sv_account';
 class RequestError extends Error {constructor(status,message){super(message);this.status=status;}}
@@ -8,7 +11,9 @@ const fail=(status,message)=>{throw new RequestError(status,message);};
 const uuid=value=>typeof value==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 const providerId=value=>typeof value==='string'&&/^[a-zA-Z0-9_-]{1,180}$/.test(value);
 const scalar=value=>typeof value==='string'?value:'';
-function configured(env){return !!(env.SUPABASE_URL&&env.SUPABASE_PUBLISHABLE_KEY&&env.SESSION_SECRET?.length>=32&&env.SITE_URL);}
+function configured(env){return !!((neonSelected(env)?neonAuthUrl(env):env.SUPABASE_URL&&env.SUPABASE_PUBLISHABLE_KEY)&&env.SESSION_SECRET?.length>=32&&env.SITE_URL);}
+const accountId=(value,env)=>neonSelected(env)?typeof value==='string'&&/^[a-zA-Z0-9_-]{1,128}$/.test(value):uuid(value);
+const storageReady=env=>neonSelected(env)?databaseConfigured(env):!!env.SUPABASE_SERVICE_ROLE_KEY;
 function site(env){
   let url;try{url=new URL(env.SITE_URL);}catch{fail(503,'Account setup is in progress. Please try again later.');}
   if(url.protocol!=='https:'&&!['localhost','127.0.0.1'].includes(url.hostname))fail(503,'Account setup is in progress. Please try again later.');
@@ -43,7 +48,7 @@ function setCookie(res,value,env,clear=false){
 }
 function saveSession(res,data,env,recovery=false){
   if(!data.access_token||!data.refresh_token)fail(502,'Sign-in could not be completed. Please try again.');
-  const session={access:data.access_token,refresh:data.refresh_token,recovery,validUntil:Date.now()+604800000};
+  const session={access:data.access_token,refresh:data.refresh_token,provider:neonSelected(env)?'neon':'supabase',recovery,validUntil:Date.now()+604800000};
   setCookie(res,session,env);return session;
 }
 async function upstream(url,options,fetcher){
@@ -53,26 +58,62 @@ async function upstream(url,options,fetcher){
   return {response,data};
 }
 async function auth(env,endpoint,body,fetcher,token){
+  if(neonSelected(env)){
+    if(!configured(env))fail(503,'Account setup is in progress. You can still open the tools without signing in.');
+    try{return await neonAuth(env,endpoint,body,fetcher,site(env),token);}catch{fail(502,'The account service is temporarily unavailable. Please try again.');}
+  }
   const headers={apikey:env.SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'};
   if(token)headers.Authorization=`Bearer ${token}`;
   return upstream(`${authBase(env)}/auth/v1/${endpoint}`,{method:body===undefined?'GET':'POST',headers,...(body===undefined?{}:{body:JSON.stringify(body)})},fetcher);
 }
-async function identity(req,res,env,fetcher,optional=false){
+async function neonCall(env,endpoint,body,fetcher){
+  if(!configured(env))fail(503,'Account setup is in progress.');
+  try{return await neonRequest(env,endpoint,body,fetcher,site(env));}catch{fail(502,'The account service is temporarily unavailable. Please try again.');}
+}
+async function completeSignIn(res,data,env,fetcher,recovery=false){
+  if(!data?.access_token||!data.refresh_token)fail(502,'Sign-in could not be completed. Please try again.');
+  let record=data.user;
+  if(!record){
+    const profile=await auth(env,'user',undefined,fetcher,data.access_token);
+    if(!profile.response.ok)fail(502,'Your signed-in account could not be verified. Please try again.');
+    record=profile.data;
+  }
+  if(!accountId(record?.id,env))fail(502,'Your signed-in account could not be verified. Please try again.');
+  const user=publicUser(record,env);
+  if(neonSelected(env)&&!user.emailVerified)fail(403,'Verify your email before signing in.');
+  saveSession(res,data,env,recovery);
+  return {signedIn:true,user,redirectTo:signInDestination(user,recovery),...(recovery?{recovery:true}:{})};
+}
+function requestSession(req,env){
   const value=scalar(req.headers.cookie).split(';').map(item=>item.trim()).find(item=>item.startsWith(`${cookieName}=`))?.slice(cookieName.length+1);
-  let session=openSession(value,env.SESSION_SECRET);
+  return openSession(value,env.SESSION_SECRET);
+}
+async function identity(req,res,env,fetcher,optional=false){
+  let session=requestSession(req,env);
+  if(session&&(neonSelected(env)?session.provider!=='neon':session.provider&&session.provider!=='supabase'))session=null;
   if(!session){if(optional)return null;fail(401,'Please sign in to continue.');}
   let result=await auth(env,'user',undefined,fetcher,session.access);
-  if(result.response.status===401||result.response.status===403){
+  if(!neonSelected(env)&&(result.response.status===401||result.response.status===403)){
     const renewed=await auth(env,'token?grant_type=refresh_token',{refresh_token:session.refresh},fetcher);
     if(!renewed.response.ok){setCookie(res,null,env,true);if(optional)return null;fail(401,'Your session has expired. Please sign in again.');}
     session=saveSession(res,renewed.data,env,session.recovery);
     result=await auth(env,'user',undefined,fetcher,session.access);
   }
-  if(!result.response.ok||!uuid(result.data.id)){if(result.response.status>=500)fail(502,'Sign-in is temporarily unavailable.');fail(401,'Please sign in again.');}
+  if(!result.response.ok||!accountId(result.data?.id,env)){
+    if(result.response.status>=500)fail(502,'Sign-in is temporarily unavailable.');
+    setCookie(res,null,env,true);if(optional)return null;fail(401,'Please sign in again.');
+  }
+  if(neonSelected(env)){
+    if(!result.data.email_confirmed_at)fail(403,'Verify your email before signing in.');
+    if(result.credential&&result.credential!==session.access){session={...session,access:result.credential};setCookie(res,session,env);}
+    if(storageReady(env)){
+      try{await (await neonStore(env)).syncAccount(result.data);}catch{fail(502,'Your account could not be saved. Please try again.');}
+    }
+  }
   return {session,user:publicUser(result.data,env)};
 }
 function email(value){const address=scalar(value).trim().toLowerCase();if(address.length>254||!/^\S+@\S+\.\S+$/.test(address))fail(400,'Enter a valid email address.');return address;}
-function password(value){if(typeof value!=='string'||value.length<12||value.length>128)fail(400,'Use a password between 12 and 128 characters.');return value;}
+function password(value){if(typeof value!=='string'||value.length<passwordPolicy.minLength||value.length>passwordPolicy.maxLength)fail(400,`Use a password between ${passwordPolicy.minLength} and ${passwordPolicy.maxLength} characters.`);return value;}
 async function rawBody(req,limit){
   let size=0;const chunks=[];
   for await(const chunk of req){const bytes=Buffer.from(chunk);size+=bytes.length;if(size>limit)fail(413,'Request is too large.');chunks.push(bytes);}
@@ -80,11 +121,20 @@ async function rawBody(req,limit){
 }
 function jsonBody(raw){try{const data=JSON.parse(raw.toString());if(!data||typeof data!=='object'||Array.isArray(data))throw new Error();return data;}catch{fail(400,'Send a valid request.');}}
 async function db(env,resource,fetcher,options={}){
+  if(neonSelected(env)){
+    if(!storageReady(env))fail(503,'Database setup is in progress.');
+    try{return await (await neonStore(env)).request(resource,options);}catch{fail(502,'Account data could not be saved. Please try again later.');}
+  }
   if(!env.SUPABASE_SERVICE_ROLE_KEY)fail(503,'Billing setup is in progress.');
   const {response,data}=await upstream(`${authBase(env)}/rest/v1/${resource}`,{...options,headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,'Content-Type':'application/json',...options.headers}},fetcher);
   if(!response.ok)fail(502,'Billing could not be saved. Please try again later.');return data;
 }
 async function adminAuth(env,resource,fetcher){
+  if(neonSelected(env)){
+    if(!storageReady(env))fail(503,'Admin database setup is in progress.');
+    let result;try{result=await (await neonStore(env)).adminUsers(resource);}catch{fail(502,'User information is temporarily unavailable.');}
+    if(result.response.status===404)fail(404,'User not found.');return result;
+  }
   if(!env.SUPABASE_SERVICE_ROLE_KEY)fail(503,'Admin setup is in progress.');
   const result=await upstream(`${authBase(env)}/auth/v1/admin/${resource}`,{headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`}},fetcher);
   if(result.response.status===404)fail(404,'User not found.');
@@ -111,7 +161,7 @@ async function adminRoute(route,method,url,body,current,env,fetcher){
     if(!Number.isInteger(page)||page<1||page>100000)fail(400,'Choose a valid user page.');
     const response=await adminAuth(env,`users?page=${page}&per_page=${perPage}`,fetcher);
     const records=response.data.users;
-    if(!Array.isArray(records)||records.length>perPage||records.some(record=>!uuid(record.id)))fail(502,'User information is temporarily unavailable.');
+    if(!Array.isArray(records)||records.length>perPage||records.some(record=>!accountId(record.id,env)))fail(502,'User information is temporarily unavailable.');
     const data=records.length?await planRecords(records.map(record=>record.id),env,fetcher):{subscriptions:[],overrides:[]};
     const rawTotal=response.response.headers.get('x-total-count');
     const total=rawTotal!==null&&/^\d+$/.test(rawTotal)?Number(rawTotal):null;
@@ -122,7 +172,7 @@ async function adminRoute(route,method,url,body,current,env,fetcher){
     return {users,page,perPage,total,hasNext:total!==null?page*perPage<total:records.length===perPage};
   }
   if(route==='/api/admin/user'&&method==='GET'){
-    const id=url.searchParams.get('user');if(!uuid(id))fail(400,'Choose a valid user.');
+    const id=url.searchParams.get('user');if(!accountId(id,env))fail(400,'Choose a valid user.');
     const response=await adminAuth(env,`users/${id}`,fetcher),record=response.data;
     if(record.id!==id)fail(502,'User information could not be verified.');
     const data=await planRecords([id],env,fetcher),user=adminUser(record,env),override=data.overrides[0]||null;
@@ -130,7 +180,7 @@ async function adminRoute(route,method,url,body,current,env,fetcher){
     return {user,subscriptions:data.subscriptions,override,access:planAccess(user,data.subscriptions,override),audit};
   }
   if(route==='/api/admin/plan'&&method==='POST'){
-    if(!uuid(body.userId))fail(400,'Choose a valid user.');
+    if(!accountId(body.userId,env))fail(400,'Choose a valid user.');
     if(body.plan!==null&&!plans.some(plan=>plan.id===body.plan))fail(400,'Choose a valid plan.');
     const reason=scalar(body.reason).trim();if(reason.length<3||reason.length>500)fail(400,'Add a reason between 3 and 500 characters.');
     let expires=null;
@@ -161,7 +211,7 @@ async function razorpay(env,endpoint,body,fetcher){
 function providerFor(env,region){return region==='IN'?(env.BILLING_PROVIDER_IN||'razorpay'):(env.BILLING_PROVIDER_GLOBAL||'stripe');}
 function billingReady(env,choice){
   const provider=providerFor(env,choice.region.id);
-  if(!configured(env)||!env.SUPABASE_SERVICE_ROLE_KEY)return false;
+  if(!configured(env)||!storageReady(env))return false;
   return provider==='stripe'?!!(env.STRIPE_SECRET_KEY&&env.STRIPE_WEBHOOK_SECRET&&env[`STRIPE_PRICE_${choice.key}`]):provider==='razorpay'?!!(env.RAZORPAY_KEY_ID&&env.RAZORPAY_KEY_SECRET&&env.RAZORPAY_WEBHOOK_SECRET&&env[`RAZORPAY_PLAN_${choice.key}`]):false;
 }
 export function sameSignature(expected,received){
@@ -201,7 +251,7 @@ async function applyWebhook(provider,raw,req,env,fetcher){
       const match=/^(STUDIO|TEAM)_(MONTHLY|ANNUAL)_(INR|USD|GBP)$/.test(key);
       if(customers[0]&&match)owner={user_id:customers[0].user_id,plan_key:key};
     }
-    if(!owner||!uuid(owner.user_id))fail(409,'Subscription ownership has not been recorded yet.');
+    if(!owner||!accountId(owner.user_id,env))fail(409,'Subscription ownership has not been recorded yet.');
     const epoch=provider==='stripe'?(subscription.items?.data?.[0]?.current_period_end||subscription.current_period_end):subscription.current_end;
     const record={provider,provider_subscription_id:subscriptionId,user_id:owner.user_id,plan_key:owner.plan_key,status:subscription.status,current_period_end:epoch?new Date(epoch*1000).toISOString():null,observed_at:observedAt};
     await db(env,'rpc/apply_billing_subscription',fetcher,{method:'POST',body:JSON.stringify({record})});
@@ -262,7 +312,8 @@ async function checkout(user,choice,env,fetcher){
   }
 }
 
-export function createHandler({env=process.env,fetcher=fetch}={}){
+export function createHandler({env=process.env,fetcher=fetch,store}={}){
+  if(store)bindNeonStore(env,store);
   return async function handler(req,res){
     res.setHeader('Content-Type','application/json; charset=utf-8');res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');
     try{
@@ -271,7 +322,7 @@ export function createHandler({env=process.env,fetcher=fetch}={}){
       let result;
       if(route==='/api/account/config'&&method==='GET'){
         const ready=configured(env);
-        result={authAvailable:ready,pricingApproved:env.PRICING_APPROVED==='true',plans,regions,checkoutAvailable:Object.fromEntries(regions.map(region=>[region.id,env.PRICING_APPROVED==='true'&&billingReady(env,selection('studio',region.id,'monthly'))]))};
+        result={authAvailable:ready,authProvider:neonSelected(env)?'neon':'supabase',databaseAvailable:storageReady(env),passwordPolicy,pricingApproved:env.PRICING_APPROVED==='true',plans,regions,checkoutAvailable:Object.fromEntries(regions.map(region=>[region.id,env.PRICING_APPROVED==='true'&&billingReady(env,selection('studio',region.id,'monthly'))]))};
       }else if(route.startsWith('/api/billing/webhook/')&&method==='POST'){
         const provider=route.split('/').at(-1);if(!['stripe','razorpay'].includes(provider))fail(404,'Endpoint not found.');
         result=await applyWebhook(provider,await rawBody(req,524288),req,env,fetcher);
@@ -287,34 +338,70 @@ export function createHandler({env=process.env,fetcher=fetch}={}){
         }else if(route==='/api/account/sign-in'&&method==='POST'){
           const response=await auth(env,'token?grant_type=password',{email:email(body.email),password:scalar(body.password)},fetcher);
           if(!response.response.ok)fail(response.response.status===429?429:400,'Sign-in failed. Check your email, password and email verification.');
-          saveSession(res,response.data,env);result={signedIn:true};
+          if(neonSelected(env)&&!response.data.access_token)fail(403,'Verify your email before signing in.');
+          result=await completeSignIn(res,response.data,env,fetcher);
         }else if(route==='/api/account/sign-up'&&method==='POST'){
           const name=scalar(body.name).trim();if(!name||name.length>80)fail(400,'Enter your name (up to 80 characters).');
           const response=await auth(env,'signup',{email:email(body.email),password:password(body.password),data:{full_name:name}},fetcher);
           if(!response.response.ok)fail(response.response.status===429?429:400,'Account creation could not be completed. Please try again or sign in.');
-          if(response.data.access_token)saveSession(res,response.data,env);
-          result={signedIn:!!response.data.access_token,verifyEmail:!response.data.access_token};
+          if(neonSelected(env)&&response.data.user&&storageReady(env)){
+            try{await (await neonStore(env)).syncAccount(response.data.user,!!response.data.access_token);}catch{fail(502,'Your account could not be saved. Please try signing in.');}
+          }
+          result=response.data.access_token?await completeSignIn(res,response.data,env,fetcher):{signedIn:false,verifyEmail:true};
         }else if(route==='/api/account/recovery'&&method==='POST'){
           const response=await auth(env,'recover',{email:email(body.email)},fetcher);
           if(!response.response.ok)fail(response.response.status===429?429:502,'A reset email could not be sent. Please try again later.');
           result={sent:true};
+        }else if(route==='/api/account/resend-verification'&&method==='POST'&&neonSelected(env)){
+          if(!['signup','recovery'].includes(body.type))fail(400,'Choose a verification purpose.');
+          const address=email(body.email);
+          const sent=body.type==='recovery'
+            ?await neonCall(env,'email-otp/request-password-reset',{email:address},fetcher)
+            :await neonCall(env,'email-otp/send-verification-otp',{email:address,type:'email-verification'},fetcher);
+          if(!sent.response.ok||sent.data?.success!==true)fail(sent.response.status===429?429:502,'A new code could not be sent. Please try again later.');
+          result={sent:true};
         }else if(route==='/api/account/verify'&&method==='POST'){
           if(!['signup','recovery'].includes(body.type)||!/^\d{6,8}$/.test(scalar(body.code)))fail(400,'Enter the verification code from your email.');
+          if(neonSelected(env)&&body.type==='recovery'){
+            const address=email(body.email),otp=body.code;
+            const verified=await neonCall(env,'email-otp/check-verification-otp',{email:address,otp,type:'forget-password'},fetcher);
+            if(!verified.response.ok||verified.data?.success!==true)fail(400,'That code is invalid or has expired. Request a new email and try again.');
+            setCookie(res,{provider:'neon-recovery',access:'',refresh:'',recovery:true,email:address,otp,validUntil:Date.now()+600000},env);
+            result={signedIn:false,recovery:true};
+          }else{
           const response=await auth(env,'verify',{email:email(body.email),token:body.code,type:body.type},fetcher);
           if(!response.response.ok)fail(400,'That code is invalid or has expired. Request a new email and try again.');
-          saveSession(res,response.data,env,body.type==='recovery');result={signedIn:true,recovery:body.type==='recovery'};
+          if(neonSelected(env)&&!response.data.user?.email_confirmed_at)fail(400,'Email verification could not be confirmed. Request a new code.');
+          if(neonSelected(env)&&!response.data.access_token)result={verified:true,signInRequired:true};
+          else{result=await completeSignIn(res,response.data,env,fetcher,body.type==='recovery');}
+          }
         }else if(route==='/api/account/password'&&method==='POST'){
+          if(neonSelected(env)){
+            const pending=requestSession(req,env);
+            if(pending?.provider!=='neon-recovery'||!pending.recovery)fail(401,'Request and verify a password-reset code first.');
+            const updated=await neonCall(env,'email-otp/reset-password',{email:pending.email,otp:pending.otp,password:password(body.password)},fetcher);
+            if(!updated.response.ok||updated.data?.success!==true)fail(400,'Password could not be reset. Request a new code and try again.');
+            setCookie(res,null,env,true);result={updated:true,signInRequired:true};
+          }else{
           const current=await identity(req,res,env,fetcher);
           const {response}=await upstream(`${authBase(env)}/auth/v1/user`,{method:'PUT',headers:{apikey:env.SUPABASE_PUBLISHABLE_KEY,Authorization:`Bearer ${current.session.access}`,'Content-Type':'application/json'},body:JSON.stringify({password:password(body.password)})},fetcher);
           if(!response.ok)fail(400,'Password could not be updated. Try a stronger password.');
           setCookie(res,{...current.session,recovery:false},env);result={updated:true};
+          }
         }else if(route==='/api/account/sign-out'&&method==='POST'){
-          const current=await identity(req,res,env,fetcher,true);
-          try{if(current)await auth(env,'logout?scope=local',{},fetcher,current.session.access);}finally{setCookie(res,null,env,true);}
+          try{
+            if(neonSelected(env)){
+              const session=requestSession(req,env);
+              if(session?.provider==='neon')await auth(env,'logout?scope=local',{},fetcher,session.access);
+            }else{
+              const current=await identity(req,res,env,fetcher,true);
+              if(current)await auth(env,'logout?scope=local',{},fetcher,current.session.access);
+            }
+          }finally{setCookie(res,null,env,true);}
           result={signedOut:true};
         }else if(route==='/api/billing/status'&&method==='GET'){
           const current=await identity(req,res,env,fetcher);
-          const data=env.SUPABASE_SERVICE_ROLE_KEY?await planRecords([current.user.id],env,fetcher):{subscriptions:[],overrides:[]};
+          const data=storageReady(env)?await planRecords([current.user.id],env,fetcher):{subscriptions:[],overrides:[]};
           result={subscriptions:data.subscriptions,access:planAccess(current.user,data.subscriptions,data.overrides[0])};
         }else if(route==='/api/billing/checkout'&&method==='POST'){
           const current=await identity(req,res,env,fetcher);if(current.session.recovery)fail(403,'Set your new password before opening checkout.');

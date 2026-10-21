@@ -96,9 +96,9 @@ export function rekenVoorwaardenNu(a: BedieningActies): RekenVoorwaarden {
 /** Is de rekengang in rust: niets gepland, niets lopend, geen toetsing bezig? */
 function inRust(a: BedieningActies): string | null {
   const r = a.rekenToestand();
-  if (r.lopendeRekengangen > 0) return "er loopt een rekengang";
-  if (r.herberekeningGepland) return "er staat een herberekening gepland";
-  if (useCheckStore.getState().isRunning) return "de toetsing loopt";
+  if (r.lopendeRekengangen > 0) return "a calculation is running";
+  if (r.herberekeningGepland) return "a recalculation is scheduled";
+  if (useCheckStore.getState().isRunning) return "verification is running";
   return null;
 }
 
@@ -112,7 +112,7 @@ export async function wachtOpRekenrust(a: Acties, deadline: number): Promise<voi
     const bezig = inRust(a());
     if (bezig === null) return;
     if (performance.now() >= deadline) {
-      throw new Error(`wachten op rust in de rekengang verliep — ${bezig}`);
+      throw new Error(`timed out waiting for the calculation to become idle — ${bezig}`);
     }
     await pauze(BEMONSTER_MS);
   }
@@ -135,8 +135,8 @@ async function wachtOpRekenOordeel(
     await verseRender();
     const o = beoordeelRekenVoorwaarden(rekenVoorwaardenNu(a()));
     if (o.soort === "ok") return;
-    if (o.soort === "weiger") throw new Error(`rapport niet geëxporteerd: ${o.reden}`);
-    if (performance.now() >= deadline) throw new Error(`wachten op de rekengang verliep — ${o.reden}`);
+    if (o.soort === "weiger") throw new Error(`report was not exported: ${o.reden}`);
+    if (performance.now() >= deadline) throw new Error(`timed out waiting for the calculation — ${o.reden}`);
     await pauze(BEMONSTER_MS);
   }
 }
@@ -250,9 +250,9 @@ export async function rapportVoorbereiden(
     let aantalVellen = 0;
     for (;;) {
       const r = beoordeelRekenVoorwaarden(rekenVoorwaardenNu(a()));
-      if (r.soort === "weiger") throw new Error(`rapport niet geëxporteerd: ${r.reden}`);
+      if (r.soort === "weiger") throw new Error(`report was not exported: ${r.reden}`);
       if (a().activeView !== "report") {
-        throw new Error(`de weergave werd tijdens het voorbereiden gewisseld (naar "${a().activeView}")`);
+        throw new Error(`the view changed during preparation (to "${a().activeView}")`);
       }
       if (r.soort === "wacht") {
         laatsteReden = r.reden;
@@ -264,7 +264,7 @@ export async function rapportVoorbereiden(
           projectInfoLaadt: projectInfoLaadtNog(),
           nu: performance.now(),
         });
-        if (p.soort === "weiger") throw new Error(`rapport niet geëxporteerd: ${p.reden}`);
+        if (p.soort === "weiger") throw new Error(`report was not exported: ${p.reden}`);
         if (p.soort === "klaar") {
           aantalVellen = p.aantalVellen;
           break;
@@ -273,7 +273,7 @@ export async function rapportVoorbereiden(
       }
       if (performance.now() >= deadline) {
         throw new Error(
-          `het rapport werd niet klaar binnen ${Math.round(opties.tijdslimietMs / 1000)} s — ${laatsteReden}`,
+          `the report was not ready within ${Math.round(opties.tijdslimietMs / 1000)} s — ${laatsteReden}`,
         );
       }
       await pauze(BEMONSTER_MS);
@@ -350,7 +350,7 @@ export function rapportAfronden(args: Record<string, unknown>, a: Acties): unkno
   const exp = lopende;
   if (!exp || typeof id !== "number" || exp.id !== id) {
     throw new Error(
-      `geen lopende export met id ${String(id)} — al afgerond, of vervangen door een nieuwere export`,
+      `no running export with id ${String(id)} — already completed or replaced by a newer export`,
     );
   }
   window.removeEventListener("beforeprint", exp.opPrint);

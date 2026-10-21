@@ -37,7 +37,7 @@ function ucClass(uc: number): string {
   return "vb-uc-ok";
 }
 
-const nl2 = (v: number) => v.toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const nl2 = (v: number) => v.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 /**
  * De stapaanduiding. Bij beton staan de wapeningsvarianten door elkaar — een

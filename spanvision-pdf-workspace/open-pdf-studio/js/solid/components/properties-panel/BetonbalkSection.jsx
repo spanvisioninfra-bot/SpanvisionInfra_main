@@ -38,9 +38,9 @@ export default function BetonbalkSection() {
 
   return (
     <Show when={annotProps.annotationType === 'betonbalk'}>
-      <CollapsibleSection title="Betonbalk" name="betonbalk" id="prop-betonbalk-section">
+      <CollapsibleSection title={"Concrete beam"} name="betonbalk" id="prop-betonbalk-section">
         <div class="property-group">
-          <label>Profiel (b×h)</label>
+          <label>Section (b×h)</label>
           <select id="prop-bb-profiel"
             value={profielWaarde()}
             disabled={locked()}
@@ -51,12 +51,12 @@ export default function BetonbalkSection() {
                 {betonbalkProfielNaam(p.breedteMm, p.hoogteMm)}
               </option>
             )}</For>
-            <option value="aangepast">Aangepast…</option>
+            <option value="aangepast">Custom…</option>
           </select>
         </div>
 
         <div class="property-group">
-          <label>Breedte (mm)</label>
+          <label>Width (mm)</label>
           <input type="number" id="prop-bb-breedte"
             min={BETONBALK_BREEDTE_RANGE.min} max={BETONBALK_BREEDTE_RANGE.max} step="10"
             value={breedte()}
@@ -66,7 +66,7 @@ export default function BetonbalkSection() {
         </div>
 
         <div class="property-group">
-          <label>Hoogte (mm)</label>
+          <label>Height (mm)</label>
           <input type="number" id="prop-bb-hoogte"
             min={BETONBALK_HOOGTE_RANGE.min} max={BETONBALK_HOOGTE_RANGE.max} step="10"
             value={hoogte()}
@@ -76,14 +76,14 @@ export default function BetonbalkSection() {
         </div>
 
         <div class="property-group">
-          <label>Lijnstijl</label>
+          <label>Line style</label>
           <select id="prop-bb-lijnstijl"
             value={annotProps.lijnstijl || BETONBALK_DEFAULTS.lijnstijl}
             disabled={locked()}
             onChange={(e) => updateAnnotProp('lijnstijl', e.target.value)}
           >
-            <option value="doorgetrokken">Doorgetrokken</option>
-            <option value="gestippeld">Gestippeld (boven aanzichtvlak)</option>
+            <option value="doorgetrokken">Solid</option>
+            <option value="gestippeld">Dashed (above the view plane)</option>
           </select>
         </div>
 
@@ -93,7 +93,7 @@ export default function BetonbalkSection() {
               checked={annotProps.toonHartlijn === true}
               disabled={locked()}
               onChange={(e) => updateAnnotProp('toonHartlijn', e.target.checked)}
-            /> Hartlijn tonen
+            />  Show centerline
           </label>
         </div>
 
@@ -103,12 +103,12 @@ export default function BetonbalkSection() {
               checked={annotProps.tagTonen === true}
               disabled={locked()}
               onChange={(e) => updateAnnotProp('tagTonen', e.target.checked)}
-            /> Tag tonen
+            />  Show tag
           </label>
         </div>
         <Show when={annotProps.tagTonen === true}>
           <div class="property-group">
-            <label>Tagtekst</label>
+            <label>Tag text</label>
             <input type="text" id="prop-bb-tagtekst"
               placeholder={betonbalkProfielNaam(breedte(), hoogte())}
               value={annotProps.tagTekst || ''}

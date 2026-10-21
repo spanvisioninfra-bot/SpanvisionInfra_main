@@ -54,7 +54,7 @@ export function ProjectTreePanel({ onAddClick }: Props) {
     spread: "Funderingen",
     wall: "Wanden",
     anchor: "Ankers",
-    other: "Overig",
+    other: "Other",
   };
 
   return (
@@ -120,7 +120,7 @@ export function ProjectTreePanel({ onAddClick }: Props) {
                     </button>
                     <button
                       onClick={() => {
-                        if (confirm(`Verwijder "${c.name}"?`)) {
+                        if (confirm(`Delete "${c.name}"?`)) {
                           remove(activeDocId, c.id);
                         }
                       }}

@@ -7,12 +7,9 @@
  * Variabelenamen komen exact overeen met PenDesigner.tsx.
  */
 
-export const penverbinding = `"Pin connection — lug plate met pin
+export const penverbinding = `"Pin connection — lug plate with pin
 
-'<i>Een oogplaat in een vork, verbonden door een pen. EN 1993-1-8 §3.13 stelt
-'eisen aan de plaatgeometrie (a en c rond het gat), en toetst de pen op
-'afschuiving, buiging en stuik. Moet de pen vervangbaar zijn, dan geldt
-'bovendien een contactspanningseis in de bruikbaarheidsgrenstoestand.</i>
+'<i>An eye plate in a fork connected by a pin. EN 1993-1-8 §3.13 specifies plate geometry around the hole (a and c) and checks pin shear, bending, and bearing. A replaceable pin also requires a contact-stress check at the serviceability limit state.</i>
 
 # 1. Inputs
 
@@ -22,7 +19,7 @@ export const penverbinding = `"Pin connection — lug plate met pin
   S355 = 355
 @end
 
-@select penkwaliteit "Grade van de pin"
+@select penkwaliteit "Pin grade"
   4.6 = 46
   5.6 = 56
   8.8 = 88
@@ -30,22 +27,22 @@ export const penverbinding = `"Pin connection — lug plate met pin
 @end
 
 @select vervangbaar "Pen must replaceable are"
-  Ja = 1
-  Nee = 0
+  Yes = 1
+  No = 0
 @end
 
-d_pen = ?*(mm)', diameter van de pen d'
+d_pen = ?*(mm)', pin diameter d'
 d_0 = ?*(mm)', gatdiameter d_0'
-a_oog = ?*(mm)', afstand gat tot de kop van de oogplaat a'
-c_oog = ?*(mm)', afstand gat tot de zijkant van de oogplaat c'
-t_oog = ?*(mm)', dikte van de oogplaat t'
-t_vork = ?*(mm)', dikte van één vorkplaat a_1'
-c_1 = ?*(mm)', speling tussen oogplaat en vork c_1'
+a_oog = ?*(mm)', distance from hole to end of eye plate a'
+c_oog = ?*(mm)', distance from hole to side of eye plate c'
+t_oog = ?*(mm)', eye plate thickness t'
+t_vork = ?*(mm)', thickness of one fork plate a_1'
+c_1 = ?*(mm)', clearance between eye and fork c_1'
 
-F_Ed = ?*(kN)', rekenwaarde van de trekkracht F_Ed'
+F_Ed = ?*(kN)', design tension force F_Ed'
 F_Edser = ?*(kN)', karakteristieke trekkracht in de BGT F_Ed,ser'
 
-'<h6>Overzicht van de invoer</h6>
+'<h6>Input summary</h6>
 d_pen
 d_0
 a_oog
@@ -53,10 +50,7 @@ c_oog
 t_oog
 F_Ed
 
-# 2. Toetsing
+# 2. Checks
 
-'<i><b>Nog niet uitgewerkt.</b> Dit blad legt voorlopig alleen de invoer en het
-'parametrische beeld vast. De geometrie-eisen van EN 1993-1-8 tabel 3.9, de
-'afschuif-, buig- en stuikweerstand van de pen (tabel 3.10) en de
-'contactspanning in de BGT volgen.</i>
+'<i><b>Not yet implemented.</b> This sheet defines inputs and the parametric drawing only. Plate geometry under EN 1993-1-8 Table 3.9, pin shear/bending/bearing under Table 3.10, and SLS contact stress checks are planned.</i>
 `;

@@ -103,7 +103,7 @@ export function formatVrijMateriaal(m: VrijMateriaal): string {
 
 /** Korte weergave voor tabellen en kopregels: "Natuursteen (f = 8 N/mm²)". */
 export function vrijMateriaalLabel(m: VrijMateriaal): string {
-  const f = m.fToel.toLocaleString("nl-NL", { maximumFractionDigits: 2 });
+  const f = m.fToel.toLocaleString("en-GB", { maximumFractionDigits: 2 });
   return `${m.naam} (f = ${f} N/mm²)`;
 }
 

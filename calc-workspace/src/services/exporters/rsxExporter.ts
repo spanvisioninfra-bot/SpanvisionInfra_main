@@ -26,7 +26,7 @@ function renderDeelraming(ch: CostItem, all: CostItem[], warnings: string[]): Xm
   const subs = kids.filter((it) => it.rowType === "chapter");
 
   if (subs.length > 0) {
-    warnings.push(`RSX: geneste chapters onder "${ch.description ?? ch.code}" worden afgevlakt (CROW RSX ondersteunt 1 niveau Deelraming)`);
+    warnings.push(`RSX: nested chapters under "${ch.description ?? ch.code}" are flattened (CROW RSX supports one Deelraming level)`);
   }
 
   return {

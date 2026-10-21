@@ -1,7 +1,6 @@
 export const paalExample = `# Project details
 
-'<i>Onderstaande gegevens komen uit de projectgegevens en gelden voor elk blad
-'in dit project.</i>
+'<i>These values come from the project settings and apply to every worksheet in this project.</i>
 
 'Projectnummer: 'project_nummer
 'Projectnaam: 'project_naam
@@ -19,7 +18,7 @@ Betonpaal prefab = 2
 Stalen buispaal gesloten = 3
 @end
 
-@select installatie "Wijze van installeren"
+@select installatie "Installation method"
 Geheid (grondverdringend) = 1
 Geschroefd (grondverdringend) = 2
 Geboord = 3
@@ -40,11 +39,11 @@ z_punt = -12.00 m
 
 ## Sonderingsgegevens
 
-Upload een GEF-bestand (sondering):
+Upload a GEF file (cone penetration test):
 
 @gef sondering1
 
-Gemiddelde conusweerstanden ter hoogte van de paalpunt (handmatig of uit GEF):
+Mean cone resistances at pile tip level (manual or from GEF):
 
 q_cI = 8.00 MPa
 q_cII = 8.00 MPa
@@ -52,7 +51,7 @@ q_cIII = 7.55 MPa
 
 ## Load
 
-Normaalkracht (karakteristiek):
+Axial force (characteristic):
 
 N_k = 130 kN
 
@@ -81,7 +80,7 @@ q_bmax = 1/2 * alpha_p * beta_f * s_f * ((q_cI + q_cII) / 2 + q_cIII) to MPa
 #if q_bmax < 15 MPa
   Conusweerstand q_b,max voldoet (< 15 MPa).
 #else
-  Conusweerstand begrensd op 15 MPa!
+  Cone resistance capped at 15 MPa!
 #end if
 
 Puntdraagvermogen:
@@ -94,7 +93,7 @@ Schachtwrijvingslengte (exclusief negatieve kleef zone):
 
 delta_L = 7 m
 
-Omtrek van de paal:
+Pile perimeter:
 
 O_s = pi * D_eq
 
@@ -112,7 +111,7 @@ R_ccal = R_bcal + R_scal to kN
 
 ## Negatieve kleef (art. 7.3.2.2)
 
-Lengte negatieve kleef zone:
+Negative skin friction zone length:
 
 L_nk = 4 m
 
@@ -146,7 +145,7 @@ UC = N_Ed / R_cnetd
 #if UC < 1
   Funderingspaal voldoet (UC < 1.0).
 #else
-  Funderingspaal voldoet NIET!
+  The foundation pile fails!
 #end if
 
 ## Overzicht
@@ -211,7 +210,7 @@ UC = N_Ed / R_cnetd
 @end
 `;
 
-export const exampleDoc = `# Toetsing Stalen Ligger — IPE 300, S235
+export const exampleDoc = `# Steel beam check — IPE 300, S235
 
 ## Profielgegevens IPE 300
 
@@ -232,18 +231,18 @@ E = 210000 N/mm^2
 
 ## Load en geometrie
 
-Overspanning en gelijkmatig verdeelde belasting:
+Span and uniformly distributed load:
 
 L = 6000 mm
 q = 20 kN/m
 
 ## Krachtwerking
 
-Maatgevend moment (veldmoment bij gelijkmatige belasting):
+Governing moment (span moment under uniform load):
 
 M_Ed = q*L^2 / 8 to kN*m
 
-Maatgevende dwarskracht (oplegreactie):
+Governing shear force (support reaction):
 
 V_Ed = q*L / 2 to kN
 
@@ -258,7 +257,7 @@ UC_M = M_Ed / M_Rd
 #if UC_M < 1
   Buiging voldoet (UC < 1.0).
 #else
-  Buiging voldoet NIET!
+  Bending fails!
 #end if
 
 ## Dwarskrachtcapaciteit
@@ -276,27 +275,27 @@ UC_V = V_Ed / V_Rd
 #if UC_V < 1
   Dwarskracht voldoet (UC < 1.0).
 #else
-  Dwarskracht voldoet NIET!
+  Shear fails!
 #end if
 
 ## Doorbuigingscontrole
 
-Toelaatbare doorbuiging (L/250):
+Allowable deflection (L/250):
 
 delta_max = L / 250 to mm
 
-Optredende doorbuiging (5qL4/384EI):
+Actual deflection (5qL4/384EI):
 
 delta = 5*q*L^4 / (384*E*I_y) to mm
 
-Unity check doorbuiging:
+Deflection unity check:
 
 UC_d = delta / delta_max
 
 #if UC_d < 1
   Doorbuiging voldoet (UC < 1.0).
 #else
-  Doorbuiging voldoet NIET!
+  Deflection fails!
 #end if
 
 ## Overzicht

@@ -67,7 +67,7 @@ async function deflateViaCompressionStream(data: Uint8Array): Promise<Uint8Array
 
 function assertWritableName(name: string): void {
   if (!ASCII_NAME.test(name)) {
-    throw new Error(`ZIP-entrynaam moet printbare ASCII zijn: ${JSON.stringify(name)}`);
+    throw new Error(`ZIP entry name must contain printable ASCII: ${JSON.stringify(name)}`);
   }
   if (name.startsWith('/') || name.includes('\\')) {
     throw new Error(`Onveilige ZIP-entrynaam: ${JSON.stringify(name)}`);
@@ -92,7 +92,7 @@ export async function writeZip(
   opts: { deflate?: ((data: Uint8Array) => Promise<Uint8Array>) | null } = {},
 ): Promise<Uint8Array> {
   if (files.length > MAX_ENTRIES) {
-    throw new Error(`ZIP kan maximaal ${MAX_ENTRIES} entries dragen, niet ${files.length}`);
+    throw new Error(`ZIP supports at most ${MAX_ENTRIES} entries, not ${files.length}`);
   }
 
   const deflate = opts.deflate === undefined
@@ -109,10 +109,10 @@ export async function writeZip(
   const prepared: PreparedEntry[] = [];
   for (const file of ordered) {
     assertWritableName(file.name);
-    if (seen.has(file.name)) throw new Error(`Dubbele ZIP-entrynaam: ${JSON.stringify(file.name)}`);
+    if (seen.has(file.name)) throw new Error(`Duplicate ZIP entry name: ${JSON.stringify(file.name)}`);
     seen.add(file.name);
     if (file.data.length > MAX_U32) {
-      throw new Error(`ZIP-entry "${file.name}" is te groot voor een 32-bits ZIP`);
+      throw new Error(`ZIP-entry "${file.name}" is too large for a 32-bit ZIP`);
     }
 
     let method = 0;
@@ -138,7 +138,7 @@ export async function writeZip(
   const localSize = prepared.reduce((sum, e) => sum + 30 + e.nameBytes.length + e.comp.length, 0);
   const centralSize = prepared.reduce((sum, e) => sum + 46 + e.nameBytes.length, 0);
   if (localSize > MAX_U32 || localSize + centralSize + 22 > MAX_U32) {
-    throw new Error('ZIP is te groot voor het 32-bits formaat');
+    throw new Error("ZIP is too large for the 32-bit format");
   }
 
   const out = new Uint8Array(localSize + centralSize + 22);

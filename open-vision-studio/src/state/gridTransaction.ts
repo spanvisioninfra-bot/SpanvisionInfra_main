@@ -114,7 +114,7 @@ export function bindDefaultGridTransactionStore(get: StoreGet, set: StoreSet): v
 }
 
 function getDefaultStore(): { get: StoreGet; set: StoreSet } {
-  if (!defaultStore) throw new Error('De standaard gridtransactiestore is nog niet gekoppeld');
+  if (!defaultStore) throw new Error('The default grid transaction store is not connected');
   return defaultStore;
 }
 
@@ -1077,18 +1077,18 @@ function commitPreparedAgainstStore(
   requireFreshBefore = false,
 ): GridResult<void, readonly GridMutationError[]> {
   if (get().activeDocumentId !== prepared.documentId) {
-    return { ok: false, errors: [{ code: 'documentChanged', message: 'Het actieve document is gewijzigd' }] };
+    return { ok: false, errors: [{ code: 'documentChanged', message: "The active document changed" }] };
   }
   // Alleen de rechtstreeks geëxporteerde test-/diagnosenaad kan tussen prepare en commit worden
   // vastgehouden. De normale wrapper is synchroon en slaat deze onnodige hotpathcheck over.
   if (requireFreshBefore && !snapshotsEqual(createSnapshot(get()), prepared.before)) {
-    return { ok: false, errors: [{ code: 'stateChanged', message: 'De documentdata is na prepare gewijzigd' }] };
+    return { ok: false, errors: [{ code: 'stateChanged', message: "The document data changed after preparation" }] };
   }
   const changed = !snapshotsEqual(prepared.before, prepared.after);
   if (changed) {
     try {
       set(state => {
-        if (state.activeDocumentId !== prepared.documentId) throw new Error('Het actieve document is gewijzigd');
+        if (state.activeDocumentId !== prepared.documentId) throw new Error("The active document changed");
         restoreSnapshot(state, prepared.after);
         state.viewRows = [...prepared.derivedAfter.viewRows];
         state.resourceLoadResult = prepared.derivedAfter.resourceLoadResult;

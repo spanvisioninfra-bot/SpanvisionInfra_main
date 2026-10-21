@@ -51,25 +51,25 @@ export default function MaterialsSection() {
   const hasTimber = rows.some((r) => r.kind === "timber");
 
   const kindLabel = (kind: MaterialRow["kind"]): string => {
-    if (kind === "steel") return t("report.matSteel", "Staal");
-    if (kind === "timber") return t("report.matTimber", "Hout");
+    if (kind === "steel") return t("report.matSteel", "Steel");
+    if (kind === "timber") return t("report.matTimber", "Timber");
     return "—";
   };
 
   return (
     <div className="rpt-block">
-      <h2 className="rpt-h2">{t("report.sectionMaterials", "Materialen")}</h2>
+      <h2 className="rpt-h2">{t("report.sectionMaterials", "Materials")}</h2>
 
       {rows.length === 0 ? (
         <p className="rpt-empty-note">
-          {t("report.noBeams", "Geen staven in het model.")}
+          {t("report.noBeams", "No members in the model.")}
         </p>
       ) : (
         <>
           <table className="rpt-table">
             <thead>
               <tr>
-                <th>{t("report.colMaterial", "Materiaal")}</th>
+                <th>{t("report.colMaterial", "Material")}</th>
                 <th>{t("report.colType", "Type")}</th>
                 <th className="rpt-num">E [N/mm²]</th>
                 <th className="rpt-num">fy [N/mm²]</th>
@@ -92,7 +92,7 @@ export default function MaterialsSection() {
             <p className="rpt-note" style={{ marginTop: "2mm" }}>
               {t(
                 "report.timberNote",
-                "Hout: E = E₀,mean (stijfheid in de berekening); sterktewaarden per klasse volgen uit EN 338 / EN 14080 en worden door de normtoetsing (EN 1995) toegepast.",
+                "Timber: E = E₀,mean (stiffness used in the calculation). Strength values follow EN 338 / EN 14080 and are applied by the EN 1995 code checks.",
               )}
             </p>
           )}

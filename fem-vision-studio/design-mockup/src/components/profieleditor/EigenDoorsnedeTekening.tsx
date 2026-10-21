@@ -79,7 +79,7 @@ export default function EigenDoorsnedeTekening({ doorsnede, stijl, className, ma
       className={className ?? (stijl === "rapport" ? "rpt-section-sketch" : undefined)}
       viewBox={`0 0 ${W} ${H}`}
       role="img"
-      aria-label={`Doorsnede ${doorsnede.naam}, ${fmtMaat(bw)} × ${fmtMaat(bh)} mm`}
+      aria-label={`Cross-section ${doorsnede.naam}, ${fmtMaat(bw)} × ${fmtMaat(bh)} mm`}
     >
       <g transform={`translate(${ox} ${oy}) scale(${s} ${-s})`}>
         {items.map((it) => (

@@ -207,8 +207,8 @@ export default function BetondoorsnedeDesigner() {
         <span>Click a blue dimension to edit it and update the calculation sheet.
           <br />Bars are drawn to scale and distributed automatically inside the stirrup.</span>
         <span className="vd-live">
-          C{fck} · {STAALSOORT.find((o) => o.v === staal)?.label} · {fmt(b)}×{fmt(h)} mm · dekking {fmt(c)} mm ·
-          {nO}Ø{fmt(dO)} onder · {nM}Ø{fmt(dM)} midden · {nB}Ø{fmt(dB)} boven · Ø{fmt(dBg)}-{fmt(sBg)} ({nSn}sn.) ·
+          C{fck} · {STAALSOORT.find((o) => o.v === staal)?.label} · {fmt(b)}×{fmt(h)} mm · cover {fmt(c)} mm ·
+          {nO}Ø{fmt(dO)} bottom · {nM}Ø{fmt(dM)} midden · {nB}Ø{fmt(dB)} top · Ø{fmt(dBg)}-{fmt(sBg)} ({nSn}sn.) ·
           A<sub>s</sub> = {fmt(Astot)} mm² ({fmt(rho, 2)} %) · d ≈ {fmt(dEff)} mm ·
           N/M/V/T = {fmt(NEd)} kN / {fmt(MEd)} kNm / {fmt(VEd)} kN / {fmt(TEd)} kNm
         </span>

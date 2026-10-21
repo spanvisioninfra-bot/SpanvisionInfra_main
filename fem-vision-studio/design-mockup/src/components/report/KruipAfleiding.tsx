@@ -33,7 +33,7 @@ export default function KruipAfleiding({
       <p className="rpt-beff-inleiding">
         {t("report.kruipInleiding", {
           defaultValue:
-            "Berekend uit RH = {{rh}} %, h₀ = {{h0}} mm, t₀ = {{t0}} dagen en cementklasse {{cement}}: φ(∞,t₀) = {{phi}}. Met deze waarde rekenen de BGT-stijfheid en de kolomtoets van deze staaf, omdat er geen φ(∞,t₀) is opgegeven.",
+            "Calculated from RH = {{rh}} %, h₀ = {{h0}} mm, t₀ = {{t0}} days and cement class {{cement}}: φ(∞,t₀) = {{phi}}. The SLS stiffness and the column check of this member use this value, because no φ(∞,t₀) has been specified.",
           rh: fmtValue(u.relative_humidity_pct, 0),
           h0: fmtValue(u.h0_mm, 1),
           t0: fmtValue(u.t0_days, 1),

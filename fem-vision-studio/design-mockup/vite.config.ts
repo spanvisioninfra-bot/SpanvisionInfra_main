@@ -2,8 +2,9 @@ import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
+import { backendServices } from '../../deployment/backend-services.mjs';
 
 // @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
@@ -167,18 +168,37 @@ function doorsnedemotor(): Plugin {
 }
 
 // https://vite.dev/config/
-export default defineConfig(async () => ({
-  plugins: [react(), toetsbrug(), doorsnedemotor()],
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, hier, 'SPANVISION_');
+  const local = env.SPANVISION_FEM_API_TARGET === 'local';
+  const target = local ? 'http://127.0.0.1:10000' : env.SPANVISION_FEM_API_TARGET || backendServices.fem.origin;
+  const proxy = {
+    '/api': {
+      target, changeOrigin: true,
+      rewrite: (url: string) => url.replace(/^\/api\/engine-health$/, '/health'),
+    },
+  };
+  const localHealth: Plugin = { name: 'local-engine-health', configureServer(server) {
+    server.middlewares.use('/api/engine-health', (_req, res) => {
+      const suffix = process.platform === 'win32' ? '.exe' : '';
+      const ready = ['toetsbrug', 'doorsnedemotor'].every(name => existsSync(resolve(hier, '../src-tauri/target/release', name + suffix)));
+      res.writeHead(ready ? 200 : 503, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
+      res.end(JSON.stringify({ status: ready ? 'ok' : 'unavailable' }));
+    });
+  } };
+  return {
+  plugins: [react(), ...(local ? [localHealth, toetsbrug(), doorsnedemotor()] : [])],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
   // 1. prevent Vite from obscuring rust errors
   clearScreen: false,
   preview: {
-    proxy: { '/api': { target: 'http://127.0.0.1:10000', changeOrigin: true } },
+    proxy,
   },
   // 2. tauri expects a fixed port, fail if that port is not available
   server: {
+    ...(local ? {} : { proxy }),
     port: 1440,
     strictPort: true,
     host: host || false,
@@ -196,4 +216,5 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**", "**/src/lib/types/**"],
     },
   },
-}));
+};
+});

@@ -279,7 +279,7 @@ const presentEmptyTaskGroupPayload = JSON.parse(new TextDecoder().decode(diagnos
 const presentEmptyTaskRows = (presentEmptyTaskGroupPayload.readModel as Record<string, unknown>)
   .taskSourceRowsByProject as Record<string, Array<Record<string, unknown>>>;
 presentEmptyTaskRows['P-A'] = [];
-const presentEmptyTaskGroupRejection = droppedMetadata(ifcWithMetadataPayload(presentEmptyTaskGroupPayload), 'ontbrekende TASK-identiteit');
+const presentEmptyTaskGroupRejection = droppedMetadata(ifcWithMetadataPayload(presentEmptyTaskGroupPayload), 'missing TASK identity');
 truthy('6d aanwezige maar lege TASK-groep blijft hard gebonden: specifieke regel, archief weg mét signaal',
   presentEmptyTaskGroupRejection);
 const byProject = ((payload.diagnostics as Record<string, unknown>).documentViews) as Record<string, Record<string, unknown>>;
@@ -490,7 +490,7 @@ for (const [label, mutate] of relationCorruptions) {
 
 const assignmentSkipCorruptions: readonly [string, string, (candidate: Record<string, unknown>) => void][] = [
   ['A1 TASK_MISSING is herlabeld naar RESOURCE_MISSING terwijl de resource bestaat',
-    'TASKRSRC-skipdiagnostiek', candidate => {
+    'TASKRSRC skip diagnostics', candidate => {
       const diagnostics = candidate.diagnostics as Record<string, unknown>;
       const views = diagnostics.documentViews as Record<string, Record<string, unknown>>;
       const resources = views['P-A']!.resources as Record<string, unknown>;
@@ -500,7 +500,7 @@ const assignmentSkipCorruptions: readonly [string, string, (candidate: Record<st
       issue.code = 'XER_ASSIGNMENT_RESOURCE_MISSING';
     }],
   ['A2 een volledig geldige assignment draagt een verzonnen TASK_MISSING-issue',
-    'TASKRSRC-skipdiagnostiek', candidate => {
+    'TASKRSRC skip diagnostics', candidate => {
       const diagnostics = candidate.diagnostics as Record<string, unknown>;
       const views = diagnostics.documentViews as Record<string, Record<string, unknown>>;
       const resources = views['P-A']!.resources as Record<string, unknown>;
@@ -512,7 +512,7 @@ const assignmentSkipCorruptions: readonly [string, string, (candidate: Record<st
         line: assignment.line, sourceId: assignment.sourceId, fallback: 'SKIPPED' });
     }],
   ['A3 RESOURCE_MISSING is herlabeld naar TASK_MISSING terwijl resource én taak ontbreken',
-    'TASKRSRC-skipdiagnostiek', candidate => {
+    'TASKRSRC skip diagnostics', candidate => {
       const diagnostics = candidate.diagnostics as Record<string, unknown>;
       const views = diagnostics.documentViews as Record<string, Record<string, unknown>>;
       const resources = views['P-A']!.resources as Record<string, unknown>;
@@ -522,7 +522,7 @@ const assignmentSkipCorruptions: readonly [string, string, (candidate: Record<st
       issue.code = 'XER_ASSIGNMENT_TASK_MISSING';
     }],
   ['A4 ROLE_MISSING is herlabeld naar TASK_MISSING',
-    'TASKRSRC-skipdiagnostiek', candidate => {
+    'TASKRSRC skip diagnostics', candidate => {
       const diagnostics = candidate.diagnostics as Record<string, unknown>;
       const views = diagnostics.documentViews as Record<string, Record<string, unknown>>;
       const resources = views['P-A']!.resources as Record<string, unknown>;
@@ -532,7 +532,7 @@ const assignmentSkipCorruptions: readonly [string, string, (candidate: Record<st
       issue.code = 'XER_ASSIGNMENT_TASK_MISSING';
     }],
   ['A6 een vereiste TASK_MISSING-diagnose ontbreekt volledig',
-    'TASKRSRC-skipdiagnostiek', candidate => {
+    'TASKRSRC skip diagnostics', candidate => {
       const diagnostics = candidate.diagnostics as Record<string, unknown>;
       const views = diagnostics.documentViews as Record<string, Record<string, unknown>>;
       const resources = views['P-A']!.resources as Record<string, unknown>;
@@ -540,7 +540,7 @@ const assignmentSkipCorruptions: readonly [string, string, (candidate: Record<st
       resources.issues = issues.filter(item => item.sourceId !== 'AS-A-UNLINKED');
     }],
   ['A7 een TASK_MISSING-diagnose komt dubbel voor',
-    'TASKRSRC-skipdiagnostiek', candidate => {
+    'TASKRSRC skip diagnostics', candidate => {
       const diagnostics = candidate.diagnostics as Record<string, unknown>;
       const views = diagnostics.documentViews as Record<string, Record<string, unknown>>;
       const resources = views['P-A']!.resources as Record<string, unknown>;
@@ -550,7 +550,7 @@ const assignmentSkipCorruptions: readonly [string, string, (candidate: Record<st
       issues.push(structuredClone(issue));
     }],
   ['A8 een TASK_MISSING-diagnose is aan de verkeerde bronregel gekoppeld',
-    'TASKRSRC-skipdiagnostiek', candidate => {
+    'TASKRSRC skip diagnostics', candidate => {
       const diagnostics = candidate.diagnostics as Record<string, unknown>;
       const views = diagnostics.documentViews as Record<string, Record<string, unknown>>;
       const resources = views['P-A']!.resources as Record<string, unknown>;
@@ -590,7 +590,7 @@ const staleResourceSkipPayload = JSON.parse(new TextDecoder().decode(diagnosticB
   (rawRow.cells as Record<string, unknown>).rsrc_id = 'R-1';
   assignment.entity = { kind: 'RESOURCE', sourceId: 'R-1', internalId: 'xer-resource:R-1' };
 }
-const staleResourceSkipRejection = droppedMetadata(ifcWithMetadataPayload(staleResourceSkipPayload), 'TASKRSRC-skipdiagnostiek');
+const staleResourceSkipRejection = droppedMetadata(ifcWithMetadataPayload(staleResourceSkipPayload), 'TASKRSRC skip diagnostics');
 truthy('7d A9 canonieke resource bestaat weer maar de oude RESOURCE_MISSING-diagnose blijft specifiek rood',
   staleResourceSkipRejection);
 
@@ -613,7 +613,7 @@ const missingResourceWithoutIssuePayload = JSON.parse(new TextDecoder().decode(d
   (rawRow.cells as Record<string, unknown>).rsrc_id = 'R-GHOST';
   assignment.entity = { kind: 'RESOURCE', sourceId: 'R-GHOST', internalId: 'xer-resource:R-GHOST' };
 }
-const missingResourceWithoutIssueRejection = droppedMetadata(ifcWithMetadataPayload(missingResourceWithoutIssuePayload), 'TASKRSRC-skipdiagnostiek');
+const missingResourceWithoutIssueRejection = droppedMetadata(ifcWithMetadataPayload(missingResourceWithoutIssuePayload), 'TASKRSRC skip diagnostics');
 truthy('7d A10 canonieke resource ontbreekt nu maar zonder skipdiagnose wordt specifiek rood',
   missingResourceWithoutIssueRejection);
 
@@ -629,20 +629,20 @@ const remoteGhostPayload = JSON.parse(new TextDecoder().decode(diagnosticBytes))
     (link.successor as Record<string, unknown>).taskId = 'T-B-GHOST';
   }
 }
-const remoteGhostRejection = droppedMetadata(ifcWithMetadataPayload(remoteGhostPayload), 'ontbrekend extern TASK-eindpunt');
+const remoteGhostRejection = droppedMetadata(ifcWithMetadataPayload(remoteGhostPayload), 'missing external TASK endpoint');
 truthy('7e A5 coherente externe ghost-taak in een open TASK-project raakt de specifieke endpointregel',
   remoteGhostRejection);
 
 const taskGroupCorruptions: readonly [string, string, (candidate: Record<string, unknown>) => void][] = [
   ['aanwezige TASK-groep is coherent naar een ghost-identiteit gewijzigd',
-    'ontbrekende TASK-identiteit', candidate => {
+    'missing TASK identity', candidate => {
       const readModel = candidate.readModel as Record<string, unknown>;
       const groups = readModel.taskSourceRowsByProject as Record<string, Array<Record<string, unknown>>>;
       const cells = groups['P-A']![0]!.cells as Record<string, unknown>;
       cells.task_id = 'T-A-GHOST';
     }],
   ['aanwezige TASK-groep is buiten zijn bronvolgorde herschikt',
-    'staat niet in bronvolgorde', candidate => {
+    'is not in source order', candidate => {
       const readModel = candidate.readModel as Record<string, unknown>;
       const groups = readModel.taskSourceRowsByProject as Record<string, Array<Record<string, unknown>>>;
       [groups['P-A']![0], groups['P-A']![1]] = [groups['P-A']![1]!, groups['P-A']![0]!];

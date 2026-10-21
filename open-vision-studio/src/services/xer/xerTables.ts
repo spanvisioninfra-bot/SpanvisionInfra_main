@@ -293,7 +293,7 @@ function decodeBomPayload(
   } catch {
     throw new XerImportError(
       'XER_INVALID_ENCODING',
-      `XER-bestand heeft een ${encoding}-BOM maar een ongeldige of afgeknotte payload.`,
+      `The XER file has a ${encoding} BOM but an invalid or truncated payload.`,
       { encoding },
     );
   }
@@ -339,7 +339,7 @@ function assertRequiredColumns(tables: ReadonlyMap<string, XerTable>): void {
     if (missingColumns.length === 0) continue;
     throw new XerImportError(
       'XER_MISSING_REQUIRED_COLUMNS',
-      `XER-tabel ${tableName} mist verplichte kolommen: ${missingColumns.join(', ')}.`,
+      `XER table ${tableName} is missing required columns: ${missingColumns.join(', ')}.`,
       { table: tableName, missingColumns },
     );
   }
@@ -368,7 +368,7 @@ function assertRequiredIdentity(tables: ReadonlyMap<string, XerTable>): void {
       if (missingValues.length === 0) continue;
       throw new XerImportError(
         'XER_MISSING_REQUIRED_VALUE',
-        `XER-tabel ${tableName} heeft op regel ${row.line} lege verplichte identiteit: `
+        `XER table ${tableName} has an empty required identity on line ${row.line}: `
           + `${missingValues.join(', ')}.`,
         { table: tableName, missingValues, line: row.line },
       );
@@ -427,7 +427,7 @@ function determineNumberFormat(
     if (value === 'dg_period' && family === 'group') return '.';
     if (value === 'dg_comma' && family === 'group') return ',';
     throw formatError(
-      'CURRTYPE bevat geen betrouwbare combinatie van decimaal- en groepsteken.',
+      'CURRTYPE has no reliable decimal and grouping separator combination.',
       line,
     );
   };
@@ -456,7 +456,7 @@ function determineNumberFormat(
     ], 'group', row.line);
     if (decimal === null || group === decimal) {
       throw formatError(
-        'CURRTYPE bevat geen betrouwbare combinatie van decimaal- en groepsteken.',
+        'CURRTYPE has no reliable decimal and grouping separator combination.',
         row.line,
       );
     }
@@ -493,14 +493,14 @@ export function parseXerNumber(raw: string, format: XerNumberFormat): number | n
   const integer = group === null ? '\\d+' : `(?:\\d+|\\d{1,3}(?:${group}\\d{3})+)`;
   const pattern = new RegExp(`^[+-]?${integer}(?:${decimal}\\d+)?$`);
   if (!pattern.test(value)) {
-    throw new XerImportError('XER_INVALID_NUMBER', `Ongeldig XER-getal: ${JSON.stringify(value)}.`);
+    throw new XerImportError('XER_INVALID_NUMBER', `Invalid XER number: ${JSON.stringify(value)}.`);
   }
   let normalized = value;
   if (format.group !== null) normalized = normalized.split(format.group).join('');
   if (format.decimal === ',') normalized = normalized.replace(',', '.');
   const parsed = Number(normalized);
   if (!Number.isFinite(parsed)) {
-    throw new XerImportError('XER_INVALID_NUMBER', `Ongeldig XER-getal: ${JSON.stringify(value)}.`);
+    throw new XerImportError('XER_INVALID_NUMBER', `Invalid XER number: ${JSON.stringify(value)}.`);
   }
   return parsed;
 }
@@ -590,7 +590,7 @@ export function parseXerTables(bytes: XerByteInput): XerTables {
   if (!(bytes instanceof Uint8Array)) {
     throw new XerImportError(
       'XER_INVALID_INPUT',
-      'XER-parser verwacht oorspronkelijke bestandsbytes, geen reeds gedecodeerde tekst.',
+      'The XER parser requires original file bytes rather than previously decoded text.',
     );
   }
   const { text, encoding } = decodeXerBytes(bytes);
@@ -603,7 +603,7 @@ export function parseXerTables(bytes: XerByteInput): XerTables {
   if (headerCells[0] !== 'ERMHDR' || !(headerCells[1] ?? '').trim()) {
     throw new XerImportError(
       'XER_INVALID_FILE',
-      'Ongeldig XER-bestand: ERMHDR met versie ontbreekt.',
+      'Invalid XER file: ERMHDR with a version is missing.',
     );
   }
   let current: MutableXerTable | undefined;
@@ -626,7 +626,7 @@ export function parseXerTables(bytes: XerByteInput): XerTables {
           const secondHeaderLine = index + 1;
           throw new XerImportError(
             'XER_DUPLICATE_TABLE',
-            `Bekende XER-tabel ${name} begint vóór de eerste %E meer dan één keer.`,
+            `Known XER table ${name} starts more than once before the first %E.`,
             {
               table: name,
               line: secondHeaderLine,
@@ -739,7 +739,7 @@ export function parseXerTables(bytes: XerByteInput): XerTables {
   if (commaDecimalEvidence) {
     throw new XerImportError(
       'XER_AMBIGUOUS_DECIMAL',
-      'XER-bestand gebruikt aantoonbaar komma-decimalen maar bevat geen bruikbare CURRTYPE-tabel.',
+      'The XER file uses decimal commas but has no usable CURRTYPE table.',
       commaDecimalEvidence,
     );
   }

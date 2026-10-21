@@ -91,11 +91,11 @@ function importStandardCuf(doc: Document): ImportResult {
   const items: CostItem[] = [];
 
   const proj = descendants(root, 'PROJECTGEGEVENS')[0];
-  const name = proj?.getAttribute('PROJECTNAAM')?.trim() || 'Geïmporteerde begroting';
+  const name = proj?.getAttribute('PROJECTNAAM')?.trim() || 'Imported estimate';
 
   const begroting = descendants(root, 'BEGROTING')[0];
   if (!begroting) {
-    warnings.push('Geen <BEGROTING> gevonden in het CUF-bestand.');
+    warnings.push('No <BEGROTING> was found in the CUF file.');
     return { schedule: { name }, items, warnings, format: 'cuf' };
   }
 
@@ -182,10 +182,10 @@ function importStandardCuf(doc: Document): ImportResult {
 
   if (usedDerivedTarief) {
     warnings.push(
-      `Uurtarief € ${uurtarief.toFixed(2)} afgeleid uit het bestand (CUF bevat geen tarieventabel); controleer dit zo nodig.`,
+      `Uurtarief € ${uurtarief.toFixed(2)} derived from the file (CUF has no rate table); review it if needed.`,
     );
   }
-  if (items.length === 0) warnings.push('CUF-bestand bevat geen posten of regels.');
+  if (items.length === 0) warnings.push('The CUF file contains no items or lines.');
 
   const schedule = uurtarief > 0
     ? { name, projectName: name, tarieven: { A: uurtarief } }
@@ -200,7 +200,7 @@ function importLegacyCuf(doc: Document): ImportResult {
   const warnings: string[] = [];
   const items: CostItem[] = [];
 
-  const name = getText(root, 'Naam') || 'Geïmporteerde begroting';
+  const name = getText(root, 'Naam') || 'Imported estimate';
 
   children(root, 'Hoofdstuk').forEach((h, idx) => {
     const chapter = makeCostItem({
@@ -261,13 +261,13 @@ function importLegacyCuf(doc: Document): ImportResult {
       children(p, 'Toeslag').forEach((t) => {
         const tCode = t.getAttribute('code') ?? '?';
         warnings.push(
-          `Toeslag "${tCode}" wordt niet geïmporteerd (niet ondersteund in OCS model)`,
+          `Toeslag "${tCode}" is not imported (unsupported by the OCS model)`,
         );
       });
     });
   });
 
-  if (items.length === 0) warnings.push('CUF-bestand bevat geen hoofdstukken of posten.');
+  if (items.length === 0) warnings.push('The CUF file contains no chapters or items.');
 
   return { schedule: { name }, items, warnings, format: 'cuf' };
 }

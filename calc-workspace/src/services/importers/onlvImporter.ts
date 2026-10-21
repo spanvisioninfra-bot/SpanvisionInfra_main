@@ -193,7 +193,7 @@ export function importOnlv(xml: string): ImportResult {
   const root = parseLiteXml(xml);
   const rootName = root.name;
   if (rootName !== 'onlv' && rootName !== 'onlb') {
-    throw new Error(`Geen ÖNORM A 2063-bestand: wortelelement <${rootName}> (verwacht <onlv> of <onlb>)`);
+    throw new Error(`Not an ÖNORM A 2063 file: root element <${rootName}> (verwacht <onlv> of <onlb>)`);
   }
 
   const warnings: string[] = [];
@@ -392,12 +392,12 @@ export function importOnlv(xml: string): ImportResult {
     addLgListe(null, 0, kid(root, 'lg-liste'), '');
     ctx.warn(
       'leistungsbuch',
-      'Dit is een Leistungsbuch (catalogus van standaardteksten) zonder hoeveelheden en prijzen — alle posities zijn met hoeveelheid 0 geïmporteerd.',
+      'This is a Leistungsbuch (standard text catalog) without quantities or prices — all items were imported with quantity 0.',
     );
   } else {
     // ── Leistungsverzeichnis ──
     const lv = kidEndingWith(root, '-lv');
-    if (!lv) throw new Error('ÖNORM A 2063: geen LV-element (entwurfs-lv, ausschreibungs-lv, …) gevonden');
+    if (!lv) throw new Error('ÖNORM A 2063: no LV element (entwurfs-lv, ausschreibungs-lv, …) found');
     const kenn = kid(lv, 'kenndaten');
     const bezeichnung = kidText(kenn, 'lvbezeichnung');
     const vorhaben = kidText(kenn, 'vorhaben');
@@ -437,7 +437,7 @@ export function importOnlv(xml: string): ImportResult {
         const c = calculated.toFixed(2);
         ctx.warn(
           'sumMismatch',
-          `De LV-som in het bestand (${f}) wijkt af van de berekende som van de posities (${c}).`,
+          `The bill-of-quantities total in the file (${f}) wijkt af van de berekende som van de posities (${c}).`,
           { file: f, calculated: c },
         );
       }
@@ -445,7 +445,7 @@ export function importOnlv(xml: string): ImportResult {
     if (ctx.posCount === 0 || !ctx.priced) {
       ctx.warn(
         'noPrices',
-        'Dit bestand bevat geen prijzen — alleen teksten en hoeveelheden (bv. een Ausschreibungs-LV). Het totaal blijft daarom 0,00.',
+        'This file contains no prices — only text and quantities (for example, an Ausschreibungs-LV). The total therefore remains 0.00.',
       );
     }
   }
@@ -453,8 +453,8 @@ export function importOnlv(xml: string): ImportResult {
   if (ctx.optionalCount > 0) {
     ctx.warn(
       'wahlEventual',
-      `${ctx.optionalCount} Wahl-/Eventualposition(s) tellen in ÖNORM niet mee in de LV-som. Ze zijn mét hoeveelheid en prijs geïmporteerd, `
-      + 'in de notities gemarkeerd en in de verrekenbaar-kolom op N gezet; het totaal hier bevat ze wél.',
+      `${ctx.optionalCount} ÖNORM excludes Wahl-/Eventualposition items from the bill-of-quantities total. They were imported with quantities and prices, `
+      + 'marked in the notes and set to N in the billable column; the total shown here includes them.',
       { count: ctx.optionalCount },
     );
   }
@@ -462,14 +462,14 @@ export function importOnlv(xml: string): ImportResult {
     const examples = Array.from(ctx.unknownUnits).slice(0, 8).join(', ');
     ctx.warn(
       'unknownUnit',
-      `${ctx.unknownUnits.size} eenheid/eenheden zonder tegenhanger zijn ongewijzigd overgenomen: ${examples}.`,
+      `${ctx.unknownUnits.size} unit(s) without an equivalent were retained unchanged: ${examples}.`,
       { count: ctx.unknownUnits.size, examples },
     );
   }
   if (ctx.gapCount > 0) {
     ctx.warn(
       'luecken',
-      `${ctx.gapCount} positie(s) bevatten in te vullen Lücken (Ausschreiber-/Bieterlücken); die staan als ${GAP} in de notities.`,
+      `${ctx.gapCount} positie(s) bevatten in te vullen Lücken (Ausschreiber-/Bieterlücken); die staan als ${GAP} in the notes.`,
       { count: ctx.gapCount },
     );
   }

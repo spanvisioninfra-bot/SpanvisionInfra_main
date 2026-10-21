@@ -599,7 +599,7 @@ export default function BalklaagDesigner() {
       sig: ontwerpSig,
       tekst:
         id === profId
-          ? `${PROFILES[id].name} voldoet al — lichter kan niet binnen deze lijst.`
+          ? `${PROFILES[id].name} already passes — no lighter option is available in this list.`
           : `${PROFILES[id].name}selected: the first section that passes all checks.`,
     });
   };
@@ -786,7 +786,7 @@ export default function BalklaagDesigner() {
 
           <span className="vd-ctrl-h">Deflection</span>
           <JaNee
-            label="Controleer doorbuiging"
+            label="Check deflection"
             waarde={controleer === 1}
             onChange={(v) => setVal("controleer", v ? 1 : 0)}
           />
@@ -798,7 +798,7 @@ export default function BalklaagDesigner() {
 
           <span className="vd-ctrl-h">Vibration (§7.3.3)</span>
           <JaNee
-            label="Controleer trilling"
+            label="Check vibration"
             waarde={tril === 1}
             onChange={(v) => setVal("controleer_trilling", v ? 1 : 0)}
           />

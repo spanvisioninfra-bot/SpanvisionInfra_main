@@ -149,7 +149,7 @@ export function buildSpanningCheckInputs(ruweData: SpanningBuildData): SpanningB
 
     const lengthMm = beamLengthMm(beam, data.nodes);
     if (lengthMm <= 0) {
-      skipped.push({ beamId: beam.id, reason: "staaflengte is 0 — knopen ontbreken" });
+      skipped.push({ beamId: beam.id, reason: "Member length is 0 — nodes are missing" });
       continue;
     }
 
@@ -159,7 +159,7 @@ export function buildSpanningCheckInputs(ruweData: SpanningBuildData): SpanningB
     if (!hasAnyResult) {
       skipped.push({
         beamId: beam.id,
-        reason: "geen krachtsverloop in de UGT-combinaties — reken het model eerst door",
+        reason: "No force diagrams in the ULS combinations. Solve the model first.",
       });
       continue;
     }

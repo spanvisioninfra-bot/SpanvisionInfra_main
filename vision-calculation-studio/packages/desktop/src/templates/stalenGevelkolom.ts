@@ -11,9 +11,7 @@
 
 export const stalenGevelkolom = `"Steel facade column — checks wind + N + LTB
 
-'<i>Toetsing van een enkelvoudig opgelegde stalen gevelkolom belast door
-'winddruk + axiaal, inclusief kip via de vereenvoudigde slankheidsmethode
-'(EN 1993-1-1 §6.3.2.4).</i>
+'<i>Checks a simply supported steel facade column under wind pressure and axial force, including lateral-torsional buckling using the simplified slenderness method (EN 1993-1-1 §6.3.2.4).</i>
 
 # 1. Profielkeuze
 
@@ -98,22 +96,22 @@ I_y
 
 # 2. Geometry en belastingbreedte
 
-L = ?*(m)', verdiepingshoogte (m) — kniklengte van de kolom'
-b_belast = ?*(m)', belastingbreedte (m) — c.t.c. tussen kolommen'
-n_kipsteunen = ?', aantal tussenliggende kipsteunen (regels/vloeren)'
+L = ?*(m)', story height (m) — column buckling length'
+b_belast = ?*(m)', tributary width (m) — column center-to-center spacing'
+n_kipsteunen = ?', number of intermediate lateral restraints (rails/floors)'
 
-L_LT = L/(n_kipsteunen + 1)', afstand tussen kipsteunen — lengte voor kipcontrole'
+L_LT = L/(n_kipsteunen + 1)', distance between lateral restraints — length for lateral-torsional buckling'
 
 # 3. Wind load
 
-q_wind = ?*(kN/m^2)', wind-rekenwaarde uit project-uitgangspunten'
+q_wind = ?*(kN/m^2)', design wind pressure from project assumptions'
 
-q_line = q_wind*b_belast', lijnlast op de kolom (kN/m)'
+q_line = q_wind*b_belast', line load on the column (kN/m)'
 
 # 4. Optredende forces
 
-N_Ed = ?*(kN)', axiale rekenwaarde — drukkracht door bovenliggende verdiepingen'
-M_Ed = q_line*L^2/8', buigend moment in het midden bij gelijkmatige lijnlast'
+N_Ed = ?*(kN)', design axial force — compression from upper stories'
+M_Ed = q_line*L^2/8', mid-height bending moment under a uniform line load'
 V_Ed = q_line*L/2', dwarskracht aan de oplegging'
 
 # 5. Model en M/V-lijnen
@@ -146,7 +144,7 @@ arrow_len = 80
 '  <text x="'col_x + 60'" y="'q_y_bottom + 30'" style="fill:#525252; font-size:11px">b<tspan baseline-shift="sub">belast</tspan> = 'b_belast'</text>
 '</svg>'
 
-'<h6>5.2 M-lijn (buigend moment) en V-lijn (dwarskracht)</h6>
+'<h6>5.2 M-lijn (buigend moment) and V-lijn (dwarskracht)</h6>
 #hide
 dia_x_left = 50
 dia_x_right = 430
@@ -174,45 +172,43 @@ vline_y_max = 50
 '  <text x="'dia_x_right - 80'" y="'vline_y_base + vline_y_max + 15'" style="fill:#16A34A; font-weight:700">−V<tspan baseline-shift="sub">Ed</tspan> = 'V_Ed'</text>
 '</svg>'
 
-# 6. Toetsing bending — §6.2.5
+# 6. Bending check — §6.2.5
 
 M_c,Rd = W_el,y*f_y/γ_M0' (elastische weerstand om y-as)
 UC_M = M_Ed/M_c,Rd
 
 #if UC_M ≤ 1.0
-    'UC<sub>M</sub> = 'UC_M = M_Ed/M_c,Rd'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>M</sub> = 'UC_M = M_Ed/M_c,Rd'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>M</sub> = 'UC_M = M_Ed/M_c,Rd'<span style="color: red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>M</sub> = 'UC_M = M_Ed/M_c,Rd'<span style="color: red"> > 1.0 → <b>Fails</b></span>
 #end if
 
-# 7. Toetsing dwarskracht — §6.2.6
+# 7. Shear check — §6.2.6
 
 A_v = A - 2*b_profile*t_f + t_w*t_f', schuifvlak (vereenvoudigd voor I-profielen, wortelstraal r verwaarloosd)
 V_pl,Rd = A_v*(f_y/sqrt(3))/γ_M0
 UC_V = V_Ed/V_pl,Rd
 
 #if UC_V ≤ 1.0
-    'UC<sub>V</sub> = 'UC_V = V_Ed/V_pl,Rd'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>V</sub> = 'UC_V = V_Ed/V_pl,Rd'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>V</sub> = 'UC_V = V_Ed/V_pl,Rd'<span style="color: red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>V</sub> = 'UC_V = V_Ed/V_pl,Rd'<span style="color: red"> > 1.0 → <b>Fails</b></span>
 #end if
 
-# 8. Toetsing compression — §6.2.4
+# 8. Compression check — §6.2.4
 
 N_c,Rd = A*f_y/γ_M0
 UC_N = N_Ed/N_c,Rd
 
 #if UC_N ≤ 1.0
-    'UC<sub>N</sub> = 'UC_N = N_Ed/N_c,Rd'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>N</sub> = 'UC_N = N_Ed/N_c,Rd'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>N</sub> = 'UC_N = N_Ed/N_c,Rd'<span style="color: red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>N</sub> = 'UC_N = N_Ed/N_c,Rd'<span style="color: red"> > 1.0 → <b>Fails</b></span>
 #end if
 
 # 9. Kipcontrole — §6.3.2.4 (vereenvoudigde slankheidsmethode)
 
-'<i>Vereenvoudigde methode voor de kniklengte tussen de kipsteunen.
-'k<sub>c</sub> = 0,94 (uniform belaste, simpel opgelegde lengte tussen steunen, Tabel 6.6).
-'k<sub>fl</sub> = 1,10 (verlaagde drukflens — Aanbevolen waarde NB).</i>
+'<i>Simplified method for length between lateral restraints. k<sub>c</sub> = 0.94 for a uniformly loaded, simply supported segment (Table 6.6). k<sub>fl</sub> = 1.10 for the reduced compression flange, the NB recommended value.</i>
 
 #hide
 ε = sqrt(235 N/mm^2/f_y)
@@ -225,17 +221,17 @@ k_fl = 1.10
 λ_c0 = 0.5
 #show
 
-'L<sub>LT</sub> = L / (n<sub>kipsteunen</sub> + 1) = 'L_LT' (afstand tussen kipsteunen)'
+'L<sub>LT</sub> = L / (n<sub>kipsteunen</sub> + 1) = 'L_LT' (distance between lateral restraints)'
 
 i_f,z
 λ_f = (k_c*L_LT)/(i_f,z*λ_1)', §6.3.2.4 (5)
-'λ̄<sub>f</sub> = 'λ_f' (slankheid drukflens)'
+'λ̄<sub>f</sub> = 'λ_f' (compression flange slenderness)'
 
 #if λ_f ≤ λ_c0
-    'λ̄<sub>f</sub> ≤ λ̄<sub>c0</sub> = 0,5 → <b>geen kipcontrole nodig</b>: M<sub>b,Rd</sub> = M<sub>c,Rd</sub>
+    'λ̄<sub>f</sub> ≤ λ̄<sub>c0</sub> = 0.5 → <b>no lateral-torsional buckling check required</b>: M<sub>b,Rd</sub> = M<sub>c,Rd</sub>
     M_b,Rd = M_c,Rd
 #else
-    'λ̄<sub>f</sub> > λ̄<sub>c0</sub> = 0,5 → kipcontrole nodig
+    'λ̄<sub>f</sub> &gt; λ̄<sub>c0</sub> = 0.5 → lateral-torsional buckling check required
     #if h/b_profile ≤ 2
         α_LT = 0.34', buigingsknik-kromme b (Tabel 6.5, h/b ≤ 2)
     #else
@@ -252,23 +248,21 @@ i_f,z
 
 UC_LT = M_Ed/M_b,Rd
 #if UC_LT ≤ 1.0
-    'UC<sub>kip</sub> = M<sub>Ed</sub>/M<sub>b,Rd</sub> = 'UC_LT'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>kip</sub> = M<sub>Ed</sub>/M<sub>b,Rd</sub> = 'UC_LT'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>kip</sub> = M<sub>Ed</sub>/M<sub>b,Rd</sub> = 'UC_LT'<span style="color: red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>kip</sub> = M<sub>Ed</sub>/M<sub>b,Rd</sub> = 'UC_LT'<span style="color: red"> > 1.0 → <b>Fails</b></span>
 #end if
 
 # 10. Verplaatsingstoets (SLS) — §7.2 + NEN-EN 1993-1-1 NB Table B.1
 
-'<i>Toetsing van horizontale verplaatsing onder karakteristieke windbelasting
-'(BGT karakteristieke combinatie). Voor gevelelementen is de gangbare grens
-'δ ≤ L/300; voor algemene constructies δ ≤ L/250.</i>
+'<i>Horizontal displacement is checked under characteristic wind load (SLS characteristic combination). Typical facade limits are δ ≤ L/300; for general structures, δ ≤ L/250.</i>
 
-E = 210000 N/mm^2', E-modulus staal'
+E = 210000 N/mm^2', steel modulus of elasticity'
 
 q_wind,kar = q_wind/1.5', terug naar karakteristieke wind (γ_Q,wind = 1.5)'
 q_kar,line = q_wind,kar*b_belast
 
-δ_max = 5*q_kar,line*L^4/(384*E*I_y)', maximale doorbuiging midden bij UDL'
+δ_max = 5*q_kar,line*L^4/(384*E*I_y)', maximum mid-span deflection under UDL'
 
 @select VerplGrens "Verplaatsingsgrens"
   L/300 (gevel) = 300
@@ -281,9 +275,9 @@ q_kar,line = q_wind,kar*b_belast
 UC_δ = δ_max/δ_lim
 
 #if UC_δ ≤ 1.0
-    'UC<sub>δ</sub> = δ<sub>max</sub>/δ<sub>lim</sub> = 'UC_δ'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>δ</sub> = δ<sub>max</sub>/δ<sub>lim</sub> = 'UC_δ'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>δ</sub> = δ<sub>max</sub>/δ<sub>lim</sub> = 'UC_δ'<span style="color: red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>δ</sub> = δ<sub>max</sub>/δ<sub>lim</sub> = 'UC_δ'<span style="color: red"> > 1.0 → <b>Fails</b></span>
 #end if
 
 # 11. Gecombineerde checks — §6.2.9 + §6.3.3 (simplified, klasse 3)
@@ -291,23 +285,10 @@ UC_δ = δ_max/δ_lim
 UC_combi = N_Ed/N_c,Rd + M_Ed/M_b,Rd
 
 #if UC_combi ≤ 1.0
-    'UC<sub>M+N+kip</sub> = 'UC_combi' <span style="color: green">≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>M+N+kip</sub> = 'UC_combi' <span style="color: green">≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>M+N+kip</sub> = 'UC_combi' <span style="color: red">> 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>M+N+kip</sub> = 'UC_combi' <span style="color: red">> 1.0 → <b>Fails</b></span>
 #end if
 
-'<hr/>
-'<i>Vereenvoudigingen in deze toetsing:
-'<ul>
-'<li>Kniklengte = staaflengte L (geen aparte knikcontrole §6.3.1) — voor een
-'gevelkolom met c.t.c. vloer is de kniklengte meestal gelijk aan de
-'verdiepingshoogte.</li>
-'<li>Kipcontrole via §6.3.2.4 vereenvoudigde slankheidsmethode i.p.v. de
-'gedetailleerde §6.3.2.2 M<sub>cr</sub>-berekening. Conservatief voor
-'rolprofielen onder gelijkmatig belasting.</li>
-'<li>Dwarskrachtreductie van de momentcapaciteit (§6.2.8) is verwaarloosd
-'omdat UC<sub>V</sub> meestal &lt; 0.5 blijft.</li>
-'<li>Elastische weerstand (klasse 3) — voor klasse 1/2 kun je W<sub>pl,y</sub> gebruiken
-'in plaats van W<sub>el,y</sub> voor circa 10–15% extra capaciteit.</li>
-'</ul></i>
+'<hr/><i>Simplifications:<ul><li>Buckling length equals member length L; no separate §6.3.1 check is included. A facade column supported at floor levels usually has buckling length equal to story height.</li><li>Lateral-torsional buckling uses the §6.3.2.4 simplified slenderness method instead of the detailed §6.3.2.2 M<sub>cr</sub> calculation; conservative for rolled sections under uniform load.</li><li>Shear reduction of moment resistance (§6.2.8) is omitted because UC<sub>V</sub> is usually &lt;0.5.</li><li>Elastic resistance (class 3) is used. For classes 1/2, W<sub>pl,y</sub> can replace W<sub>el,y</sub> for approximately 10–15% extra resistance.</li></ul></i>
 `;

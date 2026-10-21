@@ -3,11 +3,13 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHandler} from './server.mjs';
+import {readLocalEnvironment} from './local-env.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const staticRoot=path.join(root,'suite-hub/dist');
-const port=Number(process.env.PORT||4231);
+const settings=readLocalEnvironment();
+const port=Number(settings.PORT||4231);
 const origin=`http://127.0.0.1:${port}`;
-const handler=createHandler({env:{...process.env,SITE_URL:origin}});
+const handler=createHandler({env:{...settings,SITE_URL:origin}});
 const mime={'.html':'text/html','.css':'text/css','.js':'text/javascript','.mjs':'text/javascript','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2','.wasm':'application/wasm','.txt':'text/plain'};
 const server=http.createServer(async(req,res)=>{
   try{

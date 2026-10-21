@@ -29,7 +29,7 @@ const NAMES = NEN_NAMES;
 const CATEGORY_META = {
   'Tb': { name: 'NL NEN 1414 — Brandbeveiliging', color: '#dc2626' },
   'Tbk': { name: 'NL NEN 1414 — Blussystemen', color: '#b91c1c' },
-  'Td': { name: 'NL NEN 1414 — Deuren', color: '#92400e' },
+  'Td': { name: 'NL NEN 1414 — Doors', color: '#92400e' },
   'Tn': { name: 'NL NEN 1414 — Noodverlichting', color: '#ca8a04' },
   'Tr': { name: 'NL NEN 1414 — Rook/Warmteafvoer', color: '#6b7280' },
   'Tv': { name: 'NL NEN 1414 — Ventilatie', color: '#059669' },

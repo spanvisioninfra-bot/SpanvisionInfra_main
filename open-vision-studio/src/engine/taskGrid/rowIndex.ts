@@ -23,7 +23,7 @@ export function createTaskGridRowIndex(rows: readonly ViewRow[]): TaskGridRowInd
   for (let absoluteIndex = 0; absoluteIndex < rows.length; absoluteIndex++) {
     const row = rows[absoluteIndex];
     if (absoluteIndexByRowKey.has(row.rowKey)) {
-      throw new TypeError(`ViewRow.rowKey moet uniek zijn: ${row.rowKey}`);
+      throw new TypeError(`ViewRow.rowKey must be unique: ${row.rowKey}`);
     }
     absoluteIndexByRowKey.set(row.rowKey, absoluteIndex);
     if (row.kind !== 'task') continue;

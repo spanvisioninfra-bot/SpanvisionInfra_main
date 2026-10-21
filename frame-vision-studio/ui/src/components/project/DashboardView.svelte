@@ -7,7 +7,7 @@
   // shows real figures in every mode (no backend/wasm round-trip needed).
 
   function materialLabel(m) {
-    if (!m) return "Onbekend";
+    if (!m) return "Unknown";
     if (typeof m === "string") {
       return { aluminum: "Aluminium", pvc: "uPVC", wood_aluminum: "Timber-aluminum" }[m] || m;
     }

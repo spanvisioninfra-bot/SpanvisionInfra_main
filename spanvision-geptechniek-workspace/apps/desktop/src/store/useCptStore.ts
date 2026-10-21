@@ -788,7 +788,7 @@ export async function loadGwpFromContent(
   const gwp = parseGmwXml(xml);
   if (!gwp) {
     throw new Error(
-      `${filename}: kon geen GMW-dispatch parsen (geen <GMW_PO>/<GMW_O> root of geen broId gevonden)`,
+      `${filename}: unable to parse GMW dispatch (no <GMW_PO>/<GMW_O> root or broId found)`,
     );
   }
   useCptStore.setState((s) => {
@@ -908,7 +908,7 @@ export async function addBoreToActiveProject(
 ): Promise<Bore> {
   if (!looksLikeBoringXml(xml)) {
     throw new Error(
-      `${filename}: lijkt geen BHR-GT XML (geen <BHR_*_O> root gevonden)`,
+      `${filename}: this does not appear to be BHR-GT XML (no <BHR_*_O> root found)`,
     );
   }
   const bore = parseBhrgtXml(xml, filename);
@@ -1216,7 +1216,7 @@ export async function openContentByFilename(
   if (lower.endsWith(".ifcgeo") && looksLikeProjectIfcgeo(content.slice(0, 4096))) {
     if (!path) {
       throw new Error(
-        "Projectbestanden (.ifcgeo) zijn alleen ondersteund in de desktop-versie.",
+        "Project files (.ifcgeo) are supported only in the desktop version.",
       );
     }
     await openProjectIfcgis(path);
@@ -1225,7 +1225,7 @@ export async function openContentByFilename(
   if (lower.endsWith(".ifcx") || lower.endsWith(".ifcgis")) {
     if (!path) {
       throw new Error(
-        "Projectbestanden (.ifcgis/.ifcx) zijn alleen ondersteund in de desktop-versie.",
+        "Project files (.ifcgis/.ifcx) are supported only in the desktop version.",
       );
     }
     await openProjectIfcgis(path);

@@ -456,13 +456,13 @@ export function onbekendeTopVelden(parsed: unknown): string[] {
 export function deserializeProject(text: string): ProjectFile {
   const parsed = JSON.parse(text);
   if (parsed.format !== "open-fem2d-studio-v2") {
-    throw new Error(`Onbekend bestandsformaat: ${parsed.format ?? "(geen format-tag)"}`);
+    throw new Error(`Unknown file format: ${parsed.format ?? "(no format tag)"}`);
   }
   if (typeof parsed.version !== "number") {
-    throw new Error("Bestand mist version-tag");
+    throw new Error("The file has no version tag");
   }
   if (parsed.version > PROJECT_FORMAT_VERSION) {
-    throw new Error(`Bestand is opgeslagen met nieuwere versie (${parsed.version}) — werk je app bij`);
+    throw new Error(`File was saved with a newer version (${parsed.version}) — update your app`);
   }
   // Structuur. Hier stond `return parsed as ProjectFile` en verder niets: de
   // drie poorten hierboven keken alleen naar de kaft van het bestand.

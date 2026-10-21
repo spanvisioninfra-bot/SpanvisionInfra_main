@@ -9,6 +9,7 @@
  * `betonKern`: één rekenkern, twee wegen ernaartoe, geen tweede implementatie
  * in TypeScript.
  */
+import { engineRequest } from "../engineApi";
 import { invoke } from "@tauri-apps/api/core";
 import { isTauriApp } from "../tauri";
 import type { LasInput } from "../types/las/LasInput";
@@ -20,34 +21,7 @@ async function roepKern<T>(opdracht: string, inputs: unknown, signal?: AbortSign
   if (isTauriApp()) {
     return invoke<T>(opdracht, { inputs });
   }
-  const antwoord = await fetch("/api/toetsing", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ opdracht, inputs }),
-    signal,
-  });
-  // Geen `.json().catch(() => null)`: een statische webbouw heeft geen
-  // dev-brug en beantwoordt /api/toetsing met de index.html van de app, status
-  // 200. Dat werd dan `null` en ging als RESULTAAT naar de aanroeper — een
-  // leeg diagram zonder één woord waarom. Zie dezelfde afweging bij `roepKern`
-  // in `stores/checkStore.ts`.
-  const ruw = await antwoord.text();
-  let data: unknown = null;
-  try {
-    data = JSON.parse(ruw);
-  } catch {
-    throw new Error(
-      `The calculation service did not return JSON (HTTP ${antwoord.status}). ` +
-        `The browser requires a running calculation API. Try again or use the Windows app.`,
-    );
-  }
-  if (!antwoord.ok || (data && typeof data === "object" && "fout" in data)) {
-    throw new Error(
-      (data as { fout?: string; detail?: string } | null)?.fout ?? (data as { detail?: string } | null)?.detail ??
-        `The calculation engine returned HTTP ${antwoord.status}.`,
-    );
-  }
-  return data as T;
+  return engineRequest<T>("toetsing", { opdracht, inputs }, signal);
 }
 
 /** Spanningsverloop en unity checks voor één doorsnede met één snedekrachtenset. */
@@ -57,7 +31,7 @@ export async function toetsSpanning(
 ): Promise<SpanningBeamCheckResult> {
   const uit = await roepKern<SpanningBeamCheckResult[]>("check_stress_beams", [input], signal);
   if (!Array.isArray(uit) || uit.length === 0) {
-    throw new Error("De spanningskern gaf geen resultaat terug.");
+    throw new Error("The stress engine returned no result.");
   }
   return uit[0];
 }

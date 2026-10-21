@@ -75,7 +75,7 @@ UC
 #else if UC < 1.0
   Net voldoende (UC < 1.0) — let op uitvoeringstoleranties.
 #else
-  UC ≥ 1 — profiel onvoldoende!
+  UC ≥ 1 — section fails!
 #end if
 
 ## Parametric sweep (#repeat)

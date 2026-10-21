@@ -14,6 +14,7 @@ import { attachMapLocation, WORLD_CENTER, WORLD_TILES, WORLD_TILE_OPTIONS } from
  */
 export default function LocationMiniMap({ cpts, activeId }: { cpts: Cpt[]; activeId: string | null }) {
   const ref = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.LayerGroup | null>(null);
 
@@ -24,8 +25,21 @@ export default function LocationMiniMap({ cpts, activeId }: { cpts: Cpt[]; activ
     L.control.zoom({ position: "bottomright" }).addTo(map);
     markersRef.current = L.layerGroup().addTo(map);
     mapRef.current = map;
-    attachMapLocation(map, { autoLocate: !cpts.some(cpt => cpt.position), zoom: 14 });
-    return () => { map.remove(); mapRef.current = null; };
+    attachMapLocation(map, {
+      autoLocate: !cpts.some(cpt => cpt.position), zoom: 14,
+      controlContainer: controlsRef.current ?? undefined,
+    });
+    const resize = new ResizeObserver(() => {
+      const container = map.getContainer(), size = map.getSize();
+      if (size.x === container.clientWidth && size.y === container.clientHeight) return;
+      const center = map.getCenter();
+      map.invalidateSize({ animate: false, pan: false });
+      // Reset the pixel origin so resize rounding does not look like a manual pan.
+      const viewOptions = { animate: false, reset: true };
+      map.setView(center, map.getZoom(), viewOptions);
+    });
+    resize.observe(ref.current);
+    return () => { resize.disconnect(); map.remove(); mapRef.current = null; };
   }, []);
 
   useEffect(() => {
@@ -66,7 +80,10 @@ export default function LocationMiniMap({ cpts, activeId }: { cpts: Cpt[]; activ
     }
   }, [cpts, activeId]);
 
-  return <div ref={ref} className="mini-map" />;
+  return <div className="mini-map-workspace">
+    <div ref={ref} className="mini-map" />
+    <div ref={controlsRef} className="mini-map-location" />
+  </div>;
 }
 
 // Inline RD → WGS84 (Schreutelkamp 2001). Mirrors cpt-core::coords::rd_to_wgs84.

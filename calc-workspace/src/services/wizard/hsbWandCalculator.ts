@@ -114,7 +114,7 @@ function calculateHsbWand(params: Record<string, number | string>): WizardResult
   // Chapter: HSB-wand
   items.push(makeItem({
     id: chapterId,
-    description: `HSB-wand ${lengte.toFixed(1)}×${hoogte.toFixed(1)}m`,
+    description: `Timber frame wall ${lengte.toFixed(1)}×${hoogte.toFixed(1)}m`,
     rowType: "chapter",
     parentId: null,
     sortOrder: sortOrder++,
@@ -179,7 +179,7 @@ function calculateHsbWand(params: Record<string, number | string>): WizardResult
   addPost(`Mullions ${stijlBreedte}×${stijlDiepte}mm (${aantalStijlen} stuks)`, 'm', totaalStijlHout, prijsStijlHout, arbeidHout);
 
   // 2. Onder- en bovenregel
-  addPost(`Onder-/bovenregel ${stijlBreedte}×${stijlDiepte}mm`, 'm', regelHout, prijsRegelHout, arbeidRegel);
+  addPost(`Bottom/top plate ${stijlBreedte}×${stijlDiepte}mm`, 'm', regelHout, prijsRegelHout, arbeidRegel);
 
   // 3. Beplating
   const beplLabel = beplatingType === 'osb' ? 'OSB plaat 12mm' : 'Multiplex 12mm';
@@ -199,7 +199,7 @@ function calculateHsbWand(params: Record<string, number | string>): WizardResult
   }
 
   return {
-    chapterName: `HSB-wand ${lengte.toFixed(1)}×${hoogte.toFixed(1)}m`,
+    chapterName: `Timber frame wall ${lengte.toFixed(1)}×${hoogte.toFixed(1)}m`,
     items,
   };
 }
@@ -207,7 +207,7 @@ function calculateHsbWand(params: Record<string, number | string>): WizardResult
 // Register the HSB wizard
 registerWizard({
   id: 'hsb-wand',
-  label: 'HSB-wand',
+  label: 'Timber frame wall',
   icon: '🏗️',
   description: "Timber frame wall — calculates studs, rails, sheathing, insulation and finishes",
   params: [

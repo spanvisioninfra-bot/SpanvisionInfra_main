@@ -70,13 +70,13 @@ export function ExposureClassSection({ exposureClasses, onChange }: {
             <option value="">(None)</option>
             {EXPOSURE_CLASSES.map(cls => (
               <option key={cls.value} value={cls.value}>
-                {cls.label} - {cls.description} (min. dekking: {EXPOSURE_CLASS_MIN_COVER[cls.value]}mm)
+                {cls.label} - {cls.description} (min. cover: {EXPOSURE_CLASS_MIN_COVER[cls.value]}mm)
               </option>
             ))}
           </select>
           {ec[surface] && (
             <div className="text-[10px] text-cad-text-dim mt-0.5">
-              Min. dekking: {EXPOSURE_CLASS_MIN_COVER[ec[surface]!]}mm
+              Minimum cover: {EXPOSURE_CLASS_MIN_COVER[ec[surface]!]}mm
             </div>
           )}
         </div>

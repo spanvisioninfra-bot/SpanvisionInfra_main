@@ -75,7 +75,7 @@ function assertUniqueProjectIds(projectRows: readonly XerRow[]): void {
     if (firstLine !== undefined) {
       throw new XerImportError(
         'XER_DUPLICATE_ID',
-        `PROJECT.proj_id bevat dubbele id '${projectId}' op regels ${firstLine} and ${projectRow.line}.`,
+        `PROJECT.proj_id contains duplicate id '${projectId}' on lines ${firstLine} and ${projectRow.line}.`,
         {
           table: 'PROJECT',
           field: 'proj_id',

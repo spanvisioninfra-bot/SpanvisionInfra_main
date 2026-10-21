@@ -10,9 +10,9 @@ export const beugelTemplate = {
   defaultSize: { width: 300, height: 160 },
   params: [
     { key: 'diameter', label: 'Diameter (mm)', labelEn: 'Diameter (mm)', type: 'number', default: 8, min: 4, max: 25, step: 1 },
-    { key: 'afstand', label: 'Afstand h.o.h. (mm)', labelEn: 'Spacing (mm)', type: 'number', default: 250, min: 25, max: 1000, step: 25 },
+    { key: 'afstand', label: "Center-to-center spacing (mm)", labelEn: 'Spacing (mm)', type: 'number', default: 250, min: 25, max: 1000, step: 25 },
     { key: 'prefix', label: 'Voorvoegsel', labelEn: 'Prefix', type: 'string', default: 'bgls' },
-    { key: 'kader', label: 'Doorsnede-kader', labelEn: 'Section outline', type: 'boolean', default: true },
+    { key: 'kader', label: "Section frame", labelEn: 'Section outline', type: 'boolean', default: true },
   ],
   _layout(params, bbox) {
     const { x, y, width: w, height: h } = bbox;

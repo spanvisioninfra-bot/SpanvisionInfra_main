@@ -37,7 +37,7 @@ const TEKENING_EXT: ExtensionMeta = {
   description:
     "CAD sheets (A2/A3/A4) with CPTs, snapping, overlays and PDF export.",
   author: BRAND.organization,
-  category: "Tekening",
+  category: "Drawing",
 };
 const OFFERTES_EXT: ExtensionMeta = {
   id: "offertes",
@@ -58,7 +58,7 @@ const INSTALLED_EXTENSIONS: ExtensionMeta[] = [
     version: m.status === "available" ? "0.3.0" : "0.0.1-coming-soon",
     description: `${m.subtitle} — ${m.norm}`,
     author: BRAND.organization,
-    category: "Berekening",
+    category: "Calculation",
   })),
 ];
 

@@ -7,6 +7,8 @@ const module = brand.modules.find(tool => tool.id === id);
 const splash = document.querySelector('.tool-splash');
 const status = document.getElementById('splash-status');
 const actions = document.getElementById('splash-actions');
+const direct = document.getElementById('splash-direct');
+const directLink = document.getElementById('splash-open');
 let controller;
 
 function delay(milliseconds, signal) {
@@ -16,27 +18,6 @@ function delay(milliseconds, signal) {
     if (signal.aborted) cancel();
     else signal.addEventListener('abort', cancel, { once: true });
   });
-}
-
-async function waitForService(signal) {
-  const started = performance.now();
-  while (!signal.aborted) {
-    const attempt = new AbortController();
-    const cancel = () => attempt.abort();
-    signal.addEventListener('abort', cancel, { once: true });
-    const timeout = setTimeout(cancel, 8000);
-    try {
-      const response = await fetch(`/__suite/ready/${id}`, { cache: 'no-store', credentials: 'omit', signal: attempt.signal });
-      if (response.ok) {
-        const data = await response.json();
-        if (id === 'bim' ? data.status === 'healthy' : data.id === 'stl') return;
-      }
-    } catch { /* The service may still be starting; keep the splash visible. */ }
-    finally { clearTimeout(timeout); signal.removeEventListener('abort', cancel); }
-    status.textContent = performance.now() - started > 45000 ? 'The workspace is still starting. Please wait…' : 'Preparing workspace…';
-    await delay(1500, signal);
-  }
-  throw new DOMException('Cancelled', 'AbortError');
 }
 
 function updateAppearance() {
@@ -59,10 +40,11 @@ async function openWorkspace() {
   splash.dataset.state = 'loading';
   splash.setAttribute('aria-busy', 'true');
   actions.hidden = true;
+  direct.hidden = true;
+  directLink.removeAttribute('href');
   status.textContent = 'Opening workspace…';
   const started = performance.now();
-  let stage = 'availability';
-  let timeout = setTimeout(() => request.abort(), 12000);
+  const timeout = setTimeout(() => request.abort(), 12000);
   try {
     if (!module) throw new Error('This tool could not be found. Choose a tool from the workspace.');
     const response = await fetch('/__suite/status', { cache: 'no-store', signal: request.signal });
@@ -72,12 +54,12 @@ async function openWorkspace() {
     if (!state?.available) throw new Error('This workspace is currently unavailable. Please try again shortly.');
     const url = moduleUrl(module, state, window.SpanvisionAppearance.getMode(), location.hostname);
     if (!url || (!isLocalPreview(location.hostname) && new URL(url).protocol !== 'https:')) throw new Error('This workspace has no valid deployment address.');
-    if (!isLocalPreview(location.hostname) && state.platform === 'render' && ['bim', 'stl'].includes(id)) {
-      stage = 'startup';
-      clearTimeout(timeout);
-      timeout = setTimeout(() => request.abort(), 120000);
-      await waitForService(request.signal);
+    if (!isLocalPreview(location.hostname) && ['bim', 'stl', 'fem'].includes(id)) {
+      directLink.href = url;
+      direct.hidden = false;
     }
+    // Opening a page must not depend on a separate calculation or health service.
+    // Navigating to Render also wakes the service without a second proxy request.
     await delay(Math.max(0, 700 - (performance.now() - started)), request.signal);
     if (request.signal.aborted) throw new Error('Tool availability took too long to respond. Please try again.');
     location.replace(url);
@@ -85,7 +67,7 @@ async function openWorkspace() {
     if (request !== controller) return;
     splash.dataset.state = 'error';
     splash.setAttribute('aria-busy', 'false');
-    status.textContent = request.signal.aborted ? (stage === 'startup' ? 'This workspace is taking longer to start. Please try again shortly.' : 'Tool availability took too long to respond. Please try again.') : error.message;
+    status.textContent = request.signal.aborted ? 'Tool availability took too long to respond. Please try again.' : error.message;
     actions.hidden = false;
     document.getElementById('splash-retry').hidden = !module;
   } finally {

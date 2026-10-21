@@ -80,7 +80,7 @@ export function useResultScope(): ResultScope {
 export function useScopeName(rs: ResultScope): string {
   const { t } = useTranslation("ribbon");
   if (rs.scope === "envelope") {
-    return t("report.scopeEnvelope", "Omhullende (alle combinaties)");
+    return t("report.scopeEnvelope", "Envelope (all combinations)");
   }
   return rs.combo?.name ?? String(rs.scope);
 }
@@ -109,7 +109,7 @@ export function ScopeSelector({ rs }: { rs: ResultScope }) {
         >
           {rs.envelopeAvailable && (
             <option value="envelope">
-              {t("report.scopeEnvelope", "Omhullende (alle combinaties)")}
+              {t("report.scopeEnvelope", "Envelope (all combinations)")}
             </option>
           )}
           {rs.combosWithResults.map((c) => (
@@ -142,7 +142,7 @@ export function NotComputedNote() {
     <p className="rpt-empty-note">
       {t(
         "report.notComputed",
-        "Nog niet berekend — voer de berekening uit via Berekenen. Na een modelwijziging vervallen eerdere resultaten automatisch.",
+        "Not calculated yet. Run Calculate. Previous results are invalidated automatically when the model changes.",
       )}
     </p>
   );

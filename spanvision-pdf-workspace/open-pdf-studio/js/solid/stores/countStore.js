@@ -3,8 +3,8 @@ import { getActiveDocument } from '../../core/state.js';
 
 // --- Telcategorieën (per sessie; presets + vrij toe te voegen) ---
 const DEFAULT_CATEGORIES = [
-  { id: 'deuren',        name: 'Deuren',        color: '#e11d48', markerStyle: 'dot' },
-  { id: 'ramen',         name: 'Ramen',         color: '#2563eb', markerStyle: 'dot' },
+  { id: 'deuren',        name: 'Doors',        color: '#e11d48', markerStyle: 'dot' },
+  { id: 'ramen',         name: 'Windows',         color: '#2563eb', markerStyle: 'dot' },
   { id: 'stopcontacten', name: 'Stopcontacten', color: '#16a34a', markerStyle: 'dot' },
 ];
 

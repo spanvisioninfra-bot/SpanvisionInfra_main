@@ -211,7 +211,7 @@ export const SONDEERBEDRIJVEN: Sondeerbedrijf[] = [
   },
   {
     id: "tjaden-nieuw-vennep",
-    name: "Tjaden Adviesbureau voor Grondmechanica (vestiging Nieuw-Vennep)",
+    name: "Tjaden Adviesbureau voor Grondmechanica (Nieuw-Vennep office)",
     address: "Roggestraat 9, 2153 GC Nieuw-Vennep",
     city: "Nieuw-Vennep",
     lat: 52.2613,

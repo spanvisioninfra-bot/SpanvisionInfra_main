@@ -32,7 +32,7 @@
       }
       await loadParts();
     } catch (e) {
-      console.error("Kozijnen laden mislukt:", e);
+      console.error("Failed to load frames:", e);
       toast.error($_("cnc.loadError") + ": " + e);
     }
     loading = false;
@@ -47,7 +47,7 @@
     try {
       parts = (await invoke("get_cnc_parts", { id: selectedId })) || [];
     } catch (e) {
-      console.error("CNC-onderdelen laden mislukt:", e);
+      console.error("Failed to load CNC parts:", e);
       toast.error($_("cnc.loadError") + ": " + e);
       parts = [];
     }
@@ -58,7 +58,7 @@
     try {
       await exportCncGcode(selectedId);
     } catch (e) {
-      console.error("G-code export mislukt:", e);
+      console.error("G-code export failed:", e);
       toast.error($_("cnc.exportError") + ": " + e);
     }
   }

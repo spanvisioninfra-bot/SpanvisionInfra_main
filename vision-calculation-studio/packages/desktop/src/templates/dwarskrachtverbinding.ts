@@ -9,14 +9,11 @@
 
 export const dwarskrachtverbinding = `"Shear connection — scharnierende ligger-kolomverbinding
 
-'<i>Een scharnierende oplegging van een ligger op een kolom, uitgevoerd als
-'kopplaat, lijfplaat of hoekstalen. De verbinding draagt alleen dwarskracht;
-'de rotatiecapaciteit moet groot genoeg zijn om het scharnier waar te maken.
-'Het aantal boutrijen bepaalt zowel de tekening als de weerstand.</i>
+'<i>A pinned beam-to-column connection using an end plate, web plate, or angles. It transfers shear only and must have sufficient rotation capacity to behave as a hinge. The number of bolt rows controls both the drawing and the resistance.</i>
 
-# 1. Systeem
+# 1. System
 
-@select verbindingsvorm "Vorm van de connection"
+@select verbindingsvorm "Connection type"
   End plate = 1
   Web plate (gusset plate) = 2
   Double angle = 3
@@ -66,24 +63,24 @@ export const dwarskrachtverbinding = `"Shear connection — scharnierende ligger
   M24 = 24
 @end
 
-@select hartlijn "Hartlijn van de bouten"
+@select hartlijn "Bolt centerline"
   staggered = 1
   aligned = 2
 @end
 
 # 2. End plate en bouten
 
-n_boutrijen = ?', aantal boutrijen'
+n_boutrijen = ?', number of bolt rows'
 t_kp = ?*(mm)', dikte kopplaat'
-b_kp = ?*(mm)', breedte kopplaat'
-e_kp = ?*(mm)', randafstand boven en onder'
-p_kp = ?*(mm)', steek tussen de boutrijen'
-w_kp = ?*(mm)', horizontale hart-op-hart afstand van de bouten'
-a_las = ?*(mm)', keeldikte las liggerlijf op kopplaat'
+b_kp = ?*(mm)', end plate width'
+e_kp = ?*(mm)', top and bottom edge distances'
+p_kp = ?*(mm)', bolt row pitch'
+w_kp = ?*(mm)', horizontal bolt center-to-center spacing'
+a_las = ?*(mm)', weld throat thickness between beam web and end plate'
 
 V_Ed = ?*(kN)', dwarskracht V_Ed'
 
-'<h6>Overzicht van de invoer</h6>
+'<h6>Input summary</h6>
 n_boutrijen
 t_kp
 b_kp
@@ -92,9 +89,7 @@ p_kp
 w_kp
 V_Ed
 
-# 3. Toetsing
+# 3. Checks
 
-'<i><b>Nog niet uitgewerkt.</b> Dit blad legt voorlopig alleen de invoer en het
-'parametrische beeld vast. De boutgroep op afschuiving en stuik, de kopplaat en
-'het liggerlijf op afschuiving, de blokschuif van §3.10.2 en de lassen volgen.</i>
+'<i><b>Not yet implemented.</b> This sheet defines inputs and the parametric drawing only. Bolt-group shear and bearing, end-plate and beam-web shear, block tearing under §3.10.2, and weld checks are planned.</i>
 `;

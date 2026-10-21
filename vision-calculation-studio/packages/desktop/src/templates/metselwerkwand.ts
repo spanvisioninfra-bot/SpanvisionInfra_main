@@ -51,11 +51,7 @@
 
 export const metselwerkwand = `"Load-bearing masonry wall — compression (EN 1996-1-1 §6.1.2)
 
-'<i>Ongewapende dragende metselwerkwand, belast door een normaalkracht
-'N<sub>Ed</sub> en de eindmomenten M<sub>1Ed</sub> (kop), M<sub>mEd</sub> (midden)
-'en M<sub>2Ed</sub> (voet). Getoetst worden de slankheid (§5.5.1.4) en de
-'capaciteit aan kop, voet en op halve hoogte via de reductiefactor Φ
-'(§6.1.2.2 + bijlage G). Belastingen zijn <b>rekenwaarden</b>.</i>
+'<i>An unreinforced load-bearing masonry wall under axial force N<sub>Ed</sub> and moments M<sub>1Ed</sub> at the top, M<sub>mEd</sub> at mid-height, and M<sub>2Ed</sub> at the base. Checks cover slenderness (§5.5.1.4) and resistance at the top, base, and mid-height using reduction factor Φ (§6.1.2.2 and Annex G). Loads are <b>design values</b>.</i>
 
 # 1. Geometry & randsteuning
 
@@ -66,7 +62,7 @@ export const metselwerkwand = `"Load-bearing masonry wall — compression (EN 19
   timber floor or roof supported on one side of the wall = 4
 @end
 
-@select n_rand "Aantal gesteunde edges n"
+@select n_rand "Number of supported edges n"
   2 (top + bottom) = 2
   3 (+ one vertical edge) = 3
   4 (+ two vertical edges) = 4
@@ -89,21 +85,21 @@ L_v = ?*(mm)', afstand tot de gesteunde (verticale) rand'
   Aerated concrete <25% = 7
 @end
 
-f_b = ?', genormaliseerde druksterkte steen f_b [N/mm²] — fb-waarde (baksteen/betonsteen), CS-klasse (kalkzandsteen, CS12→12) of G-klasse (cellenbeton, G2→2)'
+f_b = ?', normalized masonry unit compressive strength f_b [N/mm²] — fb value (clay/concrete units), CS class (calcium silicate, CS12→12), or G class (aerated concrete, G2→2)'
 
 @select morteltype "Mortar type"
   Masonry mortar = 1
   Thin-layer mortar = 2
 @end
 
-f_m = ?', mortelsterkte f_m [N/mm²] — M-klasse (metselmortel) of L-klasse (lijmmortel); bij lijmmortel niet van invloed op f_k (β=0)'
+f_m = ?', mortar strength f_m [N/mm²] — M class (general-purpose) or L class (thin-layer); thin-layer mortar does not affect f_k (β=0)'
 
 @select steencategorie "Masonry unit category / uitvoeringsklasse (basis γ_M)"
   Category I = 1
   Category II = 2
 @end
 
-phi_inf = ?', eindkruipgetal φ_∞ voor de kruip-excentriciteit e_k (6.7); NB:2018 → 0'
+phi_inf = ?', final creep coefficient φ_∞ for creep eccentricity e_k (6.7); NB:2018 → 0'
 
 #hide
 'Kolommen: [id | K_metsel | K_lijm | α_lijm | β_lijm]. Metselmortel heeft altijd
@@ -128,36 +124,31 @@ bexp', exponent β'
 gam_M
 f_k = K*f_b^alfa*f_meff^bexp*N/mm^2', karakteristieke druksterkte metselwerk (3.2)'
 f_k
-f_d = f_k/gam_M', rekenwaarde druksterkte (3.1)'
+f_d = f_k/gam_M', design compressive strength (3.1)'
 f_d
 E_mw = K_E*f_k', elasticiteitsmodulus E = 700·f_k (NB:2018)'
 E_mw
 
 # 3. Loads (design values)
 
-N_Ed = ?*(kN)', normaalkracht'
-N_Ed_max = ?*(kN)', maximale normaalkracht — alléén voor de minimale-excentriciteitstoets'
-M_1Ed = ?*(kN*m)', moment aan de kop'
-M_mEd = ?*(kN*m)', moment op halve hoogte'
-M_2Ed = ?*(kN*m)', moment aan de voet'
+N_Ed = ?*(kN)', axial force'
+N_Ed_max = ?*(kN)', maximum axial force — minimum-eccentricity check only'
+M_1Ed = ?*(kN*m)', top moment'
+M_mEd = ?*(kN*m)', mid-height moment'
+M_2Ed = ?*(kN*m)', base moment'
 
 # 4. Effectieve height — §5.5.1.2
 
-'<i>ρ<sub>2</sub> = 0,75 bij inklemming door betonvloeren — maar alléén zolang de
-'excentriciteit aan de kop e<sub>t</sub> = |M<sub>1Ed</sub>|/|N<sub>Ed</sub>| niet groter is dan
-'0,25·t (§5.5.1.2(4)); daarboven vervalt de inklemming en wordt ρ<sub>2</sub> = 1,00. Een
-'verticale randsteuning telt alleen mee zolang L<sub>v</sub> < 15·t (n = 3) respectievelijk
-'L<sub>v</sub> < 30·t (n = 4); daarboven valt de wand terug op n = 2. ρ<sub>3</sub> en
-'ρ<sub>4</sub> volgen uit (5.3)-(5.6) met L<sub>v</sub> als afstand tussen de stijve randen.</i>
+'<i>Concrete floor restraint permits ρ<sub>2</sub> = 0.75 only while top eccentricity e<sub>t</sub> = |M<sub>1Ed</sub>|/|N<sub>Ed</sub>| ≤ 0.25·t (§5.5.1.2(4)); beyond this, restraint is lost and ρ<sub>2</sub> = 1.00. Vertical edge support counts only while L<sub>v</sub> &lt; 15·t for n = 3, or &lt; 30·t for n = 4; otherwise n returns to 2. Factors ρ<sub>3</sub> and ρ<sub>4</sub> follow (5.3)–(5.6), using L<sub>v</sub> between stiff edges.</i>
 #hide
 'Terugval op n = 2 zodra de gesteunde rand te ver weg staat.
 n_lim = if(n_rand ≡ 4; 30*t_w; 15*t_w)
 n_eff = if(n_rand ≡ 2; 2; if(L_v ≥ n_lim; 2; n_rand))
 N_min = max(abs(N_Ed); 0.001*kN)
 #show
-e_t0 = abs(M_1Ed)/N_min to mm', eerste-orde excentriciteit aan de kop (bepaalt of ρ_2 = 0,75 mag)'
+e_t0 = abs(M_1Ed)/N_min to mm', first-order top eccentricity (determines whether ρ_2 = 0.75 is permitted)'
 e_t0
-e_grens = 0.25*t_w', grens waarboven de inklemming vervalt (§5.5.1.2(4))'
+e_grens = 0.25*t_w', limit above which rotational restraint is lost (§5.5.1.2(4))'
 e_grens
 #hide
 'Beton (optie 1-2) → 0,75; hout (optie 3-4) → 1,00. Bij een oplegging aan één
@@ -172,10 +163,10 @@ rho_3m = if(h_w ≤ 3.5*L_v; 1/(1 + (h_w/(3*L_v))^2); 1.5*L_v/h_w)
 rho_4m = if(h_w ≤ 1.15*L_v; 1/(1 + (h_w/L_v)^2); 0.5*L_v/h_w)
 rho_nm = if(n_eff ≡ 3; rho_3m; if(n_eff ≡ 4; rho_4m; 1.0))
 #show
-n_eff', aantal gesteunde randen na toetsing van L_v'
+n_eff', number of supported edges after checking L_v'
 rho_2
 rho_n
-h_ef = rho_n*h_w', effectieve hoogte (5.2)'
+h_ef = rho_n*h_w', effective height (5.2)'
 t_ef = t_w', effectieve dikte — enkelvoudig blad'
 h_ef
 t_ef
@@ -184,60 +175,56 @@ e_init
 
 # 5. Slenderness — §5.5.1.4
 
-lam = h_ef/t_ef', slankheid'
+lam = h_ef/t_ef', slenderness'
 UC_lam = lam/27
 #if lam ≤ 27
-    'λ = h<sub>ef</sub>/t<sub>ef</sub> = 'lam' ≤ 27 — u.c. = 'UC_lam'<span style="color: green"> → <b>voldoet</b></span>
+    'λ = h<sub>ef</sub>/t<sub>ef</sub> = 'lam' ≤ 27 — u.c. = 'UC_lam'<span style="color: green"> → <b>passes</b></span>
 #else
-    'λ = h<sub>ef</sub>/t<sub>ef</sub> = 'lam' > 27 — u.c. = 'UC_lam'<span style="color: red"> → <b>voldoet niet</b></span>
+    'λ = h<sub>ef</sub>/t<sub>ef</sub> = 'lam' > 27 — u.c. = 'UC_lam'<span style="color: red"> → <b>fails</b></span>
 #end if
 
 # 6. Eccentricity aan head en base — §6.1.2.2 (6.4)/(6.5)
 
-'<i>Bij N<sub>Ed</sub>/(ℓ·t·f<sub>d</sub>) ≤ 0,1 begrenst de referentie-uitwerking de excentriciteit op
-'de waarde die nog binnen de doorsnede past, t/2 − N<sub>Ed</sub>/(2·ℓ·f<sub>d</sub>); het
-'afgekapte deel komt als restmoment ΔM terug op halve hoogte.</i>
+'<i>For N<sub>Ed</sub>/(ℓ·t·f<sub>d</sub>) ≤ 0.1, the reference limits eccentricity to the value fitting within the section, t/2 − N<sub>Ed</sub>/(2·ℓ·f<sub>d</sub>). The truncated portion returns as residual moment ΔM at mid-height.</i>
 ratio_N = N_Ed/(l_w*t_w*f_d)', N_Ed/(ℓ·t·f_d) — bepaalt welke tak geldt'
 ratio_N
-e_cap = t_w/2 - N_Ed/(2*l_w*f_d) to mm', grens-excentriciteit bij de lage-belastingstak'
+e_cap = t_w/2 - N_Ed/(2*l_w*f_d) to mm', limiting eccentricity for the low-load branch'
 
-e_t = M_1Ed/N_min to mm', excentriciteit aan de kop'
-e_itf = max(abs(e_t) + e_init; 0.05*t_w)', excentriciteit kop vóór begrenzing (6.5)'
-e_it = if(ratio_N > 0.1; e_itf; min(e_itf; e_cap))', maatgevende excentriciteit kop'
+e_t = M_1Ed/N_min to mm', top eccentricity'
+e_itf = max(abs(e_t) + e_init; 0.05*t_w)', top eccentricity before limiting (6.5)'
+e_it = if(ratio_N > 0.1; e_itf; min(e_itf; e_cap))', governing top eccentricity'
 e_t
 e_itf
 e_it
-dM_t = (e_itf - e_it)*N_Ed to kN*m', restmoment kop'
-Phi_it = 1 - 2*e_it/t_w', reductiefactor kop (6.4)'
+dM_t = (e_itf - e_it)*N_Ed to kN*m', residual top moment'
+Phi_it = 1 - 2*e_it/t_w', top reduction factor (6.4)'
 Phi_it
-N_Rdt = Phi_it*l_w*t_w*f_d to kN', capaciteit aan de kop (6.2)'
+N_Rdt = Phi_it*l_w*t_w*f_d to kN', top resistance (6.2)'
 N_Rdt
 
-e_b = M_2Ed/N_min to mm', excentriciteit aan de voet'
-e_ibf = max(abs(e_b) + e_init; 0.05*t_w)', excentriciteit voet vóór begrenzing (6.5)'
-e_ib = if(ratio_N > 0.1; e_ibf; min(e_ibf; e_cap))', maatgevende excentriciteit voet'
+e_b = M_2Ed/N_min to mm', base eccentricity'
+e_ibf = max(abs(e_b) + e_init; 0.05*t_w)', base eccentricity before limiting (6.5)'
+e_ib = if(ratio_N > 0.1; e_ibf; min(e_ibf; e_cap))', governing base eccentricity'
 e_b
 e_ibf
 e_ib
-dM_b = (e_ibf - e_ib)*N_Ed to kN*m', restmoment voet'
-Phi_ib = 1 - 2*e_ib/t_w', reductiefactor voet (6.4)'
+dM_b = (e_ibf - e_ib)*N_Ed to kN*m', residual base moment'
+Phi_ib = 1 - 2*e_ib/t_w', base reduction factor (6.4)'
 Phi_ib
-N_Rdb = Phi_ib*l_w*t_w*f_d to kN', capaciteit aan de voet (6.2)'
+N_Rdb = Phi_ib*l_w*t_w*f_d to kN', base resistance (6.2)'
 N_Rdb
 
-# 7. Eccentricity op halve height — §6.1.2.2 + bijlage G
+# 7. Mid-height eccentricity — §6.1.2.2 and Annex G
 
-'<i>M<sub>Ed,mc</sub> = M<sub>mEd</sub> + (ΔM<sub>t</sub> + ΔM<sub>b</sub>)/2, met de
-'restmomenten uit de begrenzing hierboven. De kruip-excentriciteit e<sub>k</sub> volgt uit (6.7) met φ<sub>∞</sub>;
-'NB:2018 geeft φ<sub>∞</sub> = 0, waardoor e<sub>k</sub> vervalt.</i>
-M_Edmc = M_mEd + (dM_t + dM_b)/2', maatgevend moment op halve hoogte'
+'<i>M<sub>Ed,mc</sub> = M<sub>mEd</sub> + (ΔM<sub>t</sub> + ΔM<sub>b</sub>)/2, using the residual moments above. Creep eccentricity e<sub>k</sub> follows (6.7) with φ<sub>∞</sub>; NB:2018 gives φ<sub>∞</sub> = 0, so e<sub>k</sub> vanishes.</i>
+M_Edmc = M_mEd + (dM_t + dM_b)/2', governing mid-height moment'
 e_Edm = M_Edmc/N_min to mm
-e_m = abs(e_Edm) + e_init', eerste-orde excentriciteit halve hoogte'
+e_m = abs(e_Edm) + e_init', first-order mid-height eccentricity'
 e_Edm
 e_m
-e_k = 0.002*phi_inf*(h_ef/t_ef)*sqrt(t_w*e_m)', kruip-excentriciteit (6.7)'
+e_k = 0.002*phi_inf*(h_ef/t_ef)*sqrt(t_w*e_m)', creep eccentricity (6.7)'
 e_k
-e_mk = max(abs(e_m) + e_k; 0.05*t_ef)', totale excentriciteit halve hoogte (6.6)'
+e_mk = max(abs(e_m) + e_k; 0.05*t_ef)', total mid-height eccentricity (6.6)'
 e_mk
 
 A_1 = 1 - 2*e_mk/t_w', (G.2)'
@@ -246,29 +233,26 @@ lam_F = (h_ef/t_ef)*sqrt(f_k/E_mw)', slankheidsparameter (G.4)'
 lam_F
 u_m = (lam_F - 0.063)/(0.73 - 1.17*e_mk/t_ef)', (G.3)'
 u_m
-Phi_m = A_1*exp(-u_m^2/2)', reductiefactor halve hoogte (G.1)'
+Phi_m = A_1*exp(-u_m^2/2)', mid-height reduction factor (G.1)'
 Phi_m
-N_Rdm = Phi_m*l_w*t_w*f_d to kN', capaciteit op halve hoogte (6.2)'
+N_Rdm = Phi_m*l_w*t_w*f_d to kN', mid-height resistance (6.2)'
 N_Rdm
 
-# 8. Toetsing — §6.1.2.1 (6.1)
+# 8. Check — §6.1.2.1 (6.1)
 
-N_Rd = min(N_Rdt; N_Rdb; N_Rdm)', maatgevende capaciteit'
+N_Rd = min(N_Rdt; N_Rdb; N_Rdm)', governing resistance'
 N_Rd
 UC_1 = N_Ed/N_Rd
 #if UC_1 ≤ 1.0
-    'UC = N<sub>Ed</sub>/N<sub>Rd</sub> = 'UC_1'<span style="color: green"> ≤ 1.0 → <b>voldoet</b></span>
+    'UC = N<sub>Ed</sub>/N<sub>Rd</sub> = 'UC_1'<span style="color: green"> ≤ 1.0 → <b>passes</b></span>
 #else
-    'UC = N<sub>Ed</sub>/N<sub>Rd</sub> = 'UC_1'<span style="color: red"> > 1.0 → <b>voldoet niet</b></span>
+    'UC = N<sub>Ed</sub>/N<sub>Rd</sub> = 'UC_1'<span style="color: red"> > 1.0 → <b>fails</b></span>
 #end if
 
 # 9. Constante minimum first-orde eccentricity
 
-'<i>Naast de werkelijke excentriciteit wordt de wand getoetst op een constante
-'minimale eerste-orde excentriciteit met N<sub>Ed,max</sub>. Daarbij vervalt de gunstige
-'inklemming boven/onder (ρ<sub>2</sub> = 1,00); een verticale randsteuning blijft wél
-'meetellen. de referentie-uitwerking slaat deze toets over zodra de vorige al niet voldoet.</i>
-h_ef2 = rho_nm*h_w', effectieve hoogte met rho_2 = 1,00 (5.2)'
+'<i>Besides actual eccentricity, the wall is checked with constant minimum first-order eccentricity and N<sub>Ed,max</sub>. Favorable top/bottom restraint is removed (ρ<sub>2</sub> = 1.00), while vertical edge support remains. The reference skips this check if the preceding check already fails.</i>
+h_ef2 = rho_nm*h_w', effective height with rho_2 = 1.00 (5.2)'
 e_m2 = max(10*mm; h_ef2/300)', constante minimale excentriciteit'
 h_ef2
 e_m2
@@ -277,9 +261,9 @@ e_m2
     lam_2 = h_ef2/t_ef
     UC_lam2 = lam_2/27
     #if lam_2 ≤ 27
-        'λ = h<sub>ef2</sub>/t<sub>ef</sub> = 'lam_2' ≤ 27 — u.c. = 'UC_lam2'<span style="color: green"> → <b>voldoet</b></span>
+        'λ = h<sub>ef2</sub>/t<sub>ef</sub> = 'lam_2' ≤ 27 — u.c. = 'UC_lam2'<span style="color: green"> → <b>passes</b></span>
     #else
-        'λ = h<sub>ef2</sub>/t<sub>ef</sub> = 'lam_2' > 27 — u.c. = 'UC_lam2'<span style="color: red"> → <b>voldoet niet</b></span>
+        'λ = h<sub>ef2</sub>/t<sub>ef</sub> = 'lam_2' > 27 — u.c. = 'UC_lam2'<span style="color: red"> → <b>fails</b></span>
     #end if
     e_mk2 = max(e_m2 + e_k; 0.05*t_w)', (6.6)'
     e_mk2
@@ -295,13 +279,13 @@ e_m2
     N_Rdm2
     UC_2 = N_Ed_max/N_Rdm2
     #if UC_2 ≤ 1.0
-        'UC = N<sub>Ed,max</sub>/N<sub>Rd,m2</sub> = 'UC_2'<span style="color: green"> ≤ 1.0 → <b>voldoet</b></span>
+        'UC = N<sub>Ed,max</sub>/N<sub>Rd,m2</sub> = 'UC_2'<span style="color: green"> ≤ 1.0 → <b>passes</b></span>
     #else
-        'UC = N<sub>Ed,max</sub>/N<sub>Rd,m2</sub> = 'UC_2'<span style="color: red"> > 1.0 → <b>voldoet niet</b></span>
+        'UC = N<sub>Ed,max</sub>/N<sub>Rd,m2</sub> = 'UC_2'<span style="color: red"> > 1.0 → <b>fails</b></span>
     #end if
     UC_lam2m = UC_lam2
 #else
-    'Niet uitgevoerd: de wand voldoet al niet op de werkelijke excentriciteit.
+    'Not performed: the wall already fails with actual eccentricity.
     UC_2 = 0
     UC_lam2m = 0
 #end if
@@ -310,38 +294,10 @@ e_m2
 
 UC_max = max(UC_lam; UC_lam2m; UC_1; UC_2)
 #if UC_max ≤ 1.0
-    '<b>Maatgevende UC = 'UC_max'</b><span style="color: green"> ≤ 1.0 → <b>Dragende metselwerkwand voldoet</b></span>
+    '<b>Governing UC = 'UC_max'</b><span style="color: green"> ≤ 1.0 → <b>Dragende metselwerkwand passes</b></span>
 #else
-    '<b>Maatgevende UC = 'UC_max'</b><span style="color: red"> > 1.0 → <b>Dragende metselwerkwand voldoet niet</b></span>
+    '<b>Governing UC = 'UC_max'</b><span style="color: red"> > 1.0 → <b>Dragende metselwerkwand fails</b></span>
 #end if
 
-'<hr/>
-'<i>Aandachtspunten:
-'<ul>
-'<li>Gecalibreerd op 14 de referentie-uitwerking-referenties (kalkzandsteen CS12/M15 en baksteen fb18/L12,5,
-'categorie I, CC2 en CC3, n = 2/3/4, N<sub>Ed</sub> = 30 tot 300 kN, M = 0 tot 10 kNm): alle exact
-'gereproduceerd.</li>
-'<li>ρ<sub>2</sub> = 0,75 geldt alléén zolang e<sub>t</sub> = |M<sub>1Ed</sub>|/|N<sub>Ed</sub>| ≤ 0,25·t;
-'daarboven vervalt de inklemming en wordt ρ<sub>2</sub> = 1,00 (§5.5.1.2(4)). De regel kijkt alleen
-'naar de kop.</li>
-'<li><b>Nog niet geverifieerd:</b> de ρ<sub>2</sub> per ondersteuningsoptie. De vier
-'referentiebladen met elk een andere optie hebben allemaal e<sub>t</sub> = 50 mm > 0,25·t,
-'waardoor ρ<sub>2</sub> = 1,00 wordt ongeacht de keuze — ze zijn vanaf blad 2 identiek. Dit blad
-'volgt EN 1996-1-1 §5.5.1.2: beton (optie 1-2) → 0,75, hout (optie 3-4) → 1,00.</li>
-'<li>E = 700·f<sub>k</sub> (NB:2018) en φ<sub>∞</sub> = 0, dus e<sub>k</sub> = 0 — beide uit de
-'referenties teruggerekend. φ<sub>∞</sub> is invoerbaar voor het geval een andere NB-waarde geldt.</li>
-'<li>De f<sub>k</sub>-exponenten hangen af van steensoort én morteltype. Geverifieerd zijn
-'kalkzandsteen + metselmortel (0,6 / 0,65 / 0,25), baksteen + lijmmortel (0,8 / 0,75 / 0,10) en
-'cellenbeton + lijmmortel (0,8 / 0,85 / 0). <b>De overige lijmmortel-combinaties volgen dat patroon
-'maar zijn niet tegen een referentie getoetst.</b></li>
-'<li>Een verticale randsteuning vervalt zodra L<sub>v</sub> ≥ 15·t (n = 3) respectievelijk
-'L<sub>v</sub> ≥ 30·t (n = 4); beide grenzen zijn geverifieerd.</li>
-'<li>N<sub>Ed,max</sub> komt uitsluitend voor in de minimale-excentriciteitstoets. Die toets
-'behoudt de verticale randsteuning en wordt overgeslagen zodra de eerste toets al niet voldoet —
-'precies zoals de referentie-uitwerking rapporteert.</li>
-'<li>Nog niet vastgelegd: of die extra toets óók loopt wanneer de werkelijke excentriciteit
-'gróter is dan de minimale (e<sub>m</sub> > e<sub>m2</sub>) en de eerste toets tóch voldoet. Dit blad
-'voert hem dan uit — de veilige kant. Een referentie met bijvoorbeeld M<sub>mEd</sub> = 5 kNm en
-'N<sub>Ed</sub> = 60 kN zou dat beslissen.</li>
-'</ul></i>
+'<hr/><i>Limitations:<ul><li>Fourteen reference cases were reproduced exactly: calcium silicate CS12/M15 and clay brick fb18/L12.5, category I, CC2/CC3, n=2/3/4, N<sub>Ed</sub>=30–300 kN, and M=0–10 kNm.</li><li>ρ<sub>2</sub>=0.75 applies only while top eccentricity e<sub>t</sub>=|M<sub>1Ed</sub>|/|N<sub>Ed</sub>| ≤ 0.25·t. Beyond this, restraint is lost and ρ<sub>2</sub>=1.00 (§5.5.1.2(4)). Only the top is considered.</li><li><b>Unverified:</b> ρ<sub>2</sub> for each support option. Four reference sheets all have e<sub>t</sub>=50 mm &gt; 0.25·t, forcing ρ<sub>2</sub>=1.00 regardless of selection. This sheet follows EN 1996-1-1 §5.5.1.2: concrete options 1/2 → 0.75; timber options 3/4 → 1.00.</li><li>E=700·f<sub>k</sub> (NB:2018) and φ<sub>∞</sub>=0, hence e<sub>k</sub>=0, are derived from references. φ<sub>∞</sub> can be entered for other national annexes.</li><li>f<sub>k</sub> exponents depend on unit and mortar type. Verified K/α/β sets are calcium silicate with general-purpose mortar 0.6/0.65/0.25, clay brick with thin-layer mortar 0.8/0.75/0.10, and aerated concrete with thin-layer mortar 0.8/0.85/0. Other thin-layer combinations follow the pattern but are not reference-verified.</li><li>Vertical edge support is lost when L<sub>v</sub> ≥ 15·t for n=3 or ≥30·t for n=4; both limits are verified.</li><li>N<sub>Ed,max</sub> is used only for minimum eccentricity. That check retains vertical edge support and is skipped if the first check fails, matching the reference.</li><li>It remains unconfirmed whether the extra check also runs when actual eccentricity exceeds the minimum (e<sub>m</sub> &gt; e<sub>m2</sub>) and the first check passes. This sheet conservatively runs it. A reference with M<sub>mEd</sub>=5 kNm and N<sub>Ed</sub>=60 kN would resolve this.</li></ul></i>
 `;

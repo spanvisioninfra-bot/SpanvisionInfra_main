@@ -440,8 +440,8 @@ function ProjectBrowser() {
                     type="button"
                     className={`cpt-list-eye${isHidden ? " is-hidden" : ""}`}
                     onClick={(e) => { e.stopPropagation(); toggleHidden(c.id); }}
-                    aria-label={isHidden ? t("show", "Tonen") : t("hide", "Verbergen")}
-                    title={isHidden ? t("show", "Tonen") : t("hide", "Verbergen")}
+                    aria-label={isHidden ? t("show", "Show") : t("hide", "Verbergen")}
+                    title={isHidden ? t("show", "Show") : t("hide", "Verbergen")}
                   >
                     {isHidden ? <EyeOffIcon /> : <EyeIcon />}
                   </button>

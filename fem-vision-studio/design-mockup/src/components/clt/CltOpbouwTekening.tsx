@@ -187,7 +187,7 @@ export function spanningsDecimalen(v: number): number {
 }
 
 function fmt(v: number, digits = spanningsDecimalen(v)): string {
-  return v.toLocaleString("nl-NL", { maximumFractionDigits: digits });
+  return v.toLocaleString("en-GB", { maximumFractionDigits: digits });
 }
 
 function maat(v: number): string {

@@ -62,8 +62,8 @@ export type XerScheduleOptionColumnDisposition =
   | { field: string; status: 'mapped'; target: string }
   | { field: string; status: 'ignored' | 'todo'; reason: string };
 
-const resourceLevelingReason = 'De CPM-solver voert geen resource-nivellering uit; het nivelleerfundament '
-  + '(`schedulingOptions.leveling`) leest deze instelling (nog) niet — alleen keep/all/prioriteit/resourcelijst.';
+const resourceLevelingReason = 'The CPM solver does not perform resource leveling; the leveling foundation '
+  + '(`schedulingOptions.leveling`) does not yet use this setting — only keep/all/priority/resource list.';
 
 /** Exhaustieve bestemming van de 27 kolommen uit de openbare corpus-union. */
 export const XER_SCHEDOPTIONS_COLUMN_DISPOSITIONS: readonly XerScheduleOptionColumnDisposition[] = [
@@ -71,7 +71,7 @@ export const XER_SCHEDOPTIONS_COLUMN_DISPOSITIONS: readonly XerScheduleOptionCol
   {
     field: 'key_activity_for_multiple_longest_paths',
     status: 'todo',
-    reason: 'OPS kan meerdere floatpaden berekenen maar heeft nog geen eindactiviteit-anker in het model.',
+    reason: 'OPS can calculate multiple float paths, but the model does not yet have an end-activity anchor.',
   },
   { field: 'level_all_rsrc_flag', status: 'mapped', target: 'schedulingOptions.leveling.levelAllResources' },
   { field: 'level_float_thrs_cnt', status: 'ignored', reason: resourceLevelingReason },
@@ -91,14 +91,14 @@ export const XER_SCHEDOPTIONS_COLUMN_DISPOSITIONS: readonly XerScheduleOptionCol
   {
     field: 'sched_outer_depend_type',
     status: 'todo',
-    reason: 'Externe-relatieplanning vereist het X4b-multi-projectpad en valt buiten de X5-schrijfgrens.',
+    reason: 'Scheduling external relationships requires the X4b multi-project path and is outside the X5 write scope.',
   },
   { field: 'sched_progress_override', status: 'mapped', target: 'project.progressMode' },
   { field: 'sched_retained_logic', status: 'mapped', target: 'project.progressMode' },
   {
     field: 'sched_setplantoforecast',
     status: 'todo',
-    reason: 'OPS heeft nog geen afzonderlijke planned-versus-forecast-taakdatums die dit veilig kunnen consumeren.',
+    reason: 'OPS does not yet have separate planned and forecast task dates that can safely use this setting.',
   },
   { field: 'sched_use_expect_end_flag', status: 'mapped', target: 'schedulingOptions.useExpectedFinishDates' },
   {
@@ -106,7 +106,7 @@ export const XER_SCHEDOPTIONS_COLUMN_DISPOSITIONS: readonly XerScheduleOptionCol
     status: 'mapped',
     target: 'schedulingOptions.useProjectEndDateForFloat',
   },
-  { field: 'schedhash', status: 'ignored', reason: 'Technische bronhash; geen planningssemantiek of stabiele OPS-identiteit.' },
+  { field: 'schedhash', status: 'ignored', reason: 'Technical source hash; no scheduling semantics or stable OPS identity.' },
   {
     field: 'schedoptions_id',
     status: 'mapped',
@@ -440,7 +440,7 @@ function levelingValue(
   for (const listRow of listRows) {
     const sourceId = listRow.cells.rsrc_id?.trim() ?? '';
     if (!index.resourceSourceIds.has(sourceId)) {
-      reportFallback(fallbacks, listRow, 'RSRCLEVELLIST.rsrc_id', sourceId, 'weggelaten (geen RSRC-rij)');
+      reportFallback(fallbacks, listRow, 'RSRCLEVELLIST.rsrc_id', sourceId, 'omitted (no RSRC row)');
       continue;
     }
     if (seen.has(sourceId)) continue;
@@ -469,7 +469,7 @@ function levelingValue(
 function reportOrphanLevelResourceRows(index: XerScheduleOptionsIndex, fallbacks: XerScheduleOptionFallback[]): void {
   for (const listRow of index.orphanLevelResourceRows) {
     reportFallback(fallbacks, listRow, 'RSRCLEVELLIST.schedoptions_id',
-      listRow.cells.schedoptions_id?.trim() || "(empty)", 'weggelaten (geen SCHEDOPTIONS-rij)');
+      listRow.cells.schedoptions_id?.trim() || "(empty)", 'omitted (no SCHEDOPTIONS row)');
   }
 }
 
@@ -565,7 +565,7 @@ export function deriveXerScheduleOptions(
       row,
       'sched_use_project_end_date_for_float',
       row.cells.sched_use_project_end_date_for_float?.trim() ?? '',
-      'N (geen projecteinddatum en geen taakeinddatum in de bron: projecteinde = max(EF))',
+      'N (no project or task finish date in the source: project finish = max(EF))',
     );
   }
 

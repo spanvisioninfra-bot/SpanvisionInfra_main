@@ -1322,7 +1322,7 @@ export function buildTaskColumnRegistry(input: TaskColumnRegistryInput): TaskCol
   ];
   const seen = new Set<TaskColumnId>();
   for (const column of columns) {
-    if (seen.has(column.id)) throw new Error(`Dubbele TaskColumnId: ${column.id}`);
+    if (seen.has(column.id)) throw new Error(`Duplicate TaskColumnId: ${column.id}`);
     seen.add(column.id);
   }
   return columns

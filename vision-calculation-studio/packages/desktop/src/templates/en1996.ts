@@ -42,7 +42,7 @@ f_m = 5 N/mm^2
 
 #if steentype == 1
 #if morteltype == 1
-Factor K (baksteen groep 1, mortel voor alg. gebruik):
+Factor K (clay brick group 1, general-purpose mortar):
 
 K = 0.55
 alpha = 0.7
@@ -58,7 +58,7 @@ beta = 0
 
 #if steentype == 2
 #if morteltype == 1
-Factor K (baksteen groep 2, mortel voor alg. gebruik):
+Factor K (clay brick group 2, general-purpose mortar):
 
 K = 0.45
 alpha = 0.7
@@ -74,7 +74,7 @@ beta = 0
 
 #if steentype == 3
 #if morteltype == 1
-Factor K (KZS, mortel voor alg. gebruik):
+Factor K (calcium silicate, general-purpose mortar):
 
 K = 0.55
 alpha = 0.7
@@ -90,7 +90,7 @@ beta = 0
 
 #if steentype == 4
 #if morteltype == 1
-Factor K (cellenbeton, mortel voor alg. gebruik):
+Factor K (aerated concrete, general-purpose mortar):
 
 K = 0.55
 alpha = 0.7
@@ -106,7 +106,7 @@ beta = 0
 
 #if steentype == 5
 #if morteltype == 1
-Factor K (betonsteen, mortel voor alg. gebruik):
+Factor K (concrete block, general-purpose mortar):
 
 K = 0.55
 alpha = 0.7
@@ -148,7 +148,7 @@ E = K_E * f_k to N/mm^2
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** EN 1996-1-1 §6.1.2 — Wand belast op druk */
-export const en1996Drukwand = `# Toetsing Drukwand — EN 1996-1-1 §6.1.2
+export const en1996Drukwand = `# Masonry compression wall check — EN 1996-1-1 §6.1.2
 
 ## Steentype en morteltype
 
@@ -253,7 +253,7 @@ Category III (gamma_M = 2.2) = 2.2
 
 gamma_M = categorie * 1
 
-Rekenwaarde druksterkte:
+Design compressive strength:
 
 f_d = f_k / gamma_M to N/mm^2
 
@@ -269,12 +269,12 @@ t = 100 mm
 
 @select oplegging_boven "Oplegging top side (table 5.1)"
 Betonvloer both sides (rho_2 = 0.75) = 0.75
-Betonvloer een side (rho_2 = 0.75) = 0.75
+Concrete floor on one side (rho_2 = 0.75) = 0.75
 Houten vloer (rho_2 = 1.0) = 1.00
 Vrije edge (rho_2 = 1.0) = 1.00
 @end
 
-Reductiefactor rho_2 (tabel 5.1):
+Reduction factor rho_2 (Table 5.1):
 
 rho_2 = oplegging_boven * 1
 
@@ -288,7 +288,7 @@ t_ef = t to mm
 
 ## Slenderness (art. 5.5.1.4)
 
-Slankheid:
+Slenderness:
 
 slankheid = h_ef / t_ef
 
@@ -306,11 +306,11 @@ Initiele excentriciteit (formule 6.5):
 
 e_init = h_ef / 450 to mm
 
-Excentriciteit door belasting (M_Ed/N_Ed):
+Eccentricity from loads (M_Ed/N_Ed):
 
 e_belasting = 0 mm
 
-Totale excentriciteit aan kop/voet:
+Total eccentricity at top/base:
 
 e_top = e_init + e_belasting to mm
 
@@ -320,15 +320,15 @@ Excentriciteitsverhouding:
 
 e_ratio = e_top / t
 
-Phi_1 (formule 6.4, aan kop/voet):
+Phi_1 (expression 6.4, at top/base):
 
 Phi_1 = 1 - 2 * e_top / t
 
-Phi_2 (formule 6.4, op halve hoogte, vereenvoudigd):
+Phi_2 (expression 6.4, at mid-height, simplified):
 
 Phi_2 = 1 - 2 * e_top / t
 
-Maatgevende Phi (kleinste waarde):
+Governing Phi (smallest value):
 
 #if Phi_1 < Phi_2
 Phi = Phi_1
@@ -338,17 +338,17 @@ Phi = Phi_2
 
 ## Load
 
-Normaalkracht per strekkende meter wand:
+Axial force per meter of wall:
 
 N_Ed = 50 kN/m
 
 ## Draagvermogen (formula 6.2)
 
-Rekenwaarde draagvermogen per m' wand:
+Design resistance per meter of wall:
 
 N_Rd = Phi * t * f_d to kN/m
 
-## Toetsing (art. 6.1.2)
+## Check (art. 6.1.2)
 
 Unity check:
 
@@ -417,7 +417,7 @@ UC_druk = N_Ed / N_Rd
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** EN 1996-1-1 §6.2 — Afschuiving metselwerk */
-export const en1996Afschuiving = `# Toetsing Shear Masonry — EN 1996-1-1 §6.2
+export const en1996Afschuiving = `# Masonry shear check — EN 1996-1-1 §6.2
 
 ## Material
 
@@ -428,7 +428,7 @@ Aerated concrete = 3
 Concrete block = 4
 @end
 
-Karakteristieke afschuifhechting f_vk,0 (tabel 3.4 NB):
+Characteristic initial shear strength f_vk,0 (NB Table 3.4):
 
 #if steentype == 1
 f_vk0 = 0.15 N/mm^2
@@ -464,13 +464,13 @@ Wandlengte (schuifwand):
 
 L_w = 3000 mm
 
-Doorsnede schuifwand:
+Shear wall cross-section:
 
 A_s = t * L_w to mm^2
 
 ## Load
 
-Normaalkracht op schuifwand:
+Axial force on the shear wall:
 
 N_Ed = 80 kN
 
@@ -497,14 +497,14 @@ Bovengrens f_vk (art. 3.6.2):
 f_vk_max = 0.045 * f_b to N/mm^2
 
 #if f_vk > f_vk_max
-  f_vk wordt begrensd op {{f_vk_max}} N/mm^2 (bovengrens).
+  f_vk is limited to {{f_vk_max}} N/mm^2 (upper bound).
 #end if
 
-Rekenwaarde afschuifsterkte:
+Design shear strength:
 
 f_vd = f_vk / gamma_M to N/mm^2
 
-## Toetsing (formula 6.13)
+## Check (expression 6.13)
 
 Schuifspanning:
 
@@ -526,11 +526,11 @@ UC_afschuiving = tau_d / f_vd
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** EN 1996-1-1 §5.5.1 — Slankheid en effectieve hoogte */
-export const en1996Slankheid = `# Slenderness en Effectieve Hoogte — EN 1996-1-1 §5.5.1
+export const en1996Slankheid = `# Slenderness and effective height — EN 1996-1-1 §5.5.1
 
 ## Geometry
 
-Wandhoogte (vrije hoogte):
+Wall height (clear height):
 
 h = 2700 mm
 
@@ -553,7 +553,7 @@ Vrije top (rho_2 = 2.0) = 2.0
 
 rho_2 = oplegging * 1
 
-Effectieve hoogte (formule 5.3):
+Effective height (expression 5.3):
 
 h_ef = rho_2 * h to mm
 
@@ -561,7 +561,7 @@ h_ef = rho_2 * h to mm
 
 @select wandtype "Type wall"
 Enkelblads wall (rho_t = 1.0) = 1.0
-Spouwmuur met spouwankers (rho_t = 0.7) = 0.7
+Cavity wall with ties (rho_t = 0.7) = 0.7
 @end
 
 rho_t = wandtype * 1
@@ -572,11 +572,11 @@ t_ef = rho_t * t to mm
 
 ## Slankheidscontrole (art. 5.5.1.4)
 
-Slankheid:
+Slenderness:
 
 lambda = h_ef / t_ef
 
-Grenswaarde slankheid:
+Slenderness limit:
 
 lambda_max = 27
 

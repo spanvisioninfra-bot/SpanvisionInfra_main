@@ -451,9 +451,9 @@ function writeXerSourceArchive(
   ctx: WriteContext, ownerHistId: number, archive: XerSourceArchive | undefined, sourceProjectId: string | undefined,
 ): void {
   if (!archive) return;
-  if (!sourceProjectId) throw new Error('XER-bronarchief kan niet zonder OPS_XerDocument-selector worden opgeslagen.');
+  if (!sourceProjectId) throw new Error('The XER source archive cannot be saved without an OPS_XerDocument selector.');
   if (!archive.diagnostics.documentViews[sourceProjectId]) {
-    throw new Error('XER-bronarchief kan niet zonder geldige OPS_XerDocument-selector worden opgeslagen.');
+    throw new Error('The XER source archive cannot be saved without a valid OPS_XerDocument selector.');
   }
   const props: number[] = [];
   const property = (name: string, value: string) => props.push(addLine(ctx, `xerarchive_prop_${name}`, `IFCPROPERTYSINGLEVALUE(${ifcStr(name)},$,${value},$)`));
@@ -510,7 +510,7 @@ function ifcTypedValue(type: CustomFieldType, value: CustomFieldValue): string {
       // COMPILE-fout (het valt dan niet meer onder `never`). Zo kan de writer nooit stil een
       // veld overslaan.
       const _exhaustive: never = type;
-      throw new Error(`Onbekend custom-field-type: ${String(_exhaustive)}`);
+      throw new Error(`Unknown custom field type: ${String(_exhaustive)}`);
     }
   }
 }

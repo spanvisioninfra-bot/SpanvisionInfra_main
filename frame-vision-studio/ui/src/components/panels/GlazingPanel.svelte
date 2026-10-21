@@ -64,7 +64,7 @@
       const k = await invoke("get_kozijn", { id: $currentKozijn.id });
       currentKozijn.set(k);
     } catch (e) {
-      console.error("Glazing update fout:", e);
+      console.error("Glazing update failed:", e);
     }
   }
 
@@ -80,7 +80,7 @@
       const k = await invoke("get_kozijn", { id: $currentKozijn.id });
       currentKozijn.set(k);
     } catch (e) {
-      console.error("Glazing update fout:", e);
+      console.error("Glazing update failed:", e);
     }
   }
 </script>

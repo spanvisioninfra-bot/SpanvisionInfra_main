@@ -281,7 +281,7 @@ function shareRecoveredXerArchives(docs: readonly RecoveryDocInput[]): RecoveryD
   ): RecoveryDocInput => {
     const selector = doc.xerSourceProjectId ?? doc.xer?.sourceProjectId;
     if (!selector) {
-      throw new XerSourceArchiveValidationError('XER-recovery mist een documentselector');
+      throw new XerSourceArchiveValidationError("XER recovery is missing a document selector");
     }
     const metadata = bindXerImportMetadataToArchive(archive, selector);
     return {

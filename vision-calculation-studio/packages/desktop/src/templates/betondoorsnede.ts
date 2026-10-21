@@ -10,15 +10,12 @@
 
 export const betondoorsnede = `"Concrete section — rectangular section below M, N, V en T
 
-'<i>Een gewapende rechthoekige doorsnede met drie wapeningslagen en beugels.
-'De invoer legt de geometrie, de dekking en de staafverdeling vast; daaruit
-'volgen straks de inwendige hefboomsarmen en de weerstanden. De karakteristieke
-'krachten N<sub>k</sub> en M<sub>k</sub> dienen voor de scheurwijdte.</i>
+'<i>A reinforced rectangular section with three reinforcement layers and stirrups. Inputs define geometry, cover, and bar layout, from which internal lever arms and resistances will be derived. Characteristic forces N<sub>k</sub> and M<sub>k</sub> are used for crack-width checks.</i>
 
 # 1. Section
 
-b_dsn = ?*(mm)', breedte b'
-h_dsn = ?*(mm)', hoogte h'
+b_dsn = ?*(mm)', width b'
+h_dsn = ?*(mm)', height h'
 
 @select betonklasse "Concrete strength class"
   C20/25 = 20
@@ -36,30 +33,30 @@ h_dsn = ?*(mm)', hoogte h'
   B500C = 3
 @end
 
-c_dek = ?*(mm)', dekking op de beugel c'
+c_dek = ?*(mm)', stirrup cover c'
 
 # 2. Reinforcement
 
-n_onder = ?', aantal staven onderin'
+n_onder = ?', number of bottom bars'
 d_onder = ?*(mm)', staafdiameter onderin'
-n_midden = ?', aantal staven in de tussenlaag (0 = geen)'
+n_midden = ?', number of intermediate-layer bars (0 = none)'
 d_midden = ?*(mm)', staafdiameter tussenlaag'
-n_boven = ?', aantal staven bovenin'
+n_boven = ?', number of top bars'
 d_boven = ?*(mm)', staafdiameter bovenin'
 d_beugel = ?*(mm)', beugeldiameter'
 s_beugel = ?*(mm)', beugelafstand'
-n_sneden = ?', aantal beugelsneden'
+n_sneden = ?', number of stirrup legs'
 
 # 3. Loads
 
-N_Ed = ?*(kN)', normaalkracht N_Ed (druk positief)'
-M_Ed = ?*(kN*m)', buigend moment M_Ed'
+N_Ed = ?*(kN)', axial force N_Ed (compression positive)'
+M_Ed = ?*(kN*m)', bending moment M_Ed'
 V_Ed = ?*(kN)', dwarskracht V_Ed'
 T_Ed = ?*(kN*m)', wringend moment T_Ed'
-N_k = ?*(kN)', karakteristieke normaalkracht N_k (BGT)'
+N_k = ?*(kN)', characteristic axial force N_k (SLS)'
 M_k = ?*(kN*m)', karakteristiek moment M_k (BGT)'
 
-'<h6>Overzicht van de invoer</h6>
+'<h6>Input summary</h6>
 b_dsn
 h_dsn
 c_dek
@@ -71,11 +68,7 @@ N_Ed
 M_Ed
 V_Ed
 
-# 4. Toetsing
+# 4. Checks
 
-'<i><b>Nog niet uitgewerkt.</b> Dit blad legt voorlopig alleen de invoer en de
-'parametrische doorsnede vast. De M-N-interactie met het rechthoekige
-'spanningsblok, de dwarskracht volgens §6.2 (V<sub>Rd,c</sub> en de
-'vakwerkanalogie), de wringing van §6.3 en de scheurwijdte van §7.3 volgen —
-'net als het M-N-κ-diagram.</i>
+'<i><b>Not yet implemented.</b> This sheet currently defines inputs and the parametric section only. M-N interaction with the rectangular stress block, shear per §6.2 (V<sub>Rd,c</sub> and truss analogy), torsion per §6.3, crack width per §7.3, and the M-N-κ diagram are planned.</i>
 `;

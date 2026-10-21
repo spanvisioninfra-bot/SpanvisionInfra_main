@@ -1145,9 +1145,17 @@ body,
   padding: 8px 10px;
   height: 100%;
 }
-/* The Locatie section reserves 50% of the right-panel height for the map. */
-.right-panel-section:has(.mini-map) { flex: 1 1 50%; min-height: 0; }
+/* Keep the map visible while location controls flow below it. */
+.right-panel-section:has(.mini-map) { flex: 1 0 auto; min-height: 260px; }
 .right-panel-section { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+.mini-map-workspace { display: flex; flex-direction: column; flex: 1; min-height: 220px; }
+.mini-map-location { flex: none; }
+:root[data-sv-tool] .mini-map-location .sv-map-location {
+  position: static; max-width: none; padding: 6px 0; box-sizing: border-box;
+  background: transparent; border: 0; box-shadow: none; border-radius: 0;
+  gap: 4px; font-size: 11px; overflow-wrap: anywhere;
+}
+:root[data-sv-tool] .mini-map-location .sv-map-location button { min-height: 28px; padding: 4px 8px; }
 .mini-map {
   width: 100%;
   flex: 1;

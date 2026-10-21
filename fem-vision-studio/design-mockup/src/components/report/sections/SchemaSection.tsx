@@ -56,7 +56,7 @@ export default function SchemaSection() {
     return (
       <div className="rpt-block">
         <h2 className="rpt-h2">{t("report.sectionSchema", "Constructieschets")}</h2>
-        <p className="rpt-empty-note">{t("report.noNodes", "Geen knopen in het model.")}</p>
+        <p className="rpt-empty-note">{t("report.noNodes", "No nodes in the model.")}</p>
       </div>
     );
   }
@@ -318,7 +318,7 @@ export default function SchemaSection() {
       <p className="rpt-note">
         {t(
           "report.schemaLegend",
-          "Knoopnummers zwart, staafnummers grijs tussen haakjes; maten in m, lasten karakteristiek per belastinggeval (G/Q/S/W).",
+          "Node numbers are black, member numbers are grey in parentheses; dimensions in m and characteristic loads per load case (G/Q/S/W).",
         )}
         {heeftAanzicht && <> {t("report.schemaLegendAanzicht")}</>}
         {heeftKipsteunen && <> {t("report.schemaLegendKipsteunen")}</>}

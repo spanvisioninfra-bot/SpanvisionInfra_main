@@ -21,7 +21,7 @@ function ucClass(uc: number): string {
   return UC_CSS[ucKlasse(uc)];
 }
 
-const nl = (v: number, d: number) => v.toLocaleString("nl-NL", { maximumFractionDigits: d });
+const nl = (v: number, d: number) => v.toLocaleString("en-GB", { maximumFractionDigits: d });
 
 export function PlaatToetsKaart({ result, focusToken, namen, onToon }: {
   result: PlateCheckResult;

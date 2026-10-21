@@ -111,7 +111,7 @@ function IfcPane({
           </span>
           {content && (
             <span className="ifc-pane-filename">
-              {t("ifc.autoLive", "Live — automatisch gegenereerd")}
+              {t("ifc.autoLive", "Live — automatically generated")}
             </span>
           )}
         </div>

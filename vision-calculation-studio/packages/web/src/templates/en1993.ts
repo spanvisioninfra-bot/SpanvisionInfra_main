@@ -1274,7 +1274,7 @@ export const ec3Formules: { id: string; label: string; template: string }[] = [
   },
   {
     id: 'ec3-buiging-normaalkracht',
-    label: 'EC3: Buiging + normaalkracht (art. 6.2.9)',
+    label: 'EC3: Bending + axial force (art. 6.2.9)',
     template: ec3BuigingNormaalkracht,
   },
   {
@@ -1289,7 +1289,7 @@ export const ec3Formules: { id: string; label: string; template: string }[] = [
   },
   {
     id: 'ec3-doorbuiging',
-    label: 'EC3: Doorbuiging (art. 7.2)',
+    label: "EC3: Deflection (clause 7.2)",
     template: ec3Doorbuiging,
   },
   {

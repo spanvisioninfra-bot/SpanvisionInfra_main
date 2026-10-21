@@ -604,7 +604,7 @@ log("\n[8] Combinaties, verende aansluitingen en bedding");
   checkTrue("de combinaties hangen aan het analysemodel (LoadedBy)",
     /IFCSTRUCTURALANALYSISMODEL\([^)]*\(#\d+,#\d+,#\d+,#\d+\)/.test(ifc));
   checkTrue("de beperkingenlijst noemt de combinaties niet meer als weggelaten",
-    !verzamelIfcBeperkingen(model).some((r) => /combinatie/.test(r)));
+    !verzamelIfcBeperkingen(model).some((r) => /load combination/.test(r)));
   // Veren
   checkTrue("momentveer 5000 kNm/rad = 5e6 N·m/rad op de eindverbinding",
     /IFCBOUNDARYNODECONDITION\('Verende aansluiting',IFCBOOLEAN\(\.T\.\),\$,IFCBOOLEAN\(\.T\.\),\$,IFCROTATIONALSTIFFNESSMEASURE\(5000000\.?\d*\),\$\)/.test(ifc));
@@ -618,7 +618,7 @@ log("\n[8] Combinaties, verende aansluitingen en bedding");
   checkTrue("BeddingK 50000 kN/m³ = 5e7 N/m³", /'BeddingK',\$,IFCMODULUSOFSUBGRADEREACTIONMEASURE\(50000000\.?\d*\)/.test(ifc));
   checkTrue("BeddingBreedte 300 mm = 0,3 m", /'BeddingBreedte',\$,IFCPOSITIVELENGTHMEASURE\(0\.3\)/.test(ifc));
   checkTrue("zonder combinaties in de invoer blijft de melding staan",
-    verzamelIfcBeperkingen({ ...model, combinations: undefined }).some((r) => /combinatie/.test(r)));
+    verzamelIfcBeperkingen({ ...model, combinations: undefined }).some((r) => /load combination/.test(r)));
   checkEq("determinisme", bouwIfcRekenmodel(model), ifc);
 }
 
@@ -684,9 +684,9 @@ log("\n[9] Platen als IfcStructuralSurfaceMember, met randlasten");
   // Vier plaatlasten op plaat 1 (twee lineair, één curve, één punt), elk aan het vlaklid.
   checkEq("elke plaatlast hangt aan het vlaklid (plus geen staaflast)", tel(ifc, "IFCRELCONNECTSSTRUCTURALACTIVITY"), 4);
   const beperkingen = verzamelIfcBeperkingen(model).join("\n");
-  checkTrue("beperkingen: alleen de plaat zonder hoekknopen en haar randlast", /1 plaat zonder hoekknopen/.test(beperkingen) && /1 randbelasting/.test(beperkingen));
+  checkTrue("beperkingen: alleen de plaat zonder hoekknopen en haar randlast", /1 plate without corner nodes/.test(beperkingen) && /1 plate edge load/.test(beperkingen));
   checkTrue("een model met alleen getekende platen meldt niets over platen",
-    !verzamelIfcBeperkingen({ ...model, plates: [model.plates[0]], loads: model.loads.slice(0, 2) }).some((r) => /plaat|randbelasting/i.test(r)));
+    !verzamelIfcBeperkingen({ ...model, plates: [model.plates[0]], loads: model.loads.slice(0, 2) }).some((r) => /plate|plate edge load/i.test(r)));
   checkEq("determinisme", bouwIfcRekenmodel(model), ifc);
 }
 

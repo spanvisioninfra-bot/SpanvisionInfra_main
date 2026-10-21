@@ -157,9 +157,9 @@ export function buildFromMapping(data: TabularData, mapping: ColumnMapping): Imp
   const cUp = colOf('unitPrice');
   const cTot = colOf('total');
 
-  if (cDesc < 0) warnings.push('Geen kolom aan "Omschrijving" gekoppeld.');
+  if (cDesc < 0) warnings.push('No column is mapped to "Description".');
   if (cQty < 0 && cUp < 0 && cTot < 0 && cMat < 0 && cLab < 0) {
-    warnings.push('Geen prijs- of hoeveelheidskolom gekoppeld — alles wordt als hoofdstuk ingelezen.');
+    warnings.push('No price or quantity column is mapped — all rows will be imported as chapters.');
   }
 
   const cell = (row: string[], idx: number): string => (idx >= 0 ? (row[idx] ?? '').trim() : '');
@@ -228,7 +228,7 @@ export function buildFromMapping(data: TabularData, mapping: ColumnMapping): Imp
     });
   }
 
-  if (builder.length === 0) warnings.push('Geen bruikbare rijen gevonden met deze kolomindeling.');
+  if (builder.length === 0) warnings.push('No usable rows were found with this column mapping.');
 
   return {
     schedule: { name: data.sourceName || 'Import' },

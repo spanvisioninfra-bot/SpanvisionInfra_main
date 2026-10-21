@@ -22,7 +22,7 @@
         toast.success($_("procurement.generated"));
       }
     } catch (e) {
-      console.error("Inkoopvoorstel genereren mislukt:", e);
+      console.error("Failed to generate procurement proposal:", e);
       toast.error($_("procurement.generateError") + ": " + e);
     }
     loading = false;
@@ -37,7 +37,7 @@
         toast.success($_("procurement.generated"));
       }
     } catch (e) {
-      console.error("Bestellingen genereren mislukt:", e);
+      console.error("Failed to generate orders:", e);
       toast.error($_("procurement.generateError") + ": " + e);
     }
     loading = false;

@@ -15,7 +15,7 @@
     try {
       result = await invoke("optimize_project_cut_list", { stockLengthMm: stockLength });
     } catch (e) {
-      console.error("Zaagoptimalisatie mislukt:", e);
+      console.error("Cut optimization failed:", e);
     }
     loading = false;
   }

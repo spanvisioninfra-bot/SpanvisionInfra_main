@@ -16,9 +16,7 @@
 
 export const gording = `"Purlin — timber roof purlin according to EN 1995-1-1
 
-'<i>Toetsing van een houten dakgording op een enkelvoudige overspanning. Op een
-'schuin dak wordt de belasting ontbonden loodrecht (⊥, sterke as y) en evenwijdig
-'(∥, zwakke as z) aan het dakvlak → <b>dubbele buiging</b> (§6.1.6).</i>
+'<i>Checks a simply supported timber roof purlin. On a pitched roof, the load resolves perpendicular (⊥, strong axis y) and parallel (∥, weak axis z) to the roof plane, producing <b>biaxial bending</b> (§6.1.6).</i>
 
 # 1. Section and material
 
@@ -69,7 +67,7 @@ k_hy = if(h_g < 150*mm; min((150*mm/h_g)^0.2; 1.3); 1)
 k_hz = if(b_g < 150*mm; min((150*mm/b_g)^0.2; 1.3); 1)
 #show
 
-'<h6>Gekozen profiel en materiaal</h6>
+'<h6>Selected section and material</h6>
 b_g
 h_g
 f_mk
@@ -111,8 +109,7 @@ I_y
 I_z
 W_y
 W_z
-'<i><b>Splitspunt — eigen gewicht (register punt 8).</b> De referentie-uitwerking rekent met een
-'vaste 550 kg/m³ én g = 10 m/s², de norm met ρ<sub>mean</sub> uit EN 338 en g = 9,81.</i>
+'<i><b>Alternative assumption — self-weight (register item 8).</b> The reference calculation uses 550 kg/m³ and g = 10 m/s²; the code method uses ρ<sub>mean</sub> from EN 338 and g = 9.81.</i>
 g_eig_xc = A*5.5*kN/m^3 to kN/m', eigen gewicht — de referentie-uitwerking'
 g_eig_nb = A*ρ_mean*9.81*m/s^2 to kN/m', eigen gewicht — EN 338'
 g_eig = if(rekenwijze ≡ 1; g_eig_xc; g_eig_nb)', gehanteerd eigen gewicht'
@@ -127,11 +124,11 @@ g_eig
   Pitched roof = 2
 @end
 
-l_h = ?*(mm)', horizontale projectie van het dakvlak'
-h_v = ?*(mm)', hoogte (nok)'
+l_h = ?*(mm)', horizontal roof plane projection'
+h_v = ?*(mm)', ridge height'
 L_dag = ?*(mm)', dagmaat (overspanning gording)'
 a_opl = ?*(mm)', opleglengte (totaal)'
-n_gording = ?', aantal gordingen'
+n_gording = ?', number of purlins'
 
 #hide
 h_eff = if(dakType ≡ 1; 0*mm; h_v)
@@ -153,7 +150,7 @@ t_beschot = ?*(mm)', dikte dakbeschot'
   Automatisch (1000·t³/12) = 0
   Handmatig = 1
 @end
-I_beschot = ?*(mm^4)', I dakbeschot (bij handmatig)'
+I_beschot = ?*(mm^4)', roof decking I (manual input)'
 E_beschot = ?*(N/mm^2)', E dakbeschot'
 I_db = if(I_manual ≡ 1; I_beschot; 1000*mm*t_beschot^3/12)', gehanteerde I dakbeschot'
 I_db
@@ -166,29 +163,24 @@ g_dakplaat = ?*(kN/m^2)', e.g. dakplaat'
 g_plafond = ?*(kN/m^2)', e.g. plafond'
 P_gk = g_pannen + g_panlat + g_dakplaat + g_plafond', permanente dakbelasting'
 P_gk
-q_par = ?*(kN/m)', door muurplaat/nokgording opgenomen ∥-belasting'
+q_par = ?*(kN/m)', parallel load carried by the wall plate/ridge purlin'
 @select varType "Type variable load"
   Geconcentreerd Q_k = 1
   Distributed q_k = 2
 @end
 Q_k = ?*(kN)', geconcentreerde last'
-q_var = ?*(kN/m^2)', verdeelde veranderlijke belasting'
+q_var = ?*(kN/m^2)', distributed variable load'
 s_k = ?*(kN/m^2)', karakteristieke sneeuwbelasting (grondvlak)'
 
-'<h6>Wind</h6>
-'<i>Windgebied en terreincategorie staan in de <b>projectgegevens</b>; de
-'referentiehoogte z<sub>e</sub> hoort bij dít constructiedeel en staat daarom
-'hieronder. Een gording op 9 m en een gevelkolom op 4 m in hetzelfde gebouw
-'hebben een verschillende q<sub>p</sub>. De drukcoëfficiënten zijn vaste
-'NB-waarden (dakzone F-G-H).</i>
+'<h6>Wind</h6><i>Wind region and terrain category are set in <b>project settings</b>. Reference height z<sub>e</sub> belongs to this member and is entered below: a purlin at 9 m and facade column at 4 m in the same building have different q<sub>p</sub>. Pressure coefficients are fixed NB values for roof zones F-G-H.</i>
 
 @select windbron "Peak velocity pressure q_p"
   Berekenen uit de project details = 1
   Enter manually = 0
 @end
 
-z_wind = ?*(m)', referentiehoogte z_e boven maaiveld'
-q_wind_hand = ?*(kN/m^2)', q_p — alleen bij "zelf invullen"'
+z_wind = ?*(m)', reference height z_e above ground'
+q_wind_hand = ?*(kN/m^2)', q_p — manual input only'
 
 #hide
 'Tabel NB.1 — fundamentele basiswindsnelheid per windgebied.
@@ -202,8 +194,8 @@ ze_ruw = max(zw_ruw; zmin_ruw)
 verh = ze_ruw/z0_ruw
 vm_ruw = 0.19*(z0_ruw/0.05)^0.07*log(verh)*vb0_ruw
 #show
-v_b0 = vb0_ruw*(m/s)', basiswindsnelheid (Tabel NB.1); c_dir = c_season = 1'
-z_e = ze_ruw*(m)', gehanteerde hoogte — ten minste z_min'
+v_b0 = vb0_ruw*(m/s)', basic wind velocity (NB Table NB.1); c_dir = c_season = 1'
+z_e = ze_ruw*(m)', adopted height — at least z_min'
 k_r_w = 0.19*(z0_ruw/0.05)^0.07', terreinfactor (4.5)'
 c_r = k_r_w*log(verh)', ruwheidsfactor (4.4); c_o = 1 (vlak terrein, NB)'
 v_m = vm_ruw*(m/s)', gemiddelde windsnelheid (4.3)'
@@ -224,14 +216,11 @@ K_FI', gevolgklasse-factor uit de projectgegevens (EN 1990)'
 
 # 5. Load case 1 — Permanent
 
-'<i>Ontbinding t.o.v. het dakvlak: ⊥ = ·cos α (sterke as y), ∥ = ·sin α (zwakke as z).
-'De ∥-component wordt over alle gordingen verdeeld; q<sub>∥</sub> is de ontlasting
-'door muurplaat/nokgording.</i>
+'<i>Resolve loads relative to the roof plane: ⊥ = ·cos α (strong axis y), ∥ = ·sin α (weak axis z). The parallel component is shared by all purlins; q<sub>∥</sub> is the load carried by the wall plate/ridge purlin.</i>
 P_gy = P_gk*cos_α
 P_gz = P_gk*sin_α
-P_gz_tot = slope*P_gz + n_gording*g_eig*sin_α to kN/m', totale ∥-last over het dak'
-'De ontlasting door muurplaat/nokgording kan niet meer wegnemen dan er aan
-'∥-last ligt: op een plat dak is de ∥-component nul en blijft q_gz nul.
+P_gz_tot = slope*P_gz + n_gording*g_eig*sin_α to kN/m', total parallel load over the roof'
+'The wall plate/ridge purlin cannot relieve more than the existing parallel load. On a flat roof the parallel component is zero and q_gz remains zero.
 q_gz = max(0*(kN/m); (P_gz_tot - q_par)/n_gording) to kN/m', ∥-lijnlast per gording (zwakke as)'
 q_gy = hoh*P_gy + g_eig*cos_α to kN/m', ⊥-lijnlast per gording (sterke as)'
 q_gy
@@ -249,8 +238,7 @@ u_gz
 
 # 6. Load case 2 — Veranderlijke load
 
-'<i>Geconcentreerd Q<sub>k</sub> (concentratiefactor k<sub>r</sub>, kapt op 1,0; dakbeschot E·I
-'beïnvloedt alléén k<sub>r</sub>) óf verdeeld q<sub>k</sub> (op grondvlak, zoals sneeuw).</i>
+'<i>Apply either concentrated Q<sub>k</sub> (concentration factor k<sub>r</sub>, capped at 1.0; decking E·I affects only k<sub>r</sub>) or distributed q<sub>k</sub> on the ground projection, as for snow.</i>
 #hide
 kr_db = (E_beschot/(1*N/mm^2))*(I_db/(1*mm^4))/1000000/50000
 #show
@@ -287,7 +275,7 @@ Md_z', moment verdeelde last (zwakke as)'
 # 7. Load case 3 — Sneeuw
 
 μ_1 = if(α_deg ≤ 30; 0.8; if(α_deg ≥ 60; 0; 0.8*(60 - α_deg)/30))', vormcoëfficiënt'
-P_sn = μ_1*s_k', sneeuw op het dak (grondvlak)'
+P_sn = μ_1*s_k', roof snow load (ground projection)'
 q_sn = hoh*P_sn*cos_α to kN/m', verticale sneeuw-lijnlast per gording'
 μ_1
 q_sn
@@ -302,8 +290,8 @@ u_sz = 5/384*q_sz*L_th^4/(E_mean*I_z) to mm
 
 # 8. Load case 4 — Wind
 
-'<i>Wind werkt loodrecht op het dakvlak (alleen ⊥, sterke as).</i>
-P_w = (C_pe - C_pi)*q_wind', winddruk op het dakvlak'
+'<i>Wind acts perpendicular to the roof plane (⊥ only, strong axis).</i>
+P_w = (C_pe - C_pi)*q_wind', wind pressure on the roof plane'
 q_wy = hoh*P_w to kN/m', wind-lijnlast per gording (⊥)'
 P_w
 q_wy
@@ -312,14 +300,13 @@ V_wy = q_wy*L_th/2 to kN
 u_wy = 5/384*q_wy*L_th^4/(E_mean*I_y) to mm
 u_wy
 
-# 9. Toetsing SLS — deflection (§7.2)
+# 9. SLS checks — deflection (§7.2)
 
-'<i>Eindstand-doorbuiging per richting (ψ<sub>2</sub> = 0 voor dak/sneeuw/wind):
-'w<sub>fin</sub> = (1+k<sub>def</sub>)·u<sub>perm</sub> + u<sub>var,leidend</sub>. Grens = 0,004·L.</i>
+'<i>Final deflection in each direction (ψ<sub>2</sub> = 0 for roof/snow/wind): w<sub>fin</sub> = (1+k<sub>def</sub>)·u<sub>perm</sub> + u<sub>var,leidend</sub>. Limit = 0.004·L.</i>
 
 @select controleer "Check deflection"
-  Ja = 1
-  Nee = 0
+  Yes = 1
+  No = 0
 @end
 @select grensfactor "Permissible additional deflection"
   0.004 × L = 0.004
@@ -327,13 +314,13 @@ u_wy
   0.002 × L = 0.002
 @end
 @select dubbele "Biaxial bending (weak axis)"
-  Ja = 1
-  Nee = 0
+  Yes = 1
+  No = 0
 @end
 
 #if controleer ≡ 1
-    u_var_y = max(heeft_q*ud_y; uc_y; u_sy; u_wy)', maatgevende veranderlijke ⊥'
-    u_var_z = max(heeft_q*ud_z; uc_z; u_sz)', maatgevende veranderlijke ∥'
+    u_var_y = max(heeft_q*ud_y; uc_y; u_sy; u_wy)', governing variable load perpendicular to the roof'
+    u_var_z = max(heeft_q*ud_z; uc_z; u_sz)', governing variable load parallel to the roof'
     w_fin_y = (1 + k_def)*u_gy + u_var_y
     w_fin_z = (1 + k_def)*u_gz + u_var_z
     w_lim = grensfactor*L_th
@@ -342,37 +329,31 @@ u_wy
     w_lim
     UC_wy = w_fin_y/w_lim
     #if UC_wy ≤ 1.0
-        'UC<sub>w,y</sub> = w<sub>fin,y</sub>/w<sub>lim</sub> = 'UC_wy'<span style="color: green"> ≤ 1.0 → <b>voldoet</b></span>
+        'UC<sub>w,y</sub> = w<sub>fin,y</sub>/w<sub>lim</sub> = 'UC_wy'<span style="color: green"> ≤ 1.0 → <b>passes</b></span>
     #else
-        'UC<sub>w,y</sub> = w<sub>fin,y</sub>/w<sub>lim</sub> = 'UC_wy'<span style="color: red"> > 1.0 → <b>voldoet niet</b></span>
+        'UC<sub>w,y</sub> = w<sub>fin,y</sub>/w<sub>lim</sub> = 'UC_wy'<span style="color: red"> > 1.0 → <b>fails</b></span>
     #end if
     UC_wz = if(dubbele ≡ 1; w_fin_z/w_lim; 0)
     #if dubbele ≡ 1
         #if UC_wz ≤ 1.0
-            'UC<sub>w,z</sub> = w<sub>fin,z</sub>/w<sub>lim</sub> = 'UC_wz'<span style="color: green"> ≤ 1.0 → <b>voldoet</b></span>
+            'UC<sub>w,z</sub> = w<sub>fin,z</sub>/w<sub>lim</sub> = 'UC_wz'<span style="color: green"> ≤ 1.0 → <b>passes</b></span>
         #else
-            'UC<sub>w,z</sub> = w<sub>fin,z</sub>/w<sub>lim</sub> = 'UC_wz'<span style="color: red"> > 1.0 → <b>voldoet niet</b></span>
+            'UC<sub>w,z</sub> = w<sub>fin,z</sub>/w<sub>lim</sub> = 'UC_wz'<span style="color: red"> > 1.0 → <b>fails</b></span>
         #end if
     #end if
 #else
-    'Doorbuiging wordt niet getoetst.
+    'Deflection is not checked.
     UC_wy = 0
     UC_wz = 0
 #end if
 
-# 10. Toetsing ULS
+# 10. ULS checks
 
 '<h6>10.1 Belastingscombinaties (γ·K_FI)</h6>
 γ_G = 1.2*K_FI', 6.10b'
 γ_Q = 1.5*K_FI
 γ_G_a = 1.35*K_FI', 6.10a'
-'<i>De nationale bijlage geeft ψ<sub>0</sub> = 0 voor wind, sneeuw én de
-'dakbelasting zelf (categorie H). Daardoor valt in <b>6.10a</b> de begeleidende
-'term weg en blijft 1,35·G over — een combinatie zónder veranderlijke belasting,
-'en dus in de duurklasse <b>blijvend</b> met k<sub>mod</sub> = 0,60. Op een steil
-'dak, waar de ∥-component van het eigen gewicht groot is, wint die van 6.10b.
-'De referentie-uitwerking rekent alleen 6.10b; zie punt 10 van het afwijkingenregister.</i>
-'Combinatie 0 — alleen permanent, 6.10a (blijvend):
+'<i>The national annex gives ψ<sub>0</sub> = 0 for wind, snow, and roof load itself (category H). The accompanying term in <b>6.10a</b> therefore disappears, leaving 1.35·G without variable load: duration class <b>permanent</b>, k<sub>mod</sub> = 0.60. On a steep roof, a large parallel self-weight component can make this govern over 6.10b. The reference calculation uses only 6.10b; see register item 10.</i> Combination 0 — permanent only, 6.10a (permanent):
 My_0 = γ_G_a*M_gy
 Mz_0 = γ_G_a*M_gz
 Vz_0 = γ_G_a*V_gy
@@ -392,7 +373,7 @@ My_3 = γ_G*M_gy + γ_Q*M_sy
 Mz_3 = γ_G*M_gz + γ_Q*M_sz
 Vz_3 = γ_G*V_gy + γ_Q*V_sy
 Vy_3 = γ_G*V_gz + γ_Q*V_sz
-'Combinatie 4 — permanent + wind (kort, geen ∥):
+'Combination 4 — permanent + wind (short-term, no parallel component):
 My_4 = γ_G*M_gy + γ_Q*M_wy
 Mz_4 = γ_G*M_gz
 Vz_4 = γ_G*V_gy + γ_Q*V_wy
@@ -432,15 +413,15 @@ UC_612_nb = max(r612_0; r612_1; r612_2; r612_3; r612_4)
 UC_611 = if(rekenwijze ≡ 1; UC_611_xc; UC_611_nb)', maatgevend over de combinaties'
 UC_612 = if(dubbele ≡ 1; if(rekenwijze ≡ 1; UC_612_xc; UC_612_nb); 0)
 #if UC_611 ≤ 1.0
-    'UC<sub>6.11</sub> = σ<sub>m,y,d</sub>/f<sub>m,y,d</sub> + k<sub>m</sub>·σ<sub>m,z,d</sub>/f<sub>m,z,d</sub> = 'UC_611'<span style="color: green"> ≤ 1.0 → <b>voldoet</b></span>
+    'UC<sub>6.11</sub> = σ<sub>m,y,d</sub>/f<sub>m,y,d</sub> + k<sub>m</sub>·σ<sub>m,z,d</sub>/f<sub>m,z,d</sub> = 'UC_611'<span style="color: green"> ≤ 1.0 → <b>passes</b></span>
 #else
-    'UC<sub>6.11</sub> = σ<sub>m,y,d</sub>/f<sub>m,y,d</sub> + k<sub>m</sub>·σ<sub>m,z,d</sub>/f<sub>m,z,d</sub> = 'UC_611'<span style="color: red"> > 1.0 → <b>voldoet niet</b></span>
+    'UC<sub>6.11</sub> = σ<sub>m,y,d</sub>/f<sub>m,y,d</sub> + k<sub>m</sub>·σ<sub>m,z,d</sub>/f<sub>m,z,d</sub> = 'UC_611'<span style="color: red"> > 1.0 → <b>fails</b></span>
 #end if
 #if dubbele ≡ 1
     #if UC_612 ≤ 1.0
-        'UC<sub>6.12</sub> = k<sub>m</sub>·σ<sub>m,y,d</sub>/f<sub>m,y,d</sub> + σ<sub>m,z,d</sub>/f<sub>m,z,d</sub> = 'UC_612'<span style="color: green"> ≤ 1.0 → <b>voldoet</b></span>
+        'UC<sub>6.12</sub> = k<sub>m</sub>·σ<sub>m,y,d</sub>/f<sub>m,y,d</sub> + σ<sub>m,z,d</sub>/f<sub>m,z,d</sub> = 'UC_612'<span style="color: green"> ≤ 1.0 → <b>passes</b></span>
     #else
-        'UC<sub>6.12</sub> = k<sub>m</sub>·σ<sub>m,y,d</sub>/f<sub>m,y,d</sub> + σ<sub>m,z,d</sub>/f<sub>m,z,d</sub> = 'UC_612'<span style="color: red"> > 1.0 → <b>voldoet niet</b></span>
+        'UC<sub>6.12</sub> = k<sub>m</sub>·σ<sub>m,y,d</sub>/f<sub>m,y,d</sub> + σ<sub>m,z,d</sub>/f<sub>m,z,d</sub> = 'UC_612'<span style="color: red"> > 1.0 → <b>fails</b></span>
     #end if
 #end if
 
@@ -454,27 +435,19 @@ tau_4 = sqrt((Vz_4*S_y/(b_g*I_y))^2 + (Vy_4*S_z/(h_g*I_z))^2)/f_vd_k
 #show
 UC_afsch = max(tau_0; tau_1; tau_2; tau_3; tau_4)
 #if UC_afsch ≤ 1.0
-    'UC<sub>afschuiving</sub> = τ<sub>d</sub>/f<sub>v,d</sub> = 'UC_afsch'<span style="color: green"> ≤ 1.0 → <b>voldoet</b></span>
+    'UC<sub>shear</sub> = τ<sub>d</sub>/f<sub>v,d</sub> = 'UC_afsch'<span style="color: green"> ≤ 1.0 → <b>passes</b></span>
 #else
-    'UC<sub>afschuiving</sub> = τ<sub>d</sub>/f<sub>v,d</sub> = 'UC_afsch'<span style="color: red"> > 1.0 → <b>voldoet niet</b></span>
+    'UC<sub>shear</sub> = τ<sub>d</sub>/f<sub>v,d</sub> = 'UC_afsch'<span style="color: red"> > 1.0 → <b>fails</b></span>
 #end if
 
 # 11. Summary
 
 UC_max = max(UC_611; UC_612; UC_afsch; UC_wy; UC_wz)
 #if UC_max ≤ 1.0
-    '<b>Maatgevende UC = 'UC_max'</b><span style="color: green"> ≤ 1.0 → <b>Gording voldoet</b></span>
+    '<b>Governing UC = 'UC_max'</b><span style="color: green"> ≤ 1.0 → <b>Purlin passes</b></span>
 #else
-    '<b>Maatgevende UC = 'UC_max'</b><span style="color: red"> > 1.0 → <b>Gording voldoet niet</b></span>
+    '<b>Governing UC = 'UC_max'</b><span style="color: red"> > 1.0 → <b>Purlin fails</b></span>
 #end if
 
-'<hr/>
-'<i>Aandachtspunten:
-'<ul>
-'<li>Gecalibreerd op 3 de referentie-uitwerking-referenties (Set 1/2/3), alle exact gereproduceerd.</li>
-'<li>Eigengewicht = A·5,5 kN/m³ (550 kg/m³ · g=10), conform de referentie-uitwerking.</li>
-'<li>Dakbeschot (E·I) beïnvloedt alléén de concentratiefactor k<sub>r</sub> (kapt op 1,0);
-'de ∥-last wordt gelijk over de gordingen verdeeld.</li>
-'<li>Duurklasse <b>Kort</b> (k<sub>mod</sub> = 0,90; klimaat 3 → 0,70). ψ<sub>2</sub> = 0 voor dak/sneeuw/wind.</li>
-'</ul></i>
+'<hr/><i>Limitations:<ul><li>Calibrated against three reference cases (Sets 1/2/3), reproduced exactly.</li><li>Self-weight = A·5.5 kN/m³ (550 kg/m³ · g=10), following the reference calculation.</li><li>Decking E·I affects only concentration factor k<sub>r</sub>, capped at 1.0; parallel load is shared equally among purlins.</li><li>Duration class <b>short-term</b>: k<sub>mod</sub> = 0.90, or 0.70 for service class 3. ψ<sub>2</sub> = 0 for roof/snow/wind.</li></ul></i>
 `;

@@ -40,7 +40,7 @@ export class ZipValidationError extends Error {
  */
 export class ZipCompressionUnsupportedError extends ZipValidationError {
   constructor() {
-    super('Compressie niet ondersteund in deze omgeving');
+    super('Compression is not supported in this environment');
     this.name = 'ZipCompressionUnsupportedError';
   }
 }
@@ -89,7 +89,7 @@ const ZIP64_U16 = 0xffff;
 /** Zip64 wordt geweigerd, niet geraden: zonder deze weigering leest de lezer zo'n bestand stil
  *  verkeerd (alle maten komen uit `getUint32`). Onze eigen bladen zijn kilobytes groot. */
 function rejectZip64(): never {
-  throw new ZipValidationError('Zip64 wordt niet ondersteund');
+  throw new ZipValidationError('Zip64 is not supported');
 }
 
 /**
@@ -122,7 +122,7 @@ export async function inflateRawBounded(
     if (totalLen > budget) {
       await reader.cancel().catch(() => {});
       throw new ZipValidationError(
-        `Uitgepakte ZIP-data overschrijdt het budget van ${budget} bytes`,
+        `Unpacked ZIP data exceeds the budget of ${budget} bytes`,
         totalLen,
       );
     }
@@ -179,7 +179,7 @@ async function decompressEntry(
     }
     return compressed;
   }
-  if (method !== 8) throw new Error(`Niet-ondersteunde compressiemethode: ${method}`);
+  if (method !== 8) throw new Error(`Unsupported compression method: ${method}`);
 
   try {
     return await inflate(compressed, budget);
@@ -258,7 +258,7 @@ function normalizeZipEntries(entries: ZipEntry[], stripTopDir: boolean): ZipEntr
   return entries.map((entry, index) => {
     const name = sharedTopDir ? parts[index].slice(1).join('/') : entry.name;
     assertSafeZipEntryName(name);
-    if (seen.has(name)) throw new ZipValidationError(`Dubbele ZIP-entrynaam na normalisatie: "${name}"`);
+    if (seen.has(name)) throw new ZipValidationError(`Duplicate ZIP entry name after normalization: "${name}"`);
     seen.add(name);
     return { name, data: entry.data };
   });
@@ -315,7 +315,7 @@ async function parseViaCentralDirectory(
   let cd = view.getUint32(eocd + 16, true); // offset van central directory
   if (total === ZIP64_U16 || cd === ZIP64_U32) rejectZip64();
   if (total > limits.maxEntries) {
-    throw new ZipValidationError(`ZIP bevat ${total} entries; het maximum is ${limits.maxEntries}`);
+    throw new ZipValidationError(`ZIP bevat ${total} entries; the maximum is ${limits.maxEntries}`);
   }
 
   const entries: ZipEntry[] = [];
@@ -339,7 +339,7 @@ async function parseViaCentralDirectory(
     // Elke lengte uit een header is een leugen tot het tegendeel blijkt: eerst toetsen tegen de
     // bufferlengte, dan pas een view maken of de cursor verzetten.
     if (cd + 46 + nameLen + extraLen + commentLen > buffer.byteLength) {
-      throw new ZipValidationError('ZIP central directory loopt buiten het bestand');
+      throw new ZipValidationError('ZIP central directory extends beyond the file');
     }
     const name = new TextDecoder().decode(new Uint8Array(buffer, cd + 46, nameLen));
     cd += 46 + nameLen + extraLen + commentLen;
@@ -356,7 +356,7 @@ async function parseViaCentralDirectory(
     const localExtraLen = view.getUint16(localOffset + 28, true);
     const dataStart = localOffset + 30 + localNameLen + localExtraLen;
     if (dataStart + compSize > buffer.byteLength) {
-      throw new ZipValidationError(`ZIP-entry "${name}" loopt buiten het bestand`);
+      throw new ZipValidationError(`ZIP-entry "${name}" extends beyond the file`);
     }
 
     const compressed = new Uint8Array(buffer, dataStart, compSize);
@@ -406,7 +406,7 @@ async function parseViaLocalHeaders(
     const extraLen = view.getUint16(offset + 28, true);
     if (compSize === ZIP64_U32 || uncompressedSize === ZIP64_U32) rejectZip64();
     if (offset + 30 + nameLen + extraLen > buffer.byteLength) {
-      throw new ZipValidationError('ZIP local header loopt buiten het bestand');
+      throw new ZipValidationError('ZIP local header extends beyond the file');
     }
     const name = new TextDecoder().decode(new Uint8Array(buffer, offset + 30, nameLen));
     const dataOffset = offset + 30 + nameLen + extraLen;
@@ -431,7 +431,7 @@ async function parseViaLocalHeaders(
       }
     }
     if (dataOffset + compSize > buffer.byteLength) {
-      throw new ZipValidationError(`ZIP-entry "${name}" loopt buiten het bestand`);
+      throw new ZipValidationError(`ZIP-entry "${name}" extends beyond the file`);
     }
 
     if (!name.endsWith('/')) {

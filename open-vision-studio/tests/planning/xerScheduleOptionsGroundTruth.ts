@@ -286,7 +286,7 @@ export function expectedXerScheduleOptions(
     schedulingOptions.useProjectEndDateForFloat = false;
     fallback(
       fallbacks, scheduleRow, 'sched_use_project_end_date_for_float', retainedToken,
-      'N (geen projecteinddatum en geen taakeinddatum in de bron: projecteinde = max(EF))',
+      "N (no project or task finish date in the source: project finish = max(EF))",
     );
   }
 
@@ -345,7 +345,7 @@ function expectedOrphanLevelRows(scan: RawXerScheduleScan, fallbacks: XerSchedul
   for (const listRow of scan.tables.get('RSRCLEVELLIST')?.rows ?? []) {
     const id = listRow.cells.schedoptions_id?.trim() ?? '';
     if (id !== '' && known.has(id)) continue;
-    fallbacks.push({ field: 'RSRCLEVELLIST.schedoptions_id', token: id || '(empty)', fallback: 'weggelaten (geen SCHEDOPTIONS-rij)', line: listRow.line });
+    fallbacks.push({ field: 'RSRCLEVELLIST.schedoptions_id', token: id || '(empty)', fallback: "omitted (no SCHEDOPTIONS row)", line: listRow.line });
   }
 }
 
@@ -392,7 +392,7 @@ function expectedLeveling(
   for (const listRow of listRows) {
     const id = listRow.cells.rsrc_id?.trim() ?? '';
     if (id === '' || !knownResources.has(id)) {
-      fallbacks.push({ field: 'RSRCLEVELLIST.rsrc_id', token: id, fallback: 'weggelaten (geen RSRC-rij)', line: listRow.line });
+      fallbacks.push({ field: 'RSRCLEVELLIST.rsrc_id', token: id, fallback: "omitted (no RSRC row)", line: listRow.line });
       continue;
     }
     if (resources.some(entry => entry.resourceId === `xer-resource:${id}`)) continue;

@@ -305,7 +305,7 @@ export function ValidationPanel() {
         const globalIds = (m.viewpoint.components?.selection ?? []).map((c) => c.ifc_guid);
         captureAndAttachScreenshot(iss.id, globalIds);
       }
-      showBcfFeedback(`${issues.length} BCF issues aangemaakt`);
+      showBcfFeedback(`${issues.length} BCF issues created`);
       setActiveRightTab("bcf");
     });
   }, [validationResult, bcfAddIssues, showBcfFeedback, setActiveRightTab, openBcfDialog, captureAndAttachScreenshot]);
@@ -423,7 +423,7 @@ export function ValidationPanel() {
                 type="button"
                 className="vt-header__icon-btn"
                 onClick={handleHighlightFailures}
-                title="Toon failures in 3D"
+                title={"Show failures in 3D"}
               >
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 2a2 2 0 110 4 2 2 0 010-4z" />
@@ -454,7 +454,7 @@ export function ValidationPanel() {
                   type="button"
                   className="vt-header__icon-btn vt-header__icon-btn--bcf"
                   onClick={handleCreateBcfBulk}
-                  title="Alle failures → BCF"
+                  title="All failures → BCF"
                 >
                   BCF
                 </button>

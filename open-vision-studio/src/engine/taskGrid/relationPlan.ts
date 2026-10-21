@@ -731,7 +731,7 @@ function nextUniqueId(factory: () => string, used: Set<string>, kind: string): s
       return id;
     }
   }
-  throw new Error(`Kon geen unieke ${kind}-id genereren`);
+  throw new Error(`Unable to generate a unique ${kind} id`);
 }
 
 /** Past een reeds volledig gevalideerd plan toe op een geïsoleerde mutable/Immer-state. */
@@ -753,7 +753,7 @@ export function applyRelationMutationPlan(
   }
 
   const owner = state.tasks.find(task => task.id === plan.ownerTaskId);
-  if (!owner) throw new Error(`Relatieplan-eigenaar '${plan.ownerTaskId}' bestaat niet meer`);
+  if (!owner) throw new Error(`Relation plan owner '${plan.ownerTaskId}' no longer exists`);
   const removedExternal = new Set(plan.externalRemovals);
   const externalUpdates = new Map(plan.externalUpdates.map(update => [update.id, update.link]));
   const untouched = (owner.externalLinks ?? []).flatMap(link => {

@@ -22,7 +22,7 @@ export async function loadProject() {
     project.set(p);
     return p;
   } catch (e) {
-    console.error("Laden project mislukt:", e);
+    console.error("Failed to load project:", e);
     return null;
   }
 }

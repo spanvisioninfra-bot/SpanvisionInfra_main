@@ -72,7 +72,7 @@
   async function handleSave() {
     if (saving) return;
     if (!profile?.name?.trim()) {
-      toast.warning($_("profileEditor.nameRequired") || "Voer een profielnaam in.");
+      toast.warning($_("profileEditor.nameRequired") || "Enter a section name.");
       return;
     }
 
@@ -127,7 +127,7 @@
   </div>
 
   <div class="section">
-    <div class="section-header">{$_("profileEditor.dimensions") || "Afmetingen"}</div>
+    <div class="section-header">{$_("profileEditor.dimensions") || "Dimensions"}</div>
     <div class="field-row">
       <label class="field">
         <span class="label">{$_("profileEditor.width") || "Width (mm)"}</span>

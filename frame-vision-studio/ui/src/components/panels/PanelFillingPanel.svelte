@@ -115,7 +115,7 @@
             />
           </div>
           <div class="field">
-            <label title="Inzetdiepte t.o.v. de binnenkant; leeg = automatisch gecentreerd">Inzet (mm)</label>
+            <label title="Inset depth from the inside face; leave empty to center automatically">Inzet (mm)</label>
             <input
               type="number"
               step="1"

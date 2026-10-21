@@ -2,7 +2,12 @@ export const SUPER_ADMIN_EMAIL='spanvisioninfra.admin@gmail.com';
 const levels=['explorer','studio','team'];
 const text=value=>typeof value==='string'?value:'';
 
-// Authorization uses the identity returned by Supabase, never signup metadata or request fields.
+export function signInDestination(user,recovery=false){
+  if(recovery)return '#reset';
+  return user?.role==='super_admin'?'#admin':'#account';
+}
+
+// Authorization uses the verified provider identity, never signup metadata or request fields.
 export function publicUser(record,env={}){
   const verified=!!record.email_confirmed_at&&Number.isFinite(Date.parse(record.email_confirmed_at));
   const admin=verified&&record.is_anonymous!==true&&text(record.email).trim().toLowerCase()===SUPER_ADMIN_EMAIL

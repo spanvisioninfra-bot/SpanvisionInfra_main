@@ -89,7 +89,7 @@ export default function OfferteTab() {
             icon={reportIcon}
             label={t("offerte.send")}
             onClick={() => {
-              const label = `${t("offerte.sentPrefix")} ${new Date().toLocaleDateString('nl-NL')}`;
+              const label = `${t("offerte.sentPrefix")} ${new Date().toLocaleDateString('en-GB')}`;
               createSnapshot(label, 'verstuurd');
             }}
           />
@@ -97,7 +97,7 @@ export default function OfferteTab() {
             icon={reportIcon}
             label={t("offerte.concept")}
             onClick={() => {
-              const label = `${t("offerte.conceptPrefix")} ${new Date().toLocaleDateString('nl-NL')}`;
+              const label = `${t("offerte.conceptPrefix")} ${new Date().toLocaleDateString('en-GB')}`;
               createSnapshot(label, 'concept');
             }}
           />

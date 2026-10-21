@@ -98,6 +98,7 @@ describe('buildBudgetContext', () => {
     const ctx = buildBudgetContext(s.schedule, s.items);
     expect(ctx).toContain('21.01.01');
     expect(ctx).toContain('Betonbak');
-    expect(ctx).toContain('Tarieven per uur');
+    expect(ctx).toContain('Hourly rates');
+    expect(ctx).toContain('Direct cost (excluding overheads and VAT)');
   });
 });

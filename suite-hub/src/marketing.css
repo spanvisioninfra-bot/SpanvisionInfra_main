@@ -70,3 +70,4 @@
   .company-home-page .intro-summary{font-size:10px;gap:12px;margin-top:23px}
 }
 @media(forced-colors:active){.landing-cover{display:none}.company-home-page .company-intro::before{display:none}.company-home-page .company-intro{min-height:0;height:auto}.company-home-page .company-intro-copy{padding:48px 20px}.company-home-page .intro-actions .button-outline{background:Canvas}}
+.account-retry{margin-bottom:18px}

@@ -1,3 +1,4 @@
+import { backendFetch } from "./request";
 /**
  * API client for the Nextcloud cloud storage endpoints.
  *
@@ -49,7 +50,7 @@ export interface ManifestInfo {
 export async function cloudStatus(): Promise<CloudStatus> {
   let response: Response;
   try {
-    response = await fetch(`${CLOUD_BASE}/status`);
+    response = await backendFetch(`${CLOUD_BASE}/status`);
   } catch (error) {
     throw new ApiError(
       "Network error: unable to check cloud status.",
@@ -70,7 +71,7 @@ export async function cloudStatus(): Promise<CloudStatus> {
 export async function cloudListProjects(): Promise<CloudProject[]> {
   let response: Response;
   try {
-    response = await fetch(`${CLOUD_BASE}/projects`);
+    response = await backendFetch(`${CLOUD_BASE}/projects`);
   } catch (error) {
     throw new ApiError(
       "Network error: unable to list cloud projects.",
@@ -95,7 +96,7 @@ export async function cloudListFiles(
 ): Promise<CloudFile[]> {
   let response: Response;
   try {
-    response = await fetch(
+    response = await backendFetch(
       `${CLOUD_BASE}/projects/${encodeURIComponent(project)}/files?category=${category}`,
     );
   } catch (error) {
@@ -123,7 +124,7 @@ export async function cloudDownloadFile(
 ): Promise<Blob> {
   let response: Response;
   try {
-    response = await fetch(
+    response = await backendFetch(
       `${CLOUD_BASE}/projects/${encodeURIComponent(project)}/files/${encodeURIComponent(filename)}?category=${category}`,
     );
   } catch (error) {
@@ -154,7 +155,7 @@ export async function cloudUploadFile(
 
   let response: Response;
   try {
-    response = await fetch(
+    response = await backendFetch(
       `${CLOUD_BASE}/projects/${encodeURIComponent(project)}/files/${encodeURIComponent(filename)}?category=${category}`,
       { method: "PUT", body: formData },
     );
@@ -178,7 +179,7 @@ export async function cloudListManifests(
 ): Promise<ManifestInfo[]> {
   let response: Response;
   try {
-    response = await fetch(
+    response = await backendFetch(
       `${CLOUD_BASE}/projects/${encodeURIComponent(project)}/manifests`,
     );
   } catch (error) {
@@ -205,7 +206,7 @@ export async function cloudReadManifest(
 ): Promise<Record<string, unknown>> {
   let response: Response;
   try {
-    response = await fetch(
+    response = await backendFetch(
       `${CLOUD_BASE}/projects/${encodeURIComponent(project)}/manifests/${encodeURIComponent(name)}`,
     );
   } catch (error) {
@@ -239,7 +240,7 @@ export async function cloudSaveManifest(
 
   let response: Response;
   try {
-    response = await fetch(url, {
+    response = await backendFetch(url, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(manifest),
@@ -265,7 +266,7 @@ export async function cloudDeleteFile(
 ): Promise<void> {
   let response: Response;
   try {
-    response = await fetch(
+    response = await backendFetch(
       `${CLOUD_BASE}/projects/${encodeURIComponent(project)}/files/${encodeURIComponent(filename)}`,
       { method: "DELETE" },
     );

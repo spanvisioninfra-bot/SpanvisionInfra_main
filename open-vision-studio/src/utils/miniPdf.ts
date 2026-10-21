@@ -55,7 +55,7 @@ export interface PdfImagePage {
 function readJpegSize(bytes: Uint8Array): { width: number; height: number } {
   const len = bytes.length;
   if (len < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8) {
-    throw new Error('Geen geldige JPEG (ontbrekende SOI-marker)');
+    throw new Error('Invalid JPEG (missing SOI marker)');
   }
   let i = 2;
   while (i + 1 < len) {
@@ -85,7 +85,7 @@ function readJpegSize(bytes: Uint8Array): { width: number; height: number } {
     }
     i += segLen;
   }
-  throw new Error('Kon JPEG-afmetingen niet bepalen (geen SOF-marker gevonden)');
+  throw new Error('Unable to determine JPEG dimensions (no SOF marker found)');
 }
 
 /**
@@ -103,7 +103,7 @@ function readJpegSize(bytes: Uint8Array): { width: number; height: number } {
  * dit deelt dezelfde offset-boekhouding als de oorspronkelijke single-page-generator.
  */
 export function buildImagePdf(pages: PdfImagePage[]): Uint8Array<ArrayBuffer> {
-  if (pages.length === 0) throw new Error('buildImagePdf: minstens één pagina vereist');
+  if (pages.length === 0) throw new Error('buildImagePdf: at least one page is required');
 
   const header = asciiBytes('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
   const streamEnd = asciiBytes('\nendstream');

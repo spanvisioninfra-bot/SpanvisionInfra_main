@@ -17,7 +17,7 @@
       const result = await invoke("validate_project_ids", {});
       checks = Array.isArray(result) ? result : [];
     } catch (e) {
-      console.error("IDS validatie mislukt:", e);
+      console.error("IDS validation failed:", e);
     }
     loading = false;
   }

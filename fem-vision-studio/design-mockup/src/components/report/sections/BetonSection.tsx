@@ -156,7 +156,7 @@ function BetonStaafBlok({
   return (
     <div className="rpt-bet-member">
       <h3 className="rpt-h3">
-        {t("report.colBeam", "Staaf")} {r.beam_id} — {r.section_name} ({r.concrete_class})
+        {t("report.colBeam", "Member")} {r.beam_id} — {r.section_name} ({r.concrete_class})
       </h3>
       <div className="rpt-chk-member-meta">
         <span>
@@ -178,7 +178,7 @@ function BetonStaafBlok({
       {fout ? (
         <p className="rpt-empty-note">
           {r.governing_check_id.replace(/^ERROR:\s*/, "") ||
-            t("report.betonGeenToets", "De rekenkern heeft voor deze staaf geen toets geleverd.")}
+            t("report.betonGeenToets", "The calculation engine returned no check for this member.")}
         </p>
       ) : (
         <>
@@ -198,7 +198,7 @@ function BetonStaafBlok({
                 />
                 <div className="rpt-figuur-bijschrift">
                   {t("report.betonDoorsnedeBijschrift", {
-                    defaultValue: "Doorsnede {{naam}} mm met wapeningskorf (ware schaal).",
+                    defaultValue: "Cross-section {{naam}} mm with reinforcement cage (true to scale).",
                     naam: r.section_name,
                   })}
                 </div>
@@ -207,7 +207,7 @@ function BetonStaafBlok({
               <p className="rpt-empty-note">
                 {t(
                   "report.betonGeenKorf",
-                  "De wapeningskorf kon niet uit het model of uit de samenvattingsregel worden herleid; de doorsnedetekening is daarom weggelaten.",
+                  "The reinforcement cage could not be recovered from the model or summary line, so the section drawing is omitted.",
                 )}
               </p>
             )}
@@ -215,7 +215,7 @@ function BetonStaafBlok({
             <table className="rpt-table rpt-bet-invoertabel">
               <tbody>
                 <tr>
-                  <th>{t("report.betonSterkteklasse", "Sterkteklasse beton")}</th>
+                  <th>{t("report.betonSterkteklasse", "Concrete strength class")}</th>
                   <td>{r.concrete_class}</td>
                 </tr>
                 <tr>
@@ -225,8 +225,8 @@ function BetonStaafBlok({
                 <tr>
                   <th>
                     {heeftFlens
-                      ? t("report.betonAfmetingenFlens", "Doorsnede b_eff × h")
-                      : t("report.betonAfmetingen", "Doorsnede b × h")}
+                      ? t("report.betonAfmetingenFlens", "Cross-section b_eff × h")
+                      : t("report.betonAfmetingen", "Cross-section b × h")}
                   </th>
                   <td>{r.section_name} mm</td>
                 </tr>
@@ -251,7 +251,7 @@ function BetonStaafBlok({
                   </>
                 )}
                 <tr>
-                  <th>{t("report.betonDekking", "Dekking c")}</th>
+                  <th>{t("report.betonDekking", "Cover c")}</th>
                   <td>{korf ? `${fmtValue(korf.korf.cover_mm, 0)} mm` : "—"}</td>
                 </tr>
                 <tr>
@@ -260,7 +260,7 @@ function BetonStaafBlok({
                     {korf
                       ? korf.korf.stirrup_diameter_mm > 0
                         ? `Ø${fmtValue(korf.korf.stirrup_diameter_mm, 0)} mm`
-                        : t("report.betonGeenBeugel", "geen beugel")
+                        : t("report.betonGeenBeugel", "No stirrup")
                       : "—"}
                   </td>
                 </tr>
@@ -280,7 +280,7 @@ function BetonStaafBlok({
                 </tr>
                 <tr>
                   <th>
-                    {t("report.betonNuttigeHoogte", "Nuttige hoogte d")}
+                    {t("report.betonNuttigeHoogte", "Effective depth d")}
                     {rho !== null && <> / ρ</>}
                   </th>
                   <td>
@@ -320,7 +320,7 @@ function BetonStaafBlok({
           {r.shape_assumptions.length > 0 && (
             <div className="rpt-bet-aannamen">
               <p className="rpt-bet-kopje">
-                {t("report.betonAannamenKop", "Aannamen bij deze doorsnedevorm")}
+                {t("report.betonAannamenKop", "Assumptions for this cross-section shape")}
               </p>
               <ul className="rpt-bet-aannamen-lijst">
                 {r.shape_assumptions.map((a, i) => (
@@ -331,7 +331,7 @@ function BetonStaafBlok({
           )}
 
           {/* De toetsen die de kern teruggeeft, met formule en vindplaats. */}
-          <p className="rpt-bet-kopje">{t("report.betonToetsKop", "Toetsen op de doorsnede")}</p>
+          <p className="rpt-bet-kopje">{t("report.betonToetsKop", "Cross-section checks")}</p>
           <table className="rpt-table rpt-bet-toetstabel">
             <thead>
               <tr>
@@ -418,7 +418,7 @@ function BetonStaafBlok({
                   <p className="rpt-bet-verwijzing">
                     {t("report.betonKetenVerwijzing", {
                       defaultValue:
-                        "De volledige afleiding van deze toets — {{aantal}} stappen, elk met formule, ingevulde waarden, vindplaats en de aannamen die eronder liggen — staat in het hoofdstuk “Toetsing per staaf”, op het gedetailleerde niveau.",
+                        "The full derivation of this check — {{aantal}} steps, each with formula, substituted values, reference and the underlying assumptions — is given in the chapter “Check per member”, at the detailed level.",
                       aantal: c.deelstappen.length,
                     })}
                   </p>
@@ -444,12 +444,12 @@ function BetonStaafBlok({
                 {diagram
                   ? t("report.betonMKappaBijschrift", {
                       defaultValue:
-                        "M-κ-diagram bij N_Ed = {{n}} kN. M_Rd = {{mrd}} kNm bij κ_u = {{ku}}·10⁻³/m.",
+                        "M-κ diagram at N_Ed = {{n}} kN. M_Rd = {{mrd}} kNm at κ_u = {{ku}}·10⁻³/m.",
                       n: fmtValue(diagram.n_kn, 1),
                       mrd: fmtValue(diagram.m_max_knm, 1),
                       ku: fmtValue(diagram.kappa_u_per_m * 1e3, 2),
                     })
-                  : t("report.betonGeenMKappa", "Geen M-κ-diagram beschikbaar.")}
+                  : t("report.betonGeenMKappa", "No M-κ diagram available.")}
               </div>
             </div>
 
@@ -468,7 +468,7 @@ function BetonStaafBlok({
                   <div className="rpt-figuur-bijschrift">
                     {t("report.betonInteractieBijschrift", {
                       defaultValue:
-                        "N-M-interactiediagram (bezwijkomhullende) met het rekenpunt (N_Ed; M_Ed) = ({{n}} kN; {{m}} kNm). De streeplijn is de horizontale snede M_Rd(N_Ed) waarop de unity check rust.",
+                        "N-M interaction diagram (failure envelope) with the design point (N_Ed; M_Ed) = ({{n}} kN; {{m}} kNm). The dashed line is the horizontal cut M_Rd(N_Ed) on which the unity check rests.",
                       n: nEd === undefined ? "—" : fmtValue(nEd, 1),
                       m: mEd === undefined ? "—" : fmtValue(mEd, 1),
                     })}
@@ -478,7 +478,7 @@ function BetonStaafBlok({
                 <p className="rpt-empty-note">
                   {t(
                     "report.betonGeenInteractie",
-                    "Geen interactiediagram beschikbaar voor deze staaf.",
+                    "No interaction diagram available for this member.",
                   )}
                 </p>
               )}
@@ -769,7 +769,7 @@ export default function BetonSection() {
       <style>{BETON_REPORT_CSS}</style>
       <style>{BEFF_REPORT_CSS}</style>
       <h2 className="rpt-h2">
-        {t("report.sectionBeton", "Beton — doorsnede, M-κ-diagram en N-M-interactiediagram")}
+        {t("report.sectionBeton", "Concrete — section, M-κ diagram, and N-M interaction diagram")}
       </h2>
 
       {beton.length === 0 ? (
@@ -777,11 +777,11 @@ export default function BetonSection() {
           {results.length === 0
             ? t(
                 "report.notChecked",
-                "Nog niet getoetst — voer de normtoetsing uit via het tabblad Toetsing.",
+                "Not checked yet. Run the code checks from the Checks tab.",
               )
             : t(
                 "report.betonGeen",
-                'Geen betonstaven in het model (materiaal een sterkteklasse zoals "C30/37", profiel een rechthoek zoals "300x500", plus een wapeningskorf bij de staafeigenschappen).',
+                'No concrete members in the model (a material strength class such as "C30/37", a rectangular section such as "300x500", and a reinforcement cage in member properties).',
               )}
         </p>
       ) : (
@@ -790,13 +790,13 @@ export default function BetonSection() {
             {checkedTime && `${t("report.checkedAt", "Toetsing uitgevoerd op")} ${checkedTime}. `}
             {t("report.betonMethodeNoot", {
               defaultValue:
-                "Methode: doorsnedetoetsing op buiging met normaalkracht volgens {{norm}}, in de uiterste grenstoestand. Twee toetsen op hetzelfde punt: de rechthoekige spanningsverdeling van 3.1.7(3) (de klassieke handberekening) en de M-N-κ-berekening met het parabool-rechthoekdiagram van 3.1.7(1), waarbij M_Rd(N_Ed) het grootste moment op het M-κ-diagram bij N_Ed is. Bij druk geldt de minimale excentriciteit van 6.1(4). Tekenconventie: N positief is trek, M positief is trek in de onderste vezel.",
+                "Method: cross-section check for bending with axial force to {{norm}}, in the ultimate limit state. Two checks at the same point: the rectangular stress distribution of 3.1.7(3) (the classic hand calculation) and the M-N-κ calculation with the parabola-rectangle diagram of 3.1.7(1), where M_Rd(N_Ed) is the largest moment on the M-κ diagram at N_Ed. Under compression the minimum eccentricity of 6.1(4) applies. Sign convention: N positive is tension, M positive is tension in the bottom fibre.",
               norm: betonNorm,
             })}{" "}
             {weggelaten > 0 &&
               t("report.betonStaafKeuzeNoot", {
                 defaultValue:
-                  "Van {{aantal}} van de {{totaal}} betonstaven is de uitwerking op verzoek weggelaten; die staven staan wel in het toetsingsoverzicht.",
+                  "For {{aantal}} of the {{totaal}} concrete members the elaboration has been omitted on request; those members do appear in the check summary.",
                 aantal: weggelaten,
                 totaal: beton.length,
               })}
@@ -816,17 +816,17 @@ export default function BetonSection() {
               betonstaven in dit rapport. */}
           <div className="rpt-bet-beperkingen">
             <h3 className="rpt-h3">
-              {t("report.betonBeperkingenKop", "Wat deze betontoetsing niet omvat")}
+              {t("report.betonBeperkingenKop", "What this concrete check does not cover")}
             </h3>
             <p className="rpt-bet-beperking-inleiding">
               {t(
                 "report.betonBeperkingenInleiding",
-                "Getoetst is uitsluitend de DOORSNEDE op buiging met normaalkracht in de uiterste grenstoestand, op het maatgevende punt van de omhullende van de UGT-combinaties. Alles hieronder is NIET getoetst; een betonstaaf die hier voldoet, is daarmee niet compleet nagerekend.",
+                "Only the SECTION is checked for bending with axial force at the ultimate limit state, at the governing point of the ULS-combination envelope. Everything below is NOT checked; a concrete member passing here has not been fully verified.",
               )}{" "}
               {fysischGerekend &&
                 t(
                   "report.betonBeperkingenTweedeOrdeUitzondering",
-                  "Op één punt na: de tweede-orde-effecten van 5.8 zijn in deze berekening wél meegenomen — zie het punt 5.8 hieronder en het hoofdstuk met de segmenttabellen.",
+                  "With one exception: the second-order effects in 5.8 are included in this calculation. See item 5.8 below and the chapter containing the segment tables.",
                 )}
             </p>
             <ul className="rpt-bet-beperking-lijst">
@@ -851,14 +851,14 @@ export default function BetonSection() {
                 <strong>{t("report.betonBeperkingVormLabel", "Toepassingsgebied")}</strong> —{" "}
                 {t(
                   "report.betonBeperkingVorm",
-                  "een rechthoek b × h, een T of een L, met buiging om de sterke as. Dubbele buiging (art. 5.8.9) wordt getoetst voor een rechthoekige kolom met art. 5.8-gegevens: de imperfectie en de tweede orde om de z-as en de interactie (5.39); voor een T of L niet. Andere doorsnedevormen worden niet getoetst. Bij een T of L rust de berekening bovendien op de aannamen die per staaf bij de doorsnede staan.",
+                  "A rectangle b × h, a T or an L, with bending about the strong axis. Biaxial bending (5.8.9) is checked for a rectangular column with 5.8 data: imperfection, second-order effects about the z-axis, and interaction (5.39). It is not checked for a T or L. Other section shapes are not checked. For a T or L, the calculation also relies on the assumptions listed with each member section.",
                 )}
               </li>
             </ul>
             <p className="rpt-bet-beperking-uc">
               {t(
                 "report.betonBeperkingUc",
-                "Over de unity check zelf: die is bepaald als M_Ed / M_Rd(N_Ed) — een horizontale snede door het interactiediagram bij de rekenwaarde van de normaalkracht — en NIET als de afstand van het rekenpunt tot de bezwijkomhullende. Bij een staaf waarvan N en M in dezelfde combinatie samen toenemen, geeft die maat een gunstiger beeld dan een radiale maat zou doen. Het interactiediagram is er om die verhouding te kunnen zien, niet om de UC uit af te lezen.",
+                "The unity check is M_Ed / M_Rd(N_Ed): a horizontal cut through the interaction diagram at the design axial force. It is NOT the distance from the design point to the failure envelope. When N and M increase together within one combination, this measure is more favourable than a radial measure. The interaction diagram shows that relationship; it is not used to read off the UC.",
               )}
             </p>
           </div>

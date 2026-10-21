@@ -60,7 +60,7 @@ export const KNIKGEVALLEN: {
     schoring: "Geschoord",
     letter: "c",
     factor: 0.7,
-    label: "c) onder ingeklemd, boven scharnierend en gesteund — l₀ = 0,7·l",
+    label: "c) fixed at the bottom, pinned and restrained at the top — l₀ = 0.7·l",
   },
   {
     geval: "TweezijdigIngeklemdGeschoord",
@@ -74,14 +74,14 @@ export const KNIKGEVALLEN: {
     schoring: "Ongeschoord",
     letter: "b",
     factor: 2.0,
-    label: "b) onder ingeklemd, boven volledig vrij (console) — l₀ = 2·l",
+    label: "b) fixed at the base, free at the top (cantilever) — l₀ = 2·l",
   },
   {
     geval: "TweezijdigIngeklemdOngeschoord",
     schoring: "Ongeschoord",
     letter: "e",
     factor: 1.0,
-    label: "e) beide einden ingeklemd, boven zijdelings vrij — l₀ = l",
+    label: "e) fixed at both ends, free to move laterally at the top — l₀ = l",
   },
 ];
 

@@ -156,7 +156,7 @@ export default function AfdrukVoorbeeld() {
       <div className="av-balk">
         <span className="av-titel">Print preview</span>
         <span className="av-tel">
-          {bezig ? "formatting pages…" : `${aantal} pagina${aantal === 1 ? "" : "'s"}`}
+          {bezig ? "formatting pages…" : `${aantal} page${aantal === 1 ? "" : "'s"}`}
         </span>
         <span className="av-rek" />
         <span className="av-zoom">

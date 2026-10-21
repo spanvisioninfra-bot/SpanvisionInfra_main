@@ -143,21 +143,21 @@ export default function ProjectSection() {
         className="rpt-header-input rpt-screen-only"
         type="text"
         value={headerValue}
-        placeholder={t("report.headerPlaceholder", "Koptekst-regel (klik om te bewerken)")}
+        placeholder={t("report.headerPlaceholder", "Header line (click to edit)")}
         onChange={(e) => setHeaderDraft(e.target.value)}
         onBlur={commitHeader}
         onKeyDown={(e) => {
           if (e.key === "Enter") (e.target as HTMLInputElement).blur();
           if (e.key === "Escape") setHeaderDraft(null);
         }}
-        aria-label={t("report.headerLine", "Koptekst")}
+        aria-label={t("report.headerLine", "Header")}
       />
       {headerValue.trim() !== "" && (
         <div className="rpt-header-line rpt-print-only">{headerValue}</div>
       )}
       <div className="rpt-doc-kind">{t("report.docKind", "Rekenrapport")}</div>
       <h1 className="rpt-project-title">
-        {info.name || t("report.unnamedProject", "Naamloos project")}
+        {info.name || t("report.unnamedProject", "Untitled project")}
       </h1>
       {info.location && <div className="rpt-project-location">{info.location}</div>}
       <table className="rpt-meta-table">
@@ -237,7 +237,7 @@ export default function ProjectSection() {
         // Zelfde blokvorm: een "!"-regel is een waarschuwing of fout.
         if (analyseToelichting.trim() !== "") {
           rijen.push([
-            t("report.fieldAnalyse", "Berekening en stabiliteit"),
+            t("report.fieldAnalyse", "Analysis and stability"),
             <ScheefstandBlok tekst={analyseToelichting} />,
           ]);
         }

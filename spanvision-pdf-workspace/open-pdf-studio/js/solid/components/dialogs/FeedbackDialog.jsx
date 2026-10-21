@@ -299,13 +299,13 @@ export default function FeedbackDialog() {
           <Show when={!canSubmit() && status() !== 'submitting'}>
             <div style="font-size:11px;color:var(--theme-text-secondary,#996);margin-bottom:4px">
               <Show when={!isValidEmail()}>
-                <div>• Vul een geldig e-mailadres in.</div>
+                <div>• Enter a valid email address.</div>
               </Show>
               <Show when={message().length < MIN_MESSAGE}>
-                <div>• Bericht: minimaal {MIN_MESSAGE} tekens (nu {message().length}).</div>
+                <div>• Message: at least {MIN_MESSAGE}  characters (currently {message().length}).</div>
               </Show>
               <Show when={message().length > MAX_MESSAGE}>
-                <div>• Bericht is te lang (max {MAX_MESSAGE} tekens).</div>
+                <div>• Message is too long (maximum {MAX_MESSAGE}  characters).</div>
               </Show>
             </div>
           </Show>

@@ -593,20 +593,20 @@ export function buildCltCheckInputs(ruweData: CltBuildData): CltBuildResult {
       continue;
     }
     if (!layup.layers.some((l) => l.orientation === "Longitudinal")) {
-      skipped.push({ beamId: beam.id, reason: "de CLT-opbouw heeft geen lengtelaag — niets draagt in de spanrichting" });
+      skipped.push({ beamId: beam.id, reason: "The CLT lay-up has no longitudinal layer; nothing carries load in the span direction." });
       continue;
     }
 
     const lengthMm = beamLengthMm(beam, data.nodes);
     if (lengthMm <= 0) {
-      skipped.push({ beamId: beam.id, reason: "staaflengte is 0 — knopen ontbreken" });
+      skipped.push({ beamId: beam.id, reason: "Member length is 0 — nodes are missing" });
       continue;
     }
     const hasAnyResult = ulsCombos.some((c) => data.combinationResults.get(c.id)?.elements.has(beam.id));
     if (!hasAnyResult) {
       skipped.push({
         beamId: beam.id,
-        reason: "geen krachtsverloop in de UGT-combinaties — reken het model eerst door",
+        reason: "No force diagrams in the ULS combinations. Solve the model first.",
       });
       continue;
     }

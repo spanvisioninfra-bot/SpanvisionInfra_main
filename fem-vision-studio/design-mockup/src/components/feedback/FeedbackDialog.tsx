@@ -247,7 +247,7 @@ export default function FeedbackDialog({
       setSubmitted(true);
     } catch (err) {
       console.error(err);
-      setError(t("errorGeneric", "Er ging iets mis. Probeer het later opnieuw."));
+      setError(t("errorGeneric", "Something went wrong. Please try again later."));
     } finally {
       setSubmitting(false);
     }
@@ -280,7 +280,7 @@ export default function FeedbackDialog({
         disabled={!canSubmit}
       >
         {submitting
-          ? t("submitting", "Bezig...")
+          ? t("submitting", "Working...")
           : t("submitToGithub", "Open GitHub issue")}
       </button>
     </>
@@ -302,11 +302,11 @@ export default function FeedbackDialog({
           <p>
             {t(
               "githubSuccessMessage",
-              "Je browser is geopend met een vooringevulde issue. Plak de screenshot(s) met Ctrl+V in het GitHub-editorscherm en klik op 'Submit new issue'."
+              "Your browser opened a prefilled issue. Paste the screenshot(s) with Ctrl+V in the GitHub editor and click \"Submit new issue\"."
             )}
           </p>
           <button className="feedback-btn feedback-btn-primary" onClick={handleSendAnother}>
-            {t("sendAnother", "Nog een feedback")}
+            {t("sendAnother", "Send more feedback")}
           </button>
         </div>
       ) : (
@@ -314,11 +314,11 @@ export default function FeedbackDialog({
           {/* Name */}
           <div className="feedback-section">
             <div className="feedback-field-row">
-              <label className="feedback-field-label">{t("fullName", "Naam (optioneel)")}</label>
+              <label className="feedback-field-label">{t("fullName", "Name (optional)")}</label>
               <input
                 type="text"
                 className="feedback-input"
-                placeholder={t("fullNamePlaceholder", "Je naam")}
+                placeholder={t("fullNamePlaceholder", "Your name")}
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
               />
@@ -347,7 +347,7 @@ export default function FeedbackDialog({
               className="feedback-textarea"
               placeholder={t(
                 "messagePlaceholder",
-                "Beschrijf je feedback hier. Tip: druk Ctrl+V om een afbeelding uit je klembord toe te voegen."
+                "Describe your feedback here. Tip: press Ctrl+V to attach an image from your clipboard."
               )}
               value={message}
               onChange={(e) => setMessage(e.target.value.slice(0, MAX_CHARS))}
@@ -370,14 +370,14 @@ export default function FeedbackDialog({
               <span>
                 {t(
                   "attachScreenshot",
-                  "Huidige schermafbeelding meesturen"
+                  "Include the current screenshot"
                 )}
               </span>
             </label>
             <p className="feedback-hint">
               {t(
                 "screenshotHint",
-                "De screenshot wordt op je klembord gezet — plak hem met Ctrl+V in het GitHub-editorvenster."
+                "The screenshot is copied to your clipboard. Paste it with Ctrl+V in the GitHub editor."
               )}
             </p>
           </div>
@@ -395,7 +395,7 @@ export default function FeedbackDialog({
                   <circle cx="8.5" cy="8.5" r="1.5" />
                   <polyline points="21 15 16 10 5 21" />
                 </svg>
-                {t("attachImages", "Afbeelding(en) toevoegen")}
+                {t("attachImages", "Add image(s)")}
               </button>
               <span className="feedback-image-limit">
                 {t("imageLimit", `Max ${MAX_IMAGES}`)}

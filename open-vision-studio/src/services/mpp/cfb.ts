@@ -87,12 +87,12 @@ export class CfbFile {
 
     if (bytes.byteLength < HEADER_SIZE) {
       throw new Error(
-        `CFB: bestand te klein voor een geldige header (${bytes.byteLength} bytes, minimaal ${HEADER_SIZE})`,
+        `CFB: file is too small for a valid header (${bytes.byteLength} bytes, minimum ${HEADER_SIZE})`,
       );
     }
     for (let i = 0; i < MAGIC.length; i++) {
       if (bytes[i] !== MAGIC[i]) {
-        throw new Error('CFB: ongeldige magic — geen Compound File Binary');
+        throw new Error('CFB: invalid magic bytes — not a Compound File Binary');
       }
     }
 
@@ -107,7 +107,7 @@ export class CfbFile {
     const expectedSectorShift = majorVersion === 3 ? 9 : 12;
     if (sectorShift !== expectedSectorShift) {
       throw new Error(
-        `CFB: sectorShift ${sectorShift} hoort niet bij major version ${majorVersion} (verwacht ${expectedSectorShift})`,
+        `CFB: sectorShift ${sectorShift} does not match major version ${majorVersion} (verwacht ${expectedSectorShift})`,
       );
     }
     if (miniSectorShift !== 6) {
@@ -138,7 +138,7 @@ export class CfbFile {
     const difat = this.readDifat(firstDifatSector, numDifatSectors, numFatSectors, maxSectors);
     this.fat = this.readFat(difat, maxSectors);
     if (this.fat.length === 0 || numFatSectors === 0) {
-      throw new Error('CFB: geen FAT-sectoren gevonden');
+      throw new Error('CFB: no FAT sectors found');
     }
 
     const dirBytes = this.readChain(firstDirSector, undefined, 'directory');
@@ -146,7 +146,7 @@ export class CfbFile {
 
     const rootIdx = rawEntries.findIndex((e) => e.type === 'root');
     if (rootIdx < 0) {
-      throw new Error('CFB: geen root-directory-entry gevonden');
+      throw new Error('CFB: no root directory entry found');
     }
     const rootRaw = rawEntries[rootIdx];
     this.miniStreamStartSector = rootRaw.startSector;
@@ -360,7 +360,7 @@ export class CfbFile {
         throw new Error(this.fmtErr('sectorketen te lang of cyclisch', label, sector, this.sectorOffset(sector)));
       }
       if (sector < 0 || sector >= this.fat.length) {
-        throw new Error(this.fmtErr(`ongeldig sectornummer ${sector} in keten`, label, sector));
+        throw new Error(this.fmtErr(`invalid sector number ${sector} in keten`, label, sector));
       }
       const off = this.sectorOffset(sector);
       if (off + this.sectorSize > this.bytes.byteLength) {
@@ -409,7 +409,7 @@ export class CfbFile {
       // Bereikcontrole vooraan (zoals readChain) — vóór we de sector gebruiken, niet pas
       // vlak vóór de volgende stap.
       if (sector < 0 || sector >= this.miniFat.length) {
-        throw new Error(this.fmtErr(`ongeldig minisectornummer ${sector} in keten`, label, sector));
+        throw new Error(this.fmtErr(`invalid mini-sector number ${sector} in keten`, label, sector));
       }
       // Offset relatief aan de mini-stream (niet aan het bestand) en met de minisector-korrel
       // (64 bytes), niet de gewone sectorgrootte.

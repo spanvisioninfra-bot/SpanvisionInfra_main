@@ -119,13 +119,13 @@ export function assertIfcIntegrity(content: string): void {
   if (content.slice(i, i + STEP_HEADER.length).toUpperCase() !== STEP_HEADER) {
     throw new IfcParseError(
       'not-step',
-      `Geen IFC/STEP-bestand: de verplichte kop '${STEP_HEADER}' ontbreekt.`,
+      `Not an IFC/STEP file: the required header '${STEP_HEADER}' is missing.`,
     );
   }
   if (!content.slice(-TERMINATOR_PROBE).toUpperCase().includes(STEP_TERMINATOR)) {
     throw new IfcParseError(
       'truncated',
-      `Onvolledig IFC-bestand: de afsluitende '${STEP_TERMINATOR}' ontbreekt — ` +
+      `Incomplete IFC file: the closing '${STEP_TERMINATOR}' ontbreekt — ` +
       'de tekst is afgekapt (bijvoorbeeld door een crash tijdens het schrijven).',
     );
   }
@@ -455,7 +455,7 @@ function readXerArchiveOrIssue(
       issue: {
         code: 'structure',
         detail: capXerArchiveDetail(
-          `Ongeldig OPS_XerSourceArchive: onverwachte fout bij het lezen: ${error instanceof Error ? error.message : String(error)}`,
+          `Invalid OPS_XerSourceArchive: unexpected read error: ${error instanceof Error ? error.message : String(error)}`,
         ),
       },
     };
@@ -477,7 +477,7 @@ function extractXerImportMetadata(
   try {
     return bindXerImportMetadataToArchive(archive, sourceProjectId);
   } catch (error) {
-    xerArchiveError(error instanceof Error ? error.message : 'selectorview is ongeldig', 'metadata-invalid');
+    xerArchiveError(error instanceof Error ? error.message : 'selector view is invalid', 'metadata-invalid');
   }
 }
 
@@ -486,23 +486,23 @@ function extractXerSourceProjectId(
 ): string | undefined {
   const props = archiveProps(entities, entityMap, PSET.XerDocument);
   if (!props) {
-    if (archive) xerArchiveError('OPS_XerDocument-selector ontbreekt');
+    if (archive) xerArchiveError('OPS_XerDocument selector is missing');
     return undefined;
   }
   // Typisch voor andere IFC-software die de grote archief-pset liet vallen maar de kleine selector
   // meenam: de sporen zijn er, de bronbytes niet.
   if (!archive) xerArchiveError('OPS_XerDocument bestaat zonder OPS_XerSourceArchive', 'bytes-missing');
   if (JSON.stringify([...props.keys()]) !== JSON.stringify(['ArchiveSha256', 'SourceProjectId'])) {
-    xerArchiveError('OPS_XerDocument-properties zijn niet exact en deterministisch geordend');
+    xerArchiveError('OPS_XerDocument properties are not ordered exactly and deterministically');
   }
-  if (requiredString(props, 'ArchiveSha256') !== archive.sha256) xerArchiveError('selector ArchiveSha256 wijst niet naar het archief', 'hash-mismatch');
+  if (requiredString(props, 'ArchiveSha256') !== archive.sha256) xerArchiveError('selector ArchiveSha256 does not reference the archive', 'hash-mismatch');
   return requiredString(props, 'SourceProjectId');
 }
 
 /** Het archief is onbruikbaar ⇒ gestructureerde, interne fout (zie `readXerArchiveOrIssue`).
  *  Default `structure`: pset-/propertyvorm; de specifiekere redenen geven hun code expliciet mee. */
 function xerArchiveError(message: string, code: XerArchiveIssueCode = 'structure'): never {
-  throw new XerArchiveInvalid(code, `Ongeldig OPS_XerSourceArchive: ${message}`);
+  throw new XerArchiveInvalid(code, `Invalid OPS_XerSourceArchive: ${message}`);
 }
 
 function archiveProps(entities: StepEntity[], entityMap: Map<string, StepEntity>, psetName: string): Map<string, unknown> | undefined {
@@ -510,7 +510,7 @@ function archiveProps(entities: StepEntity[], entityMap: Map<string, StepEntity>
   if (sets.length === 0) return undefined;
   if (sets.length !== 1) xerArchiveError(`Pset '${psetName}' komt ${sets.length} keer voor`);
   const projects = entities.filter(entity => entity.type === 'IFCPROJECT');
-  if (projects.length !== 1) xerArchiveError(`Pset '${psetName}' vereist exact één IFCPROJECT; gevonden: ${projects.length}`);
+  if (projects.length !== 1) xerArchiveError(`Pset '${psetName}' requires exactly one IFCPROJECT; found: ${projects.length}`);
   const project = projects[0]!;
   const attachments = entities.filter(entity =>
     entity.type === 'IFCRELDEFINESBYPROPERTIES'
@@ -518,14 +518,14 @@ function archiveProps(entities: StepEntity[], entityMap: Map<string, StepEntity>
   );
   if (!project || attachments.length !== 1
     || JSON.stringify(parseRefs(attachments[0]!.args[4] || '')) !== JSON.stringify([project.id])) {
-    xerArchiveError(`Pset '${psetName}' hangt niet één-op-één aan IFCPROJECT`);
+    xerArchiveError(`Pset '${psetName}' is not linked one-to-one with IFCPROJECT`);
   }
   const values = new Map<string, unknown>();
   for (const ref of parseRefs(sets[0]!.args[4] || '')) {
     const prop = entityMap.get(ref);
-    if (!prop || prop.type !== 'IFCPROPERTYSINGLEVALUE') xerArchiveError(`property '${ref}' ontbreekt of is geen single value`);
+    if (!prop || prop.type !== 'IFCPROPERTYSINGLEVALUE') xerArchiveError(`property '${ref}' is missing or is not a single value`);
     const name = stripQuotes(prop.args[0] || '');
-    if (!name || values.has(name)) xerArchiveError(`property '${name || ref}' ontbreekt of is dubbel`);
+    if (!name || values.has(name)) xerArchiveError(`property '${name || ref}' is missing or duplicated`);
     values.set(name, parseTypedValue(prop.args[2] || ''));
   }
   return values;
@@ -542,7 +542,7 @@ function validateArchivePropertyOrder(
     xerArchiveError('chunkcounts overschrijden het werkelijk aanwezige propertybudget', 'truncated');
   }
   if (chunkCount + diagnosticsCount !== propertyBudget) {
-    xerArchiveError('chunkcounts passen niet exact bij het werkelijk aanwezige propertybudget', 'truncated');
+    xerArchiveError('chunk counts do not match the actual property budget exactly', 'truncated');
   }
   let position = 0;
   for (const actual of props.keys()) {
@@ -554,7 +554,7 @@ function validateArchivePropertyOrder(
     } else {
       expected = `DiagnosticsChunk${String(position - manifestNames.length - chunkCount).padStart(6, '0')}`;
     }
-    if (actual !== expected) xerArchiveError('properties zijn niet uniek en deterministisch geordend');
+    if (actual !== expected) xerArchiveError('properties are not unique and deterministically ordered');
     position += 1;
   }
 }
@@ -565,14 +565,14 @@ function validateCompactArchivePropertyOrder(
   assertSourceBytesPresent(props, chunkCount);
   const propertyBudget = props.size - manifestNames.length;
   if (propertyBudget < 0 || chunkCount !== propertyBudget) {
-    xerArchiveError('chunkcount past niet exact bij het werkelijk aanwezige propertybudget', 'truncated');
+    xerArchiveError('chunk count does not match the actual property budget exactly', 'truncated');
   }
   let position = 0;
   for (const actual of props.keys()) {
     const expected = position < manifestNames.length
       ? manifestNames[position]!
       : `ByteChunk${String(position - manifestNames.length).padStart(6, '0')}`;
-    if (actual !== expected) xerArchiveError('properties zijn niet uniek en deterministisch geordend');
+    if (actual !== expected) xerArchiveError('properties are not unique and deterministically ordered');
     position += 1;
   }
 }
@@ -583,17 +583,17 @@ function validateCompactArchivePropertyOrder(
 function assertSourceBytesPresent(props: Map<string, unknown>, chunkCount: number): void {
   if (chunkCount === 0) return;
   for (const name of props.keys()) if (/^ByteChunk\d{6}$/.test(name)) return;
-  xerArchiveError(`manifest belooft ${chunkCount} bronchunk(s), maar er is er geen enkele aanwezig`, 'bytes-missing');
+  xerArchiveError(`manifest belooft ${chunkCount} source chunk(s), but none is present`, 'bytes-missing');
 }
 
 function nonNegativeSafeInteger(value: unknown, name: string, code: XerArchiveIssueCode = 'structure'): number {
-  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) xerArchiveError(`${name} is geen niet-negatief safe integer`, code);
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) xerArchiveError(`${name} is not a non-negative safe integer`, code);
   return value;
 }
 
 function requiredString(props: Map<string, unknown>, name: string, code: XerArchiveIssueCode = 'structure'): string {
   const value = props.get(name);
-  if (typeof value !== 'string' || !value) xerArchiveError(`${name} ontbreekt of is geen tekenreeks`, code);
+  if (typeof value !== 'string' || !value) xerArchiveError(`${name} is missing or is not a string`, code);
   return value;
 }
 
@@ -604,7 +604,7 @@ function concatArchiveChunks(props: Map<string, unknown>, prefix: string, count:
     const raw = requiredString(props, name, 'truncated');
     if (index < count - 1 && raw.includes('=')) xerArchiveError(`${name} bevat verboden base64-padding vóór de laatste chunk`);
     let decoded: Uint8Array;
-    try { decoded = decodeXerBase64Chunk(raw); } catch { xerArchiveError(`${name} bevat ongeldige base64`); }
+    try { decoded = decodeXerBase64Chunk(raw); } catch { xerArchiveError(`${name} contains invalid base64`); }
     const expectedChunkLength = index === count - 1 ? expectedLength - index * XER_SOURCE_ARCHIVE_CHUNK_BYTES : XER_SOURCE_ARCHIVE_CHUNK_BYTES;
     if (decoded.length !== expectedChunkLength) xerArchiveError(`${name} heeft ${decoded.length} i.p.v. ${expectedChunkLength} bytes`, 'truncated');
     chunks.push(decoded);
@@ -616,7 +616,7 @@ function concatArchiveChunks(props: Map<string, unknown>, prefix: string, count:
     if (!/^\d{6}$/.test(suffix) || Number(suffix) >= count) xerArchiveError(`${name} ligt buiten de aaneengesloten chunkreeks`);
   }
   let output: Uint8Array;
-  try { output = new Uint8Array(expectedLength); } catch { xerArchiveError('byteLength kan op dit platform niet worden gealloceerd'); }
+  try { output = new Uint8Array(expectedLength); } catch { xerArchiveError('byteLength cannot be allocated on this platform'); }
   let offset = 0;
   for (const chunk of chunks) { output.set(chunk, offset); offset += chunk.length; }
   return output;
@@ -636,16 +636,16 @@ function extractXerSourceArchive(
   if (schemaVersion === XER_SOURCE_ARCHIVE_COMPACT_STORAGE_SCHEMA_VERSION) {
     return extractCompactXerSourceArchive(props, reconstructXerArchive);
   }
-  if (schemaVersion !== XER_SOURCE_ARCHIVE_SCHEMA_VERSION) xerArchiveError(`onbekend SchemaVersion ${schemaVersion}`, 'schema-version');
-  if (requiredString(props, 'Format', 'schema-version') !== 'primavera-p6-xer') xerArchiveError('Format is niet primavera-p6-xer', 'schema-version');
+  if (schemaVersion !== XER_SOURCE_ARCHIVE_SCHEMA_VERSION) xerArchiveError(`unknown SchemaVersion ${schemaVersion}`, 'schema-version');
+  if (requiredString(props, 'Format', 'schema-version') !== 'primavera-p6-xer') xerArchiveError('Format is not primavera-p6-xer', 'schema-version');
   const byteLength = nonNegativeSafeInteger(props.get('ByteLength'), 'ByteLength');
   const chunkSize = nonNegativeSafeInteger(props.get('ByteChunkSize'), 'ByteChunkSize');
-  if (chunkSize !== XER_SOURCE_ARCHIVE_CHUNK_BYTES) xerArchiveError(`ByteChunkSize is niet ${XER_SOURCE_ARCHIVE_CHUNK_BYTES}`);
+  if (chunkSize !== XER_SOURCE_ARCHIVE_CHUNK_BYTES) xerArchiveError(`ByteChunkSize is not ${XER_SOURCE_ARCHIVE_CHUNK_BYTES}`);
   const chunkCount = nonNegativeSafeInteger(props.get('ByteChunkCount'), 'ByteChunkCount');
-  if (chunkCount !== Math.ceil(byteLength / chunkSize)) xerArchiveError('ByteChunkCount past niet bij ByteLength', 'truncated');
+  if (chunkCount !== Math.ceil(byteLength / chunkSize)) xerArchiveError('ByteChunkCount does not match ByteLength', 'truncated');
   const diagnosticsLength = nonNegativeSafeInteger(props.get('DiagnosticsByteLength'), 'DiagnosticsByteLength');
   const diagnosticsCount = nonNegativeSafeInteger(props.get('DiagnosticsChunkCount'), 'DiagnosticsChunkCount');
-  if (diagnosticsCount !== Math.ceil(diagnosticsLength / chunkSize)) xerArchiveError('DiagnosticsChunkCount past niet bij DiagnosticsByteLength', 'truncated');
+  if (diagnosticsCount !== Math.ceil(diagnosticsLength / chunkSize)) xerArchiveError('DiagnosticsChunkCount does not match DiagnosticsByteLength', 'truncated');
   const manifestNames = [
     'SchemaVersion', 'Format', 'ByteLength', 'Sha256', 'Encoding', 'Bom', 'Newline',
     'ByteChunkSize', 'ByteChunkCount', 'DiagnosticsByteLength', 'DiagnosticsSha256', 'DiagnosticsChunkCount',
@@ -655,22 +655,22 @@ function extractXerSourceArchive(
   const diagnosticBytes = concatArchiveChunks(props, 'DiagnosticsChunk', diagnosticsCount, diagnosticsLength);
   const sourceHash = requiredString(props, 'Sha256');
   const diagnosticsHash = requiredString(props, 'DiagnosticsSha256');
-  if (!/^[0-9a-f]{64}$/.test(sourceHash) || sha256Hex(sourceBytes) !== sourceHash) xerArchiveError('Sha256 is ongeldig of past niet bij de bytes', 'hash-mismatch');
-  if (!/^[0-9a-f]{64}$/.test(diagnosticsHash) || sha256Hex(diagnosticBytes) !== diagnosticsHash) xerArchiveError('DiagnosticsSha256 is ongeldig of past niet bij de diagnostics', 'hash-mismatch');
+  if (!/^[0-9a-f]{64}$/.test(sourceHash) || sha256Hex(sourceBytes) !== sourceHash) xerArchiveError('Sha256 is invalid or does not match the bytes', 'hash-mismatch');
+  if (!/^[0-9a-f]{64}$/.test(diagnosticsHash) || sha256Hex(diagnosticBytes) !== diagnosticsHash) xerArchiveError('DiagnosticsSha256 is invalid or does not match the diagnostics', 'hash-mismatch');
   let archiveMetadata: XerArchiveMetadataPayloadV1;
   try {
     const parsed: unknown = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(diagnosticBytes));
     archiveMetadata = parseXerArchiveMetadataPayload(parsed);
   } catch (error) {
     if (error instanceof XerArchiveInvalid) throw error;
-    xerArchiveError(`diagnostics/readmodel is ongeldig: ${error instanceof Error ? error.message : 'geen geldige JSON'}`, 'metadata-invalid');
+    xerArchiveError(`diagnostics/read model is invalid: ${error instanceof Error ? error.message : 'invalid JSON'}`, 'metadata-invalid');
   }
   const encoding = requiredString(props, 'Encoding');
   const bom = requiredString(props, 'Bom');
   const newline = requiredString(props, 'Newline');
-  if (!(['utf-8', 'utf-16le', 'utf-16be', 'windows-1252'] as readonly string[]).includes(encoding)) xerArchiveError('Encoding is onbekend', 'metadata-invalid');
+  if (!(['utf-8', 'utf-16le', 'utf-16be', 'windows-1252'] as readonly string[]).includes(encoding)) xerArchiveError('unknown Encoding', 'metadata-invalid');
   if (!(['none', 'utf-8', 'utf-16le', 'utf-16be'] as readonly string[]).includes(bom)) xerArchiveError('Bom is onbekend', 'metadata-invalid');
-  if (!(['lf', 'crlf', 'cr', 'mixed', 'none'] as readonly string[]).includes(newline)) xerArchiveError('Newline is onbekend', 'metadata-invalid');
+  if (!(['lf', 'crlf', 'cr', 'mixed', 'none'] as readonly string[]).includes(newline)) xerArchiveError('unknown Newline', 'metadata-invalid');
   try {
     // Schema 1 draagt geen vastlegging (bak 4): het leesmodel bewaart de TASK-bronrijen wél, maar de
     // omrekening ervan vraagt de XER-kalender-/getallaag, en dit pad loopt bewust ZONDER die chunk.
@@ -686,7 +686,7 @@ function extractXerSourceArchive(
       recordedTimesByProject: {},
     };
   } catch (error) {
-    xerArchiveError(`diagnostics/readmodel kon niet worden opgebouwd: ${error instanceof Error ? error.message : String(error)}`, 'metadata-invalid');
+    xerArchiveError(`unable to build the diagnostics/read model: ${error instanceof Error ? error.message : String(error)}`, 'metadata-invalid');
   }
 }
 
@@ -695,15 +695,15 @@ function extractCompactXerSourceArchive(
   props: Map<string, unknown>,
   reconstructXerArchive: XerArchiveReconstructor | undefined,
 ): XerSourceReconstruction {
-  if (requiredString(props, 'Format', 'schema-version') !== 'primavera-p6-xer') xerArchiveError('Format is niet primavera-p6-xer', 'schema-version');
+  if (requiredString(props, 'Format', 'schema-version') !== 'primavera-p6-xer') xerArchiveError('Format is not primavera-p6-xer', 'schema-version');
   if (requiredString(props, 'StorageFormat', 'schema-version') !== XER_SOURCE_ARCHIVE_COMPACT_STORAGE_FORMAT) {
-    xerArchiveError('StorageFormat is onbekend', 'schema-version');
+    xerArchiveError('unknown StorageFormat', 'schema-version');
   }
   const byteLength = nonNegativeSafeInteger(props.get('ByteLength'), 'ByteLength');
   const chunkSize = nonNegativeSafeInteger(props.get('ByteChunkSize'), 'ByteChunkSize');
-  if (chunkSize !== XER_SOURCE_ARCHIVE_CHUNK_BYTES) xerArchiveError(`ByteChunkSize is niet ${XER_SOURCE_ARCHIVE_CHUNK_BYTES}`);
+  if (chunkSize !== XER_SOURCE_ARCHIVE_CHUNK_BYTES) xerArchiveError(`ByteChunkSize is not ${XER_SOURCE_ARCHIVE_CHUNK_BYTES}`);
   const chunkCount = nonNegativeSafeInteger(props.get('ByteChunkCount'), 'ByteChunkCount');
-  if (chunkCount !== Math.ceil(byteLength / chunkSize)) xerArchiveError('ByteChunkCount past niet bij ByteLength', 'truncated');
+  if (chunkCount !== Math.ceil(byteLength / chunkSize)) xerArchiveError('ByteChunkCount does not match ByteLength', 'truncated');
   const manifestNames = [
     'SchemaVersion', 'Format', 'StorageFormat', 'ByteLength', 'Sha256', 'ByteChunkSize', 'ByteChunkCount',
   ];
@@ -711,7 +711,7 @@ function extractCompactXerSourceArchive(
   const sourceBytes = concatArchiveChunks(props, 'ByteChunk', chunkCount, byteLength);
   const sourceHash = requiredString(props, 'Sha256');
   if (!/^[0-9a-f]{64}$/.test(sourceHash) || sha256Hex(sourceBytes) !== sourceHash) {
-    xerArchiveError('Sha256 is ongeldig of past niet bij de bytes', 'hash-mismatch');
+    xerArchiveError('Sha256 is invalid or does not match the bytes', 'hash-mismatch');
   }
   if (!reconstructXerArchive) {
     // GEEN archieffout maar een AANROEPERcontractfout: de lage synchrone ingang laadt de lazy
@@ -719,19 +719,19 @@ function extractCompactXerSourceArchive(
     // archief stil te laten vallen — `readXerArchiveOrIssue` laat deze fout door.
     throw new IfcParseError(
       'xer-source-archive',
-      'Ongeldig OPS_XerSourceArchive: compacte bron vereist readIFCWithXerReconstruction; de lage ' +
-      'synchrone readIFC-ingang laadt de XER-reader bewust niet zelf',
+      'Invalid OPS_XerSourceArchive: compact source requires readIFCWithXerReconstruction; the low-level ' +
+      'synchronous readIFC entry deliberately does not load the XER reader itself',
     );
   }
   let reconstruction: XerSourceReconstruction;
   try {
     reconstruction = reconstructXerArchive(sourceBytes);
   } catch (error) {
-    xerArchiveError(`compacte bron kon niet worden gereconstrueerd: ${error instanceof Error ? error.message : String(error)}`, 'metadata-invalid');
+    xerArchiveError(`unable to reconstruct compact source: ${error instanceof Error ? error.message : String(error)}`, 'metadata-invalid');
   }
   const archive = reconstruction.archive;
   if (archive.sha256 !== sourceHash || archive.byteLength !== byteLength) {
-    xerArchiveError('gereconstrueerd archief past niet bij de canonieke bronbytes', 'hash-mismatch');
+    xerArchiveError('reconstructed archive does not match the canonical source bytes', 'hash-mismatch');
   }
   // De hashpoort hierboven geldt daarmee ook voor `recordedTimesByProject`: die map komt uit
   // dezelfde `readXER` over dezelfde, geverifieerde bytes.
@@ -932,7 +932,7 @@ function parseSTEP(content: string): StepEntity[] {
   if (dataAt < 0) {
     throw new IfcParseError(
       'no-data-section',
-      "Onleesbaar IFC-bestand: de verplichte 'DATA;'-sectiegrens ontbreekt.",
+      "Unreadable IFC file: the required 'DATA;' section boundary is missing.",
     );
   }
 

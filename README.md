@@ -4,7 +4,7 @@
 
 A shared entry point for all 16 CAD, BIM, document, calculation, planning, structural, geotechnical and field tools.
 
-Updated **10 October 2026**: the existing website now opens Home first, with Pricing, FAQ, account screens and protected super-admin plan management. See the [release and deployment record](docs/deployment-2026-10-10.md), [hosting guide](DEPLOYMENT-GUIDE.md) and [account/admin activation guide](commerce/README.md). Real sign-in and payments remain inactive until provider setup is completed.
+Updated **14 October 2026**: the live [Spanvision Infra website](https://www.spanvisioninfra.com/) supports Neon sign-in, verified super-admin redirection, connection recovery and an eight-character minimum for new passwords. Account database setup is still pending for user listing and plan editing; payments remain disabled. See the [account guide](commerce/README.md), [earlier release record](docs/deployment-2026-10-10.md) and [hosting guide](DEPLOYMENT-GUIDE.md).
 
 English is the only interface language in this edition. Language menus offer English, browser language detection is disabled, and legacy Dutch preferences open in English. Calc reports and the PDF OCR language picker also default to English. Imported document text, technical identifiers and company names retain their original content.
 
@@ -67,7 +67,7 @@ STL-3D map workspace opens at [127.0.0.1:8765](http://127.0.0.1:8765/) and retai
 
 Run `npm run build:stl:windows` for its portable ZIP and Inno Setup installer. The standalone application includes its own branding, offline interface assets and open-source notices. See [STL architecture](spanvision-stl-3d-map-workspace/ARCHITECTURE.md) and [verification report](qa/stl/VERIFICATION.md) for storage migration, compatibility and delivery details.
 
-The hub opens Home first, with Pricing, FAQ, sign-in, sign-up, recovery, account and admin screens. Tools retains all 16 anonymous workspaces and uses a branded splash before each editor. The hub supports real local OCR, with recognition and PDF/text downloads in the browser. Local profiles persist in browser storage. Online authentication and billing use the server endpoints in `commerce`; they remain unavailable until Supabase, email and payment-provider configuration is supplied. The [account guide](commerce/README.md) describes setup and the verified-email/UUID requirements for the designated super admin.
+The hub opens Home first, with Pricing, FAQ, sign-in, sign-up, recovery, account and admin screens. Tools retains all 16 anonymous workspaces and uses a branded splash before each editor. The hub supports real local OCR, with recognition and PDF/text downloads in the browser. Local profiles persist in browser storage. Online authentication runs through the Vercel account endpoints and Neon Managed Better Auth. The administrator must match both the verified email and pinned provider user ID. User/plan management requires the separate account database migration and private server connection; paid billing still requires provider configuration and approved prices. See the [account guide](commerce/README.md).
 
 ## Verification and attribution
 

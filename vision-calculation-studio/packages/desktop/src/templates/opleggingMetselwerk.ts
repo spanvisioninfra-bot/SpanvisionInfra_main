@@ -22,10 +22,7 @@
 
 export const opleggingMetselwerk = `"Bearing on masonry — checks EN 1996-1-1 §6.1.3
 
-'<i>Geconcentreerde belasting op een metselwerkwand (stalen ligger, houten
-'balk of betonlatei die op de wand rust). De kracht onder de oplegging mag
-'lokaal verhoogd worden met factor β t.o.v. de gewone druksterkte, omdat
-'de last zich op halve hoogte boven de oplegging verspreid heeft.</i>
+'<i>A concentrated load on a masonry wall, such as a steel or timber beam or concrete lintel bearing on the wall. Local bearing resistance can be increased by factor β relative to ordinary compressive strength because the load spreads over the effective bearing region.</i>
 
 # 1. Material
 
@@ -121,25 +118,22 @@ f_b = ?*(N/mm^2)', genormaliseerde druksterkte steen f_b — EN 772-1 (typ. 10�
 
 γ_M = categorie/10
 
-'Rekenwaarde druksterkte:
+'Design compressive strength:
 f_d = f_k/γ_M
 
 # 2. Geometry wall + support
 
 t = ?*(mm)', wanddikte t (mm)'
-h_c = ?*(mm)', hoogte van wand BOVEN de oplegging tot bovenste belastingverdeling (mm)'
+h_c = ?*(mm)', wall height ABOVE the bearing to the upper load distribution (mm)'
 a_1 = ?*(mm)', afstand vanaf einde wand tot dichtstbijzijnde rand oplegging (mm) — 0 = oplegging aan wandeinde'
 
 L_b = ?*(mm)', opleglengte langs de wand (mm)'
-b_opl = ?*(mm)', oplegbreedte loodrecht op de wand (mm) — vaak gelijk aan t'
+b_opl = ?*(mm)', bearing width perpendicular to the wall (mm) — often equal to t'
 
-'<b>Belast oppervlak onder oplegging:</b>
+'<b>Loaded bearing area:</b>
 A_b = L_b*b_opl
 
-'<b>Effectief verspreid oppervlak op halve hoogte boven oplegging:</b>
-'Vereenvoudigd: L_efm = L_b + h_c (last verspreidt zich onder 45°,
-'maar voor h_c boven oplegging slechts halve hoogte → L_b + h_c)
-'Begrensd door wandlengte (hier conservatief niet begrensd).
+'<b>Effective spread area at half-height above the bearing:</b> Simplified: L_efm = L_b + h_c (45° spread over half the height h_c above bearing). Limited by wall length; this sheet conservatively omits that limit.
 L_efm = L_b + h_c
 A_ef = L_efm*t
 
@@ -149,11 +143,7 @@ A_ratio = A_b/A_ef', verhouding A_b/A_ef'
 
 # 3. β-factor §6.1.3(3)
 
-'<i>β verhoogt de toelaatbare druk onder geconcentreerde opleggingen.
-'Geldigheid (§6.1.3(1)+(4)):
-'  • excentriciteit oplegging ≤ t/4
-'  • a_1/h_c ≤ 1.0 (anders gewone drukcheck §6.1.2)
-'  • klein A_b/A_ef → grootste verhoging</i>
+'<i>β increases allowable compression under concentrated bearings. Conditions (§6.1.3(1)+(4)): bearing eccentricity ≤ t/4; a_1/h_c ≤ 1.0 (otherwise use ordinary compression check §6.1.2); a small A_b/A_ef gives the greatest increase.</i>
 
 'Basisformule (6.10):
 β_calc = (1 + 0.3*a_h)*(1.5 - 1.1*A_ratio)
@@ -167,10 +157,10 @@ A_ratio = A_b/A_ef', verhouding A_b/A_ef'
 'Bovengrens 3: 1.5·A_ef/A_b (geometrisch onmogelijk meer)
 β_lim3 = if(A_ratio > 0; 1.5/A_ratio; 1.5)
 
-'Ondergrens: β ≥ 1.0 (geen verhoging onder ongunstige condities)
+'Lower bound: β ≥ 1.0 (no enhancement under unfavorable conditions)
 β_min = 1.0
 
-'Maatgevende β: minimum van alle bovengrenzen, maar ≥ 1.0
+'Governing β: minimum of all upper bounds, but at least 1.0
 β = max(β_min; min(β_calc; min(β_lim1; min(β_lim2; β_lim3))))
 
 'β<sub>calc</sub> = (1 + 0.3·a/h_c)·(1.5 − 1.1·A_b/A_ef) = 'β_calc
@@ -181,49 +171,47 @@ A_ratio = A_b/A_ef', verhouding A_b/A_ef'
 
 # 4. Capaciteit + unity check
 
-N_Edc = ?*(kN)', geconcentreerde belasting onder oplegging N_Edc (kN)'
+N_Edc = ?*(kN)', concentrated bearing load N_Edc (kN)'
 
-'<i>Rekenwaarde capaciteit (formule 6.9):</i>
+'<i>Design resistance (expression 6.9):</i>
 N_Rdc = β*A_b*f_d
 
 UC = N_Edc/N_Rdc
 
-'σ<sub>onder oplegging</sub> = N<sub>Edc</sub>/A<sub>b</sub> = 'N_Edc/A_b
-'β·f<sub>d</sub> = 'β*f_d' (toelaatbare drukspanning lokaal)
+'σ<sub>beneath bearing</sub> = N<sub>Edc</sub>/A<sub>b</sub> = 'N_Edc/A_b
+'β·f<sub>d</sub> = 'β*f_d' (allowable local compressive stress)
 'N<sub>Rdc</sub> = β·A<sub>b</sub>·f<sub>d</sub> = 'N_Rdc
 
 #if UC ≤ 1.0
-    'UC = N<sub>Edc</sub>/N<sub>Rdc</sub> = 'UC'<span style="color:green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC = N<sub>Edc</sub>/N<sub>Rdc</sub> = 'UC'<span style="color:green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC = N<sub>Edc</sub>/N<sub>Rdc</sub> = 'UC'<span style="color:red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC = N<sub>Edc</sub>/N<sub>Rdc</sub> = 'UC'<span style="color:red"> > 1.0 → <b>Fails</b></span>
 #end if
 
 # 5. Voorwaardencheck §6.1.3(1)
 
-'<i>Bij overschrijding van deze voorwaarden geldt §6.1.3 NIET en moet de
-'oplegging als gewone wandbelasting (§6.1.2) getoetst worden — meestal
-'met een conservatievere uitkomst.</i>
+'<i>If these conditions are exceeded, §6.1.3 does not apply. Check the bearing as ordinary wall loading under §6.1.2, usually giving a more conservative result.</i>
 
 '<b>5.1 Verhouding a_1/h_c</b>
 #if a_h ≤ 1.0
     'a<sub>1</sub>/h<sub>c</sub> = 'a_h'<span style="color:green"> ≤ 1.0 → toepasbaar</span>
 #else
-    'a<sub>1</sub>/h<sub>c</sub> = 'a_h'<span style="color:red"> > 1.0 → §6.1.3 niet toepasbaar, gebruik §6.1.2</span>
+    'a<sub>1</sub>/h<sub>c</sub> = 'a_h'<span style="color:red"> > 1.0 → §6.1.3 does not apply; use §6.1.2</span>
 #end if
 
 '<b>5.2 Verhouding A_b/A_ef</b>
 #if A_ratio ≤ 0.45
     'A<sub>b</sub>/A<sub>ef</sub> = 'A_ratio'<span style="color:green"> ≤ 0.45 → gunstig (grote verhoging mogelijk)</span>
 #else if A_ratio ≤ 0.90
-    'A<sub>b</sub>/A<sub>ef</sub> = 'A_ratio' (tussen 0.45 en 0.90 — toepasbaar)
+    'A<sub>b</sub>/A<sub>ef</sub> = 'A_ratio' (tussen 0.45 and 0.90 — toepasbaar)
 #else
-    'A<sub>b</sub>/A<sub>ef</sub> = 'A_ratio'<span style="color:red"> > 0.90 → β ≈ 1.0, geen voordeel</span>
+    'A<sub>b</sub>/A<sub>ef</sub> = 'A_ratio'<span style="color:red"> > 0.90 → β ≈ 1.0, no enhancement</span>
 #end if
 
 '<b>5.3 Maximum A_b ≤ 2·t² (§6.1.3(1))</b>
 A_b_max = 2*t^2
 #if A_b ≤ A_b_max
-    'A<sub>b</sub> = 'A_b' ≤ 2·t² = 'A_b_max'<span style="color:green"> → voldoet</span>
+    'A<sub>b</sub> = 'A_b' ≤ 2·t² = 'A_b_max'<span style="color:green"> → passes</span>
 #else
     'A<sub>b</sub> = 'A_b' > 2·t² = 'A_b_max'<span style="color:red"> → A_b te groot, gebruik §6.1.2 i.p.v. §6.1.3</span>
 #end if
@@ -308,20 +296,5 @@ A_b_max = 2*t^2
 </svg>
 @end
 
-'<hr/>
-'<i>Toelichting verspreiding & vereenvoudigingen:
-'<ul>
-'<li>Verspreidingshoek 45° wordt expliciet aangenomen in §6.1.3, op
-'halve hoogte van de wand boven de oplegging. L<sub>efm</sub> = L<sub>b</sub> + h<sub>c</sub>
-'is vereenvoudigd voor enkele oplegging midden in de wand; bij meerdere
-'opleggingen of een rand-oplegging worden de bijdragen begrensd door
-'de halve wandlengte resp. tot het wandeinde.</li>
-'<li>Eccentriciteit van de oplegging (M/N) niet in deze sheet — §6.1.3
-'vereist e ≤ t/4. Bij grotere e_top moet de combinatie (§6.1.2 +
-'verhoging) opnieuw worden uitgewerkt.</li>
-'<li>De wand zelf (drukcheck §6.1.2, slankheid §5.5.1.4) moet separaat
-'worden getoetst — deze sheet behandelt uitsluitend de lokale
-'oplegcontrole.</li>
-'<li>γ<sub>M</sub> volgt uitvoeringscategorie I/II/III NB tabel 2.3.</li>
-'</ul></i>
+'<hr/><i>Load spread and simplifications:<ul><li>A 45° spread is assumed in §6.1.3 at half the wall height above bearing. L<sub>efm</sub> = L<sub>b</sub> + h<sub>c</sub> is simplified for a single central bearing. Multiple or edge bearings require contributions limited by half the wall length or wall end.</li><li>Bearing eccentricity M/N is excluded; §6.1.3 requires e ≤ t/4. Greater e_top requires reassessment under §6.1.2 with the enhancement.</li><li>Check the wall itself separately for compression (§6.1.2) and slenderness (§5.5.1.4); this sheet covers local bearing only.</li><li>γ<sub>M</sub> follows execution category I/II/III in NB Table 2.3.</li></ul></i>
 `;

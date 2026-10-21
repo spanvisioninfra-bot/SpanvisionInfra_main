@@ -36,40 +36,40 @@ export function buildBudgetContext(schedule: CostSchedule, items: CostItem[]): s
       i.rowType,
       i.description,
       [fmt(i.quantity), i.unit ?? ''].filter(Boolean).join(' '),
-      i.rowType === "regel" ? `prijs=${fmt(i.normUnitPrice)} loon/eh=${fmt(i.laborPrice)} norm=${fmt(i.normQuantity)} tarief=${i.tariefGroep ?? ''} soort=${i.resourceType ?? ''}` : '',
-      `totaal=${fmt(i.total)}`,
+      i.rowType === "regel" ? `unitPrice=${fmt(i.normUnitPrice)} laborPerUnit=${fmt(i.laborPrice)} hoursPerUnit=${fmt(i.normQuantity)} rateGroup=${i.tariefGroep ?? ''} resourceType=${i.resourceType ?? ''}` : '',
+      `total=${fmt(i.total)}`,
     ];
     return kolommen.filter(Boolean).join(' | ');
   });
   const rest = zichtbaar.length - MAX_CONTEXT_REGELS;
-  if (rest > 0) regels.push(`(… nog ${rest} regels niet getoond)`);
+  if (rest > 0) regels.push(`(… ${rest} more rows not shown)`);
 
   return [
-    `Project: ${schedule.projectName || schedule.name || '(naamloos)'}`,
-    `Kostprijs (excl. staart/btw): ${Math.round(kostprijs)}`,
-    `Tarieven per uur: A=${tarieven.A} B=${tarieven.B} C=${tarieven.C}`,
+    `Project: ${schedule.projectName || schedule.name || "(untitled)"}`,
+    `Direct cost (excluding overheads and VAT): ${Math.round(kostprijs)}`,
+    `Hourly rates: A=${tarieven.A} B=${tarieven.B} C=${tarieven.C}`,
     '',
-    'Begrotingsregels (Nr | type | omschrijving | hoeveelheid | details | totaal):',
+    "Estimate rows (No. | type | description | quantity | details | total):",
     ...regels,
   ].join('\n');
 }
 
 /** Protocol-uitleg voor in de system prompt. */
 export const ACTIE_PROTOCOL = `
-Je kunt de begroting WIJZIGEN. Doe dat door in je antwoord precies één blok op te nemen:
+You can MODIFY the estimate by including exactly one action block in your response:
 
 \`\`\`ocs-acties
 {"acties":[ ... ]}
 \`\`\`
 
-Toegestane acties (verwijs altijd met het exacte "nr" uit de begrotingsregels):
-- {"type":"update","nr":"21.01.01","veld":"aantal","waarde":14} — velden: aantal, prijs (materiaal/inkoop per eenheid), omschrijving, eenheid, norm (uren per eenheid), tariefgroep (A/B/C), code
-- {"type":"add_hoofdstuk","code":"32","omschrijving":"Trappen"}
-- {"type":"add_post","onderNr":"21","omschrijving":"Fundering"}
-- {"type":"add_regel","onderNr":"21.01","omschrijving":"Beton C30","aantal":12,"eenheid":"m3","prijs":145,"resourceType":"materiaal"} — resourceType: arbeid | materiaal | materieel | onderaannemer | overig. Voor uren-regels: eenheid "uur" en tariefgroep meegeven; het loon wordt automatisch via de tariefgroep gerekend (geef GEEN prijs op).
+Allowed actions (always refer to the exact "nr" from the estimate rows):
+- {"type":"update","nr":"21.01.01","veld":"aantal","waarde":14} — fields: aantal (quantity), prijs (material/purchase unit price), omschrijving (description), eenheid (unit), norm (hours per unit), tariefgroep (A/B/C), code
+- {"type":"add_hoofdstuk","code":"32","omschrijving":"Stairs"}
+- {"type":"add_post","onderNr":"21","omschrijving":"Foundation"}
+- {"type":"add_regel","onderNr":"21.01","omschrijving":"Concrete C30","aantal":12,"eenheid":"m3","prijs":145,"resourceType":"materiaal"} — resourceType values: arbeid (labor) | materiaal (materials) | materieel (equipment) | onderaannemer (subcontractor) | overig (other). For hourly rows, use eenheid "uur" and supply tariefgroep; wages are calculated from the rate group, so do NOT specify prijs.
 - {"type":"verwijder","nr":"21.01.02"}
 
-Regels: alleen een acties-blok opnemen als de gebruiker echt een wijziging vraagt. Leg in gewone tekst kort uit wat je doet. Bedragen zijn excl. btw. Verzin geen nr's die niet in de lijst staan.`;
+Rules: include an action block only when the user actually requests a change. Briefly explain the action in English. Amounts exclude VAT. Never invent row numbers that are not in the supplied list. Preserve all protocol field names and enum values exactly; write human-readable descriptions in English.`;
 
 // ── 2. Parsen ───────────────────────────────────────────────────────────
 
@@ -153,13 +153,13 @@ export function applyActies(acties: AssistantActie[]): string[] {
       switch (actie.type) {
         case 'update': {
           const item = vindOpNr(actie.nr);
-          if (!item) throw new Error(`nr ${actie.nr} niet gevonden`);
+          if (!item) throw new Error(`nr ${actie.nr} not found`);
           const veld = VELD_MAP[String(actie.veld ?? '').toLowerCase()];
-          if (!veld) throw new Error(`onbekend veld "${actie.veld}"`);
+          if (!veld) throw new Error(`unknown field "${actie.veld}"`);
           let waarde: unknown = actie.waarde;
           if (['quantity', 'normUnitPrice', 'normQuantity'].includes(veld)) {
             waarde = waarde == null || waarde === '' ? null : Number(waarde);
-            if (waarde !== null && isNaN(waarde as number)) throw new Error('waarde is geen getal');
+            if (waarde !== null && isNaN(waarde as number)) throw new Error("value is not a number");
           }
           useAppStore.getState().updateItem(item.id, veld, waarde as never);
           resultaten.push(`✔ ${actie.nr}: ${String(actie.veld)} → ${actie.waarde}`);
@@ -171,24 +171,24 @@ export function applyActies(acties: AssistantActie[]): string[] {
             description: String(actie.omschrijving ?? "New chapter"),
           });
           useAppStore.getState().setItems([...useAppStore.getState().items, item]);
-          resultaten.push(`✔ Hoofdstuk ${item.code} "${item.description}" toegevoegd`);
+          resultaten.push(`✔ Chapter ${item.code} "${item.description}" toegevoegd`);
           break;
         }
         case 'add_post': {
           const ouder = vindOpNr(actie.onderNr);
-          if (!ouder) throw new Error(`onderNr ${actie.onderNr} niet gevonden`);
+          if (!ouder) throw new Error(`onderNr ${actie.onderNr} not found`);
           const item = nieuwItem('begrotingspost', ouder.id, {
-            description: String(actie.omschrijving ?? 'Nieuwe post'),
+            description: String(actie.omschrijving ?? "New item"),
             quantity: actie.aantal != null ? Number(actie.aantal) : null,
             unit: (actie.eenheid as CostItem['unit']) ?? "st",
           });
           useAppStore.getState().setItems([...useAppStore.getState().items, item]);
-          resultaten.push(`✔ Post "${item.description}" toegevoegd onder ${actie.onderNr}`);
+          resultaten.push(`✔ Post "${item.description}" added under ${actie.onderNr}`);
           break;
         }
         case 'add_regel': {
           const ouder = vindOpNr(actie.onderNr);
-          if (!ouder) throw new Error(`onderNr ${actie.onderNr} niet gevonden`);
+          if (!ouder) throw new Error(`onderNr ${actie.onderNr} not found`);
           const eenheid = String(actie.eenheid ?? "st");
           const groep = (String(actie.tariefgroep ?? 'A').toUpperCase() as 'A' | 'B' | 'C');
           const isUren = eenheid.toLowerCase() === "uur";
@@ -216,12 +216,12 @@ export function applyActies(acties: AssistantActie[]): string[] {
                 }),
           });
           useAppStore.getState().setItems([...useAppStore.getState().items, item]);
-          resultaten.push(`✔ Regel "${item.description}" toegevoegd onder ${actie.onderNr}`);
+          resultaten.push(`✔ Regel "${item.description}" added under ${actie.onderNr}`);
           break;
         }
         case 'verwijder': {
           const item = vindOpNr(actie.nr);
-          if (!item) throw new Error(`nr ${actie.nr} niet gevonden`);
+          if (!item) throw new Error(`nr ${actie.nr} not found`);
           // Verwijder inclusief alle afstammelingen
           const huidige = useAppStore.getState().items;
           const weg = new Set<string>([item.id]);

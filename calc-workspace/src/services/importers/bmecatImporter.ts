@@ -44,7 +44,7 @@ export function importBmecat(xml: string): PriceImportResult {
     ...Array.from(doc.getElementsByTagName('PRODUCT')),
   ];
   if (nodes.length === 0) {
-    warnings.push('Geen <ARTICLE>/<PRODUCT> elementen gevonden — is dit een BMEcat/DICO-catalogus?');
+    warnings.push('No <ARTICLE>/<PRODUCT> elements were found — is this a BMEcat/DICO catalog?');
     return { resources, warnings, format: 'bmecat' };
   }
 
@@ -97,7 +97,7 @@ export function importBmecat(xml: string): PriceImportResult {
     });
   }
 
-  if (resources.length === 0) warnings.push('Geen bruikbare artikelen met code of omschrijving gevonden.');
+  if (resources.length === 0) warnings.push('No usable articles with a code or description were found.');
 
   return { resources, warnings, format: 'bmecat' };
 }

@@ -238,7 +238,7 @@ function buildCalendarFromDays(name: string, days: ReadonlyArray<DayResolution>,
  *  losse BYTES (`MPPUtility.getByte`). Zelfde grenscontrolediscipline als de gedeelde primitieven. */
 function getByteAt(data: Uint8Array, offset: number, ctx: string): number {
   if (offset < 0 || offset + 1 > data.length) {
-    throw new Error(`MPP: getByte buiten grenzen (offset=${offset}, bufferlengte=${data.length}) [${ctx}]`);
+    throw new Error(`MPP: getByte out of bounds (offset=${offset}, buffer length=${data.length}) [${ctx}]`);
   }
   return data[offset];
 }

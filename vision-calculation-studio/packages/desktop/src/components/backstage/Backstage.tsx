@@ -123,7 +123,7 @@ export default function Backstage({ open, onClose, onOpenSettings, onOpenFile, o
             shortcut="Ctrl+N"
             onClick={() => actionAndClose(() => {
               const project = useProjectStore.getState();
-              if (!project.dirty || confirm("Unsaved changes worden weggegooid. Doorgaan?")) project.nieuwProject();
+              if (!project.dirty || confirm("Unsaved changes will be discarded. Continue?")) project.nieuwProject();
             })}
           />
           <MenuItem

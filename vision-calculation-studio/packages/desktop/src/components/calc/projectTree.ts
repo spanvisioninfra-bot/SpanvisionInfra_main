@@ -177,7 +177,7 @@ export const bibliotheek: TreeNode[] = [
       { kind: "item", id: "book-bijlage-a", label: "Structural calculation Annex A" },
       { kind: "item", id: "book-funderingsadvies", label: "Foundation advice" },
       { kind: "item", id: "vdp-schuifspanning", label: "Vandepitte: Shear stresses (Jourawsky)", templateId: "vdp-schuifspanning" },
-      { kind: "item", id: "vdp-doorbuiging", label: "Vandepitte: Deflection + dwarskracht", templateId: "vdp-doorbuiging" },
+      { kind: "item", id: "vdp-doorbuiging", label: "Vandepitte: Deflection + shear force", templateId: "vdp-doorbuiging" },
       { kind: "item", id: "vdp-knikken", label: "Vandepitte: Buckling (Euler)", templateId: "vdp-knikken" },
       { kind: "item", id: "vdp-mohr", label: "Vandepitte: Deflection (Mohr)", templateId: "vdp-mohr" },
       { kind: "item", id: "vdp-eigenfrequentie", label: "Vandepitte: Natural frequency", templateId: "vdp-eigenfrequentie" },
@@ -340,6 +340,6 @@ function verzamel(nodes: TreeNode[], categorie: string, uit: Record<string, Modu
 export const modulesPerTemplate: Record<string, ModuleInfo> = (() => {
   const uit: Record<string, ModuleInfo> = {};
   verzamel(moduleCatalogus, "Algemeen", uit);
-  verzamel(bibliotheek, "Bibliotheek", uit);
+  verzamel(bibliotheek, "Library", uit);
   return uit;
 })();

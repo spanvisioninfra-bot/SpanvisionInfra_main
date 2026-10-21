@@ -68,7 +68,7 @@ export function createHelpApi(ctx: HelpApiContext): ExtensionApi['help'] {
   let disposed = false;
   const assertAlive = (method: string): void => {
     if (disposed) {
-      throw new Error(`Extensie "${extensionId}": help.${method} na uitschakelen of verwijderen van de extensie`);
+      throw new Error(`Extension "${extensionId}": help.${method} is unavailable after disabling or removing the extension`);
     }
   };
 
@@ -90,20 +90,20 @@ export function createHelpApi(ctx: HelpApiContext): ExtensionApi['help'] {
   const openBundledProject = async (assetName: string): Promise<void> => {
     assertAlive('openBundledProject');
     if (typeof assetName !== 'string' || !/\.ifc$/i.test(assetName)) {
-      throw new Error(`Extensie "${extensionId}": openBundledProject verwacht de naam van een .ifc-asset`);
+      throw new Error(`Extension "${extensionId}": openBundledProject expects the name of an .ifc asset`);
     }
     const bytes = assetBytes(assetName);
-    if (!bytes) throw new Error(`Extensie "${extensionId}": asset "${assetName}" bestaat niet`);
+    if (!bytes) throw new Error(`Extension "${extensionId}": asset "${assetName}" does not exist`);
     let content: string;
     try {
       content = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
     } catch {
-      throw new Error(`Extensie "${extensionId}": asset "${assetName}" is geen UTF-8-tekst`);
+      throw new Error(`Extension "${extensionId}": asset "${assetName}" is not UTF-8 text`);
     }
     const app = host.app.store.getState();
     const ok = await app.openExampleFromString(content, assetName, host.importLabels?.());
     if (!ok) {
-      const error = new Error(`Extensie "${extensionId}": "${assetName}" kon niet geopend worden`) as AlreadyNotifiedError;
+      const error = new Error(`Extension "${extensionId}": "${assetName}" could not be opened`) as AlreadyNotifiedError;
       error.alreadyNotified = true;
       throw error;
     }
@@ -166,7 +166,7 @@ export function createHelpApi(ctx: HelpApiContext): ExtensionApi['help'] {
     registerArticles(articles: ExtHelpArticle[]) {
       assertAlive('registerArticles');
       if (!Array.isArray(articles)) {
-        throw new Error(`Extensie "${extensionId}": registerArticles verwacht een lijst artikelen`);
+        throw new Error(`Extension "${extensionId}": registerArticles expects a list of articles`);
       }
       // Alleen de bekende velden, als kopie: een extensie die haar objecten later muteert, verandert
       // Help niet.
@@ -182,7 +182,7 @@ export function createHelpApi(ctx: HelpApiContext): ExtensionApi['help'] {
         openProject: openProjectFromLink,
       });
       if (!result.ok) {
-        throw new Error(`Extensie "${extensionId}": ongeldige Help-artikelen — ${result.errors.join('; ')}`);
+        throw new Error(`Extension "${extensionId}": invalid Help articles — ${result.errors.join('; ')}`);
       }
       unregisterArticles = result.unregister;
     },
@@ -198,7 +198,7 @@ export function createHelpApi(ctx: HelpApiContext): ExtensionApi['help'] {
       assertAlive('startGuide');
       const errors = validateGuide(guide, name => assetBytes(name) !== undefined);
       if (errors.length > 0) {
-        throw new Error(`Extensie "${extensionId}": ongeldige begeleiding — ${errors.join('; ')}`);
+        throw new Error(`Extension "${extensionId}": invalid guide — ${errors.join('; ')}`);
       }
       startGuideSession({
         extensionId,

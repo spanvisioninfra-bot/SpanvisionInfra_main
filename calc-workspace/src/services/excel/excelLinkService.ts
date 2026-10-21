@@ -99,25 +99,25 @@ export async function updateAllExcelLinks(items: CostItem[]): Promise<{
         }
 
         if (!wb) {
-          errors.push(`Kan bestand niet lezen: ${filePath}`);
+          errors.push(`Cannot read file: ${filePath}`);
           return item;
         }
 
         const ws = wb.Sheets[sheet];
         if (!ws) {
-          errors.push(`Sheet "${sheet}" niet gevonden in ${filePath}`);
+          errors.push(`Sheet "${sheet}" not found in ${filePath}`);
           return item;
         }
 
         const cellObj = ws[cell];
         if (!cellObj) {
-          errors.push(`Cell ${cell} is leeg in ${sheet} (${filePath})`);
+          errors.push(`Cell ${cell} is empty in ${sheet} (${filePath})`);
           return item;
         }
 
         const newQty = typeof cellObj.v === 'number' ? cellObj.v : parseFloat(String(cellObj.v));
         if (isNaN(newQty)) {
-          errors.push(`Cell ${cell} bevat geen getal in ${sheet} (${filePath})`);
+          errors.push(`Cell ${cell} does not contain a number in ${sheet} (${filePath})`);
           return item;
         }
 
@@ -127,7 +127,7 @@ export async function updateAllExcelLinks(items: CostItem[]): Promise<{
         }
         return item;
       } catch (e) {
-        errors.push(`Fout bij ${filePath}!${sheet}!${cell}: ${e}`);
+        errors.push(`Error in ${filePath}!${sheet}!${cell}: ${e}`);
         return item;
       }
     }),

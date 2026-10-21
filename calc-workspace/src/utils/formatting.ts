@@ -1,4 +1,4 @@
-const nlFormatter = new Intl.NumberFormat('nl-NL', {
+const nlFormatter = new Intl.NumberFormat('en-GB', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });

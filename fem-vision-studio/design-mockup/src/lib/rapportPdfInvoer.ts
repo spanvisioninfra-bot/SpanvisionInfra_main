@@ -390,7 +390,7 @@ export function bouwRapportInvoer(bron: RapportPdfBronnen): ReportInput {
   );
 
   const invoer: ReportInput = {
-    project_name: bron.project.name || "Naamloos",
+    project_name: bron.project.name || "Untitled",
     project_number: bron.project.projectNumber ?? "",
     engineer: bron.project.engineer ?? "",
     company: bron.project.company ?? "",

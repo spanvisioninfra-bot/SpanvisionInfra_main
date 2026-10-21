@@ -2033,9 +2033,9 @@ export function verzamelIfcBeperkingen(
   const platen = (model.plates?.length ?? 0) - geexporteerdePlaten.size;
   if (platen > 0) {
     regels.push(
-      `${platen} ${platen === 1 ? "plaat" : "platen"} zonder hoekknopen: die ` +
-      "kunnen niet als IfcStructuralSurfaceMember getekend worden en staan " +
-      "niet in het bestand.",
+      `${platen} ${platen === 1 ? "plate" : "plates"} without corner nodes: these ` +
+      "cannot be represented as IfcStructuralSurfaceMember and are omitted " +
+      "from the file.",
     );
   }
 
@@ -2046,33 +2046,33 @@ export function verzamelIfcBeperkingen(
   ).length;
   if (randlasten > 0) {
     regels.push(
-      `${randlasten} ${randlasten === 1 ? "randbelasting" : "randbelastingen"} op een plaat ` +
-      "(randlast of puntlast op een plaatrand): hoort bij een plaat die niet in het " +
-      "bestand staat en valt dus mee weg.",
+      `${randlasten} plate edge ${randlasten === 1 ? "load" : "loads"} ` +
+      "(distributed or point loads on a plate edge): the associated plate is " +
+      "missing from the file, so these loads are also omitted.",
     );
   }
 
   if (opties.zonderLasten === true) {
     if (model.loads.length > 0 || model.loadCases.length > 0) {
       regels.push(
-        `Structurele export: ${model.loads.length} belasting${model.loads.length === 1 ? "" : "en"} ` +
-        `en ${model.loadCases.length} belastinggeval${model.loadCases.length === 1 ? "" : "len"} ` +
-        "zijn bewust weggelaten — dit bestand bevat alleen het draagsysteem.",
+        `Structural export: ${model.loads.length} load${model.loads.length === 1 ? "" : "s"} ` +
+        `and ${model.loadCases.length} load case${model.loadCases.length === 1 ? "" : "s"} ` +
+        "are intentionally omitted; this file contains only the structural system.",
       );
     }
   } else {
     if (model.eigenGewicht === true) {
       regels.push(
-        "Eigen gewicht staat aan, maar is in het model geen belasting; het " +
-        "wordt niet als zelfgewichtsbelasting in het bestand gezet.",
+        "Self-weight is enabled, but is not a model load; it is not included " +
+        "as a self-weight load in the file.",
       );
     }
     const combinaties = model.aantalCombinaties ?? 0;
     if (combinaties > 0 && !model.combinations) {
       regels.push(
-        `${combinaties} belastingcombinatie${combinaties === 1 ? "" : "s"}: alleen de ` +
-        "losse belastinggevallen worden geëxporteerd, niet de combinaties " +
-        "met hun factoren.",
+        `${combinaties} load combination${combinaties === 1 ? "" : "s"}: only the ` +
+        "individual load cases are exported, without the combinations " +
+        "and their factors.",
       );
     }
   }
@@ -2088,13 +2088,13 @@ export function verzamelIfcBeperkingen(
   }
   if (zonderDoorsnede.size > 0) {
     regels.push(
-      `Doorsnede onbekend voor ${[...zonderDoorsnede].sort().join(", ")}: die staven ` +
-      "krijgen wel materiaal en profielnaam, maar geen parametrische " +
-      "doorsnede (IFC4 kent geen profiel zonder afmetingen)" +
+      `Unknown section for ${[...zonderDoorsnede].sort().join(", ")}: these members ` +
+      "include material and profile names, but no parametric " +
+      "section (IFC4 requires profile dimensions)" +
       (opties.zonderBouwkundig === true
         ? "."
-        : ", en dus ook geen IfcBeam of IfcColumn — een ligger zonder " +
-          "doorsnede is geen ligger."),
+        : ", and therefore no IfcBeam or IfcColumn; a physical member " +
+          "requires a section."),
     );
   }
 
@@ -2104,8 +2104,8 @@ export function verzamelIfcBeperkingen(
   const losseStaven = model.beams.filter(b => !knoopIds.has(b.from) || !knoopIds.has(b.to));
   if (losseStaven.length > 0) {
     regels.push(
-      `${losseStaven.length} staaf/staven verwijzen naar een knoop die niet bestaat ` +
-      `(${losseStaven.map(b => b.id).join(", ")}) — die staven zijn overgeslagen.`,
+      `${losseStaven.length} member(s) reference a node that does not exist ` +
+      `(${losseStaven.map(b => b.id).join(", ")}); these members are omitted.`,
     );
   }
   if (opties.zonderLasten !== true) {
@@ -2118,8 +2118,8 @@ export function verzamelIfcBeperkingen(
     });
     if (losseLasten.length > 0) {
       regels.push(
-        `${losseLasten.length} belasting(en) verwijzen naar een knoop of staaf die niet ` +
-        `bestaat (${losseLasten.map(l => l.id).join(", ")}) — die zijn overgeslagen.`,
+        `${losseLasten.length} load(s) reference a node or member that does not ` +
+        `exist (${losseLasten.map(l => l.id).join(", ")}); these loads are omitted.`,
       );
     }
   }
@@ -2128,9 +2128,9 @@ export function verzamelIfcBeperkingen(
   if (opties.zonderBouwkundig === true) {
     if (model.beams.length > 0) {
       regels.push(
-        "Bouwkundig model bewust weggelaten: er staan geen IfcBeam, IfcColumn " +
-        "of IfcReinforcingBar in het bestand — alleen het rekenmodel met zijn " +
-        "eigenschappensets.",
+        "The physical model is intentionally omitted: the file contains no IfcBeam, IfcColumn " +
+        "or IfcReinforcingBar entities; only the analytical model and its " +
+        "property sets are included.",
       );
     }
   } else {
@@ -2142,9 +2142,9 @@ export function verzamelIfcBeperkingen(
     });
     if (nulLengte.length > 0) {
       regels.push(
-        `${nulLengte.length} staaf/staven met lengte nul (${nulLengte.map(b => b.id).join(", ")}): ` +
-        "die krijgen geen bouwkundig element, want een extrusie met diepte 0 " +
-        "is geen geldige IfcPositiveLengthMeasure.",
+        `${nulLengte.length} zero-length member(s) (${nulLengte.map(b => b.id).join(", ")}): ` +
+        "no physical element is created because an extrusion depth of 0 " +
+        "is not a valid IfcPositiveLengthMeasure.",
       );
     }
 
@@ -2164,32 +2164,32 @@ export function verzamelIfcBeperkingen(
     }
     if (clt.size > 0) {
       regels.push(
-        `Kruislaaghout (${[...clt].sort().join(", ")}): het bouwkundige element is de ` +
-        "volle strook b × Σt als massieve rechthoek. De laagopbouw met haar " +
-        "afwisselende vezelrichting staat er niet in; daarvoor kent IFC4 " +
-        "alleen een gelaagd materiaal, en dat is een andere beschrijving dan " +
-        "de doorsnede waarmee hier gerekend is.",
+        `Cross-laminated timber (${[...clt].sort().join(", ")}): the physical element is ` +
+        "a solid rectangle of width b and total thickness Σt. The layer arrangement " +
+        "and alternating grain directions are not included. IFC4 provides " +
+        "layered materials, which describe a different representation from " +
+        "the section used in this calculation.",
       );
     }
     if (lVormig.size > 0) {
       regels.push(
-        `L-vormige betondoorsnede (${[...lVormig].sort().join(", ")}): het lijf is aan de ` +
-        "LINKERzijde getekend. Het model legt niet vast aan welke rand de " +
-        "flens uitkraagt — alleen dát er één uitkragend deel is.",
+        `L-shaped concrete section (${[...lVormig].sort().join(", ")}): the web is drawn on the ` +
+        "LEFT side. The model records a projecting flange, but does not specify " +
+        "which edge it projects from.",
       );
     }
     if (betonZonderKorf.length > 0) {
       regels.push(
-        `${betonZonderKorf.length} betonstaaf/staven zonder wapeningskorf ` +
-        `(${betonZonderKorf.join(", ")}): daar staat geen IfcReinforcingBar bij. ` +
-        "Er is met opzet geen standaardkorf.",
+        `${betonZonderKorf.length} concrete member(s) without a reinforcement cage ` +
+        `(${betonZonderKorf.join(", ")}): no IfcReinforcingBar is included for these members. ` +
+        "A default cage is intentionally not assumed.",
       );
     }
     if (metKorf > 0) {
       regels.push(
-        `Beugels van ${metKorf} betonstaaf/staven: elke reeks staat als ÉÉN ` +
-        "IfcReinforcingBar (.LIGATURE.) in het bestand, met aantal en " +
-        "hart-op-hart in de set OpenFEM2D_Beugels — niet als losse beugels.",
+        `Stirrups for ${metKorf} concrete member(s): each series is represented by ONE ` +
+        "IfcReinforcingBar (.LIGATURE.) in the file, with count and " +
+        "centre-to-centre spacing in the OpenFEM2D_Beugels property set, rather than individual stirrups.",
       );
     }
   }
@@ -2200,16 +2200,16 @@ export function verzamelIfcBeperkingen(
     const zonder = model.beams.filter(b => !getoetst.has(b.id));
     if (getoetst.size === 0) {
       regels.push(
-        "Geen toetsresultaten in het bestand: er is niet getoetst, of de " +
-        "uitslag is niet meegegeven. Draai de toetsing vóór de export, dan " +
-        "krijgt elke staaf de set OpenFEM2D_Toetsing met de maatgevende " +
-        "toets, het normartikel en de unity check.",
+        "No design-check results in the file: checks have not been run, or their " +
+        "results were not supplied. Run the checks before exporting so " +
+        "each member receives the OpenFEM2D_Toetsing property set with its governing " +
+        "check, standard clause and unity check.",
       );
     } else if (zonder.length > 0) {
       regels.push(
-        `${zonder.length} van de ${model.beams.length} staven hebben geen toetsuitslag ` +
-        `(${zonder.map(b => b.id).join(", ")}): die dragen geen set ` +
-        "OpenFEM2D_Toetsing. Zie het toetsingspaneel voor de reden per staaf.",
+        `${zonder.length} of ${model.beams.length} members have no design-check results ` +
+        `(${zonder.map(b => b.id).join(", ")}): these do not carry the ` +
+        "OpenFEM2D_Toetsing property set. See the checks panel for each member's reason.",
       );
     }
   }
@@ -2243,43 +2243,43 @@ export function bouwIfcBoom(
   opties: IfcExportOpties = {},
 ): IfcBoomKnoop {
   const projectNaam =
-    model.project?.naam?.trim() || model.projectNaam?.trim() || "Rekenmodel";
-  const locatie = model.project?.locatie?.trim() || "Terrein";
-  const knoopNaam = new Map(model.nodes.map(n => [n.id, `Knoop ${n.id}`]));
+    model.project?.naam?.trim() || model.projectNaam?.trim() || "Analysis model";
+  const locatie = model.project?.locatie?.trim() || "Site";
+  const knoopNaam = new Map(model.nodes.map(n => [n.id, `Node ${n.id}`]));
 
   const knopen: IfcBoomKnoop = {
     type: "IfcStructuralPointConnection",
-    naam: "Knopen",
+    naam: "Nodes",
     aantal: model.nodes.length,
     kinderen: model.nodes.map(n => ({
       type: "IfcVertexPoint",
-      naam: `Knoop ${n.id} — x ${nl(n.x / 1000)} m, z ${nl(n.z / 1000)} m`,
+      naam: `Node ${n.id} — x ${nl(n.x / 1000)} m, z ${nl(n.z / 1000)} m`,
     })),
   };
 
   const staven: IfcBoomKnoop = {
     type: "IfcStructuralCurveMember",
-    naam: "Staven",
+    naam: "Members",
     aantal: model.beams.length,
     kinderen: model.beams.map(b => ({
       type: "IfcMaterialProfile",
-      naam: `Staaf ${b.id} — ${b.material ?? "S235"} ${b.profile ?? "HEA160"} ` +
-        `(${knoopNaam.get(b.from) ?? `knoop ${b.from}?`} → ${knoopNaam.get(b.to) ?? `knoop ${b.to}?`})`,
+      naam: `Member ${b.id} — ${b.material ?? "S235"} ${b.profile ?? "HEA160"} ` +
+        `(${knoopNaam.get(b.from) ?? `node ${b.from}?`} → ${knoopNaam.get(b.to) ?? `node ${b.to}?`})`,
     })),
   };
 
   const opleggingNaam: Record<string, string> = {
-    pinned: "Scharnieroplegging", fixed: "Inklemming",
-    xRoller: "Rol (X vast)", zRoller: "Rol (Z vast)",
-    zSpring: "Veer Z", xSpring: "Veer X", rotSpring: "Draaiveer",
+    pinned: "Pinned support", fixed: "Fixed support",
+    xRoller: "Roller (X restrained)", zRoller: "Roller (Z restrained)",
+    zSpring: "Z spring", xSpring: "X spring", rotSpring: "Rotational spring",
   };
   const opleggingen: IfcBoomKnoop = {
     type: "IfcBoundaryNodeCondition",
-    naam: "Opleggingen",
+    naam: "Supports",
     aantal: model.supports.length,
     kinderen: model.supports.map(s => ({
       type: "IfcBoundaryNodeCondition",
-      naam: `Knoop ${s.nodeId} — ${opleggingNaam[s.type] ?? s.type}` +
+      naam: `Node ${s.nodeId} — ${opleggingNaam[s.type] ?? s.type}` +
         (s.k !== undefined ? ` (k = ${nl(s.k, 2)})` : ""),
     })),
   };
@@ -2287,11 +2287,11 @@ export function bouwIfcBoom(
   const platenInBoom = (model.plates ?? []).filter((p) => (p.nodeIds?.length ?? 0) >= 3);
   const platen: IfcBoomKnoop = {
     type: "IfcStructuralSurfaceMember",
-    naam: "Platen",
+    naam: "Plates",
     aantal: platenInBoom.length,
     kinderen: platenInBoom.map((p) => ({
       type: "IfcFaceSurface",
-      naam: `Plaat ${p.id} — t = ${nl(p.thickness ?? 20, 0)} mm, hoeken ${(p.nodeIds ?? []).join(", ")}`,
+      naam: `Plaat ${p.id} — t = ${nl(p.thickness ?? 20, 0)} mm, corners ${(p.nodeIds ?? []).join(", ")}`,
     })),
   };
   const kinderenModel: IfcBoomKnoop[] = platenInBoom.length > 0
@@ -2327,7 +2327,7 @@ export function bouwIfcBoom(
   // onderdelen van het analysemodel.
   const kinderenGebouw: IfcBoomKnoop[] = [{
     type: "IfcStructuralAnalysisModel",
-    naam: `Rekenmodel ${projectNaam}`,
+    naam: `Analysis model ${projectNaam}`,
     kinderen: kinderenModel,
   }];
   if (opties.zonderBouwkundig !== true) {
@@ -2351,18 +2351,18 @@ export function bouwIfcBoom(
       const korf = b.checkConfig?.betonKorf;
       if (korf && isBetonMateriaal(materiaal)) {
         const delen: string[] = [];
-        if (korf.bottom.count > 0) delen.push(`onder ${korf.bottom.count}Ø${korf.bottom.diameter_mm}`);
-        if (korf.top.count > 0) delen.push(`boven ${korf.top.count}Ø${korf.top.diameter_mm}`);
-        if (korf.stirrup_diameter_mm > 0) delen.push(`beugel Ø${korf.stirrup_diameter_mm}`);
+        if (korf.bottom.count > 0) delen.push(`bottom ${korf.bottom.count}Ø${korf.bottom.diameter_mm}`);
+        if (korf.top.count > 0) delen.push(`top ${korf.top.count}Ø${korf.top.diameter_mm}`);
+        if (korf.stirrup_diameter_mm > 0) delen.push(`stirrup Ø${korf.stirrup_diameter_mm}`);
         kinderen.push({
           type: "IfcReinforcingBar",
-          naam: `Wapening — ${delen.join(", ") || "geen staven"}`,
+          naam: `Reinforcement — ${delen.join(", ") || "no bars"}`,
           aantal: korf.bottom.count + korf.top.count + (korf.stirrup_diameter_mm > 0 ? 1 : 0),
         });
       }
       elementen.push({
         type: kolom ? "IfcColumn" : "IfcBeam",
-        naam: `${kolom ? "Kolom" : "Ligger"} ${b.id} — ${materiaal} ${profiel}, ` +
+        naam: `${kolom ? "Column" : "Beam"} ${b.id} — ${materiaal} ${profiel}, ` +
           `${nl(lengteMm / 1000)} m${staart}`,
         kinderen: kinderen.length > 0 ? kinderen : undefined,
       });
@@ -2370,7 +2370,7 @@ export function bouwIfcBoom(
     if (elementen.length > 0) {
       kinderenGebouw.push({
         type: "IfcBeam",
-        naam: "Bouwkundige staven",
+        naam: "Physical members",
         aantal: elementen.length,
         kinderen: elementen,
       });
@@ -2385,7 +2385,7 @@ export function bouwIfcBoom(
       naam: locatie,
       kinderen: [{
         type: "IfcBuilding",
-        naam: "Gebouw",
+        naam: "Building",
         kinderen: kinderenGebouw,
       }],
     }],
@@ -2395,35 +2395,35 @@ export function bouwIfcBoom(
 /** Eenregelige omschrijving van een belasting, met eenheden. */
 function omschrijfLast(l: Load): string {
   const doel = l.nodeId !== undefined
-    ? `knoop ${l.nodeId}`
-    : l.beamId !== undefined ? `staaf ${l.beamId}`
+    ? `node ${l.nodeId}`
+    : l.beamId !== undefined ? `member ${l.beamId}`
     : l.plateId !== undefined
-      ? `plaat ${l.plateId}, ${l.edgeIndex !== undefined ? `rand ${l.edgeIndex + 1}` : (l.edge ?? "rand ?")}`
+      ? `plate ${l.plateId}, ${l.edgeIndex !== undefined ? `edge ${l.edgeIndex + 1}` : (l.edge ?? "edge ?")}`
       : "?";
   switch (l.type) {
     case "pointForce": {
       const delen: string[] = [];
       if (l.fx !== undefined && l.fx !== 0) delen.push(`Fx ${nl(l.fx, 2)} kN`);
       if (l.fz !== undefined && l.fz !== 0) delen.push(`Fz ${nl(l.fz, 2)} kN`);
-      const plek = l.posFrac !== undefined ? ` op ${nl(l.posFrac * 100, 0)}%` : "";
-      return `Puntlast ${l.id} — ${delen.join(", ") || "0 kN"} op ${doel}${plek}`;
+      const plek = l.posFrac !== undefined ? ` on ${nl(l.posFrac * 100, 0)}%` : "";
+      return `Point load ${l.id} — ${delen.join(", ") || "0 kN"} on ${doel}${plek}`;
     }
     case "pointMoment":
-      return `Moment ${l.id} — My ${nl(l.my ?? 0, 2)} kNm op ${doel}`;
+      return `Moment ${l.id} — My ${nl(l.my ?? 0, 2)} kNm on ${doel}`;
     case "thermal":
-      return `Temperatuur ${l.id} — ΔT ${nl(l.deltaT ?? 0, 1)} K op ${doel}`;
+      return `Temperature ${l.id} — ΔT ${nl(l.deltaT ?? 0, 1)} K on ${doel}`;
     case "lineLoad": {
       const qA = l.qStart ?? l.q ?? 0;
       const qB = l.qEnd ?? l.q ?? 0;
       const waarde = qA === qB ? `${nl(qA, 2)} kN/m` : `${nl(qA, 2)} → ${nl(qB, 2)} kN/m`;
       const deel = (l.startFrac ?? 0) > 0 || (l.endFrac ?? 1) < 1
-        ? ` (deel ${nl((l.startFrac ?? 0) * 100, 0)}–${nl((l.endFrac ?? 1) * 100, 0)}%)`
+        ? ` (part ${nl((l.startFrac ?? 0) * 100, 0)}–${nl((l.endFrac ?? 1) * 100, 0)}%)`
         : "";
-      const stelsel = l.qCoord === "local" ? " lokaal" : "";
-      return `Lijnlast ${l.id} — ${waarde} ${l.qDir ?? "z"}${stelsel} op ${doel}${deel}`;
+      const stelsel = l.qCoord === "local" ? " local" : "";
+      return `Line load ${l.id} — ${waarde} ${l.qDir ?? "z"}${stelsel} on ${doel}${deel}`;
     }
     default:
-      return `Belasting ${l.id} (${l.type}) op ${doel}`;
+      return `Belasting ${l.id} (${l.type}) on ${doel}`;
   }
 }
 

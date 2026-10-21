@@ -91,7 +91,7 @@ function SpanningFiguur({ r }: { r: SpanningBeamCheckResult }) {
       </ul>
     ) : null;
   }
-  const g = (x: number, d = 2) => x.toLocaleString("nl-NL", { maximumFractionDigits: d });
+  const g = (x: number, d = 2) => x.toLocaleString("en-GB", { maximumFractionDigits: d });
   return (
     <>
       <div className="cp-spanning-figuur">
@@ -276,7 +276,7 @@ export default function CheckPanel({
   const okCount = results.filter((r) => r.status === "Ok").length;
   const notOkCount = results.filter((r) => r.status === "NotOk").length;
   const lastRunTime = lastRunAt
-    ? new Date(lastRunAt).toLocaleTimeString("nl-NL", {
+    ? new Date(lastRunAt).toLocaleTimeString("en-GB", {
         hour: "2-digit", minute: "2-digit", second: "2-digit",
       })
     : null;

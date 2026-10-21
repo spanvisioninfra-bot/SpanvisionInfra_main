@@ -4,7 +4,7 @@
     {
       "id": "cad",
       "label": "Vision CAD Studio",
-      "url": "https://spanvision-cad.vercel.app/app/",
+      "url": "https://cad.spanvisioninfra.com/app/",
       "available": true,
       "platform": "vercel"
     },

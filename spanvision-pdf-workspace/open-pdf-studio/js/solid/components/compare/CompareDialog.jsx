@@ -56,7 +56,7 @@ export default function CompareDialog() {
     <div class="cmp-dialog-footer">
       <button class="pref-btn pref-btn-secondary" onClick={close}>{tCommon('cancel') || "Cancel"}</button>
       <button class="pref-btn pref-btn-primary" disabled={!canStart()} onClick={handleOk}>
-        {t('compare.start') || 'Start vergelijken'}
+        {t('compare.start') || 'Start comparison'}
       </button>
     </div>
   );
@@ -84,7 +84,7 @@ export default function CompareDialog() {
               </svg>
             </div>
             <div class="cmp-dialog-empty-msg">
-              {t('compare.needTwoDocs') || 'Open minstens twee PDF-bestanden in tabs om te vergelijken.'}
+              {t('compare.needTwoDocs') || 'Open at least two PDF files in tabs to compare them.'}
             </div>
           </div>
         }
@@ -209,8 +209,8 @@ export default function CompareDialog() {
           {/* Legend */}
           <Show when={mode() === 'overlay'}>
             <div class="cmp-legend">
-              <span class="cmp-legend-item"><span class="cmp-color-dot" style="background:#dc2626"></span>{t('compare.legendOld') || 'Alleen in oud'}</span>
-              <span class="cmp-legend-item"><span class="cmp-color-dot" style="background:#16a34a"></span>{t('compare.legendNew') || 'Alleen in nieuw'}</span>
+              <span class="cmp-legend-item"><span class="cmp-color-dot" style="background:#dc2626"></span>{t('compare.legendOld') || 'Only in old'}</span>
+              <span class="cmp-legend-item"><span class="cmp-color-dot" style="background:#16a34a"></span>{t('compare.legendNew') || 'Only in new'}</span>
               <span class="cmp-legend-item"><span class="cmp-color-dot" style="background:#222"></span>{t('compare.legendBoth') || 'Ongewijzigd'}</span>
             </div>
           </Show>

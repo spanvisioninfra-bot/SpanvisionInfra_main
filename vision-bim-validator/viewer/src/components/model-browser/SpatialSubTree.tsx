@@ -127,7 +127,7 @@ function ElementTypeGroupNode({ group, depth }: ElementTypeGroupProps) {
                 className="spatial-node__show-all-btn"
                 onClick={() => setShowAll(true)}
               >
-                Toon alle ({group.elements.length})
+                Show all ({group.elements.length})
               </button>
             </div>
           )}

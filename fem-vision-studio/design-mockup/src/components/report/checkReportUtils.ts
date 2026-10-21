@@ -62,7 +62,7 @@ export function renderLatexHtml(latex: string, displayMode: boolean): string {
 
 /** MAX is de eindige kernrepresentatie van nulweerstand bij positieve belasting. */
 function rapportGetal(v: number, opties: Intl.NumberFormatOptions): string {
-  return (v === Number.MAX_VALUE ? Infinity : v).toLocaleString("nl-NL", {
+  return (v === Number.MAX_VALUE ? Infinity : v).toLocaleString("en-GB", {
     notation: Math.abs(v) >= 1e6 ? "scientific" : "standard",
     ...opties,
   });
@@ -430,7 +430,7 @@ export function fmtUc(v: number): string {
 /** Tijdstip van de laatste toetsrun, zelfde notatie als de samenvatting van R1. */
 export function fmtCheckedAt(lastRunAt: number | null): string | null {
   if (!lastRunAt) return null;
-  return new Date(lastRunAt).toLocaleString("nl-NL", {
+  return new Date(lastRunAt).toLocaleString("en-GB", {
     day: "2-digit", month: "2-digit", year: "numeric",
     hour: "2-digit", minute: "2-digit",
   });
@@ -602,7 +602,7 @@ export function belastingduurTekst(
 export function statusLabel(t: TFunction, status: CheckStatus): string {
   switch (status) {
     case "Ok": return t("report.statusOk", "Voldoet");
-    case "NotOk": return t("report.statusNotOk", "Voldoet niet");
+    case "NotOk": return t("report.statusNotOk", "Does not pass");
     default: return t("report.statusNa", "N.v.t.");
   }
 }

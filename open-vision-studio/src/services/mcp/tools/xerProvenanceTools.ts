@@ -193,7 +193,7 @@ function createByteBudget(maxBytes: number): ByteBudget {
       if (used > maxBytes) {
         throw new XerProvenanceError(
           'VALIDATION',
-          `Deze pagina overschrijdt de responsgrens van ${MAX_SECTION_RESPONSE_BYTES} bytes — verlaag \`limit\` of gebruik \`offset\` om te pagineren.`,
+          `This page exceeds the response limit of ${MAX_SECTION_RESPONSE_BYTES} bytes — lower limit or use offset to paginate.`,
         );
       }
     },
@@ -337,7 +337,7 @@ function finalizeBounded<T extends Record<string, unknown>>(result: T): T {
   if (byteLength > MAX_SECTION_RESPONSE_BYTES) {
     throw new XerProvenanceError(
       'VALIDATION',
-      `Deze pagina overschrijdt de responsgrens van ${MAX_SECTION_RESPONSE_BYTES} bytes geserialiseerd — verlaag \`limit\` of gebruik \`offset\` om te pagineren.`,
+      `This page exceeds the serialized response limit of ${MAX_SECTION_RESPONSE_BYTES} bytes — lower limit or use offset to paginate.`,
     );
   }
   return result;
@@ -371,7 +371,7 @@ function requireOnlyKeys(args: unknown): XerProvenanceArgs {
   const allowed = ['section', 'collection', 'projectId', 'limit', 'offset', 'includeRawSource', 'includeRawRows'];
   for (const key of Object.keys(args)) {
     if (!allowed.includes(key)) {
-      throw new XerProvenanceError('VALIDATION', `onbekend argument \`${key}\` voor inspect_xer_provenance; toegestaan: ${allowed.join(', ')}.`);
+      throw new XerProvenanceError('VALIDATION', `unknown argument “${key}” for inspect_xer_provenance; allowed: ${allowed.join(', ')}.`);
     }
   }
   return args;
@@ -397,20 +397,20 @@ function requirePage(args: XerProvenanceArgs, options: PageOptions = {}): { limi
       // grens moet de client nog een pagina opvragen.
       throw new XerProvenanceError(
         'VALIDATION',
-        `\`${options.label}\` accepteert maximaal ${maxLimit} ${options.unit ?? 'items'} per antwoord; gebruik offset voor volgende pagina's.`,
+        `“${options.label}” accepts at most ${maxLimit} ${options.unit ?? 'items'} per response; use offset for subsequent pages.`,
       );
     }
-    throw new XerProvenanceError('VALIDATION', `\`limit\` moet een geheel getal van 1 t/m ${maxLimit} zijn.`);
+    throw new XerProvenanceError('VALIDATION', `“limit” must be an integer from 1 to ${maxLimit}.`);
   }
   if (typeof offset !== 'number' || !Number.isInteger(offset) || offset < 0) {
-    throw new XerProvenanceError('VALIDATION', '`offset` moet een geheel getal ≥ 0 zijn.');
+    throw new XerProvenanceError('VALIDATION', "offset must be an integer ≥ 0.");
   }
   return { limit, offset };
 }
 
 function requireString(value: unknown, name: string): string {
   if (typeof value !== 'string' || value.trim() === '') {
-    throw new XerProvenanceError('VALIDATION', `\`${name}\` moet een niet-lege string zijn.`);
+    throw new XerProvenanceError('VALIDATION', `“${name}” must be a non-empty string.`);
   }
   return value;
 }
@@ -448,7 +448,7 @@ function collectionOf<T>(section: Section, collection: unknown, allowed: readonl
   if (typeof collection !== 'string' || !allowed.includes(collection)) {
     throw new XerProvenanceError(
       'VALIDATION',
-      `${section} vereist \`collection\` uit: ${allowed.join(', ')}.`,
+      `${section} requires collection from: ${allowed.join(', ')}.`,
     );
   }
   return value;
@@ -648,7 +648,7 @@ function diagnostics(archive: XerSourceArchive, args: XerProvenanceArgs): unknow
   const includeRawRows = args.includeRawRows === true;
   if (collection === 'importReport') {
     if (args.limit !== undefined || args.offset !== undefined) {
-      throw new XerProvenanceError('VALIDATION', '`limit` en `offset` horen niet bij diagnostics/importReport.');
+      throw new XerProvenanceError('VALIDATION', "limit and offset do not apply to diagnostics/importReport.");
     }
     // Ook het scalaire importReport-pad loopt door de poort + responsgrens —
     // structureel onbegrensd blijven is fout, ongeacht wat het type vandaag toevallig bevat.
@@ -704,7 +704,7 @@ function taskSourceRows(archive: XerSourceArchive, args: XerProvenanceArgs): unk
  *  expliciet. */
 function rawSource(archive: XerSourceArchive, args: XerProvenanceArgs): unknown {
   if (args.includeRawSource !== true) {
-    throw new XerProvenanceError('VALIDATION', 'rawSource vereist `includeRawSource: true`; bronbytes kunnen namen en vrije notities bevatten.');
+    throw new XerProvenanceError('VALIDATION', "rawSource requires includeRawSource: true; source bytes can contain names and free-text notes.");
   }
   const paged = paginateRaw(archive.byteChunks, args, { maxLimit: 8, label: 'rawSource', unit: 'chunks' });
   const next = paged.offset + paged.slice.length;
@@ -726,42 +726,42 @@ function rawSource(archive: XerSourceArchive, args: XerProvenanceArgs): unknown 
 function inspect(state: AppState, rawArgs: unknown): unknown {
   const args = requireOnlyKeys(rawArgs);
   if (args.section !== undefined && (typeof args.section !== 'string' || !(SECTIONS as readonly string[]).includes(args.section))) {
-    throw new XerProvenanceError('VALIDATION', `\`section\` moet één van ${SECTIONS.join(', ')} zijn.`);
+    throw new XerProvenanceError('VALIDATION', `“section” must be one of ${SECTIONS.join(', ')}.`);
   }
   if (args.includeRawSource !== undefined && typeof args.includeRawSource !== 'boolean') {
-    throw new XerProvenanceError('VALIDATION', '`includeRawSource` moet een boolean zijn.');
+    throw new XerProvenanceError('VALIDATION', "includeRawSource must be a boolean.");
   }
   if (args.includeRawRows !== undefined && typeof args.includeRawRows !== 'boolean') {
-    throw new XerProvenanceError('VALIDATION', '`includeRawRows` moet een boolean zijn.');
+    throw new XerProvenanceError('VALIDATION', "includeRawRows must be a boolean.");
   }
   const section = (args.section ?? 'summary') as Section;
   const archive = state.xerSourceArchive;
   if (args.projectId !== undefined && (typeof args.projectId !== 'string' || args.projectId.trim() === '')) {
-    throw new XerProvenanceError('VALIDATION', '`projectId` moet een niet-lege string zijn.');
+    throw new XerProvenanceError('VALIDATION', "projectId must be a non-empty string.");
   }
   if (section !== 'rawSource' && args.includeRawSource !== undefined) {
-    throw new XerProvenanceError('VALIDATION', '`includeRawSource` hoort alleen bij section `rawSource`.');
+    throw new XerProvenanceError('VALIDATION', "includeRawSource applies only to section rawSource.");
   }
   if (args.includeRawRows !== undefined && !RAW_ROWS_SECTIONS.includes(section)) {
     throw new XerProvenanceError(
       'VALIDATION',
-      '`includeRawRows` hoort alleen bij section `resourceCatalog`, `metadataCatalog`, `taskSourceRowsByProject` of `diagnostics`.',
+      "includeRawRows applies only to section resourceCatalog, metadataCatalog, taskSourceRowsByProject or diagnostics.",
     );
   }
   if (section === 'summary') {
-    if (args.collection !== undefined) throw new XerProvenanceError('VALIDATION', '`collection` hoort niet bij section `summary`.');
-    if (args.limit !== undefined || args.offset !== undefined) throw new XerProvenanceError('VALIDATION', '`limit` en `offset` horen niet bij section `summary`.');
+    if (args.collection !== undefined) throw new XerProvenanceError('VALIDATION', "collection does not apply to section summary.");
+    if (args.limit !== undefined || args.offset !== undefined) throw new XerProvenanceError('VALIDATION', "limit and offset do not apply to section summary.");
     if (args.projectId !== undefined && archive) validateProjectSelector(archive, args.projectId);
     return summary(state, archive);
   }
   if (args.projectId !== undefined && archive) validateProjectSelector(archive, args.projectId);
   const selected = requireArchive(state);
   if (section === 'rawSource') {
-    if (args.collection !== undefined || args.projectId !== undefined) throw new XerProvenanceError('VALIDATION', '`rawSource` neemt alleen includeRawSource, limit en offset.');
+    if (args.collection !== undefined || args.projectId !== undefined) throw new XerProvenanceError('VALIDATION', "rawSource accepts only includeRawSource, limit and offset.");
     return rawSource(selected, args);
   }
   if (section === 'taskSourceRowsByProject') {
-    if (args.collection !== undefined) throw new XerProvenanceError('VALIDATION', '`collection` hoort niet bij section `taskSourceRowsByProject`.');
+    if (args.collection !== undefined) throw new XerProvenanceError('VALIDATION', "collection does not apply to section taskSourceRowsByProject.");
     return taskSourceRows(selected, args);
   }
   if (section === 'resourceCatalog') return resourceCatalog(selected, args);

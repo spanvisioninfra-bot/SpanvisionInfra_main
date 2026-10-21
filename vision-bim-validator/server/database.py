@@ -16,17 +16,17 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import DeclarativeBase
 
-# Default to SQLite for local dev, PostgreSQL in production
-DATABASE_URL = os.environ.get(
-    "DATABASE_URL",
-    "sqlite+aiosqlite:///./bimvalidator.db",
-)
+from server.database_config import build_database_config
+
+# Standard Neon/PostgreSQL URLs are converted to the installed async driver.
+DATABASE_URL, database_options = build_database_config(os.environ.get("DATABASE_URL"))
 
 # SQLAlchemy async engine
 engine = create_async_engine(
     DATABASE_URL,
     echo=False,
     pool_pre_ping=True,
+    **database_options,
 )
 
 # Session factory

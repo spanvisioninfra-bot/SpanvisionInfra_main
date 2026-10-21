@@ -394,7 +394,7 @@ function renderProjectBlad(c: Cursor, inputs: PileReportInputs): void {
     );
 
     c.y += 2;
-    sectionTitle(c, "Berekening");
+    sectionTitle(c, "Calculation");
     paragraph(c, `D_eq = ${first.input.diameterMm} mm`);
     paragraph(
       c,
@@ -658,7 +658,7 @@ function renderEndAnalysis(
     },
   );
 
-  paragraph(c, "Type bouwwerk: Niet-stijf");
+  paragraph(c, "Structure type: Non-rigid");
   formula(
     c,
     "VC",
@@ -669,7 +669,7 @@ function renderEndAnalysis(
   formula(
     c,
     "ξ3 ; ξ4",
-    "Tabel A.10b (niet-stijf)",
+    "Table A.10b (non-rigid)",
     null,
     `ξ3 = ${nl(summary.xi3, 2)}   ξ4 = ${nl(summary.xi4, 2)}`,
     "...(tabel A.10)",

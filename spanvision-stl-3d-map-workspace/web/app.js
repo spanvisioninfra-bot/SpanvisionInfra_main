@@ -1,5 +1,6 @@
 /* STL-3D map workspace - browser side.
  * The browser owns the project object; the server is stateless. */
+import { api } from './api.mjs';
 
 // Printable bodies, in print order. Colours mirror config.py DEFAULT_BANDS.
 const BODY_DEFS = [
@@ -62,7 +63,7 @@ map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank
 
 const baseLayers = {
   'Map': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map),
-  'Netherlands': L.tileLayer('https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png', { maxZoom: 19, bounds: [[50.5,3],[54,7.5]], attribution: '&copy; PDOK / Kadaster' }),
+  'Regional topography (NL)': L.tileLayer('https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png', { maxZoom: 19, bounds: [[50.5,3],[54,7.5]], attribution: '&copy; PDOK / Kadaster' }),
   'Grayscale': L.tileLayer(
     'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/grijs/EPSG:3857/{z}/{x}/{y}.png',
     { maxZoom: 19, attribution: '&copy; PDOK / Kadaster' }),
@@ -87,16 +88,6 @@ function status(text, cls) {
   const el = $('status');
   el.textContent = text;
   el.className = cls || '';
-}
-
-async function api(path, options) {
-  const res = await fetch(path, options);
-  if (!res.ok) {
-    let detail = res.statusText;
-    try { detail = (await res.json()).detail || detail; } catch { /* not json */ }
-    throw new Error(detail);
-  }
-  return res.json();
 }
 
 function post(path, body) {
@@ -244,7 +235,7 @@ $('btn-load').onclick = async () => {
   readSettings();
   busy(true, 'Retrieving buildings (3DBAG) and OSM data…');
   try {
-    const data = await post('/api/area', { project, refresh: false });
+    const data = await post('/api/area', { project, refresh: true });
     renderArea(data);
     if (data.stats.surfaces_error) {
       status('Buildings loaded; water and roads unavailable (OSM offline).', 'err');
@@ -709,7 +700,7 @@ async function loadAppInfo() {
     $('app-version').textContent = 'v' + appInfo.version;
     if(appInfo.services.feedbackEnabled&&appInfo.feedback_url){$('btn-feedback').classList.remove('hidden');$('btn-feedback').onclick=()=>window.open(appInfo.feedback_url,'_blank','noopener,noreferrer');}
     if(appInfo.services.updaterEnabled)checkUpdate();
-  } catch { /* server not ready */ }
+  } catch (error) { status('Unable to connect to the workspace. ' + error.message, 'err'); }
 }
 
 async function checkUpdate() {
@@ -743,9 +734,22 @@ window.addEventListener('resize',resizeVisibleMap);
 function renderBuildingList(){const list=$('building-list');list.replaceChildren();buildingLayer?.eachLayer(layer=>{const p=layer.feature.properties;const label=document.createElement('label');const input=document.createElement('input');input.type='checkbox';input.dataset.building=p.id;input.checked=project.hidden_building_ids.includes(p.id);input.onchange=()=>toggleHidden(p.id);label.append(input,document.createTextNode('Hide building '+p.id));list.append(label);});}
 function moveDesign(){const lon=Number($('design-lon').value),lat=Number($('design-lat').value);if(!Number.isFinite(lon)||!Number.isFinite(lat)||Math.abs(lon)>180||Math.abs(lat)>90){status('Enter valid longitude and latitude.','err');return;}project.design.anchor_lonlat=[lon,lat];ensureDesignMarker();save();status('Design position updated.','ok');}
 $('design-lon').onchange=moveDesign;$('design-lat').onchange=moveDesign;$('btn-design-center').onclick=()=>{const center=map.getCenter();project.design.anchor_lonlat=[center.lng,center.lat];ensureDesignMarker();save();status('Design placed at map center.','ok');};
-try{const stored=JSON.parse(localStorage.getItem('oststl.map')||'null');if(stored?.center&&stored.zoom)map.setView(stored.center,stored.zoom);if(stored?.layer&&baseLayers[stored.layer]){Object.values(baseLayers).forEach(layer=>map.removeLayer(layer));baseLayers[stored.layer].addTo(map);}}catch{}
+let hasSavedMapView = false;
+try{const stored=JSON.parse(localStorage.getItem('oststl.map')||'null');if(stored?.center?.length===2&&stored.center.every(Number.isFinite)&&Number.isFinite(stored.zoom)){map.setView(stored.center,stored.zoom);hasSavedMapView=true;}const layerName=stored?.layer==='Netherlands'?'Regional topography (NL)':stored?.layer;if(layerName&&baseLayers[layerName]){Object.values(baseLayers).forEach(layer=>map.removeLayer(layer));baseLayers[layerName].addTo(map);}}catch{}
 // Restore an existing workspace; locate new maps without a selected project area.
-window.SpanvisionLocation.attachMap(map,{autoLocate:!project.bbox_wgs84});
+window.addEventListener('spanvision:map-location', event => {
+  if(event.detail.map!==map.getContainer())return;
+  const place=[event.detail.city,event.detail.country].filter(Boolean).join(', ');
+  $('map-region-label').textContent=place ? 'YOUR AREA: '+place : 'YOUR LOCATION';
+});
+// Keep both controls in Leaflet's layout so longer location messages cannot cover the instructions.
+const guidanceControl=L.control({position:'bottomleft'});
+guidanceControl.onAdd=()=>{const guidance=$('map-guidance');L.DomEvent.disableClickPropagation(guidance);return guidance;};
+guidanceControl.addTo(map);
+window.SpanvisionLocation.attachMap(map,{autoLocate:!project.bbox_wgs84&&!hasSavedMapView});
+const locationControl=L.control({position:'bottomleft'});
+locationControl.onAdd=()=>{const control=map.getContainer().querySelector('.sv-map-location');L.DomEvent.disableClickPropagation(control);L.DomEvent.disableScrollPropagation(control);return control;};
+locationControl.addTo(map);
 function saveMapView(layerName){let previous={};try{previous=JSON.parse(localStorage.getItem('oststl.map')||'{}');const center=map.getCenter();localStorage.setItem('oststl.map',JSON.stringify({center:[center.lat,center.lng],zoom:map.getZoom(),layer:layerName||previous.layer||'Map'}));}catch{}}
 map.on('moveend',()=>saveMapView());map.on('baselayerchange',event=>saveMapView(event.name));
 if(project.design.filename){$('design-controls').classList.remove('hidden');$('design-info').classList.remove('hidden');$('design-info').textContent='Saved design: '+project.design.filename;ensureDesignMarker();}

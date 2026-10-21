@@ -29,7 +29,7 @@
     try {
       combinations = (await invoke("get_combinations", {})) || [];
     } catch (e) {
-      console.error("Combinaties laden mislukt:", e);
+      console.error("Failed to load combinations:", e);
     }
     loading = false;
   }

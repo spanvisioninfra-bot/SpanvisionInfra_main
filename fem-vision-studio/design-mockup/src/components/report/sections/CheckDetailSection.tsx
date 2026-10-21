@@ -142,12 +142,12 @@ export function VerloopBlok({ verloop }: { verloop: VerloopRapport }) {
   return (
     <div className="rpt-verloop">
       <div className="rpt-verloop-kop">
-        {t("report.verloopTitel", "Verlopend profiel — toetsdoorsneden")}
+        {t("report.verloopTitel", "Tapered member — check sections")}
       </div>
       <p className="rpt-note">
         {t("report.verloopNoot", {
           defaultValue:
-            "De maten verlopen lineair van {{begin}} bij x = 0 naar {{eind}} bij x = L. Elke doorsnedetoets is op alle {{aantal}} rekenpunten met de plaatselijke doorsnede uitgevoerd; hieronder staan er zes, plus — met een * achter de plaats — het maatgevende rekenpunt.",
+            "Dimensions vary linearly from {{begin}} at x = 0 to {{eind}} at x = L. Every cross-section check was carried out at all {{aantal}} evaluation points using the local cross-section; six of them are listed below, plus — marked with * after the position — the governing evaluation point.",
           begin: verloop.begin_naam,
           eind: verloop.eind_naam,
           aantal: verloop.aantal_rekenpunten,
@@ -158,7 +158,7 @@ export function VerloopBlok({ verloop }: { verloop: VerloopRapport }) {
           <tr>
             <th>x [mm]</th>
             <th>t = x/L</th>
-            <th>{t("report.verloopColMaten", "Doorsnede [mm]")}</th>
+            <th>{t("report.verloopColMaten", "Cross-section [mm]")}</th>
             <th>A [mm²]</th>
             <th>W_y [mm³]</th>
             <th>{t("report.crossSectionClass", "doorsnedeklasse")}</th>
@@ -183,7 +183,7 @@ export function VerloopBlok({ verloop }: { verloop: VerloopRapport }) {
         <p className="rpt-note">
           {t("report.verloopMaatgevend", {
             defaultValue:
-              "Maatgevend punt: x = {{x}} mm (t = {{t}}), toets {{toets}}, UC = {{uc}}.",
+              "Governing point: x = {{x}} mm (t = {{t}}), check {{toets}}, UC = {{uc}}.",
             x: fmtValue(verloop.maatgevend.doorsnede.x_mm, 0),
             t: fmtValue(verloop.maatgevend.doorsnede.t, 3),
             toets: splitsArtikel(verloop.maatgevend.toets_id).artikel,
@@ -194,15 +194,15 @@ export function VerloopBlok({ verloop }: { verloop: VerloopRapport }) {
       {verloop.stabiliteit.length > 0 && (
         <>
           <div className="rpt-verloop-kop">
-            {t("report.verloopStabiliteit", "Doorsnede voor de stabiliteitstoetsen")}
+            {t("report.verloopStabiliteit", "Cross-section for stability checks")}
           </div>
           <table className="rpt-verloop-tabel">
             <thead>
               <tr>
                 <th>{t("report.verloopStabColToets", "Toets")}</th>
                 <th>x [mm]</th>
-                <th>{t("report.verloopColMaten", "Doorsnede [mm]")}</th>
-                <th className="rpt-verloop-reden">{t("report.verloopStabColReden", "Reden")}</th>
+                <th>{t("report.verloopColMaten", "Cross-section [mm]")}</th>
+                <th className="rpt-verloop-reden">{t("report.verloopStabColReden", "Reason")}</th>
               </tr>
             </thead>
             <tbody>
@@ -308,19 +308,19 @@ export function DerivationBlock({
           // afleiding er werkelijk uit komt — zie `ketenHerkomst`.
           switch (ketenHerkomst(check)) {
             case "nb":
-              return t("report.ketenKop", "Afleiding volgens de nationale bijlage, stap voor stap:");
+              return t("report.ketenKop", "Step-by-step derivation according to the National Annex:");
             case "nb-benadering":
               return t(
                 "report.ketenKopNbBenadering",
-                "Afleiding volgens de nationale bijlage, met een M_cr-benadering voor U-profielen buiten de norm om, stap voor stap:",
+                "Step-by-step derivation according to the National Annex, with an M_cr approximation for channel sections outside the standard:",
               );
             case "elastisch":
               return t(
                 "report.ketenKopElastisch",
-                "Afleiding met de algemene elastische formule voor M_cr (niet volgens bijlage NB.NB), stap voor stap:",
+                "Derivation using the general elastic formula for M_cr (not Annex NB.NB), step by step:",
               );
             default:
-              return t("report.ketenKopAlgemeen", "Afleiding, stap voor stap:");
+              return t("report.ketenKopAlgemeen", "Step-by-step derivation:");
           }
         })()}
       />
@@ -388,7 +388,7 @@ function MemberBlock({
     : isConcreteCheckResult(result)
       ? `EN 1992 · ${result.reinforcement_summary} · f_cd = ${result.f_cd_mpa.toFixed(1)} N/mm² · f_yd = ${result.f_yd_mpa.toFixed(0)} N/mm²`
       : isStressCheckResult(result)
-        ? `${t("report.spanningGeenNorm", "vrije spanningstoets (geen norm)")} · f_toel = ${fmtValue(result.f_toel_mpa, 2)} N/mm² · γ_M = ${fmtValue(result.gamma_m, 2)} · f_d = ${fmtValue(result.f_d_mpa, 2)} N/mm²`
+        ? `${t("report.spanningGeenNorm", "Direct stress check (no design code)")} · f_toel = ${fmtValue(result.f_toel_mpa, 2)} N/mm² · γ_M = ${fmtValue(result.gamma_m, 2)} · f_d = ${fmtValue(result.f_d_mpa, 2)} N/mm²`
         : `EN 1995 · ${t("report.serviceClass", "klimaatklasse")} ${serviceClassLabel(result.service_class)} · ${belastingduurTekst(result, t, tCheck)}`;
 
   // Beknopt: alleen de maatgevende toets — de UC die telt, met dezelfde
@@ -402,7 +402,7 @@ function MemberBlock({
       {/* Echte .rpt-h3: doet mee met de sectienummering én komt zo in de
           inhoudsopgave te staan, net als in het referentie-rapport. */}
       <h3 className="rpt-h3">
-        {t("report.colBeam", "Staaf")} {result.beam_id} —{" "}
+        {t("report.colBeam", "Member")} {result.beam_id} —{" "}
         {sectionLabel(result)} ({gradeLabel(result)})
       </h3>
 
@@ -464,13 +464,13 @@ export default function CheckDetailSection() {
   return (
     <div className="rpt-block rpt-chk-detail">
       <style>{CHECK_REPORT_CSS}</style>
-      <h2 className="rpt-h2">{t("report.sectionCheckDetail", "Toetsing per staaf")}</h2>
+      <h2 className="rpt-h2">{t("report.sectionCheckDetail", "Checks per member")}</h2>
 
       {results.length === 0 ? (
         <p className="rpt-empty-note">
           {t(
             "report.notChecked",
-            "Nog niet getoetst — voer de normtoetsing uit via het tabblad Toetsing.",
+            "Not checked yet. Run the code checks from the Checks tab.",
           )}
         </p>
       ) : (
@@ -480,12 +480,12 @@ export default function CheckDetailSection() {
             {!gedetailleerd &&
               `${t(
                 "report.detailBeknoptNoot",
-                "Beknopt niveau: per staaf is alleen de maatgevende toets uitgeschreven.",
+                "Concise level: only the governing check is written out for each member.",
               )} `}
             {weggelaten > 0 &&
               `${t("report.staafKeuzeNoot", {
                 defaultValue:
-                  "Van {{aantal}} van de {{totaal}} getoetste staven is de uitgebreide uitvoer op verzoek weggelaten; die staven staan wel in het toetsingsoverzicht.",
+                  "For {{aantal}} of the {{totaal}} checked members the detailed output was left out on request; those members do appear in the check overview.",
                 aantal: weggelaten,
                 totaal: results.length,
               })} `}
@@ -496,7 +496,7 @@ export default function CheckDetailSection() {
             <p className="rpt-empty-note">
               {t(
                 "report.staafKeuzeLeeg",
-                "Van geen enkele staaf is de uitgebreide uitvoer gekozen — vink in de rapportzijbalk minstens één staaf aan.",
+                "Detailed output is not selected for any member. Select at least one member in the report sidebar.",
               )}
             </p>
           )}
@@ -512,13 +512,13 @@ export default function CheckDetailSection() {
           {skipped.length > 0 && (
             <div className="rpt-skipped">
               <h3 className="rpt-h3">
-                {t("report.skippedTitle", "Niet-getoetste staven")} ({skipped.length})
+                {t("report.skippedTitle", "Unchecked members")} ({skipped.length})
               </h3>
               <ul>
                 {skipped.map((s) => (
                   <li key={s.beamId}>
                     <strong>
-                      {t("report.colBeam", "Staaf")} {s.beamId}
+                      {t("report.colBeam", "Member")} {s.beamId}
                     </strong>{" "}
                     — {s.reason}
                   </li>

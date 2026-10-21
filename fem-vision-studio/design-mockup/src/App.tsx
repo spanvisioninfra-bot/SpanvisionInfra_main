@@ -994,7 +994,7 @@ function App() {
   const ifcModel: IfcRekenmodelInput = useMemo(() => ({
     projectNaam: (projectPath
       ? projectPath.split(/[\\/]/).pop()?.replace(/\.[^.]+$/, "")
-      : undefined) || "Naamloos project",
+      : undefined) || "Untitled project",
     project: {
       naam: projectInfo.name,
       projectnummer: projectInfo.projectNumber,

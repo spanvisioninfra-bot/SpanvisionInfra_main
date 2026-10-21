@@ -12,22 +12,22 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Vandepitte Hfd. 2 — Schuifspanningen door dwarskrachten */
-export const vandepitteSchuifspanning = `# Shear stresses door Dwarskrachten — Formula van Jourawsky
-Bron: Prof. D. Vandepitte — Berekening van Constructies, Deel I, Hoofdstuk 2, art. 2.4
+export const vandepitteSchuifspanning = `# Shear stresses from transverse forces — Jourawsky formula
+Source: Prof. D. Vandepitte — Calculation of Structures, Volume I, Chapter 2, art. 2.4
 
-De schuifspanning in een dunwandig profiel wordt bepaald met de formule
-van Jourawsky (Hfd. 2, formule 4):
+Shear stress in a thin-walled section is determined using
+the Jourawsky formula (Chapter 2, expression 4):
 
   tau(s) = V * S_z(s) / (I_z * t(s))
 
-waarbij S_z het statisch moment is van het deel van de doorsnede begrepen
+where S_z is the first moment of area of the part of the section
 tussen de vrije rand (s=0) en het langsvlakje ter plaatse van de berekening.
 
 ## Profielkeuze
 
 @select profieltype "Type section"
 Rechthoekige section (lambda = 3/2) = 1
-I-section (belast in plane van het lijf) = 2
+I section (loaded in the web plane) = 2
 Cirkelvormige section (lambda = 4/3) = 3
 @end
 
@@ -39,7 +39,7 @@ Handmatige inputs I_z en S_z,max = 2
 @end
 
 #if invoermethode == 1
-Breedte en hoogte van de rechthoekige doorsnede:
+Rectangular section width and depth:
 
 b = 200 mm
 h = 400 mm
@@ -48,15 +48,15 @@ Traagheidsmoment:
 
 I_z = b * h^3 / 12 to mm^4
 
-Statisch moment (maximaal, ter hoogte van de neutrale lijn):
+First moment of area (maximum, at the neutral axis):
 
 S_zmax = b * h^2 / 8 to mm^3
 
-Wanddikte ter plaatse van de neutrale lijn:
+Wall thickness at the neutral axis:
 
 t = b to mm
 #else
-Handmatig ingevoerde waarden:
+Manually entered values:
 
 I_z = 83560000 mm^4
 S_zmax = 628400 mm^3
@@ -67,7 +67,7 @@ t = 7.1 mm
 
 @select belastingtype "Type belastingschema"
 Gelijkmatig distributed (q) = 1
-Puntlast in het middle (F) = 2
+Point load at mid-span (F) = 2
 @end
 
 Overspanning:
@@ -75,11 +75,11 @@ Overspanning:
 L = 6000 mm
 
 #if belastingtype == 1
-Verdeelde belasting:
+Distributed load:
 
 q = 25 kN/m
 
-Maximale dwarskracht (bij oplegging):
+Maximum shear force (at the support):
 
 V_max = q * L / 2 to kN
 #else
@@ -94,15 +94,15 @@ V_max = F / 2 to kN
 
 ## Schuifspanning (Jourawsky, Hfd. 2, formula 4)
 
-Maximale schuifspanning (ter hoogte van de neutrale lijn):
+Maximum shear stress (at the neutral axis):
 
 tau_max = V_max * S_zmax / (I_z * t) to N/mm^2
 
-Vormfactor lambda voor de schuifspanning (Hfd. 2, art. 1.1):
+Shear stress shape factor lambda (Chapter 2, art. 1.1):
 
 Vandepitte definieert lambda als de factor waarmee de gemiddelde
 schuifspanning (V/A) moet worden vermenigvuldigd om de maximale
-schuifspanning te verkrijgen. Voor een rechthoekige doorsnede
+to obtain shear stress. For a rectangular section,
 is lambda = 3/2, voor een cirkelvormige doorsnede lambda = 4/3.
 
 #if profieltype == 1
@@ -123,7 +123,7 @@ tau_controle = 4/3 * V_max / A_bruto to N/mm^2
 
 ## Permissible stress
 
-Toelaatbare schuifspanning (afhankelijk van materiaal):
+Allowable shear stress (depending on material):
 
 tau_toel = 100 N/mm^2
 
@@ -134,7 +134,7 @@ UC_schijf = tau_max / tau_toel
 #if UC_schijf < 1
   Schuifspanning voldoet (UC < 1.0).
 #else
-  Schuifspanning voldoet NIET!
+  Shear stress exceeds the limit!
 #end if
 
 ## Overzicht
@@ -183,11 +183,11 @@ UC_schijf = tau_max / tau_toel
 
 /** Vandepitte Hfd. 2 — Doorbuiging met effect van dwarskrachten */
 export const vandepitteDoorbuiging = `# Deflection including Dwarskrachteffect
-Bron: Prof. D. Vandepitte — Berekening van Constructies, Deel I, Hoofdstuk 2, art. 1.2
+Source: Prof. D. Vandepitte — Calculation of Structures, Volume I, Chapter 2, art. 1.2
 
-Vandepitte toont (Hfd. 2, formule 2) dat de doorbuiging bestaat uit twee delen:
-- v_2 : doorbuiging door buigmomenten (M/EI)
-- v_1 : doorbuiging door dwarskrachten (lambda*V/GA)
+Vandepitte shows (Chapter 2, expression 2) that deflection has two components:
+- v_2: deflection from bending moments (M/EI)
+- v_1: deflection from shear forces (lambda*V/GA)
 
 De differentiaalvergelijking luidt (formule 2):
 
@@ -246,11 +246,11 @@ Traagheidsmoment:
 
 I = b * h^3 / 12 to mm^4
 
-Vormfactor lambda voor dwarskrachtdoorbuiging (Hfd. 2, art. 1.1):
+Shear deflection shape factor lambda (Chapter 2, art. 1.1):
 
 Vandepitte: voor een rechthoekige doorsnede is lambda = 6/5.
-Voor een I-profiel is lambda bij benadering gelijk aan A/(A_lijf),
-ofwel de totale oppervlakte gedeeld door het lijfoppervlak.
+For an I section, lambda is approximately A/(A_lijf),
+the total area divided by the web area.
 
 lambda = 1.2
 
@@ -258,7 +258,7 @@ lambda = 1.2
 
 @select belastinggeval "Belastinggeval"
 Gelijkmatig verdeelde load q = 1
-Puntlast F in het middle = 2
+Point load F at mid-span = 2
 @end
 
 L = 5000 mm
@@ -293,10 +293,10 @@ Aandeel dwarskrachten:
 
 aandeel_V = v_1 / v_totaal * 100
 
-Vandepitte merkt op (Hfd. 2, art. 1.3.1) dat v_1 gewoonlijk klein is
+Vandepitte notes (Chapter 2, art. 1.3.1) that v_1 is usually small:
 t.o.v. v_2. Voor I-profielen met lambda ~ 3 en h/L = 0,1 is v_1
-slechts 3,1% van v_2. Voor zeer korte staven kan het aandeel echter
-aanzienlijk zijn.
+only 3.1% of v_2. For very short members, however, the contribution
+can be significant.
 
 Verhouding h/L:
 
@@ -310,7 +310,7 @@ ratio_hL = h / L
 
 ## Grenswaarde
 
-Toelaatbare doorbuiging (L/250):
+Allowable deflection (L/250):
 
 v_toel = L / 250 to mm
 
@@ -319,7 +319,7 @@ UC_doorbuiging = v_totaal / v_toel
 #if UC_doorbuiging < 1
   Doorbuiging voldoet (UC < 1.0).
 #else
-  Doorbuiging voldoet NIET!
+  Deflection fails!
 #end if
 `;
 
@@ -328,8 +328,8 @@ UC_doorbuiging = v_totaal / v_toel
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Vandepitte Hfd. 5 — Knikken van drukstaven (Euler) */
-export const vandepitteKnikken = `# Buckling van Drukstaven — Theorie van Euler
-Bron: Prof. D. Vandepitte — Berekening van Constructies, Deel I, Hoofdstuk 5, art. 5.2-5.4
+export const vandepitteKnikken = `# Buckling of compression members — Euler theory
+Source: Prof. D. Vandepitte — Calculation of Structures, Volume I, Chapter 5, art. 5.2-5.4
 
 De kritieke knikbelasting volgens Euler (Hfd. 5, art. 5.2.2.3):
 
@@ -339,7 +339,7 @@ met de kniklengte l_k = l / n, oftewel (Hfd. 5, art. 5.4.6):
 
 - P_k = pi^2 · E · I / l_k^2
 
-De kniklengte l_k hangt af van de randvoorwaarden (Hfd. 5, art. 5.4):
+Buckling length l_k depends on the boundary conditions (Chapter 5, art. 5.4):
 - Staaf a (inklemming-vrij):     l_k = 2 * l
 - Staaf b (scharnier-scharnier): l_k = l
 - Staaf c (inklemming-inklemming): l_k = l / 2
@@ -418,10 +418,10 @@ i_min = sqrt(I_min / A) to mm
 ## Randvoorwaarden en systeemlengte
 
 @select randvoorwaarden "Randvoorwaarden (Hfd. 5, art. 5.4)"
-Staaf a: inklemming-vrij (beta_k = 2.0) = 2.0
-Staaf b: scharnier-scharnier (beta_k = 1.0) = 1.0
-Staaf c: inklemming-inklemming (beta_k = 0.5) = 0.5
-Staaf d: inklemming-scharnier (beta_k = 0.699) = 0.699
+Member a: fixed-free (beta_k = 2.0) = 2.0
+Member b: pinned-pinned (beta_k = 1.0) = 1.0
+Member c: fixed-fixed (beta_k = 0.5) = 0.5
+Member d: fixed-pinned (beta_k = 0.699) = 0.699
 @end
 
 Systeemlengte:
@@ -442,7 +442,7 @@ P_E = pi^2 * E * I_min / l_k^2 to kN
 
 ## Slenderness
 
-Slankheid:
+Slenderness:
 
 lambda = l_k / i_min
 
@@ -454,8 +454,8 @@ lambda_grens = pi * sqrt(E / f_y)
   Elastisch knikken is maatgevend (lambda > lambda_grens).
   De Euler-formule is geldig.
 #else
-  Plastisch knikken: de Euler-formule overschat het draagvermogen.
-  Gebruik een knikcurve (bijv. Eurocode).
+  Inelastic buckling: the Euler formula overestimates resistance.
+  Use a buckling curve, for example from Eurocode.
 #end if
 
 ## Kritieke stress
@@ -468,7 +468,7 @@ ratio = sigma_E / f_y
 
 ## Load en checks
 
-Normaalkracht (ontwerp):
+Axial force (design):
 
 N_Ed = 150 kN
 
@@ -476,14 +476,14 @@ Drukspanning:
 
 sigma_d = N_Ed / A to N/mm^2
 
-Unity check (op Euler knikbelasting):
+Unity check against the Euler buckling load:
 
 UC_knik = N_Ed / P_E
 
 #if UC_knik < 1
   Knikstabiliteit voldoet (UC < 1.0).
 #else
-  Knikstabiliteit voldoet NIET!
+  Buckling stability fails!
 #end if
 
 ## Overzicht
@@ -540,19 +540,19 @@ UC_knik = N_Ed / P_E
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Vandepitte Hfd. 1 — Doorbuiging met analogieen van Mohr */
-export const vandepitteMohr = `# Deflection van Liggers — Analogieen van Mohr
-Bron: Prof. D. Vandepitte — Berekening van Constructies, Deel I, Hoofdstuk 1, art. 2.1
+export const vandepitteMohr = `# Beam deflection — Mohr analogies
+Source: Prof. D. Vandepitte — Calculation of Structures, Volume I, Chapter 1, art. 2.1
 
-Vandepitte behandelt de analogieen van Mohr voor het berekenen van
-elastische verplaatsingen en verdraaiingen van liggers (Hfd. 1, art. 2.1).
+Vandepitte uses the Mohr analogies to calculate
+elastic beam displacements and rotations (Chapter 1, art. 2.1).
 
-Het gereduceerde momentenvlak M/EI wordt beschouwd als een fictieve
+The reduced bending moment diagram M/EI is treated as a fictitious
 belasting op een hulpligger L'. De doorbuiging in een punt U is dan
 gelijk aan het buigend moment in U van de fictieve balk L'.
 
 ## Examples (Hfd. 1, art. 2.1.6)
 
-### Prismatische ligger met overkraging
+### Prismatic beam with an overhang
 
 @select belastinggeval "Belastinggeval"
 Puntlast P aan end overkraging = 1
@@ -561,11 +561,11 @@ Gelijkmatig verdeelde load q = 2
 
 ## Geometry
 
-Overspanning (tussen steunpunten):
+Span between supports:
 
 L = 6000 mm
 
-Lengte overkraging:
+Overhang length:
 
 a = 2000 mm
 
@@ -580,20 +580,20 @@ I = 83560000 mm^4
 EI = E * I to kN*mm^2
 
 #if belastinggeval == 1
-## Puntlast P op overkraging
+## Point load P on the overhang
 
 P = 10 kN
 
-### Deflection in D (middle van overspanning)
+### Deflection at D (mid-span)
 
 Vandepitte (Hfd. 1, art. 2.1.6, voorbeeld 1):
-Met de eerste analogie van Mohr is het buigend moment in D
-van de fictieve balk gelijk aan de doorbuiging a_1:
+By the first Mohr analogy, the bending moment at D
+in the fictitious beam equals deflection a_1:
 
 a_1 = P * a * L^2 / (16 * EI) to mm
 
-Richting: naar boven (de balk buigt omhoog in het midden wanneer
-de overkraging naar beneden wordt belast).
+Direction: upward (the beam bends upward at mid-span when
+the overhang carries a downward load).
 
 ### Verdraaiing at support B
 
@@ -603,9 +603,9 @@ theta_1 = P * a * L / (6 * EI)
   Opmerking: de formule is geldig voor a < L.
 #end if
 
-### Deflection aan het end C van de overkraging
+### Deflection at overhang tip C
 
-Doorbuiging door rotatie bij B plus lokale doorbuiging:
+Deflection from rotation at B plus local deflection:
 
 a_C = P * a^2 * (a + L) / (3 * EI) to mm
 
@@ -614,13 +614,13 @@ a_C = P * a^2 * (a + L) / (3 * EI) to mm
 
 q = 10 kN/m
 
-### Deflection in het middle van de overspanning
+### Mid-span deflection
 
 M_max = q * L^2 / 8 to kN*m
 
 a_1 = 5 * q * L^4 / (384 * EI) to mm
 
-### Deflection aan het end van de overkraging
+### Deflection at the overhang tip
 
 a_C = q * a^2 / (24 * EI) * (4 * a^2 + 3 * a * L) to mm
 
@@ -628,7 +628,7 @@ a_C = q * a^2 / (24 * EI) * (4 * a^2 + 3 * a * L) to mm
 
 ## Grenswaarde
 
-Toelaatbare doorbuiging (L/250):
+Allowable deflection (L/250):
 
 v_toel = L / 250 to mm
 
@@ -641,7 +641,7 @@ UC_doorbuiging = a_1 / v_toel
 #if UC_doorbuiging < 1
   Doorbuiging voldoet (UC < 1.0).
 #else
-  Doorbuiging voldoet NIET!
+  Deflection fails!
 #end if
 
 ## Overzicht
@@ -693,21 +693,21 @@ UC_doorbuiging = a_1 / v_toel
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Vandepitte Hfd. 8 — Eigenfrequentie van liggers */
-export const vandepitteEigenfrequentie = `# Natural frequency van Liggers
-Bron: Prof. D. Vandepitte — Berekening van Constructies, Deel I, Hoofdstuk 8, art. 8.2-8.3
+export const vandepitteEigenfrequentie = `# Beam natural frequency
+Source: Prof. D. Vandepitte — Calculation of Structures, Volume I, Chapter 8, art. 8.2-8.3
 
-De eigenfrequentie van een elastisch opgestaafde massa is (Hfd. 8, formule 154):
+The natural frequency of an elastically supported mass is (Chapter 8, expression 154):
 
   f = 1/(2*pi) * sqrt(K/m)
 
 waarbij K de veerstijfheid is en m de massa.
 
-## Systeem
+## System
 
-@select systeem "Type systeem (Hfd. 8, art. 8.2.3)"
-Kraagbalk met puntmassa aan het end = 1
-Ligger op two supports met puntmassa in het middle = 2
-Elastisch ingeklemde member met verdeelde massa = 3
+@select systeem "System type (Chapter 8, art. 8.2.3)"
+Cantilever beam with a tip mass = 1
+Beam on two supports with a mid-span point mass = 2
+Elastically restrained member with distributed mass = 3
 @end
 
 ## Material en section
@@ -723,9 +723,9 @@ Overspanning:
 L = 6000 mm
 
 #if systeem == 1
-## Kraagbalk met puntmassa (Hfd. 8, art. 8.2.3, formula 157)
+## Cantilever beam with a point mass (Chapter 8, art. 8.2.3, expression 157)
 
-Massa aan het uiteinde:
+Tip mass:
 
 m = 500 kg
 
@@ -733,7 +733,7 @@ Veerstijfheid kraagbalk: K = 3*EI/L^3
 
 K = 3 * E * I / L^3 to N/mm
 
-De statische doorbuiging onder eigen gewicht:
+Static deflection under self-weight:
 
 u_st = m * gravity / K to mm
 
@@ -741,16 +741,16 @@ Eigenfrequentie (formule 157):
 
 f = 1 / (2 * pi) * sqrt(K / m) to Hz
 
-Benadering met de statische doorbuiging (Hfd. 8, formule 154):
+Approximation using static deflection (Chapter 8, expression 154):
 
 f_controle = 1 / (2 * pi) * sqrt(gravity / u_st) to Hz
 
 #end if
 
 #if systeem == 2
-## Ligger met puntmassa in het middle (Hfd. 8, art. 8.2.3, formula 157)
+## Beam with a mid-span point mass (Chapter 8, art. 8.2.3, expression 157)
 
-Massa in het midden:
+Mid-span mass:
 
 m = 500 kg
 
@@ -758,7 +758,7 @@ Veerstijfheid: K = 48*EI/L^3
 
 K = 48 * E * I / L^3 to N/mm
 
-De statische doorbuiging:
+Static deflection:
 
 u_st = m * gravity / K to mm
 
@@ -773,27 +773,27 @@ f_controle = 1 / (2 * pi) * sqrt(gravity / u_st) to Hz
 #end if
 
 #if systeem == 3
-## Elastisch ingeklemde member met verdeelde massa (Hfd. 8, art. 8.8)
+## Elastically restrained member with distributed mass (Chapter 8, art. 8.8)
 
-Vandepitte geeft voor een ingeklemde staaf met gelijkmatig verdeelde
+For a fixed member with uniformly distributed mass, Vandepitte gives
 massa de eigenfrequentie (Hfd. 8, formule 163-164):
 
   f_1 = c_1^2 / (2*pi) * sqrt(EI / (m_bar * L^4))
 
 met c_1 = 4.730 voor de eerste eigenfrequentie.
 
-Massa per lengte-eenheid:
+Mass per unit length:
 
 m_bar = 50 kg/m
 
-Eerste eigenwaarde (Hfd. 8, art. 8.8):
+First eigenvalue (Chapter 8, art. 8.8):
 
 c_1 = 4.730
 
-De eigenfrequentie van een ingeklemde staaf is (Hfd. 8, formule 164):
+The natural frequency of a fixed member is (Chapter 8, expression 164):
 
-De verhouding t.o.v. een ligger op twee steunpunten bedraagt:
-33/140 bij benadering (Hfd. 8, formule 164).
+The ratio to a beam on two supports is:
+approximately 33/140 (Chapter 8, expression 164).
 
 f = c_1^2 / (2 * pi) * sqrt(E * I / (m_bar * L^4)) to Hz
 
@@ -803,7 +803,7 @@ f = c_1^2 / (2 * pi) * sqrt(E * I / (m_bar * L^4)) to Hz
 
 #if f > 5 Hz
   Eigenfrequentie > 5 Hz: geen dynamische problemen te verwachten
-  bij voetgangersbelasting.
+  under pedestrian loading.
 #else
   Eigenfrequentie <= 5 Hz: risico op resonantie met voetgangersbelasting!
   Nader dynamisch onderzoek is nodig.
@@ -821,22 +821,22 @@ f = c_1^2 / (2 * pi) * sqrt(E * I / (m_bar * L^4)) to Hz
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Vandepitte Hfd. 1 — Beginsel van de virtuele arbeid */
-export const vandepitteVirtueleArbeid = `# Beginsel van de Virtual work
-Bron: Prof. D. Vandepitte — Berekening van Constructies, Deel I, Hoofdstuk 1, art. 1.1-1.4
+export const vandepitteVirtueleArbeid = `# Principle of virtual work
+Source: Prof. D. Vandepitte — Calculation of Structures, Volume I, Chapter 1, art. 1.1-1.4
 
-Het beginsel van de virtuele arbeid (Hfd. 1, formule 3):
+The principle of virtual work (Chapter 1, expression 3):
 
-De totale virtuele arbeid van alle inwendige krachten R_i,
-voor elke mogelijke combinatie van virtuele verplaatsingen
+The total virtual work of all internal forces R_i,
+for every possible combination of virtual displacements
 vanuit de vervormingstoestand, is nul:
 
 - SOM(F_i · delta_i) + SOM(R_i · delta_i) = 0
 
-## Toepassing: Deflection van een vakwerkstaaf
+## Application: truss member deflection
 
-De virtuele arbeid bij virtuele rek (Hfd. 1, art. 1.3):
-In een staaf met trekkracht n en virtuele rek delta_epsilon,
-is de virtuele arbeid per eenheid van lengte: -n * delta_epsilon.
+Virtual work under virtual strain (Chapter 1, art. 1.3):
+For a member with tension n and virtual strain delta_epsilon,
+the virtual work per unit length is -n * delta_epsilon.
 
 ## Vakwerk
 
@@ -845,7 +845,7 @@ Eenvoudige driehoek = 1
 Warren truss (6 velden) = 2
 @end
 
-Aantal staven:
+Number of bars:
 
 n_staven = 11
 
@@ -853,7 +853,7 @@ Overspanning:
 
 L = 12000 mm
 
-Hoogte vakwerk:
+Truss depth:
 
 H = 2000 mm
 
@@ -877,14 +877,14 @@ A_diag = 1000 mm^2
 
 ## Load
 
-Puntlast op knoop (midden onderrand):
+Point load at a node (middle of the bottom chord):
 
 F = 100 kN
 
-## Deflection met de methode van de virtuele arbeid (Hfd. 1, art. 1.5)
+## Deflection using virtual work (Chapter 1, art. 1.5)
 
-De doorbuiging a in het punt en de richting van de virtuele
-eenheidskracht wordt berekend als:
+Deflection a at the point and in the direction of the virtual
+unit force is calculated as:
 
 - a = SOM( N_i · n_i · L_i / (E · A_i) )
 
@@ -894,7 +894,7 @@ waarbij:
 - L_i = lengte van de staaf
 - E * A_i = axiale stijfheid
 
-Voorbeeld (vereenvoudigd): doorbuiging door bovenrandstaaf:
+Simplified example: deflection from the top chord member:
 
 N_boven = F * L / (4 * H) to kN
 
@@ -904,7 +904,7 @@ L_boven = L / 2 to mm
 
 delta_boven = N_boven * n_boven * L_boven / (E * A_boven) to mm
 
-Voorbeeld: doorbuiging door onderrandstaaf:
+Example: deflection from the bottom chord member:
 
 N_onder = F * L / (4 * H) to kN
 
@@ -914,7 +914,7 @@ L_onder = L / 2 to mm
 
 delta_onder = N_onder * n_onder * L_onder / (E * A_onder) to mm
 
-Voorbeeld: doorbuiging door diagonaal:
+Example: deflection from a diagonal:
 
 L_diag = sqrt(H^2 + (L/4)^2) to mm
 
@@ -924,7 +924,7 @@ n_diag = 1 / 2 * L_diag / H
 
 delta_diag = N_diag * n_diag * L_diag / (E * A_diag) to mm
 
-Benadering totale doorbuiging (2x boven + 2x onder + 2x diag):
+Approximate total deflection (2×top + 2×bottom + 2×diagonal):
 
 delta_totaal = 2 * delta_boven + 2 * delta_onder + 2 * delta_diag to mm
 
@@ -937,7 +937,7 @@ UC = delta_totaal / v_toel
 #if UC < 1
   Doorbuiging van het vakwerk voldoet (UC < 1.0).
 #else
-  Doorbuiging van het vakwerk voldoet NIET!
+  Truss deflection fails!
 #end if
 `;
 
@@ -963,7 +963,7 @@ export const vandepitteFormules: { id: string; label: string; template: string }
   },
   {
     id: 'vdp-mohr',
-    label: 'Vandepitte: Doorbuiging (Mohr)',
+    label: "Vandepitte: Deflection (Mohr)",
     template: vandepitteMohr,
   },
   {

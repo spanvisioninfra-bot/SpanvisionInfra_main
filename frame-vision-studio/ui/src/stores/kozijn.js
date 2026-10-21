@@ -403,6 +403,6 @@ async function refreshGeometry(id) {
     const geom = await invoke("get_kozijn_geometry", { id });
     currentGeometry.set(geom);
   } catch (e) {
-    console.error("Geometrie laden mislukt:", e);
+    console.error("Failed to load geometry:", e);
   }
 }

@@ -376,13 +376,13 @@ export type BeamLoadRole =
 
 /** Volgorde + NL-labels van de staaftypen, voor dropdowns en tabellen. */
 export const BEAM_LOAD_ROLES: { id: BeamLoadRole; label: string; kort: string }[] = [
-  { id: "gevelLinks",  label: "Linkergevel",          kort: "Gevel L" },
-  { id: "gevelRechts", label: "Rechtergevel",         kort: "Gevel R" },
-  { id: "dakPlat",     label: "Plat dak (≤ 5°)",      kort: "Dak plat" },
-  { id: "dakHellend",  label: "Hellend dak (> 5°)",   kort: "Dak hellend" },
-  { id: "overstek",    label: "Overstek / luifel",    kort: "Overstek" },
-  { id: "vloer",       label: "Vloer",                kort: "Vloer" },
-  { id: "binnen",      label: "Binnenstaaf (geen windvlak)", kort: "Binnen" },
+  { id: "gevelLinks",  label: "Left facade",          kort: "Gevel L" },
+  { id: "gevelRechts", label: "Right facade",         kort: "Gevel R" },
+  { id: "dakPlat",     label: "Flat roof (≤ 5°)",      kort: "Dak plat" },
+  { id: "dakHellend",  label: "Pitched roof (> 5°)",   kort: "Dak hellend" },
+  { id: "overstek",    label: "Overhang / canopy",    kort: "Overstek" },
+  { id: "vloer",       label: "Floor",                kort: "Vloer" },
+  { id: "binnen",      label: "Internal member (no wind surface)", kort: "Binnen" },
 ];
 
 /**
@@ -1723,23 +1723,23 @@ export const ANALYSETYPEN: readonly Analysetype[] = [
 
 /** Korte naam voor de keuzelijst. */
 export const ANALYSETYPE_LABEL: Record<Analysetype, string> = {
-  eersteOrde: "1e orde",
-  tweedeOrdeGeometrisch: "2e orde (P-Δ)",
-  tweedeOrdeFysisch: "2e orde + fysisch",
+  eersteOrde: "First order",
+  tweedeOrdeGeometrisch: "Second order (P-Δ)",
+  tweedeOrdeFysisch: "Second order + physical nonlinearity",
 };
 
 /** Volledige omschrijving voor tooltip en rapport. */
 export const ANALYSETYPE_OMSCHRIJVING: Record<Analysetype, string> = {
   eersteOrde:
-    "Eerste orde, lineair: elke combinatie is de gewogen som van de belastinggevallen.",
+    "First-order linear analysis: each combination is the weighted sum of its load cases.",
   tweedeOrdeGeometrisch:
-    "Tweede orde, geometrisch niet-lineair (P-Δ): elke combinatie wordt met " +
-    "gefactoreerde lasten en geometrische stijfheid apart opgelost.",
+    "Second-order geometrically nonlinear analysis (P-Δ): each combination is solved separately " +
+    "with factored loads and geometric stiffness.",
   tweedeOrdeFysisch:
-    "Tweede orde, geometrisch én fysisch niet-lineair: als P-Δ, maar de " +
-    "betonstaven krijgen per segment de secans-EI uit de rekenkern " +
-    "(NEN-EN 1992-1-1 5.8.6). Zonder betonstaven mét wapeningskorf is de " +
-    "uitkomst gelijk aan 2e orde (P-Δ).",
+    "Second-order geometrically and physically nonlinear analysis: as for P-Δ, but " +
+    "concrete members receive a secant EI per segment from the calculation engine " +
+    "(NEN-EN 1992-1-1 5.8.6). Without reinforced concrete members, the " +
+    "result is identical to second-order analysis (P-Δ).",
 };
 
 /**
@@ -1846,7 +1846,7 @@ export const DEFAULT_STRUCTURAL_GRID: StructuralGrid = {
   enabled: true,
   xAxes: [
     { id: "A", label: "A", position: 0 },
-    { id: "B", label: "B", position: 12000 },
+    { id: "B", label: "V", position: 12000 },
   ],
   zAxes: [
     { id: "1", label: "1", position: 0 },

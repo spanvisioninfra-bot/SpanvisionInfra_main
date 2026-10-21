@@ -89,7 +89,7 @@ export function doorbuigingNotitie(iNu: number, iVar: number): string {
   return (
     `De zakking is niet opnieuw uitgerekend maar GESCHAALD: w_variant = w_huidig · ` +
     `I_huidig / I_variant = w_huidig · ${Math.round(iNu)} / ${Math.round(iVar)} = ` +
-    `${(iNu / iVar).toLocaleString("nl-NL", { maximumFractionDigits: 3 })} · w_huidig. ` +
+    `${(iNu / iVar).toLocaleString("en-GB", { maximumFractionDigits: 3 })} · w_huidig. ` +
     "Dat geldt onder dezelfde aanname als de rest van deze variant: de belasting en " +
     "de krachtsverdeling blijven gelijk. In een statisch onbepaalde constructie " +
     "verandert de krachtsverdeling wél mee, en dan klopt ook deze schaling niet."

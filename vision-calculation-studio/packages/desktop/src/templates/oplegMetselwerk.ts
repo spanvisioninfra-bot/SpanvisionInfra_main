@@ -21,10 +21,7 @@
 
 export const oplegMetselwerk = `"Bearing on masonry — concentrated load (EN 1996-1-1 §6.1.3)
 
-'<i>Toetsing van een geconcentreerde oplegging (liggereinde/latei in een keep) op
-'een ongewapende metselwerkwand. De last spreidt onder 60° over de effectieve
-'hoogte h<sub>c</sub> = h − h<sub>k</sub>; op halve hoogte ontstaat de effectieve
-'lengte l<sub>efm</sub>. Methodiek conform NEN-EN 1996-1-1+NB §6.1.3 (de referentie-uitwerking).</i>
+'<i>Checks concentrated bearing (a beam end or lintel in a recess) on an unreinforced masonry wall. The load spreads at 60° over effective height h<sub>c</sub> = h − h<sub>k</sub>, giving effective length l<sub>efm</sub> at mid-height. Method per NEN-EN 1996-1-1+NB §6.1.3 and the reference calculation.</i>
 
 # 1. Masonry & material
 
@@ -43,14 +40,14 @@ export const oplegMetselwerk = `"Bearing on masonry — concentrated load (EN 19
   Aerated concrete <25% = 7
 @end
 
-f_b = ?', genormaliseerde druksterkte steen f_b [N/mm²] — fb-waarde (baksteen/betonsteen), CS-klasse (kalkzandsteen, CS12→12) of G-klasse (cellenbeton, G2→2)'
+f_b = ?', normalized masonry unit compressive strength f_b [N/mm²] — fb value (clay/concrete units), CS class (calcium silicate, CS12→12), or G class (aerated concrete, G2→2)'
 
 @select morteltype "Mortar type"
   Masonry mortar = 1
   Thin-layer mortar = 2
 @end
 
-f_m = ?', mortelsterkte f_m [N/mm²] — M-klasse (metselmortel) of L-klasse (lijmmortel); bij lijmmortel niet van invloed op f_k (β=0)'
+f_m = ?', mortar strength f_m [N/mm²] — M class (general-purpose) or L class (thin-layer); thin-layer mortar does not affect f_k (β=0)'
 
 @select steencategorie "Masonry unit category / uitvoeringsklasse (basis γ_M)"
   Category I = 1
@@ -78,21 +75,21 @@ f_m_eff = min(f_m; 20)
 
 f_k = K*f_b^α*f_m_eff^β_exp', karakteristieke druksterkte metselwerk (form. 3.2) [N/mm²]'
 f_k
-f_d = f_k/γ_M', rekenwaarde druksterkte (3.1) [N/mm²]'
+f_d = f_k/γ_M', design compressive strength (3.1) [N/mm²]'
 f_d
 
 # 2. Geometry
 
 h = ?', wandhoogte [mm]'
 t = ?', wanddikte [mm]'
-a_L = ?', lengte oplegging (in het wandvlak) [mm]'
-a_t = ?', breedte oplegging (over de wanddikte) [mm]'
-h_k = ?', hoogte keep — verdiepte balk [mm]'
-a_1 = ?', afstand van het wandeinde tot de nabije rand van de oplegging [mm]'
-L_r = ?', wandlengte rechts van de oplegging [mm]'
-exc = ?', excentriciteit van de last t.o.v. het wandhart [mm]'
+a_L = ?', bearing length in the wall plane [mm]'
+a_t = ?', bearing width through the wall thickness [mm]'
+h_k = ?', recess depth — recessed beam [mm]'
+a_1 = ?', distance from wall end to the near bearing edge [mm]'
+L_r = ?', wall length to the right of the bearing [mm]'
+exc = ?', load eccentricity relative to the wall centerline [mm]'
 
-h_c = h - h_k', effectieve hoogte tot het lastniveau (onderkant keep)'
+h_c = h - h_k', effective height to the load level (bottom of recess)'
 h_c
 
 # 3. Load
@@ -100,11 +97,9 @@ h_c
 N_Edc = ?', geconcentreerde last (F-last) [kN]'
 q_Edc = ?', verdeelde wandlast (Q-last) [kN/m]'
 
-# 4. Lastspreiding (60°, op ½·h_c)
+# 4. Load spread (60°, at ½·h_c)
 
-'<i>De last spreidt onder 60° vanaf de oplegplaat (onderkant keep). De effectieve
-'lengte l<sub>efm</sub> wordt op halve effectieve hoogte bepaald en begrensd door
-'het wandeinde (a<sub>1</sub>) en de beschikbare wandlengte (L<sub>r</sub>).</i>
+'<i>The load spreads at 60° from the bearing plate at the bottom of the recess. Effective length l<sub>efm</sub> is determined at half the effective height and limited by the wall end a<sub>1</sub> and available wall length L<sub>r</sub>.</i>
 
 #hide
 tan60 = 1.7320508
@@ -112,10 +107,10 @@ reach = 0.5*h_c/tan60', horizontale spreiding per zijde [mm]'
 links = min(a_1; reach)', l_efm;1'
 rechts = min(L_r; reach)', l_efm;2'
 #show
-l_efm = a_L + links + rechts', effectieve lengte (= b_opl + l_efm;1 + l_efm;2)'
+l_efm = a_L + links + rechts', effective length (= b_opl + l_efm;1 + l_efm;2)'
 l_efm
 
-# 5. Toetsing concentrated load — art. 6.1.3
+# 5. Concentrated load check — art. 6.1.3
 
 A_b = a_L*a_t', belaste (opleg)vlak [mm²]'
 A_ef = l_efm*t', effectief vlak [mm²]'
@@ -136,9 +131,9 @@ N_Ed
 
 UC = N_Ed/N_Rdc
 #if UC ≤ 1.0
-    'UC = N<sub>Ed</sub>/N<sub>Rdc</sub> = 'UC'<span style="color: green"> ≤ 1,0 → <b>voldoet</b></span> (6.9)
+    'UC = N<sub>Ed</sub>/N<sub>Rdc</sub> = 'UC'<span style="color: green"> ≤ 1,0 → <b>passes</b></span> (6.9)
 #else
-    'UC = N<sub>Ed</sub>/N<sub>Rdc</sub> = 'UC'<span style="color: red"> > 1,0 → <b>voldoet niet</b></span> (6.9)
+    'UC = N<sub>Ed</sub>/N<sub>Rdc</sub> = 'UC'<span style="color: red"> > 1,0 → <b>fails</b></span> (6.9)
 #end if
 
 # 6. Nevenvoorwaarden
@@ -146,22 +141,22 @@ UC = N_Ed/N_Rdc
 '<b>Geldigheid methode 6.1.3 — verhouding vlakken:</b>
 ratio_Ab = A_b/A_ef
 #if ratio_Ab ≤ 0.45
-    'A<sub>b</sub>/A<sub>ef</sub> = 'ratio_Ab'<span style="color: green"> ≤ 0,45 → <b>voldoet</b></span>
+    'A<sub>b</sub>/A<sub>ef</sub> = 'ratio_Ab'<span style="color: green"> ≤ 0,45 → <b>passes</b></span>
 #else
-    'A<sub>b</sub>/A<sub>ef</sub> = 'ratio_Ab'<span style="color: red"> > 0,45 → methode niet geldig</span>
+    'A<sub>b</sub>/A<sub>ef</sub> = 'ratio_Ab'<span style="color: red"> > 0,45 → method is invalid</span>
 #end if
 
 '<b>Detaillering — art. 8.1.6(1): minimale oplegmaat ≥ 90 mm:</b>
 opleg_min = min(a_L; a_t)
 #if opleg_min ≥ 90
-    'min(a<sub>L</sub>; a<sub>t</sub>) = 'opleg_min' mm<span style="color: green"> ≥ 90 mm → <b>voldoet</b></span>
+    'min(a<sub>L</sub>; a<sub>t</sub>) = 'opleg_min' mm<span style="color: green"> ≥ 90 mm → <b>passes</b></span>
 #else
-    'min(a<sub>L</sub>; a<sub>t</sub>) = 'opleg_min' mm<span style="color: red"> < 90 mm → <b>voldoet niet</b></span>
+    'min(a<sub>L</sub>; a<sub>t</sub>) = 'opleg_min' mm<span style="color: red"> < 90 mm → <b>fails</b></span>
 #end if
 
 '<b>Excentriciteit — voorwaarde e ≤ t/4:</b>
 #if abs(exc) ≤ t/4
-    'e = 'abs(exc)' mm<span style="color: green"> ≤ t/4 = 't/4' mm → <b>voldoet</b></span>
+    'e = 'abs(exc)' mm<span style="color: green"> ≤ t/4 = 't/4' mm → <b>passes</b></span>
 #else
     'e = 'abs(exc)' mm<span style="color: red"> > t/4 = 't/4' mm → buiten toepassingsgebied</span>
 #end if
@@ -169,29 +164,10 @@ opleg_min = min(a_L; a_t)
 # 7. Summary
 
 #if UC ≤ 1.0
-    '<b>UC = 'UC'</b><span style="color: green"> ≤ 1,0 → <b>Oplegging voldoet</b></span>
+    '<b>UC = 'UC'</b><span style="color: green"> ≤ 1,0 → <b>Bearing passes</b></span>
 #else
-    '<b>UC = 'UC'</b><span style="color: red"> > 1,0 → <b>Oplegging voldoet niet</b></span>
+    '<b>UC = 'UC'</b><span style="color: red"> > 1,0 → <b>Bearing fails</b></span>
 #end if
 
-'<hr/>
-'<i>Aandachtspunten / open punten (status t.o.v. de referentie-uitwerking-referenties):
-'<ul>
-'<li><b>Metselmortel (M-klasse):</b> f_k = K·f_b<sup>0,65</sup>·f_m<sup>0,25</sup>; K per steengroep
-'(groep 1 &lt;25% = 0,6 · groep 2 &lt;55%/&lt;60% = 0,5). Gecheckt: KZS&lt;25%, cellenbeton&lt;25% (K=0,6)
-'en baksteen&lt;55% (K=0,5). Baksteen&lt;25%, betonsteen en KZS&lt;55% volgen het groep-patroon.</li>
-'<li><b>Lijmmortel (L-klasse):</b> f_k = K·f_b<sup>0,85</sup> (β=0, f_m valt weg); K per steensoort
-'(EN-tabel). Gecheckt: cellenbeton&lt;25% (K=0,8). Overige lijm-K's nog te bevestigen.</li>
-'<li><b>γ_M — afhankelijk van categorie én CC:</b> basiswaarde per categorie (I=1,7 · II=2,2 ·
-'III=2,7), waarbij alleen CC1 met 0,2 verlaagt (CC2 = CC3 = basis). Geverifieerd: Cat I CC1=1,5,
-'CC2=1,7, CC3=1,7 en Cat II CC1=2,0. Cat III (basis 2,7) en Cat II CC2/CC3 geëxtrapoleerd.</li>
-'<li><b>f<sub>m</sub>-bovengrens:</b> de referentie past de EN-eis f<sub>m</sub> ≤ 2·f<sub>b</sub>
-'(§3.6.1.2) NIET toe (alleen f<sub>m</sub> ≤ 20). Hier idem om de referentie te reproduceren —
-'<b>afwijkend van de norm</b>; controleer of dit gewenst is.</li>
-'<li><b>N<sub>Ed</sub>:</b> de wandlast draagt mee via N<sub>Ed</sub> = N<sub>Edc</sub> + a<sub>L</sub>·q<sub>Edc</sub>.</li>
-'<li><b>l<sub>efm</sub>:</b> spreiding 60° over ½·h<sub>c</sub> met h<sub>c</sub> = h − h<sub>k</sub>,
-'begrensd door wandeinde (a<sub>1</sub>, mag 0 zijn) en beschikbare wandlengte.</li>
-'<li><b>art. 8.1.6:</b> de referentie-uitwerking toont één oplegmaat (oriëntatie-afhankelijk); hier de
-'kleinste maat min(a<sub>L</sub>; a<sub>t</sub>) ≥ 90 mm getoetst (zelfde conclusie).</li>
-'</ul></i>
+'<hr/><i>Limitations and open points against reference calculations:<ul><li><b>General-purpose mortar (M class):</b> f_k = K·f_b<sup>0.65</sup>·f_m<sup>0.25</sup>; K depends on unit group (group 1 &lt;25%: 0.6; group 2 &lt;55%/&lt;60%: 0.5). Verified: calcium silicate &lt;25%, aerated concrete &lt;25% (K=0.6), and clay brick &lt;55% (K=0.5). Clay brick &lt;25%, concrete units, and calcium silicate &lt;55% follow the group pattern.</li><li><b>Thin-layer mortar (L class):</b> f_k = K·f_b<sup>0.85</sup> (β=0; f_m drops out), with K by unit type from the EN table. Aerated concrete &lt;25% (K=0.8) is verified; other K values remain unconfirmed.</li><li><b>γ_M depends on category and CC:</b> category bases I=1.7, II=2.2, III=2.7; only CC1 subtracts 0.2 (CC2=CC3=base). Verified: category I CC1=1.5, CC2=1.7, CC3=1.7, and category II CC1=2.0. Category III and category II CC2/CC3 are extrapolated.</li><li><b>f<sub>m</sub> limit:</b> the reference omits f<sub>m</sub> ≤ 2·f<sub>b</sub> (§3.6.1.2), enforcing only f<sub>m</sub> ≤ 20. This sheet reproduces that <b>departure from the code</b>; assess whether it is appropriate.</li><li>N<sub>Ed</sub> includes wall load: N<sub>Edc</sub> + a<sub>L</sub>·q<sub>Edc</sub>.</li><li>l<sub>efm</sub> uses 60° spread over ½·h<sub>c</sub>, h<sub>c</sub> = h − h<sub>k</sub>, limited by wall end a<sub>1</sub> (which may be zero) and available wall length.</li><li>For art. 8.1.6, the reference shows one orientation-dependent bearing dimension. This sheet checks min(a<sub>L</sub>; a<sub>t</sub>) ≥ 90 mm, giving the same conclusion.</li></ul></i>
 `;

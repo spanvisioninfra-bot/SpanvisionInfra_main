@@ -13,7 +13,7 @@
 /** EN 1992-1-1 Tabel 3.1 -- Materiaaleigenschappen beton */
 export const ec2Materiaal = `# Material properties -- EN 1992-1-1 Table 3.1
 
-## Betoneigenschappen
+## Concrete properties
 
 @select sterkteklasse "Concrete strength class (Table 3.1)"
 C12/15 -- f_ck=12 = 12
@@ -33,15 +33,15 @@ C80/95 -- f_ck=80 = 80
 C90/105 -- f_ck=90 = 90
 @end
 
-Karakteristieke cilinderdruksterkte (Tabel 3.1):
+Characteristic cylinder compressive strength (Table 3.1):
 
 f_ck = sterkteklasse * 1 N/mm^2
 
-Gemiddelde cilinderdruksterkte (Tabel 3.1):
+Mean cylinder compressive strength (Table 3.1):
 
 f_cm = f_ck + 8 N/mm^2
 
-Gemiddelde treksterkte (Tabel 3.1, formule 3.1):
+Mean tensile strength (Table 3.1, expression 3.1):
 
 #if sterkteklasse < 51
   f_ctm = 0.30 * sterkteklasse^(2/3) * 1 N/mm^2
@@ -57,13 +57,13 @@ f_ctk005 = 0.7 * f_ctm to N/mm^2
 
 f_ctk095 = 1.3 * f_ctm to N/mm^2
 
-Elasticiteitsmodulus (Tabel 3.1):
+Modulus of elasticity (Table 3.1):
 
 E_cm = 22000 * (f_cm / (10 N/mm^2))^0.3 * 1 N/mm^2
 
 ## Partiele factoren (Table 2.1N / NB)
 
-Partiele factor beton:
+Partial factor for concrete:
 
 gamma_C = 1.5
 
@@ -81,11 +81,11 @@ alpha_ct = 1.0
 
 ## Design values (art. 3.1.6)
 
-Rekenwaarde druksterkte (formule 3.15):
+Design compressive strength (expression 3.15):
 
 f_cd = alpha_cc * f_ck / gamma_C to N/mm^2
 
-Rekenwaarde treksterkte (formule 3.16):
+Design tensile strength (expression 3.16):
 
 f_ctd = alpha_ct * f_ctk005 / gamma_C to N/mm^2
 
@@ -101,19 +101,19 @@ Karakteristieke vloeigrens:
 
 f_yk = staalsoort * 1 N/mm^2
 
-Elasticiteitsmodulus staal:
+Steel modulus of elasticity:
 
 E_s = 200000 N/mm^2
 
-Rekenwaarde vloeigrens (art. 3.2.7):
+Design yield strength (art. 3.2.7):
 
 f_yd = f_yk / gamma_S to N/mm^2
 
 ## Rechthoekig spanningsblok (art. 3.1.7, formulas 3.19-3.22)
 
 #if sterkteklasse < 51
-  lambda = 0.8', voor f_ck ≤ 50 MPa'
-  eta = 1.0', voor f_ck ≤ 50 MPa'
+  lambda = 0.8', for f_ck ≤ 50 MPa'
+  eta = 1.0', for f_ck ≤ 50 MPa'
 #else
   lambda = 0.8 - (sterkteklasse - 50) / 400
   eta = 1.0 - (sterkteklasse - 50) / 200
@@ -153,7 +153,7 @@ B500A -- f_yk=500 = 500
 
 f_yk = staalsoort * 1 N/mm^2
 
-Partiele factoren (Tabel 2.1N / NB):
+Partial factors (Table 2.1N / NB):
 
 gamma_C = 1.5
 gamma_S = 1.15
@@ -175,13 +175,13 @@ b = 300 mm
 h = 500 mm
 d_1 = 50 mm
 
-Effectieve hoogte:
+Effective depth:
 
 d = h - d_1 to mm
 
 ## Load
 
-Maatgevend buigend moment:
+Governing bending moment:
 
 M_Ed = 200 kN*m
 
@@ -213,13 +213,13 @@ Benodigde wapening (uit M_Ed = z * A_s * f_yd):
 
 A_s_req = M_Ed / (z * f_yd) to mm^2
 
-Momentweerstand bij gegeven wapening:
+Moment resistance for the specified reinforcement:
 
 A_s = A_s_req to mm^2
 
 M_Rd = z * A_s * f_yd to kN*m
 
-## Toetsing
+## Check
 
 UC_buiging = M_Ed / M_Rd
 
@@ -315,7 +315,7 @@ rho_l = A_sl / (b_w * d)
   rho_l is begrensd tot 0,02.
 #end if
 
-Betondrukspanning door normaalkracht:
+Concrete compressive stress from axial force:
 
 sigma_cp = N_Ed / (b_w * h) to N/mm^2
 
@@ -331,7 +331,7 @@ V_Rdc_min = (v_min + k_1 * sigma_cp) * b_w * d to kN
   V_Rdc verhoogd naar minimumwaarde.
 #end if
 
-## Toetsing
+## Check
 
 UC_dwarskracht = V_Ed / V_Rdc
 
@@ -347,7 +347,7 @@ UC_dwarskracht = V_Ed / V_Rdc
 // ---------------------------------------------------------------------------
 
 /** EN 1992-1-1 art. 6.2.3 -- Dwarskracht met beugels */
-export const ec2DwarskrachtMet = `# Shear met stirrups -- EN 1992-1-1 art. 6.2.3
+export const ec2DwarskrachtMet = `# Shear with stirrups -- EN 1992-1-1 art. 6.2.3
 
 ## Material
 
@@ -401,13 +401,13 @@ Oppervlakte per beugelpoot:
 
 A_sw1 = beugeldia * 1 mm^2
 
-Aantal poten:
+Number of legs:
 
 n_poten = 2
 
 A_sw = n_poten * A_sw1 to mm^2
 
-Hart-op-hart afstand beugels:
+Stirrup center-to-center spacing:
 
 s = 200 mm
 
@@ -435,7 +435,7 @@ V_Rds = A_sw / s * z * f_ywd * cot_theta to kN
 
 ## Maximum dwarskrachtweerstand drukdiagonaal (formula 6.9)
 
-Niet-voorgespannen constructie:
+Non-prestressed structure:
 
 alpha_cw = 1.0
 
@@ -445,9 +445,9 @@ nu_1 = 0.6 * (1 - f_ck / (250 N/mm^2))
 
 V_Rdmax = alpha_cw * b_w * z * nu_1 * f_cd / (cot_theta + tan_theta) to kN
 
-## Toetsing
+## Check
 
-Maatgevend is de kleinste waarde:
+The smallest value governs:
 
 #if V_Rds < V_Rdmax
   V_Rd = V_Rds', (beugels maatgevend)'
@@ -470,7 +470,7 @@ UC_Vrdmax = V_Ed / V_Rdmax
   Drukdiagonaal voldoet NIET (UC = {{UC_Vrdmax}})! Grotere doorsnede of kleiner theta nodig.
 #end if
 
-## Maximum beugel h.o.h. (art. 9.2.2)
+## Maximum stirrup spacing (art. 9.2.2)
 
 s_max = 0.75 * d to mm
 
@@ -519,7 +519,7 @@ Effectieve hoogten in twee richtingen:
 d_y = 200 mm
 d_z = 190 mm
 
-Gemiddelde effectieve hoogte (formule 6.32):
+Mean effective depth (expression 6.32):
 
 d_eff = (d_y + d_z) / 2 to mm
 
@@ -564,9 +564,9 @@ Ponskracht:
 
 V_Ed = 500 kN
 
-## Eerste controle-perimeter u_1 (art. 6.4.2)
+## First control perimeter u_1 (art. 6.4.2)
 
-Omtrek op afstand 2d van kolom (rechthoekige kolom):
+Perimeter at 2d from the column (rectangular column):
 
 u_1 = 2 * (c_1 + c_2) + 2 * pi * 2 * d_eff to mm
 
@@ -606,7 +606,7 @@ v_Rdmax = 0.4 * nu * f_cd to N/mm^2
 
 v_Ed0 = beta_pons * V_Ed / (u_0 * d_eff) to N/mm^2
 
-## Toetsing
+## Check
 
 UC_pons = v_Ed / v_Rdc
 
@@ -647,7 +647,7 @@ f_ck = sterkteklasse * 1 N/mm^2
 f_cm = f_ck + 8 N/mm^2
 f_ctm = 0.30 * sterkteklasse^(2/3) * 1 N/mm^2
 
-Effectieve treksterkte op moment van scheuren:
+Effective tensile strength at cracking:
 
 f_cteff = f_ctm to N/mm^2
 
@@ -670,7 +670,7 @@ Staafdiameter langswapening:
 
 phi = 16 mm
 
-Betondekking op langswapening:
+Concrete cover to longitudinal reinforcement:
 
 c = 35 mm
 
@@ -680,7 +680,7 @@ A_s = 1257 mm^2
 
 ## Effectief trekspanningsgebied (figuur 7.1)
 
-Hoogte effectief trekgebied h_c,ef (kleinste van):
+Effective tension area height h_c,ef (minimum of):
 
 h_cef_1 = 2.5 * (h - d) to mm
 h_cef_2 = (h - d) / 3 to mm
@@ -700,7 +700,7 @@ rho_peff = A_s / A_ceff
 
 M_Ed_bgt = 120 kN*m
 
-Hefboomsarm (gescheurde doorsnede, aanname):
+Lever arm (cracked section, assumed):
 
 z = 0.9 * d to mm
 
@@ -789,9 +789,9 @@ f_ck = sterkteklasse * 1 N/mm^2
 
 f_yk = 500 N/mm^2
 
-## Constructief systeem (Table 7.4N)
+## Structural system (Table 7.4N)
 
-@select systeem "Constructief systeem"
+@select systeem "Structural system"
 Vrij opgelegde beam / plate (K=1.0) = 1.0
 Eindoverspanning doorgaand (K=1.3) = 1.3
 Tussenoverspanning doorgaand (K=1.5) = 1.5
@@ -837,7 +837,7 @@ Referentiewapeningsverhouding:
 
 rho_0 = sqrt(f_ck / (1 N/mm^2)) / 1000
 
-## Grenswaarde slankheid l/d (formula 7.16)
+## Slenderness limit l/d (expression 7.16)
 
 #if rho < rho_0
   Laag wapeningspercentage (rho <= rho_0), formule 7.16.a is maatgevend.
@@ -845,7 +845,7 @@ rho_0 = sqrt(f_ck / (1 N/mm^2)) / 1000
   Hoog wapeningspercentage (rho > rho_0), formule 7.16.b is maatgevend.
 #end if
 
-Basiswaarde l/d (vereenvoudigd, Tabel 7.4N):
+Basic l/d (simplified, Table 7.4N):
 
 #if rho < rho_0
   ld_basis = K_sys * (11 + 1.5 * sqrt(f_ck / (1 N/mm^2)) * rho_0 / rho + 3.2 * sqrt(f_ck / (1 N/mm^2)) * (rho_0 / rho - 1)^(3/2))
@@ -853,17 +853,17 @@ Basiswaarde l/d (vereenvoudigd, Tabel 7.4N):
   ld_basis = K_sys * (11 + 1.5 * sqrt(f_ck / (1 N/mm^2)) * rho_0 / (rho - rho_prime) + 1/12 * sqrt(f_ck / (1 N/mm^2)) * sqrt(rho_prime / rho_0))
 #end if
 
-Correctie voor f_yk en A_s,prov / A_s,req (formule 7.17):
+Correction for f_yk and A_s,prov / A_s,req (expression 7.17):
 
 corr_staal = 500 / (f_yk / (1 N/mm^2)) * A_s_prov / A_s_req
 
 ld_toel = ld_basis * corr_staal
 
-## Werkelijke slankheid
+## Actual slenderness
 
 ld_werk = L / d
 
-## Toetsing
+## Check
 
 UC_doorbuiging = ld_werk / ld_toel
 
@@ -879,7 +879,7 @@ UC_doorbuiging = ld_werk / ld_toel
 // ---------------------------------------------------------------------------
 
 /** EN 1992-1-1 Complete -- Volledige betonbalk toetsing */
-export const ec2BetonBalk = `# Volledige Toetsing Betonbalk -- EN 1992-1-1
+export const ec2BetonBalk = `# Complete concrete beam checks -- EN 1992-1-1
 
 ## Material
 
@@ -921,7 +921,7 @@ b = 300 mm
 h = 600 mm
 d_1 = 50 mm
 
-Effectieve hoogte:
+Effective depth:
 
 d = h - d_1 to mm
 
@@ -939,7 +939,7 @@ Staafdiameter:
 
 phi = 20 mm
 
-Aantal staven:
+Number of bars:
 
 n_staven = 4
 
@@ -947,13 +947,13 @@ Trekwapening:
 
 A_s = n_staven * pi / 4 * phi^2 to mm^2
 
-## Systeem en load
+## System and loads
 
 Overspanning:
 
 L = 7000 mm
 
-Gelijkmatig verdeelde belasting (UGT):
+Uniformly distributed load (ULS):
 
 q_d = 30 kN/m
 
@@ -961,7 +961,7 @@ Maatgevend moment:
 
 M_Ed = q_d * L^2 / 8 to kN*m
 
-Maatgevende dwarskracht:
+Governing shear force:
 
 V_Ed = q_d * L / 2 to kN
 
@@ -1028,7 +1028,7 @@ V_Rdc_min = v_min * b * d to kN
 
 ---
 
-## 3. Shear met stirrups (art. 6.2.3)
+## 3. Shear with stirrups (art. 6.2.3)
 
 Beugelwapening (tweesnedig):
 
@@ -1036,7 +1036,7 @@ phi_w = 8 mm
 
 A_sw = 2 * pi / 4 * phi_w^2 to mm^2
 
-Beugel h.o.h.:
+Stirrup spacing:
 
 s_w = 200 mm
 
@@ -1093,7 +1093,7 @@ A_ceff = b * h_cef to mm^2
 
 rho_peff = A_s / A_ceff
 
-BGT belasting (quasi-blijvend, aanname 50% van UGT):
+SLS load (quasi-permanent, assumed 50% of ULS):
 
 M_bgt = 0.5 * M_Ed to kN*m
 
@@ -1132,8 +1132,8 @@ UC_scheur = w_k / w_max
 
 ## 5. Deflection (art. 7.4.2, slankheidscontrole)
 
-@select systeem "Constructief systeem (Table 7.4N)"
-Vrij opgelegd (K=1.0) = 1.0
+@select systeem "Structural system (Table 7.4N)"
+Simply supported (K=1.0) = 1.0
 Eindoverspanning doorgaand (K=1.3) = 1.3
 Tussenoverspanning doorgaand (K=1.5) = 1.5
 @end
@@ -1166,13 +1166,13 @@ UC_doorbuiging = ld_werk / ld_toel
 
 ## Summary
 
-| Toetsing | UC | Resultaat |
+| Check | UC | Result |
 |---|---|---|
 | Buiging (6.1) | {{UC_buiging}} | |
 | Dwarskracht beugels (6.2.3) | {{UC_Vrds}} | |
 | Drukdiagonaal (6.2.3) | {{UC_Vrdmax}} | |
 | Scheurwijdte (7.3.4) | {{UC_scheur}} | |
-| Doorbuiging (7.4.2) | {{UC_doorbuiging}} | |
+| Deflection (7.4.2) | {{UC_doorbuiging}} | |
 
 ## Overzicht
 

@@ -257,7 +257,7 @@ function SymbolContent() {
                     <button
                       id="btn-systeemtypen"
                       class="sp-settings-btn"
-                      title="Systeemtypen beheren"
+                      title={"Manage system types"}
                       onClick={(e) => { e.stopPropagation(); openDialog('systeemtypen'); }}
                       innerHTML={`<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="1" width="10" height="10"/><line x1="4.3" y1="1" x2="4.3" y2="11"/><line x1="7.6" y1="1" x2="7.6" y2="11"/><line x1="1" y1="4.3" x2="11" y2="4.3"/><line x1="1" y1="7.6" x2="11" y2="7.6"/></svg>`}
                     />
@@ -435,15 +435,15 @@ export function SymbolSettingsDialog() {
         const maten = catalog.families.reduce((n, f) => n + f.variants.length, 0);
         const zonderPreview = catalog.families.filter(f => !f.preview).length;
         updateStatusMessage(
-          `Catalogus '${collectionId}' geladen: ${catalog.families.length} families, ${maten} maten`
-          + (zonderPreview ? ` — ${zonderPreview} zonder preview in het bestand` : '')
+          `Catalogus '${collectionId}' loaded: ${catalog.families.length} families, ${maten} maten`
+          + (zonderPreview ? ` — ${zonderPreview} without a preview in the file` : '')
         );
         return;
       }
 
       if (!data.name || !Array.isArray(data.symbols)) {
         console.warn('Invalid symbol group file: missing name or symbols array');
-        updateStatusMessage('Bestand niet herkend: geen symboolgroep en geen catalogus');
+        updateStatusMessage('Unrecognized file: neither a symbol collection nor a catalog');
         return;
       }
       const groupId = addCustomGroup(data.name);
@@ -458,7 +458,7 @@ export function SymbolSettingsDialog() {
       // Een catalogus die zichzelf wel als linework-variants aankondigt maar
       // niet klopt, gooit uit parseLineworkCatalog. Die reden hoort de
       // gebruiker te zien in plaats van alleen in de console te belanden.
-      updateStatusMessage(`Import mislukt: ${err?.message || err}`, 6000);
+      updateStatusMessage(`Import failed: ${err?.message || err}`, 6000);
     }
     e.target.value = '';
   }
@@ -485,7 +485,7 @@ export function SymbolSettingsDialog() {
               </select>
             </label>
             <label class="sp-settings-locale-field">
-              <span>Land</span>
+              <span>Country</span>
               <select value={selectedCountry()} onChange={(e) => setSelectedCountry(e.target.value)}>
                 <For each={libraryCountries()}>
                   {(c) => <option value={c.id} selected={c.id === selectedCountry()}>{c.flag ? c.flag + ' ' : ''}{c.name}</option>}
@@ -494,22 +494,22 @@ export function SymbolSettingsDialog() {
             </label>
           </div>
           <Show when={indexStatus() === 'loading'}>
-            <div class="sp-settings-download sp-settings-download-note">Online bibliotheek laden…</div>
+            <div class="sp-settings-download sp-settings-download-note">Loading online library…</div>
           </Show>
           <Show when={indexStatus() === 'offline'}>
-            <div class="sp-settings-download sp-settings-download-note">Online bibliotheek niet bereikbaar — beperkte landenlijst</div>
+            <div class="sp-settings-download sp-settings-download-note">Online library unavailable — limited country list</div>
           </Show>
           <Show when={dlInfo().toFetch.length > 0 || dlInfo().tagOnly.length > 0 || downloadBusy()}>
             <div class="sp-settings-download">
               <Show when={!downloadBusy()} fallback={
                 <span class="sp-settings-download-label">
-                  Downloaden {Math.min((downloadProgress()?.done ?? 0) + 1, downloadProgress()?.total ?? 1)}/{downloadProgress()?.total ?? 1}: {downloadProgress()?.label || ''}
+                  Download {Math.min((downloadProgress()?.done ?? 0) + 1, downloadProgress()?.total ?? 1)}/{downloadProgress()?.total ?? 1}: {downloadProgress()?.label || ''}
                 </span>
               }>
                 <span class="sp-settings-download-label">
                   {dlInfo().toFetch.length > 0
-                    ? `${dlInfo().toFetch.length} collectie${dlInfo().toFetch.length === 1 ? '' : 's'} online beschikbaar (${dlInfo().symbolCount} symbolen)`
-                    : `${dlInfo().tagOnly.length} gedownloade collectie${dlInfo().tagOnly.length === 1 ? '' : 's'} activeren voor dit land`}
+                    ? `${dlInfo().toFetch.length} collection${dlInfo().toFetch.length === 1 ? '' : 's'} available online (${dlInfo().symbolCount} symbols)`
+                    : `Activate ${dlInfo().tagOnly.length} downloaded collection${dlInfo().tagOnly.length === 1 ? '' : 's'} for this country`}
                 </span>
                 <button class="sp-settings-btn-add"
                   onClick={() => downloadCountrySector(selectedCountry(), selectedIndustry())}>
@@ -519,7 +519,7 @@ export function SymbolSettingsDialog() {
             </div>
           </Show>
           <Show when={downloadError()}>
-            <div class="sp-settings-download sp-settings-download-error">Download mislukt: {downloadError()}</div>
+            <div class="sp-settings-download sp-settings-download-error">Download failed: {downloadError()}</div>
           </Show>
           <div class="sp-settings-body">
             <For each={allCategories().filter(c => matchesLocale(c, selectedIndustry(), selectedCountry()))}>

@@ -462,7 +462,7 @@ function evaluateNodes(nodes: AstNode[], scope: Scope, selectValues: SelectValue
         const value = scope[node.name];
         if (value === undefined) {
           if (!node.hidden) {
-            result.push({ type: 'text', text: `(${node.name} is niet gedefinieerd)` });
+            result.push({ type: 'text', text: `(${node.name} is not defined)` });
           }
           break;
         }

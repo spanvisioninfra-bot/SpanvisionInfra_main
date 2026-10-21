@@ -143,9 +143,9 @@ const STABU_CHAPTERS: Record<string, string> = {
   '25': 'METAALCONSTRUCTIEWERK',
   '26': 'BOUWKUNDIGE KANALEN',
   '28': 'DAKBEDEKKINGEN (METAAL)',
-  '30': 'KOZIJNEN, RAMEN EN DEUREN',
+  '30': 'FRAMES, WINDOWS AND DOORS',
   '31': 'SYSTEEMBEKLEDINGEN',
-  '32': 'TRAPPEN EN BALUSTRADEN',
+  '32': 'STAIRS AND BALUSTRADES',
   '33': 'DAKBEDEKKINGEN',
   '34': 'BEGLAZING',
   '35': 'NATUUR- EN KUNSTSTEEN',
@@ -306,7 +306,7 @@ export function buildDncImport(
     } else {
       // Geen (eenduidige) KU-detail → samenvattende regels uit de KK-totalen,
       // zodat het posttotaal exact klopt (loon/materiaal/onderaanneming).
-      if (ambiguous && kuList) warnings.push(`Item ${code2} deelt zijn code met een andere post; middelen samengevat i.p.v. gedetailleerd.`);
+      if (ambiguous && kuList) warnings.push(`Item ${code2} shares its code with another item; resources were summarized instead of itemized.`);
       let rsort = 0;
       const summary: Array<[ResourceType, number, string]> = [
         ['arbeid', tot1, "Labor"],
@@ -363,7 +363,7 @@ export function buildDncImport(
     }));
   if (props.length) schedule.projectProperties = props;
 
-  if (!KK.length) warnings.push('Geen KK-tabel (posten) gevonden in het .DNC-bestand.');
+  if (!KK.length) warnings.push('No KK table (items) was found in the .DNC file.');
   return { schedule, items, warnings };
 }
 

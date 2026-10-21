@@ -476,7 +476,7 @@ eq('14a …ook in de store-tak',
     parseZipEntries(gedeflate, EXTENSION_ZIP_LIMITS, undefined, { inflate: null }));
   eq('18 geen inflater ⇒ eigen fout', err instanceof ZipCompressionUnsupportedError, true);
   eq('18a …met een reden die de gebruiker iets zegt',
-    err instanceof Error && /ompressie niet ondersteund/.test(err.message), true);
+    err instanceof Error && /Compression is not supported/.test(err.message), true);
   eq('18b …en niet vervlakt tot een budgetweigering',
     err instanceof Error && !err.message.includes('budget') && !err.message.includes('uitpaklimiet'),
     true);

@@ -163,7 +163,7 @@ async def list_projects(request: Request):
 @router.post("/projects", status_code=201)
 async def create_project(
     request: Request,
-    name: str = Form("Nieuw project"),
+    name: str = Form("New project"),
     description: str = Form(None),
 ):
     """Create a new project, stamped with the caller's tenant slug."""

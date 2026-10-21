@@ -46,7 +46,7 @@ export default function IfcTab() {
   return (
     <div className="ribbon-content">
       <div className="ribbon-groups">
-        <RibbonGroup label={t("ifc.autoGroup", "Automatisch gegenereerd")}>
+        <RibbonGroup label={t("ifc.autoGroup", "Automatically generated")}>
           <div className="ribbon-info-block">
             <div className="ribbon-info-title">{statusLabel}</div>
             <div className="ribbon-info-sub">

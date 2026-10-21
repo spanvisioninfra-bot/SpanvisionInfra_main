@@ -332,7 +332,7 @@ test('uur→dag met bestaande urentaak ⇒ transactie blokkeert zonder dagfallba
 
   const res = await call('planner_update_calendar', { calendars: [{ id: projId, workTime: null }] });
   assert(!res.ok, 'banden verwijderen bij een bestaande urentaak hoort te worden geblokkeerd');
-  assert(!res.ok && /concrete werkblokken/.test(res.error), `fout legt de vereiste uit: ${res.ok ? '' : res.error}`);
+  assert(!res.ok && /working-time blocks/.test(res.error), `fout legt de vereiste uit: ${res.ok ? '' : res.error}`);
   const hourTask = S().tasks.find((t) => t.id === halve)!;
   assertEq(hourTask.time.durationUnit, 'hours', 'urentaak blijft na blokkering uren');
   assertEq(hourTask.time.durationMinutes, 240, 'exacte minuten blijven na blokkering behouden');

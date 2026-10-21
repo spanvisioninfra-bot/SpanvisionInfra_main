@@ -431,7 +431,7 @@ function createCptChart(
     { nap: napWater, label: 'waterniveau', color: '#2563eb', dash: '3,3' },
     { nap: napPaalkop, label: 'paalkop', color: '#6b7280', dash: '6,2' },
     { nap: napNegKleef, label: 'neg. kleef', color: '#d97706', dash: '4,2' },
-    { nap: napPaalpunt, label: 'paalpunt', color: '#6b7280', dash: '6,2' },
+    { nap: napPaalpunt, label: "pile tip", color: '#6b7280', dash: '6,2' },
   ];
 
   for (const nl of napLines) {

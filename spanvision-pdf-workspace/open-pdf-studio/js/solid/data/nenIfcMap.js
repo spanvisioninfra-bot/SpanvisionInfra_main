@@ -37,7 +37,7 @@ export const NEN_IFC_MAP = {
   'Tb2.002': { name: 'Akoestische signaalg. (sirene)', ifcCategory: 'IfcAlarm', ifcPredefinedType: 'SIREN' },
   'Tb2.003': { name: 'Optisch/akoestisch signaal', ifcCategory: 'IfcAlarm' },
   'Tb2.004': { name: 'Spraakinstallatie', ifcCategory: 'IfcAudioVisualAppliance', ifcPredefinedType: 'SPEAKER' },
-  'Tb2.005': { name: 'Gesproken bericht', ifcCategory: 'IfcAudioVisualAppliance', ifcPredefinedType: 'SPEAKER' },
+  'Tb2.005': { name: "Spoken message", ifcCategory: 'IfcAudioVisualAppliance', ifcPredefinedType: 'SPEAKER' },
   'Tb2.021': { name: 'Deur/raamcontact', ifcCategory: 'IfcSensor', ifcPredefinedType: 'CONTACTSENSOR' },
   'Tb2.022': { name: 'Houdmagneet', ifcCategory: 'IfcActuator', ifcPredefinedType: 'ELECTRICACTUATOR' },
   'Tb2.023': { name: 'Deurdranger', ifcCategory: 'IfcActuator' },
@@ -66,7 +66,7 @@ export const NEN_IFC_MAP = {
 
   // --- Deuren (Td) ---
   'Td01': { name: 'Enkele deur', ifcCategory: 'IfcDoor', ifcPredefinedType: 'DOOR' },
-  'Td02': { name: 'Dubbele deur', ifcCategory: 'IfcDoor', ifcPredefinedType: 'DOOR' },
+  'Td02': { name: "Double door", ifcCategory: 'IfcDoor', ifcPredefinedType: 'DOOR' },
   'Td03': { name: 'Schuifdeur', ifcCategory: 'IfcDoor', ifcPredefinedType: 'DOOR' },
   'Td04': { name: 'Draaihek', ifcCategory: 'IfcDoor', ifcPredefinedType: 'GATE' },
   'Td05': { name: "Roldeur (top)", ifcCategory: 'IfcDoor', ifcPredefinedType: 'DOOR' },
@@ -86,7 +86,7 @@ export const NEN_IFC_MAP = {
   'Tn07': { name: 'Werkplekverlichting', ifcCategory: 'IfcLightFixture' },
   'Tn08': { name: 'Veiligheidsverlichting', ifcCategory: 'IfcLightFixture', ifcPredefinedType: 'SECURITYLIGHTING' },
   'Tn09': { name: 'Noodvoeding', ifcCategory: 'IfcElectricFlowStorageDevice' },
-  'Tn10': { name: 'Accu-eenheid', ifcCategory: 'IfcElectricFlowStorageDevice', ifcPredefinedType: 'BATTERY' },
+  'Tn10': { name: "Battery unit", ifcCategory: 'IfcElectricFlowStorageDevice', ifcPredefinedType: 'BATTERY' },
   'Tn11': { name: 'Aggregaat', ifcCategory: 'IfcElectricGenerator' },
   'Tn12': { name: 'UPS', ifcCategory: 'IfcElectricFlowStorageDevice', ifcPredefinedType: 'UPS' },
 

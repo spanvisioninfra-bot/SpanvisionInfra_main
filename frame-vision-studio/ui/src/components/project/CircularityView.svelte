@@ -12,7 +12,7 @@
     try {
       data = await invoke("get_project_circularity");
     } catch (e) {
-      console.error("Circulariteit laden mislukt:", e);
+      console.error("Failed to load circularity data:", e);
     }
     loading = false;
   }

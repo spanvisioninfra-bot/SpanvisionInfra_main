@@ -328,7 +328,7 @@ export const createBcfSlice: StateCreator<BcfSlice> = (set, get) => ({
       return project;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
-      set({ bcfError: `Project aanmaken mislukt: ${message}` });
+      set({ bcfError: `Project creation failed: ${message}` });
       return null;
     }
   },
@@ -468,7 +468,7 @@ export const createBcfSlice: StateCreator<BcfSlice> = (set, get) => ({
       downloadBlob(blob, `bim-validator-${timestamp}.bcf`);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
-      set({ bcfError: `BCF export mislukt: ${message}` });
+      set({ bcfError: `BCF export failed: ${message}` });
     }
   },
 });

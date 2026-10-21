@@ -108,7 +108,7 @@ export default function TekeninstellingenDialog() {
     return ['default', ...keys.filter(k => k !== 'default').sort()];
   };
   const catLabel = (cat) => cat === 'default'
-    ? tt('defaultCategory', 'Overig (default)')
+    ? tt('defaultCategory', 'Other (default)')
     : `${cat}${IFC_LABELS[cat] ? ` — ${IFC_LABELS[cat]}` : ''}`;
   const lineWidthOf = (cat) => {
     const table = current()?.lineWidthsMm?.[cat] || {};
@@ -142,14 +142,14 @@ export default function TekeninstellingenDialog() {
 
   return (
     <Dialog
-      title={tt('title', 'Tekeninstellingen')}
+      title={tt('title', 'Drawing settings')}
       dialogClass="tekeninstellingen-dialog"
       onClose={() => closeDialog('tekeninstellingen')}
       footer={
         <div style="display:flex;gap:6px;justify-content:flex-end;width:100%">
           <button class="ai-plan-btn" style="width:auto;padding:5px 16px"
             onClick={() => closeDialog('tekeninstellingen')}>
-            {tt('close', 'Sluiten')}
+            {tt('close', 'Close')}
           </button>
         </div>
       }
@@ -174,14 +174,14 @@ export default function TekeninstellingenDialog() {
               {tt('duplicate', 'Dupliceren')}
             </button>
             <button class="ai-plan-btn" style="width:auto;padding:4px 8px"
-              title={tt('rename', 'Hernoemen')}
+              title={tt('rename', "Rename")}
               onClick={() => { setRenameValue(current()?.name || ''); setRenaming(!renaming()); }}>
-              {tt('rename', 'Hernoemen')}
+              {tt('rename', "Rename")}
             </button>
             <button class="ai-plan-btn" style="width:auto;padding:4px 8px"
               disabled={data().regelsets.length <= 1}
-              title={tt('delete', 'Verwijderen')} onClick={handleDelete}>
-              {tt('delete', 'Verwijderen')}
+              title={tt('delete', "Delete")} onClick={handleDelete}>
+              {tt('delete', "Delete")}
             </button>
           </div>
           <Show when={renaming()}>
@@ -195,7 +195,7 @@ export default function TekeninstellingenDialog() {
           <Show when={current() && current().id !== data().defaultId}>
             <button class="ai-plan-btn" style="width:auto;padding:4px 8px;margin-top:4px"
               onClick={() => { data().defaultId = current().id; commit(); }}>
-              {tt('makeDefault', 'Als standaard gebruiken (buiten schaalgebieden)')}
+              {tt('makeDefault', "Use as default (outside scale regions)")}
             </button>
           </Show>
         </div>
@@ -242,7 +242,7 @@ export default function TekeninstellingenDialog() {
         <div class="ai-login-field">
           <label>{tt('regions', 'Tekeningtype per schaalgebied')}</label>
           <Show when={regions().length > 0}
-            fallback={<div style="opacity:.7">{tt('noRegions', 'Geen schaalgebieden in dit document.')}</div>}>
+            fallback={<div style="opacity:.7">{tt('noRegions', 'No scale regions in this document.')}</div>}>
             <For each={regions()}>
               {(r, i) => (
                 <div style="display:flex;gap:6px;align-items:center;margin:2px 0">

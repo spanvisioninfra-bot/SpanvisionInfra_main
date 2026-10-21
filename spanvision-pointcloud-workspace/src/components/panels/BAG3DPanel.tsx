@@ -33,6 +33,7 @@ export function BAG3DPanel({ onClose, onBuildingsLoaded }: BAG3DPanelProps) {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState<FetchProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [locationLabel, setLocationLabel] = useState('Worldwide map');
   const [drawingMode, setDrawingMode] = useState(false);
   const drawStartRef = useRef<L.LatLng | null>(null);
 
@@ -49,9 +50,17 @@ export function BAG3DPanel({ onClose, onBuildingsLoaded }: BAG3DPanelProps) {
     L.tileLayer(WORLD_TILES, WORLD_TILE_OPTIONS).addTo(map);
 
     mapInstanceRef.current = map;
+    const onLocation = (event: Event) => {
+      const detail = (event as CustomEvent<{ map: HTMLElement; city?: string; country?: string }>).detail;
+      if (detail.map !== map.getContainer()) return;
+      const place = [detail.city, detail.country].filter(Boolean).join(', ');
+      setLocationLabel(place ? `Your area: ${place}` : 'Your location');
+    };
+    window.addEventListener('spanvision:map-location', onLocation);
     attachMapLocation(map);
 
     return () => {
+      window.removeEventListener('spanvision:map-location', onLocation);
       map.remove();
       mapInstanceRef.current = null;
     };
@@ -175,7 +184,7 @@ export function BAG3DPanel({ onClose, onBuildingsLoaded }: BAG3DPanelProps) {
 
         {/* Controls */}
         <div className="bag3d-controls">
-          <div className="bag3d-bbox-info">Worldwide map · 3D BAG buildings: Netherlands</div>
+          <div className="bag3d-bbox-info" title="3DBAG building data currently covers the Netherlands">{locationLabel} · Building source: 3DBAG (regional)</div>
           <div className="bag3d-control-row">
             <button
               className={`bag3d-draw-btn ${drawingMode ? 'active' : ''}`}

@@ -6,6 +6,7 @@
  * leiden naar dezelfde binary; er bestaat geen TypeScript-implementatie van
  * de doorsnede-eigenschappen — alles wat de editor toont komt hiervandaan.
  */
+import { engineRequest } from "../engineApi";
 import { invoke } from "@tauri-apps/api/core";
 import { isTauriApp } from "../tauri";
 import type { MotorSoort, MotorUitvoer } from "./types";
@@ -89,20 +90,11 @@ export async function roepMotor(
       return await invoke<MotorUitvoer[]>(TAURI_COMMAND, { invoer });
     } catch (e) {
       throw new Error(
-        `De doorsnedemotor is in de desktop-app nog niet aangesloten (command "${TAURI_COMMAND}"): ${String(e)}`,
+        `The section engine is not connected in the desktop app yet (command "${TAURI_COMMAND}"): ${String(e)}`,
       );
     }
   }
-  const antwoord = await fetch("/api/doorsnede", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(invoer),
-    signal,
-  });
-  const data = await antwoord.json().catch(() => null);
-  if (!antwoord.ok || !Array.isArray(data)) {
-    const fout = (data as { fout?: string; detail?: string } | null)?.fout ?? (data as { detail?: string } | null)?.detail;
-    throw new Error(fout ?? `The section engine returned HTTP ${antwoord.status}.`);
-  }
-  return data as MotorUitvoer[];
+  const data = await engineRequest<MotorUitvoer[]>("doorsnede", invoer, signal);
+  if (!Array.isArray(data)) throw new Error("The section engine returned an invalid result.");
+  return data;
 }

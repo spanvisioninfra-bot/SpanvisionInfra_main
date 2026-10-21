@@ -192,7 +192,7 @@ export default function SaveAsDialog({
         manifestData.push({
           type: "WefcValidation",
           guid: crypto.randomUUID(),
-          name: `BIM Validatie - ${now.slice(0, 10)}`,
+          name: `BIM Validation - ${now.slice(0, 10)}`,
           path: "validation/validation-result.json",
           status: "active",
           created: now,

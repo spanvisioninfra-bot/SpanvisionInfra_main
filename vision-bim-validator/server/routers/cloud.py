@@ -379,7 +379,7 @@ async def cloud_save_validation(
     validation_obj: dict[str, Any] = {
         "type": "WefcValidation",
         "guid": str(uuid.uuid4()),
-        "name": f"BIM Validatie - {datetime.now(timezone.utc).strftime('%Y-%m-%d')}",
+        "name": f"BIM Validation - {datetime.now(timezone.utc).strftime('%Y-%m-%d')}",
         "path": f"{DIR_VALIDATION}/{filename}",
         "status": "active",
         "created": now,

@@ -103,8 +103,8 @@ export default function LoadsSection() {
         ? `${basis}, ${t("report.atPosition", "op")} ${fmtNum(frac * L, 2)} m`
         : `${basis}, ${t("report.atPosition", "op")} ${fmtNum(frac, 2)}·L`;
     }
-    if (l.beamId !== undefined) return `${t("report.beamWord", "staaf")} ${l.beamId}`;
-    if (l.nodeId !== undefined) return `${t("report.nodeWord", "knoop")} ${l.nodeId}`;
+    if (l.beamId !== undefined) return `${t("report.beamWord", "member")} ${l.beamId}`;
+    if (l.nodeId !== undefined) return `${t("report.nodeWord", "node")} ${l.nodeId}`;
     return "—";
   };
 
@@ -144,8 +144,8 @@ export default function LoadsSection() {
   const directionText = (l: Load): string => {
     if (l.type !== "lineLoad" && l.type !== "edgeLoad") return "—";
     return (l.qDir ?? "z") === "z"
-      ? t("report.dirVertical", "z (verticaal)")
-      : t("report.dirHorizontal", "x (horizontaal)");
+      ? t("report.dirVertical", "z (vertical)")
+      : t("report.dirHorizontal", "x (horizontal)");
   };
 
   /**
@@ -160,8 +160,8 @@ export default function LoadsSection() {
     const end = l.endFrac ?? 1;
     if (start <= 0 && end >= 1) {
       return opRand
-        ? t("report.fullEdge", "volledige rand")
-        : t("report.fullLength", "volledige lengte");
+        ? t("report.fullEdge", "entire edge")
+        : t("report.fullLength", "Full length");
     }
     let lenM: number | null = null;
     if (opStaaf) {
@@ -176,11 +176,11 @@ export default function LoadsSection() {
 
   return (
     <div className="rpt-block">
-      <h2 className="rpt-h2">{t("report.sectionLoads", "Belastinggevallen")}</h2>
+      <h2 className="rpt-h2">{t("report.sectionLoads", "Load cases")}</h2>
 
       {loadCases.length === 0 ? (
         <p className="rpt-empty-note">
-          {t("report.noLoadCases", "Geen belastinggevallen in het model.")}
+          {t("report.noLoadCases", "No load cases in the model.")}
         </p>
       ) : (
         loadCases.map((lc) => {
@@ -198,7 +198,7 @@ export default function LoadsSection() {
               </h3>
               {caseLoads.length === 0 && !carriesSelfWeight ? (
                 <p className="rpt-note">
-                  {t("report.noLoadsInCase", "Geen lasten in dit geval.")}
+                  {t("report.noLoadsInCase", "No loads in this case.")}
                 </p>
               ) : (
                 <>
@@ -208,11 +208,11 @@ export default function LoadsSection() {
                         <tr>
                           <th>{t("report.colLoadType", "Type")}</th>
                           {toontOmschrijving && (
-                            <th>{t("report.colDescription", "Omschrijving")}</th>
+                            <th>{t("report.colDescription", "Description")}</th>
                           )}
                           <th>{t("report.colTarget", "Op")}</th>
-                          <th>{t("report.colValue", "Waarde")}</th>
-                          <th>{t("report.colDirection", "Richting")}</th>
+                          <th>{t("report.colValue", "Value")}</th>
+                          <th>{t("report.colDirection", "Direction")}</th>
                           <th>{t("report.colRange", "Bereik")}</th>
                         </tr>
                       </thead>
@@ -237,7 +237,7 @@ export default function LoadsSection() {
                       <p className="rpt-note" style={{ marginTop: "1.5mm" }}>
                         {t(
                           "report.selfWeightIncluded",
-                          "Eigen gewicht van alle staven wordt in dit geval automatisch meegenomen (q = ρ·A·g per staaf).",
+                          "Self-weight of all members is included automatically in this case (q = ρ·A·g per member).",
                         )}
                         {" "}
                         {t("report.selfWeightG", "g = {{g}} m/s².", { g: fmtNum(eigenGewicht.g, 2) })}
@@ -246,9 +246,9 @@ export default function LoadsSection() {
                         <table className="rpt-table" data-testid="rpt-eigen-gewicht">
                           <thead>
                             <tr>
-                              <th>{t("report.selfWeightColBeam", "Staaf")}</th>
-                              <th>{t("report.selfWeightColMaterial", "Materiaal")}</th>
-                              <th>{t("report.selfWeightColProfile", "Profiel")}</th>
+                              <th>{t("report.selfWeightColBeam", "Member")}</th>
+                              <th>{t("report.selfWeightColMaterial", "Material")}</th>
+                              <th>{t("report.selfWeightColProfile", "Section")}</th>
                               <th>ρ [kg/m³]</th>
                               <th>A [mm²]</th>
                               <th>{t("report.selfWeightColRange", "Bereik")}</th>
@@ -265,7 +265,7 @@ export default function LoadsSection() {
                                 <td>{fmtNum(d.A_mm2, 0)}</td>
                                 <td>
                                   {d.startFrac <= 0 && d.endFrac >= 1
-                                    ? t("report.fullLength", "volledige lengte")
+                                    ? t("report.fullLength", "Full length")
                                     : `${fmtNum(d.startFrac * s.lengteMm / 1000, 2)} – ${fmtNum(d.endFrac * s.lengteMm / 1000, 2)} m`}
                                 </td>
                                 <td>{fmtNum(d.q, 3)}</td>
@@ -279,7 +279,7 @@ export default function LoadsSection() {
                           <thead>
                             <tr>
                               <th>{t("report.selfWeightColPlate", "Plaat")}</th>
-                              <th>{t("report.selfWeightColMaterial", "Materiaal")}</th>
+                              <th>{t("report.selfWeightColMaterial", "Material")}</th>
                               <th>ρ [kg/m³]</th>
                               <th>t [mm]</th>
                               <th>p = ρ·g·t [kN/m²]</th>
@@ -312,18 +312,18 @@ export default function LoadsSection() {
           {eigenGewicht.doel.soort === "kenmerkNietBlijvend"
             ? t(
                 "report.selfWeightCaseNotDead",
-                "Eigen gewicht staat aan, maar het belastinggeval met het kenmerk “eigen gewicht” is niet van type “Permanent”: het eigen gewicht is NIET in de berekening meegenomen.",
+                "Self-weight is enabled, but the load case marked \"self-weight\" is not of type \"Permanent\". Self-weight is NOT included in the calculation.",
               )
             : t(
                 "report.selfWeightNoDeadCase",
-                "Eigen gewicht staat aan, maar er is geen belastinggeval van type “Permanent”: het eigen gewicht is NIET in de berekening meegenomen.",
+                "Self-weight is enabled, but no \"Permanent\" load case exists. Self-weight is NOT included in the calculation.",
               )}
         </p>
       )}
 
       {loadCases.length > 0 && !selfWeightEnabled && (
         <p className="rpt-note" style={{ marginTop: "3mm" }}>
-          {t("report.selfWeightOff", "Eigen gewicht is uitgeschakeld — niet in de berekening meegenomen.")}
+          {t("report.selfWeightOff", "Self-weight is disabled and is not included in the calculation.")}
         </p>
       )}
     </div>

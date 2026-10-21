@@ -78,17 +78,17 @@ eq('onbekende baselinesuffix wordt geweigerd',
 eq('percent-encoded losse UTF-16-surrogaat wordt geweigerd',
   decodeDynamicTaskColumnId('activity-code:project:%ED%A0%80'), null);
 typeError('activity-code weigert leeg segment', () => activityCodeColumnId('', 'type'),
-  'TaskColumnId-segment mag niet leeg zijn');
+  "TaskColumnId segment must not be empty");
 typeError('custom-field weigert leeg segment', () => customFieldColumnId('project', ''),
-  'TaskColumnId-segment mag niet leeg zijn');
+  "TaskColumnId segment must not be empty");
 typeError('baseline weigert leeg segment', () => baselineColumnId('project', '', 'start'),
-  'TaskColumnId-segment mag niet leeg zijn');
+  "TaskColumnId segment must not be empty");
 typeError('activity-code weigert losse UTF-16-surrogaat', () => activityCodeColumnId('project', '\uD800'),
-  'TaskColumnId-segment bevat een losse UTF-16-surrogaat');
+  "TaskColumnId segment contains an unpaired UTF-16 surrogate");
 typeError('custom-field weigert losse UTF-16-surrogaat', () => customFieldColumnId('\uDC00', 'veld'),
-  'TaskColumnId-segment bevat een losse UTF-16-surrogaat');
+  "TaskColumnId segment contains an unpaired UTF-16 surrogate");
 typeError('baseline weigert losse UTF-16-surrogaat', () => baselineColumnId('project', '\uD800', 'start'),
-  'TaskColumnId-segment bevat een losse UTF-16-surrogaat');
+  "TaskColumnId segment contains an unpaired UTF-16 surrogate");
 
 const task = {
   id: 't-1', name: 'Taak', description: '', wbsCode: '1', taskType: 'CONSTRUCTION',

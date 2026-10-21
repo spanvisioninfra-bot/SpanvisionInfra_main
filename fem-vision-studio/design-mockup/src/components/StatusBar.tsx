@@ -77,8 +77,8 @@ export default function StatusBar({
       <div className="status-bar-left">
         {/* App-logo (mini) — portaal-frame + scharnier-opleggingen, in lijn met
             de TitleBar / Backstage / taakbalk-icoon. */}
-        <span className="status-bar-logo" title="Open FEM2D Studio">
-          <svg width="14" height="14" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-label="Open FEM2D Studio">
+        <span className="status-bar-logo" title={"FEM Vision Studio"}>
+          <svg width="14" height="14" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-label={"FEM Vision Studio"}>
             <rect x="0" y="0" width="64" height="64" rx="12" fill="var(--theme-accent)" />
             <line x1="14" y1="18" x2="14" y2="46" stroke="white" strokeWidth="3.5" strokeLinecap="round" />
             <line x1="50" y1="18" x2="50" y2="46" stroke="white" strokeWidth="3.5" strokeLinecap="round" />
@@ -104,12 +104,12 @@ export default function StatusBar({
               className="status-item status-bediening"
               title={t(
                 "remoteControlHint",
-                "De app is gestart met OPENAEC_GUI_CONTROL=1 en wordt via het bedieningskanaal aangestuurd.",
+                "The app started with OPENAEC_GUI_CONTROL=1 and is controlled through the automation channel.",
               )}
             >
               <span className="status-bediening-dot" aria-hidden="true" />
               <span className="status-item-label">
-                {t("remoteControlActive", "bediening op afstand actief")}
+                {t("remoteControlActive", "remote control active")}
               </span>
             </div>
           </>
@@ -158,8 +158,8 @@ export default function StatusBar({
                 aria-pressed={snap[soort]}
                 title={`${t(`snap.${soort}`, SNAP_LABELS[soort].kort)} — ${
                   t(`statusBar.snapExplain.${soort}`)
-                } ${snap[soort] ? t("snapClickOff", "Klik om uit te zetten.")
-                                : t("snapClickOn", "Klik om aan te zetten.")}`}
+                } ${snap[soort] ? t("snapClickOff", "Click to disable.")
+                                : t("snapClickOn", "Click to enable.")}`}
                 onClick={() => wisselSnap(soort)}
               >
                 {t(`snap.${soort}`, SNAP_LABELS[soort].kort)}

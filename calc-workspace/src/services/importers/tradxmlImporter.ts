@@ -56,7 +56,7 @@ export function importTradxml(xml: string): ImportResult {
     children(h, 'Activiteit').forEach((a) => addActivity(a, hId, 1));
   });
 
-  if (items.length === 0) warnings.push('TRADXML bevat geen hoofdstukken.');
+  if (items.length === 0) warnings.push('The TRADXML file contains no chapters.');
 
   return { schedule: { name }, items, warnings, format: 'tradxml' };
 }

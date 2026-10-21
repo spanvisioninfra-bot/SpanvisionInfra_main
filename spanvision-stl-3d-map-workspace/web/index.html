@@ -2,7 +2,7 @@
 <html lang="en" data-theme="spanvision-mono">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#000000"><meta name="description" content="STL-3D map workspace by Spanvision Infra. Create printable 3D maps of the Netherlands.">
+<meta name="theme-color" content="#000000"><meta name="description" content="STL-3D map workspace by Spanvision Infra. Explore your location and create printable models from supported regional building data.">
 <title>STL-3D map workspace — Spanvision Infra</title>
 <link rel="icon" href="/static/favicon.ico"><link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="/static/brand-palette.css"><link rel="stylesheet" href="/static/style.css">
@@ -23,7 +23,7 @@
  <nav class="mobile-tabs" aria-label="Workspace view"><button id="tab-map" aria-pressed="true" aria-controls="map">Map</button><button id="tab-settings" aria-pressed="false" aria-controls="panel">Settings</button></nav>
  <div id="work" data-view="map">
   <aside id="panel" tabindex="-1" aria-label="Map and print settings">
-   <div class="coverage"><span class="coverage-dot"></span> WORLDWIDE MAP <span>3D data: Netherlands</span></div>
+   <div class="coverage"><span class="coverage-dot"></span> <strong id="map-region-label">WORLDWIDE MAP</strong> <span title="3DBAG building data covers the Netherlands">Building source: 3DBAG (regional)</span></div>
    <section><h2><i>1</i> Location</h2><label for="search">Find a location</label><div class="row"><input id="search" type="search" placeholder="Address, city or street…" autocomplete="off" role="combobox" aria-controls="search-results" aria-expanded="false" aria-autocomplete="list"></div><ul id="search-results" class="results hidden" role="listbox" aria-label="Location suggestions"></ul></section>
    <section><h2><i>2</i> Area</h2><div class="row"><button id="btn-draw" class="ghost" aria-pressed="false">Draw area on map</button></div>
     <div class="row split"><label>Width (m)<input id="area-w" type="number" value="1200" min="100" step="50"></label><label>Height (m)<input id="area-h" type="number" value="1200" min="100" step="50"></label></div>
@@ -43,6 +43,6 @@
  <div id="statusbar"><span id="status" role="status" aria-live="polite">Ready. Select a location to begin.</span><span class="status-brand">STL / SPANVISION INFRA</span></div>
 </div>
 <div id="busy" class="hidden" role="status" aria-live="polite"><div class="spinner"></div><span id="busy-text">Working…</span></div>
-<dialog id="about-dialog" aria-labelledby="about-title"><div class="dialog-heading"><img src="/static/stl-mark.svg" alt="STL"><button id="btn-about-close" class="iconbtn" aria-label="Close about">×</button></div><p class="eyebrow">SPANVISION INFRA</p><h2 id="about-title">STL-3D map workspace</h2><p>Turn a Netherlands map area into a printable 3D model.</p><p class="hint">Local geometry processing · STL / 3MF export</p><a class="notice-link" href="/api/notices" target="_blank" rel="noopener noreferrer">Open-source notices ↗</a></dialog>
-<script src="/static/vendor/leaflet/leaflet.js"></script><script src="/static/app.js"></script>
+<dialog id="about-dialog" aria-labelledby="about-title"><div class="dialog-heading"><img src="/static/stl-mark.svg" alt="STL"><button id="btn-about-close" class="iconbtn" aria-label="Close about">×</button></div><p class="eyebrow">SPANVISION INFRA</p><h2 id="about-title">STL-3D map workspace</h2><p>Explore your location and create printable models from supported regional building data. The 3DBAG source currently covers the Netherlands.</p><p class="hint">Local geometry processing · STL / 3MF export</p><a class="notice-link" href="/api/notices" target="_blank" rel="noopener noreferrer">Open-source notices ↗</a></dialog>
+<script src="/static/vendor/leaflet/leaflet.js"></script><script type="module" src="/static/app.js"></script>
 </body></html>

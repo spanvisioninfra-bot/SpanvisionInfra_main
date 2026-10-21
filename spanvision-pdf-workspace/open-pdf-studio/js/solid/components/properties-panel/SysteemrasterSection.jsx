@@ -52,10 +52,10 @@ export default function SysteemrasterSection() {
 
   return (
     <Show when={annotProps.annotationType === 'systeemraster'}>
-      <CollapsibleSection title="Systeem" name="systeemraster" id="prop-sg-section">
+      <CollapsibleSection title={"System"} name="systeemraster" id="prop-sg-section">
         <Show when={heeftType()}>
           <div class="property-group">
-            <label>Systeemtype</label>
+            <label>System type</label>
             <div style={{ display: 'flex', gap: '4px', 'align-items': 'center' }}>
               <select id="prop-sg-type" style={{ flex: '1' }}
                 value={annotProps.sgTypeId || ''}
@@ -66,7 +66,7 @@ export default function SysteemrasterSection() {
                   {(t) => <option value={t.id}>{t.naam}</option>}
                 </For>
               </select>
-              <button type="button" id="prop-sg-typen-beheren" title="Typen beheren…"
+              <button type="button" id="prop-sg-typen-beheren" title={"Manage types…"}
                 onClick={() => openDialog('systeemtypen')}
               >…</button>
             </div>
@@ -100,24 +100,24 @@ export default function SysteemrasterSection() {
           <button type="button" id="prop-sg-sparing-toevoegen"
             disabled={locked()}
             onClick={() => updateAnnotProp('sgSparingToevoegen', true)}
-          >Sparing toevoegen</button>
+          >Add opening</button>
         </div>
 
         <div class="property-group">
-          <label>{heeftType() ? 'Randprofiel — type' : 'Randprofiel'}</label>
+          <label>{heeftType() ? 'Randprofiel — type' : "Edge section"}</label>
           <select id="prop-sg-randprofiel"
             value={annotProps.sgEdgeProfiel || "none"}
             disabled={locked()}
             onChange={(e) => updateAnnotProp('sgTypeEdge', e.target.value)}
           >
-            <option value="none">Geen</option>
-            <option value="hoeklijn">Hoeklijn</option>
-            <option value="schaduwvoeg">Schaduwvoeg</option>
+            <option value="none">None</option>
+            <option value="hoeklijn">Angle section</option>
+            <option value="schaduwvoeg">Shadow gap</option>
           </select>
         </div>
 
         <div class="property-group">
-          <label>Rasterhoek (°)</label>
+          <label>Grid angle (°)</label>
           <input type="number" id="prop-sg-hoek"
             min="0" max="360" step="5"
             value={annotProps.sgRasterHoek ?? 0}
@@ -130,7 +130,7 @@ export default function SysteemrasterSection() {
           <button type="button" id="prop-sg-centreer"
             disabled={locked()}
             onClick={() => updateAnnotProp('sgCentreer', true)}
-          >Centreer raster</button>
+          >Center grid</button>
         </div>
 
         <div class="property-group">
@@ -139,7 +139,7 @@ export default function SysteemrasterSection() {
               checked={annotProps.equalizeX === true}
               disabled={locked()}
               onChange={(e) => updateAnnotProp('equalizeX', e.target.checked)}
-            /> Equalize X (randstukken links = rechts)
+            /> Equalize X (left and right edge pieces)
           </label>
         </div>
 
@@ -149,25 +149,25 @@ export default function SysteemrasterSection() {
               checked={annotProps.equalizeY === true}
               disabled={locked()}
               onChange={(e) => updateAnnotProp('equalizeY', e.target.checked)}
-            /> Equalize Y (randstukken boven = onder)
+            /> Equalize Y (top and bottom edge pieces)
           </label>
         </div>
 
         <div class="property-group">
-          <label>Randconditie</label>
+          <label>Edge condition</label>
           <select id="prop-sg-rand"
             value={annotProps.randConditie || SYSTEEMRASTER_DEFAULTS.randConditie}
             disabled={locked()}
             onChange={(e) => updateAnnotProp('randConditie', e.target.value)}
           >
-            <option value="tonen">Gesneden platen tonen</option>
-            <option value="minmaat">Minimale randmaat afdwingen</option>
+            <option value="tonen">Show cut panels</option>
+            <option value="minmaat">Enforce minimum edge size</option>
           </select>
         </div>
 
         <Show when={(annotProps.randConditie || SYSTEEMRASTER_DEFAULTS.randConditie) === 'minmaat'}>
           <div class="property-group">
-            <label>Minimale randmaat (mm)</label>
+            <label>Minimum edge size (mm)</label>
             <input type="number" id="prop-sg-minrand"
               min="0" step="50"
               value={annotProps.minRandMm ?? SYSTEEMRASTER_DEFAULTS.minRandMm}
@@ -190,7 +190,7 @@ export default function SysteemrasterSection() {
                   : annotProps.sgSelectedSub.kind === 'strook'
                     ? `Onderdeel: strook #${annotProps.sgSelectedSub.index}`
                     : annotProps.sgSelectedSub.kind === 'sparing'
-                      ? 'Onderdeel: sparing'
+                      ? 'Component: opening'
                       : `Onderdeel: rasterlijn ${annotProps.sgSelectedSub.as === 'v' ? 'verticaal' : 'horizontaal'} #${annotProps.sgSelectedSub.index}`}
             </label>
             <div style={{ 'font-size': '11px', opacity: '0.75' }}>
@@ -200,7 +200,7 @@ export default function SysteemrasterSection() {
 
           <Show when={annotProps.sgSelectedSub.kind === 'paneel'}>
             <div class="property-group">
-              <label>Paneeltype</label>
+              <label>Panel type</label>
               <select id="prop-sg-paneeltype"
                 value={annotProps.sgPaneelType || 'tegel'}
                 disabled={locked()}
@@ -221,33 +221,33 @@ export default function SysteemrasterSection() {
               <button type="button" id="prop-sg-paneel-component"
                 disabled={locked()}
                 onClick={() => openDialog('systeem-paneel-component')}
-              >Ander component…</button>
+              >Another component…</button>
             </div>
             <div class="property-group">
-              <label>Afmeting</label>
+              <label>Size</label>
               <div style={{ 'font-size': '11px' }}>
                 {Math.round(breedte())} × {Math.round(hoogte())} mm
-                (Delete = terug naar tegel)
+                (Delete = restore tile)
               </div>
             </div>
           </Show>
 
           <Show when={annotProps.sgSelectedSub.kind === 'rand'}>
             <div class="property-group">
-              <label>Randprofiel (dit segment)</label>
+              <label>Edge section (this segment)</label>
               <select id="prop-sg-randseg"
                 value={annotProps.sgRandOverride || ''}
                 disabled={locked()}
                 onChange={(e) => updateAnnotProp('sgRandSegProfiel', e.target.value)}
               >
-                <option value="">(van type: {annotProps.sgEdgeProfiel || "none"})</option>
-                <option value="none">Geen</option>
-                <option value="hoeklijn">Hoeklijn</option>
-                <option value="schaduwvoeg">Schaduwvoeg</option>
+                <option value="">(from type: {annotProps.sgEdgeProfiel || "none"})</option>
+                <option value="none">None</option>
+                <option value="hoeklijn">Angle section</option>
+                <option value="schaduwvoeg">Shadow gap</option>
               </select>
             </div>
             <div class="property-group">
-              <label>Lengte</label>
+              <label>Length</label>
               <div style={{ 'font-size': '11px' }}>
                 {Math.round(annotProps.sgSelectedSub.lengthMm || 0)} mm
               </div>
@@ -256,21 +256,21 @@ export default function SysteemrasterSection() {
 
           <Show when={annotProps.sgSelectedSub.kind === 'strook'}>
             <div class="property-group">
-              <label>Strook</label>
+              <label>Strip</label>
               <div style={{ 'font-size': '11px', 'line-height': '1.5' }}>
-                <div>Breedte: {Math.round(annotProps.sgSelectedSub.breedteMm || 0)} mm
+                <div>Width: {Math.round(annotProps.sgSelectedSub.breedteMm || 0)} mm
                   {annotProps.sgSelectedSub.pas ? ' (passtrook)' : ''}</div>
-                <div>Lengte: {Math.round(annotProps.sgSelectedSub.lengteMm || 0)} mm</div>
-                <div>Positie: {Math.round(annotProps.sgSelectedSub.posMm || 0)} mm vanaf de rand</div>
+                <div>Length: {Math.round(annotProps.sgSelectedSub.lengteMm || 0)} mm</div>
+                <div>Position: {Math.round(annotProps.sgSelectedSub.posMm || 0)} mm from the edge</div>
               </div>
             </div>
           </Show>
 
           <Show when={annotProps.sgSelectedSub.kind === 'sparing'}>
             <div class="property-group">
-              <label>Afmeting sparing (mm)</label>
+              <label>Opening size (mm)</label>
               <div style={{ display: 'flex', gap: '6px', 'align-items': 'center' }}>
-                <span>B</span>
+                <span>V</span>
                 <input type="number" id="prop-sg-sparing-b" style={{ width: '70px' }}
                   min="10" step="50" value={Math.round(annotProps.sgSelectedSub.bMm || 0)}
                   disabled={locked()}
@@ -283,7 +283,7 @@ export default function SysteemrasterSection() {
               </div>
             </div>
             <div class="property-group">
-              <label>Positie (mm, t.o.v. linksboven)</label>
+              <label>Position (mm from top left)</label>
               <div style={{ display: 'flex', gap: '6px', 'align-items': 'center' }}>
                 <span>X</span>
                 <input type="number" id="prop-sg-sparing-x" style={{ width: '70px' }}
@@ -298,22 +298,22 @@ export default function SysteemrasterSection() {
               </div>
             </div>
             <div class="property-group">
-              <label>Regime</label>
+              <label>Rule</label>
               <div style={{ 'font-size': '11px' }}>
                 {annotProps.sgSelectedSub.regime === 'klein' ? "Klein (gewoon hole)"
                   : annotProps.sgSelectedSub.regime === 'raveel' ? 'Raveelijzer'
-                    : 'Verzwaarde randlijn'} — Delete verwijdert de sparing
+                    : 'Verzwaarde randlijn'} — Delete removes the opening
               </div>
             </div>
           </Show>
 
           <Show when={annotProps.sgSelectedSub.kind === 'lijn'}>
             <div class="property-group">
-              <label>Rasterlijn</label>
+              <label>Grid line</label>
               <div style={{ 'font-size': '11px', 'line-height': '1.5' }}>
-                <div>Richting: {annotProps.sgSelectedSub.as === 'v' ? 'verticaal' : 'horizontaal'}</div>
+                <div>Orientation: {annotProps.sgSelectedSub.as === 'v' ? "vertical" : "horizontal"}</div>
                 <div>Index: {annotProps.sgSelectedSub.index}</div>
-                <div>Positie: {Math.round(annotProps.sgSelectedSub.posMm || 0)} mm vanaf de oorsprong</div>
+                <div>Position: {Math.round(annotProps.sgSelectedSub.posMm || 0)} mm from the origin</div>
               </div>
             </div>
           </Show>
@@ -321,12 +321,12 @@ export default function SysteemrasterSection() {
 
         <Show when={randMm()}>
           <div class="property-group">
-            <label>Randstukken</label>
+            <label>Edge pieces</label>
             <div id="prop-sg-randmaten" style={{ 'font-size': '11px', 'line-height': '1.5' }}>
-              <div>Links: {fmt(randMm().links)}</div>
-              <div>Rechts: {fmt(randMm().rechts)}</div>
-              <div>Boven: {fmt(randMm().boven)}</div>
-              <div>Onder: {fmt(randMm().onder)}</div>
+              <div>Left: {fmt(randMm().links)}</div>
+              <div>Right: {fmt(randMm().rechts)}</div>
+              <div>Top: {fmt(randMm().boven)}</div>
+              <div>Bottom: {fmt(randMm().onder)}</div>
             </div>
           </div>
         </Show>

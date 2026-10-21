@@ -537,11 +537,11 @@ export function SubSheetEditor({ sheetId }: { sheetId: string }) {
                     const display = cell
                       ? (cell.computed !== undefined
                           ? (fmt === 'currency'
-                              ? `€ ${cell.computed.toLocaleString('nl-NL', { minimumFractionDigits: dec, maximumFractionDigits: dec })}`
+                              ? `€ ${cell.computed.toLocaleString('en-GB', { minimumFractionDigits: dec, maximumFractionDigits: dec })}`
                               : fmt === 'percentage'
                                 ? `${(cell.computed * 100).toFixed(dec)}%`
                                 : typeof cell.computed === 'number'
-                                  ? cell.computed.toLocaleString('nl-NL', { minimumFractionDigits: dec, maximumFractionDigits: dec })
+                                  ? cell.computed.toLocaleString('en-GB', { minimumFractionDigits: dec, maximumFractionDigits: dec })
                                   : cell.value)
                           : cell.value)
                       : '';

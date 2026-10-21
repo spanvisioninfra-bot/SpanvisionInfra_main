@@ -740,12 +740,12 @@ export function fromExtImportResult(r: ExtImportResult): ImportResult {
   const names = new Map<string, string>();
   const addType = (raw: { id: string; name: string }, source: string) => {
     const type = { id: raw.id.trim(), name: raw.name.trim() };
-    if (!type.id || !type.name) throw new Error(`${source}: customTaskType vereist een niet-lege id en naam`);
+    if (!type.id || !type.name) throw new Error(`${source}: customTaskType requires a non-empty id and name`);
     const byId = catalog.get(type.id);
-    if (byId && byId.name !== type.name) throw new Error(`${source}: customTaskType-id '${type.id}' heeft conflicterende namen`);
+    if (byId && byId.name !== type.name) throw new Error(`${source}: customTaskType id '${type.id}' has conflicting names`);
     const nameKey = type.name.toLocaleLowerCase();
     const byName = names.get(nameKey);
-    if (byName && byName !== type.id) throw new Error(`${source}: customTaskType-naam '${type.name}' heeft conflicterende ids`);
+    if (byName && byName !== type.id) throw new Error(`${source}: customTaskType name '${type.name}' has conflicting ids`);
     catalog.set(type.id, type);
     names.set(nameKey, type.id);
   };

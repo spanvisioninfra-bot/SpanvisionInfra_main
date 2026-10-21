@@ -89,7 +89,7 @@ function buildViewRows(data: GeneratedProject): ViewRow[] {
     customFieldDefs: [],
     resources: data.resources,
     assignments: data.assignments,
-    noneLabel: '(geen)',
+    noneLabel: "(none)",
   };
   return computeViewRows(
     data.tasks,

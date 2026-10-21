@@ -10,7 +10,7 @@ export const ifcSpaceTemplate = {
   params: [
     { key: 'naam', label: "Name", labelEn: 'Name', type: 'string', default: 'Ruimte' },
     { key: 'nummer', label: 'Nummer', labelEn: 'Number', type: 'string', default: '' },
-    { key: 'rand', label: 'Rand tonen', labelEn: 'Show boundary', type: 'boolean', default: true },
+    { key: 'rand', label: "Show border", labelEn: 'Show boundary', type: 'boolean', default: true },
   ],
   snapPoints(params, bbox) {
     const { x, y, width: w, height: h } = bbox;

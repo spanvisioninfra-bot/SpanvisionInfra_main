@@ -8,7 +8,7 @@ export const WORLD_TILE_OPTIONS: TileLayerOptions = {
   maxZoom: 24, maxNativeZoom: 19,
 };
 export const NETHERLANDS_BOUNDS: [[number, number], [number, number]] = [[50.5, 3], [54, 7.5]];
-interface MapLocationOptions { autoLocate?: boolean; zoom?: number }
+interface MapLocationOptions { autoLocate?: boolean; zoom?: number; controlContainer?: HTMLElement }
 interface LocationController { locate(): Promise<void>; cancel(): void; destroy(): void }
 interface LocationService {
   attachMap(map: Map, options?: MapLocationOptions): LocationController;

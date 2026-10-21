@@ -59,7 +59,7 @@ function anyZero() {
 export function computePile(input: PileInput, cpt: Cpt | null): PileResult {
   if (!cpt) return emptyResult("No active CPT");
   const pileType = getPileType(input.pileTypeId);
-  if (!pileType) return emptyResult(`Onbekend paaltype: ${input.pileTypeId}`);
+  if (!pileType) return emptyResult(`Unknown pile type: ${input.pileTypeId}`);
 
   const groundNap = cpt.metadata.ground_level_nap ?? 0;
   const pileToeDepth = groundNap - input.pileToeNap;
@@ -69,7 +69,7 @@ export function computePile(input: PileInput, cpt: Cpt | null): PileResult {
   const Deq = input.diameterMm / 1000;
   if (lastDepth < pileToeDepth + 0.7 * Deq) {
     return emptyResult(
-      `CPT is too shallow (extends to${lastDepth.toFixed(1)} m, vereist ≥ ${(pileToeDepth + 0.7 * Deq).toFixed(1)} m)`,
+      `CPT is too shallow (extends to${lastDepth.toFixed(1)} m, required ≥ ${(pileToeDepth + 0.7 * Deq).toFixed(1)} m)`,
     );
   }
 

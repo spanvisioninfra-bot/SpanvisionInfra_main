@@ -307,7 +307,7 @@ export default function MapView() {
   const measureModeRef = useRef(false);
   const measureStartRef = useRef<{ id: string; lat: number; lon: number; xRd?: number; yRd?: number } | null>(null);
 
-  const [status, setStatus] = useState("Zoom in en klik 'Laad gebied'");
+  const [status, setStatus] = useState("Zoom in and click 'Load area'");
   const [measureMode, setMeasureMode] = useState(false);
   /** Live cursor-coordinaten — null wanneer de muis BUITEN de kaart is.
    *  Wordt bijgewerkt door de mousemove-handler op de leaflet-map en
@@ -1107,10 +1107,10 @@ export default function MapView() {
       if (id === "kabels-leidingen") {
         if (enabled && !wasEnabled) {
           alert(
-            "Kabels & leidingen — no publieke WMS-laag beschikbaar.\n\n" +
+            "Utilities — no public WMS layer is available." +
             "Sinds 10 december 2025 host PDOK no landelijke kabel/leiding-" +
             "viewer meer (Liander dataset uit productie). Voor een graafmelding " +
-            "moet je een KLIC-aanvraag doen via:\n\n" +
+            "submit a KLIC request through:" +
             "https://www.kadaster.nl/zakelijk/producten/graafwerk/klic-viewer\n\n" +
             "The request is free. Drawings are normally available within 1–3 working days.",
           );
@@ -1925,9 +1925,9 @@ function buildPopupHtml(f: BroFeature, loadable: boolean, action: PopupAction): 
     !loadable
       ? ""
       : action === "merge"
-        ? `<a href="#" class="bro-popup-merge" data-id="${id}">Maak project + voeg toe</a>`
+        ? `<a href="#" class="bro-popup-merge" data-id="${id}">Create project and add</a>`
         : action === "addToProject"
-          ? `<a href="#" class="bro-popup-add-to-project" data-id="${id}">Voeg toe aan project</a>`
+          ? `<a href="#" class="bro-popup-add-to-project" data-id="${id}">Add to project</a>`
           : "";
   const actionRow = openAction || secondaryAction
     ? `<div class="bro-popup-actions">${openAction}${secondaryAction}</div>`
@@ -1956,7 +1956,7 @@ function broCountSummary(cpt: number, bore: number, sondOn: boolean, boresOn: bo
   const parts: string[] = [];
   if (sondOn) parts.push(`${cpt} sondering(en)`);
   if (boresOn) parts.push(`${bore} boring(en)`);
-  return `${parts.join(" / ")} geladen`;
+  return `${parts.join(" / ")} loaded`;
 }
 
 /** Cheap HTML escape — popups embed user-uncontrolled BRO text. */

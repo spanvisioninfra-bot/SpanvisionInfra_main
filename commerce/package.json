@@ -1,0 +1,8 @@
+{
+  "name": "@spanvision-infra/accounts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test server.test.mjs neon.test.mjs provision-admin.test.mjs local-env.test.mjs", "preview": "node preview.mjs", "test:neon-schema": "node --wasm-num-compilation-tasks=1 --no-wasm-tier-up --test neon-schema.test.mjs", "admin:create": "node provision-admin.mjs create", "admin:verify": "node provision-admin.mjs verify", "admin:status": "node provision-admin.mjs status" },
+  "dependencies": { "@neondatabase/serverless": "1.2.0" }
+}

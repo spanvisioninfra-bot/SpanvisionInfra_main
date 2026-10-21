@@ -120,7 +120,7 @@ export function buildXtbImport(db: SqlJsDatabase): XtbImportResult {
     'SELECT Naam, Datum, Omschrijving, NettoTotaal, BrutoTotaal, TotaalUren FROM Begrotingen LIMIT 1'
   );
   if (begrotingRows.length === 0 || begrotingRows[0].values.length === 0) {
-    throw new Error('Geen Begroting-record gevonden in .xtb bestand');
+    throw new Error('No Begroting record found in the .xtb file');
   }
   const bgRow = begrotingRows[0].values[0];
   const begroting: XtbBegroting = {
@@ -332,7 +332,7 @@ export function buildXtbImport(db: SqlJsDatabase): XtbImportResult {
   walk(startKey, null, 0, sortStart);
 
   if (items.length === 0) {
-    warnings.push('Geen items gevonden. Mogelijk is dit een leeg .xtb bestand.');
+    warnings.push('No items were found. The .xtb file may be empty.');
   }
 
   // ── Build schedule ──

@@ -16,7 +16,7 @@
     try {
       plan = await invoke("get_production_plan", { hoursPerDay, workers });
     } catch (e) {
-      console.error("Productieplanning laden mislukt:", e);
+      console.error("Failed to load production schedule:", e);
     }
     loading = false;
   }

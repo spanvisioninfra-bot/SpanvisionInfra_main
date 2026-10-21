@@ -173,7 +173,7 @@ function OpbouwVanIy({ r, mech }: { r: CltBeamCheckResult; mech: CltMechanica })
       <p className="rpt-clt-kopje">
         {t(
           "report.cltIyKop",
-          "Opbouw van I_y en de effectieve buigstijfheid (bijlage B, starre verbinding: γ = 1)",
+          "Derivation of I_y and effective bending stiffness (Annex B, rigid connection: γ = 1)",
         )}
       </p>
       <div
@@ -189,7 +189,7 @@ function OpbouwVanIy({ r, mech }: { r: CltBeamCheckResult; mech: CltMechanica })
         <thead>
           <tr>
             <th>{t("report.cltLaag", "Laag")}</th>
-            <th>{t("report.cltRichting", "Richting")}</th>
+            <th>{t("report.cltRichting", "Direction")}</th>
             <th>A_i = b·t_i (10³ mm²)</th>
             <th>I_i = b·t_i³/12 (10⁶ mm⁴)</th>
             <th>a_i (mm)</th>
@@ -229,12 +229,12 @@ function OpbouwVanIy({ r, mech }: { r: CltBeamCheckResult; mech: CltMechanica })
         {zelfdeE
           ? t("report.cltIefNetGelijk", {
               defaultValue:
-                "Alle lengtelagen hebben dezelfde E-modulus (E_ref = {{e}} N/mm²), dus de meetkundige som Σ(I_i + A_i·a_i²) is gelijk aan I_ef,net = (EI)_ef/E_ref. I_ef,net is een vergelijkingsgrootheid met een massieve doorsnede; de toetsing rekent met (EI)_ef zelf.",
+                "All longitudinal layers have the same modulus of elasticity (E_ref = {{e}} N/mm²), so the geometric sum Σ(I_i + A_i·a_i²) equals I_ef,net = (EI)_ef/E_ref. I_ef,net is a comparison quantity against a solid cross-section; the check uses (EI)_ef itself.",
               e: fmtValue(eRef ?? 0, 0),
             })
           : t("report.cltIefNetAfwijkend", {
               defaultValue:
-                "De lengtelagen hebben NIET dezelfde E-modulus, dus de meetkundige som Σ(I_i + A_i·a_i²) = {{som}}·10⁶ mm⁴ is niet gelijk aan I_ef,net = (EI)_ef/E_ref = {{ief}}·10⁶ mm⁴ met E_ref = {{e}} N/mm² (de bovenste lengtelaag). I_ef,net is een vergelijkingsgrootheid; de toetsing rekent met (EI)_ef zelf.",
+                "The longitudinal layers do NOT have the same modulus of elasticity, so the geometric sum Σ(I_i + A_i·a_i²) = {{som}}·10⁶ mm⁴ does not equal I_ef,net = (EI)_ef/E_ref = {{ief}}·10⁶ mm⁴ with E_ref = {{e}} N/mm² (the top longitudinal layer). I_ef,net is a comparison quantity; the check uses (EI)_ef itself.",
               som: fmtValue(somI / 1e6, 1),
               ief: fmtValue(r.layup.i_ef_net_mm4 / 1e6, 1),
               e: fmtValue(eRef ?? 0, 0),
@@ -270,7 +270,7 @@ function CltStaafBlok({ r }: { r: CltBeamCheckResult }) {
   return (
     <div className="rpt-clt-member">
       <h3 className="rpt-h3">
-        {t("report.colBeam", "Staaf")} {r.beam_id} — {r.section_name} ({r.strength_class})
+        {t("report.colBeam", "Member")} {r.beam_id} — {r.section_name} ({r.strength_class})
       </h3>
       <div className="rpt-chk-member-meta">
         <span>{meta}</span>
@@ -319,12 +319,12 @@ function CltStaafBlok({ r }: { r: CltBeamCheckResult }) {
             </div>
           </div>
 
-          <p className="rpt-clt-kopje">{t("report.cltToetsKop", "Toetsing per lamel (van boven naar beneden)")}</p>
+          <p className="rpt-clt-kopje">{t("report.cltToetsKop", "Checks per lamella (top to bottom)")}</p>
           <table className="rpt-table rpt-clt-tabel">
             <thead>
               <tr>
                 <th>{t("report.cltLaag", "Laag")}</th>
-                <th>{t("report.cltRichting", "Richting")}</th>
+                <th>{t("report.cltRichting", "Direction")}</th>
                 <th>t (mm)</th>
                 <th>{t("report.cltKlasse", "Klasse")}</th>
                 <th>z (mm)</th>
@@ -413,8 +413,8 @@ export default function CltSection() {
       {clt.length === 0 ? (
         <p className="rpt-empty-note">
           {results.length === 0
-            ? t("report.notChecked", "Nog niet getoetst — voer de normtoetsing uit via het tabblad Toetsing.")
-            : t("report.cltGeen", "Geen staven van kruislaaghout in het model (profielnaam \"CLT …\").")}
+            ? t("report.notChecked", "Not checked yet. Run the code checks from the Checks tab.")
+            : t("report.cltGeen", "No cross-laminated timber members in the model (profile name \"CLT …\").")}
         </p>
       ) : (
         <>
@@ -422,12 +422,12 @@ export default function CltSection() {
             {checkedTime && `${t("report.checkedAt", "Toetsing uitgevoerd op")} ${checkedTime}. `}
             {t(
               "report.cltMethodeNoot",
-              "Methode: samengestelde doorsnede met starre verbinding (NEN-EN 1995-1-1 bijlage B met γ = 1) — alleen de lengtelagen dragen in de spanrichting, de dwarslagen vormen de schuifverbinding. Toetsing per lamel: buiging art. 6.1.6 en dwarskracht art. 6.1.7 op de rekenwaarden van de sterkteklasse van die laag; rolschuiving in de dwarslagen ter informatie.",
+              "Method: composite section with rigid connection (NEN-EN 1995-1-1 Annex B with γ = 1). Only longitudinal layers carry load in the span direction; transverse layers provide the shear connection. Each lamella is checked for bending under 6.1.6 and shear under 6.1.7 using the design strengths of its layer. Rolling shear in the transverse layers is reported for information.",
             )}{" "}
             {weggelaten > 0 &&
               t("report.cltStaafKeuzeNoot", {
                 defaultValue:
-                  "Van {{aantal}} van de {{totaal}} CLT-staven is de uitwerking op verzoek weggelaten; die staven staan wel in het toetsingsoverzicht.",
+                  "For {{aantal}} of the {{totaal}} CLT members the derivation has been omitted on request; those members are still listed in the check overview.",
                 aantal: weggelaten,
                 totaal: clt.length,
               })}

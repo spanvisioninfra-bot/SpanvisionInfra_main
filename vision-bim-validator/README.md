@@ -46,6 +46,42 @@ Copy `viewer/.env.example` to `viewer/.env.local` and configure only services th
 
 Login and sign-up are real provider gateways; this project does not pretend to create accounts locally. Local model viewing and file exports remain available without an account. Clash detection is still the existing unavailable feature.
 
+## Backend database on Render
+
+Set `DATABASE_URL` in the **spanvision-bim** service's Environment page using the
+complete pooled PostgreSQL connection URL from **Neon → Connect**. Use the URL,
+not the Neon Auth endpoint. Keep the real value in Render or a private local
+environment file; never commit it. No frontend `VITE_` variable should contain it.
+
+The backend accepts `postgres://`, `postgresql://`, and `postgresql+asyncpg://`,
+converts them to the asyncpg driver, and translates Neon's default
+`sslmode=require&channel_binding=require` query. TLS verifies the certificate and
+hostname. The asyncpg driver does not support SCRAM channel binding; the libpq
+`channel_binding` hint is not forwarded. Pooled Neon endpoints disable the local
+connection and statement caches and use unique prepared statement names.
+`connect_timeout` and `application_name` are also supported. Invalid explicit
+URLs stop startup with a credential-free configuration error; they do not fall
+back to SQLite. Without `DATABASE_URL`, local development uses SQLite.
+
+Save the environment, deploy the updated backend, then check `/health` and create
+a project in BIM. Startup creates the `projects` and `project_files` tables when
+missing. Existing SQLite records and uploaded files are not migrated by changing
+the connection URL.
+
+`PROJECT_FILES_DIR` stores uploaded file contents separately from PostgreSQL.
+The free Render deployment uses `/tmp/spanvision-bim-projects`; these files are
+temporary and can disappear on a restart or redeploy. Use `/var/data/bim-projects`
+only with a persistent disk actually mounted at `/var/data`, or configure external
+file storage. Database persistence alone does not make uploads persistent.
+
+Run these checks from the suite root, with the BIM Python environment activated:
+
+```powershell
+python -m unittest deployment.test_bim_database_config
+$env:SPANVISION_SERVICE = 'bim'
+python -m unittest deployment.test_cloud
+```
+
 ## Verification
 
 ```powershell

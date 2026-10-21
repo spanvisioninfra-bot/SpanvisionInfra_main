@@ -8,8 +8,10 @@ export default function AdminPanel(props){
   const [selected,setSelected]=createSignal(null),[detail,setDetail]=createSignal(null),[detailLoading,setDetailLoading]=createSignal(false),[saving,setSaving]=createSignal(false),[notice,setNotice]=createSignal('');
   let request=0,detailRequest=0,dialog,previousFocus;
   const allowed=()=>props.account.user()?.role==='super_admin';
+  const databaseReady=()=>props.account.config()?.databaseAvailable!==false;
   const shown=()=>users().filter(user=>`${user.email} ${user.name}`.toLowerCase().includes(query().toLowerCase()));
   async function loadPage(number=1){
+    if(!allowed()||!databaseReady())return;
     const sequence=++request;setLoading(true);setError('');
     try{
       const result=await accountRequest(`admin/users?page=${number}`);
@@ -18,7 +20,7 @@ export default function AdminPanel(props){
     }catch(error){if(sequence===request&&allowed()){setUsers([]);setNext(false);setError(error.message);}}
     finally{if(sequence===request)setLoading(false);}
   }
-  createEffect(()=>{if(allowed()){void loadPage(1);}else{request++;detailRequest++;setUsers([]);setSelected(null);setDetail(null);dialog?.close();}});
+  createEffect(()=>{if(allowed()&&databaseReady()){void loadPage(1);}else{request++;detailRequest++;setLoading(false);setUsers([]);setSelected(null);setDetail(null);dialog?.close();}});
   async function openUser(event,user){
     previousFocus=event.currentTarget;setSelected(user);setDetail(null);setNotice('');setError('');setDetailLoading(true);dialog.showModal();
     const sequence=++detailRequest;
@@ -47,6 +49,8 @@ export default function AdminPanel(props){
   return <section class="admin-page marketing-section"><Show when={allowed()} fallback={<div class="signed-out-card"><span class="eyebrow">ADMINISTRATION</span><h1>Super-admin access required.</h1><p>This area is available to the designated, verified administrator.</p><a class="button button-light" href={props.account.user()?'#account':'#login'}>{props.account.user()?'Back to my account':'Sign in'} →</a></div>}>
     <div class="admin-heading"><div><span class="eyebrow">SUPER ADMIN</span><h1>Users & plan access.</h1><p>Manage access across your workspace. Your account includes Explorer, Studio and Team.</p></div><a href="#account" class="button button-outline">My account →</a></div>
     <p class="admin-disclosure">Plan grants control account access. Subscription charges and cancellation remain with the payment provider. Each saved change records who changed it and why.</p>
+    <Show when={!databaseReady()}><p class="account-setup-note" role="status">Your administrator sign-in is active. User and plan management will become available after the account database is connected.</p></Show>
+    <Show when={databaseReady()}>
     <div class="admin-toolbar"><label>Search this page<input type="search" placeholder="Name or email" value={query()} onInput={event=>setQuery(event.currentTarget.value)}/></label><button class="button button-outline" disabled={loading()||saving()} onClick={()=>loadPage(page())}>Refresh users</button></div>
     <Show when={error()&&!selected()}><p class="form-error" role="alert">{error()}</p></Show>
     <Show when={loading()}><p class="admin-empty" role="status">Loading users and plans…</p></Show>
@@ -54,6 +58,7 @@ export default function AdminPanel(props){
       <div class="admin-users"><For each={shown()}>{user=><article class="admin-user" data-user={user.id}><div class="admin-user-identity"><h2>{user.name||'Workspace user'}</h2><p>{user.email}</p><small>{user.emailVerified?'Verified email':'Email not verified'}{user.role==='super_admin'?' · Super admin':''}</small></div><div class="admin-user-plan"><strong>{user.role==='super_admin'?'All plans':label(user.access.plan)}</strong><span>{({super_admin:'Full access',admin:'Admin grant',subscription:'Provider subscription',free:'Free workspace'})[user.access.source]}</span></div><button class="button button-outline" disabled={saving()} onClick={event=>openUser(event,user)}>View plans →</button></article>}</For></div>
     </Show>
     <div class="admin-pagination"><span>Page {page()}<Show when={total()!==null}> · {total()} users</Show></span><div><button disabled={page()===1||loading()||saving()} onClick={()=>{setQuery('');loadPage(page()-1);}}>Previous</button><button disabled={!next()||loading()||saving()} onClick={()=>{setQuery('');loadPage(page()+1);}}>Next</button></div></div>
+    </Show>
   </Show>
     <dialog ref={dialog} class="admin-plan-dialog" aria-labelledby="admin-plan-heading" onCancel={event=>{event.preventDefault();close();}}>
       <div class="checkout-title-row"><span class="eyebrow">USER PLAN ACCESS</span><button class="close-icon" type="button" aria-label="Close user plans" disabled={saving()} onClick={close}>×</button></div>

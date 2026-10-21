@@ -45,7 +45,7 @@ export function parseSteelSectionCatalog(raw) {
     throw new Error('steel-sections: onbekende formatVersion/units');
   }
   if (!raw.label || typeof raw.label.en !== 'string') {
-    throw new Error('steel-sections: label.en ontbreekt');
+    throw new Error('steel-sections: label.en is missing');
   }
   if (!Array.isArray(raw.families) || !raw.families.length) {
     throw new Error('steel-sections: families ontbreken');
@@ -53,9 +53,9 @@ export function parseSteelSectionCatalog(raw) {
   const families = raw.families.map((f, i) => {
     const where = `steel-sections families[${i}]`;
     if (!f || typeof f.id !== 'string' || !/^[a-z0-9][a-z0-9-]*$/.test(f.id)) {
-      throw new Error(`${where}: ongeldige id`);
+      throw new Error(`${where}: invalid id`);
     }
-    if (!f.name || typeof f.name.en !== 'string') throw new Error(`${where}: name.en ontbreekt`);
+    if (!f.name || typeof f.name.en !== 'string') throw new Error(`${where}: name.en is missing`);
     const cols = SHAPE_COLUMNS[f.shape];
     if (!cols) throw new Error(`${where}: onbekende vorm "${f.shape}"`);
     if (!Array.isArray(f.sizes) || !f.sizes.length) throw new Error(`${where}: sizes ontbreken`);
@@ -63,7 +63,7 @@ export function parseSteelSectionCatalog(raw) {
       if (!Array.isArray(row) || row.length !== cols
         || typeof row[0] !== 'string' || !row[0].trim()
         || row.slice(1).some(n => typeof n !== 'number' || !(n > 0))) {
-        throw new Error(`${where}.sizes[${j}]: ongeldige rij`);
+        throw new Error(`${where}.sizes[${j}]: invalid row`);
       }
       return row.slice();
     });

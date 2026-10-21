@@ -196,7 +196,7 @@ test('draft.addTasks mijlpaal met expliciete duur > 0 ⇒ transactie faalt schoo
     ]);
   });
   assert(!res.ok, 'een mijlpaal met duur > 0 hoort de transactie te laten falen');
-  assert(!res.ok && res.error.toLowerCase().includes('mijlpaal'), 'de foutmelding hoort de mijlpaal te benoemen');
+  assert(!res.ok && res.error.toLowerCase().includes('milestone'), 'de foutmelding hoort de mijlpaal te benoemen');
   assertEq(JSON.stringify(createSnapshot(store.getState())), beforeSnap, 'store onaangeroerd na de mijlpaal-duur-rollback');
 });
 

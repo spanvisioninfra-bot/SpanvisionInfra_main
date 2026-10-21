@@ -38,7 +38,7 @@ export default function TocSection() {
         <p className="rpt-empty-note">
           {t(
             "report.tocLeeg",
-            "Nog geen hoofdstukken — zet secties aan in de zijbalk.",
+            "No chapters yet. Enable sections in the sidebar.",
           )}
         </p>
       ) : (
@@ -49,7 +49,7 @@ export default function TocSection() {
               type="button"
               className={`rpt-toc-regel rpt-toc-niveau${r.niveau}`}
               onClick={() => scrollNaarKop(r.nummer)}
-              title={t("report.jumpTo", "Spring naar dit hoofdstuk")}
+              title={t("report.jumpTo", "Jump to this chapter")}
             >
               <span className="rpt-toc-nummer">{r.nummer}</span>
               <span className="rpt-toc-titel">{r.titel}</span>

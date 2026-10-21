@@ -18,7 +18,7 @@ export default function DocumentBar() {
       ? "Project details"
       : (exemplaren.find((e) => e.id === activeId)?.naam ?? null);
 
-  const title = `${projectNaam || "Naamloos"}.ifccalculation`;
+  const title = `${projectNaam || "Untitled"}.ifccalculation`;
 
   return (
     <div className="document-bar">

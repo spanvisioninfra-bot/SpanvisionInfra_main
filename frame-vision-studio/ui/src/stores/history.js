@@ -130,7 +130,7 @@ async function restoreKozijn(snapshot) {
 
     await refreshProject();
   } catch (e) {
-    console.error("Undo/redo mislukt:", e);
+    console.error("Undo/redo failed:", e);
   }
 }
 

@@ -171,7 +171,7 @@ export default function PrintQueueDialog() {
       footer={footer}
     >
       <Show when={orderedJobs().length > 0} fallback={
-        <div class="print-queue-empty">{t('printQueue.empty') || 'Geen afdrukopdrachten. Print vanuit een programma naar "Spanvision PDF Printer" en de opdracht verschijnt hier.'}</div>
+        <div class="print-queue-empty">{t('printQueue.empty') || 'No print jobs. Print to "Spanvision PDF Printer" from an application and the job will appear here.'}</div>
       }>
         <div class="print-queue-list">
           <For each={orderedJobs()}>

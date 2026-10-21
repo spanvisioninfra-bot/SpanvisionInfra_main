@@ -305,7 +305,7 @@ const CLT_MIN_LAGEN = 3;
 const EIGEN_OPBOUW_WAARDE = "eigen:";
 
 function nlGetal(v: number, decimalen = 0): string {
-  return v.toLocaleString("nl-NL", { maximumFractionDigits: decimalen });
+  return v.toLocaleString("en-GB", { maximumFractionDigits: decimalen });
 }
 
 /**

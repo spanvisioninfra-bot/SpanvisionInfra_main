@@ -72,7 +72,7 @@ export function computeKalendering(input: KalenderingInput): KalenderingResult {
       error:
         input.valblokId === CUSTOM_VALBLOK_ID
           ? "For a custom drop hammer, both mass and drop height must be > 0."
-          : `Onbekend valblok-id: ${input.valblokId}`,
+          : `Unknown drop hammer ID: ${input.valblokId}`,
       warnings,
       eBlokKnm: 0,
       dEqMm: 0,
@@ -102,7 +102,7 @@ export function computeKalendering(input: KalenderingInput): KalenderingResult {
   if (!Number.isFinite(input.conusweerstandMpa) || input.conusweerstandMpa <= 0) {
     return {
       ok: false,
-      error: "Conusweerstand moet > 0 MPa zijn.",
+      error: "Cone resistance must be > 0 MPa.",
       warnings,
       eBlokKnm: valblok.eBlokKnm,
       dEqMm,
@@ -113,7 +113,7 @@ export function computeKalendering(input: KalenderingInput): KalenderingResult {
   if (!Number.isFinite(input.slagSetMm) || input.slagSetMm <= 0) {
     return {
       ok: false,
-      error: "Slag-set moet > 0 mm zijn.",
+      error: "Set per blow must be > 0 mm.",
       warnings,
       eBlokKnm: valblok.eBlokKnm,
       dEqMm,

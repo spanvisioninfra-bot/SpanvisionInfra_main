@@ -9,11 +9,7 @@
 
 export const lasberekening = `"Weld calculation — hoeklas below zes belastingcomponenten
 
-'<i>Een lasfiguur L × b met keeldikte a, belast door drie krachten en drie
-'momenten. F<sub>x</sub> werkt loodrecht op het lasvlak, F<sub>y</sub> en
-'F<sub>z</sub> in het vlak; M<sub>x</sub> wringt om de lasas, M<sub>y</sub> en
-'M<sub>z</sub> buigen. Uit de resultante volgen straks de spanningscomponenten
-'σ<sub>⊥</sub>, τ<sub>⊥</sub> en τ<sub>∥</sub> in het keelvlak.</i>
+'<i>A weld group L × b with throat thickness a, subjected to three forces and three moments. F<sub>x</sub> acts perpendicular to the weld plane; F<sub>y</sub> and F<sub>z</sub> act in the plane. M<sub>x</sub> twists about the weld axis; M<sub>y</sub> and M<sub>z</sub> cause bending. The resultant will determine σ<sub>⊥</sub>, τ<sub>⊥</sub>, and τ<sub>∥</sub> in the throat plane.</i>
 
 # 1. Inputs
 
@@ -28,8 +24,8 @@ export const lasberekening = `"Weld calculation — hoeklas below zes belastingc
   Butt weld (full penetration) = 2
 @end
 
-L_las = ?*(mm)', lengte van de lasfiguur L'
-b_las = ?*(mm)', breedte van de lasfiguur b'
+L_las = ?*(mm)', weld group length L'
+b_las = ?*(mm)', weld group width b'
 a_las = ?*(mm)', keeldikte a'
 
 @select langeverb "Long connection (reductie β_Lw)"
@@ -40,14 +36,14 @@ a_las = ?*(mm)', keeldikte a'
 
 # 2. Loads
 
-F_xEd = ?*(kN)', normaalkracht loodrecht op het lasvlak F_x,Ed'
-F_yEd = ?*(kN)', dwarskracht in het vlak F_y,Ed'
-F_zEd = ?*(kN)', dwarskracht in het vlak F_z,Ed'
+F_xEd = ?*(kN)', axial force perpendicular to the weld plane F_x,Ed'
+F_yEd = ?*(kN)', in-plane shear force F_y,Ed'
+F_zEd = ?*(kN)', in-plane shear force F_z,Ed'
 M_xEd = ?*(kN*m)', wringend moment M_x,Ed'
-M_yEd = ?*(kN*m)', buigend moment M_y,Ed'
-M_zEd = ?*(kN*m)', buigend moment M_z,Ed'
+M_yEd = ?*(kN*m)', bending moment M_y,Ed'
+M_zEd = ?*(kN*m)', bending moment M_z,Ed'
 
-'<h6>Overzicht van de invoer</h6>
+'<h6>Input summary</h6>
 L_las
 b_las
 a_las
@@ -58,10 +54,7 @@ M_xEd
 M_yEd
 M_zEd
 
-# 3. Toetsing
+# 3. Checks
 
-'<i><b>Nog niet uitgewerkt.</b> Dit blad legt voorlopig alleen de invoer en het
-'parametrische beeld vast. De richtingsmethode van EN 1993-1-8 §4.5.3.2 —
-'√(σ<sub>⊥</sub>² + 3τ<sub>⊥</sub>² + 3τ<sub>∥</sub>²) ≤ f<sub>u</sub>/(β<sub>w</sub>γ<sub>M2</sub>)
-'met de aanvullende eis σ<sub>⊥</sub> ≤ 0,9·f<sub>u</sub>/γ<sub>M2</sub> — volgt.</i>
+'<i><b>Not yet implemented.</b> This sheet defines inputs and a parametric drawing only. The EN 1993-1-8 §4.5.3.2 directional method — √(σ<sub>⊥</sub>² + 3τ<sub>⊥</sub>² + 3τ<sub>∥</sub>²) ≤ f<sub>u</sub>/(β<sub>w</sub>γ<sub>M2</sub>), plus σ<sub>⊥</sub> ≤ 0.9·f<sub>u</sub>/γ<sub>M2</sub> — is planned.</i>
 `;

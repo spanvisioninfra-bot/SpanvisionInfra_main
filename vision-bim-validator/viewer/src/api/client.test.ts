@@ -86,6 +86,7 @@ describe('submitValidation', () => {
     expect(mockFetch).toHaveBeenCalledWith('/api/v1/validate', {
       method: 'POST',
       body: expect.any(FormData),
+      signal: undefined, cache: 'no-store', credentials: 'same-origin',
     });
 
     // Verify FormData contents
@@ -279,7 +280,7 @@ describe('pollJobStatus', () => {
 
     const result = await pollJobStatus('job-pending');
 
-    expect(mockFetch).toHaveBeenCalledWith('/api/v1/jobs/job-pending');
+    expect(mockFetch).toHaveBeenCalledWith('/api/v1/jobs/job-pending', expect.objectContaining({ cache: 'no-store', credentials: 'same-origin', signal: expect.any(AbortSignal) }));
     expect(result).toEqual(mockStatus);
     expect(result.status).toBe('pending');
   });
@@ -399,7 +400,7 @@ describe('pollJobStatus', () => {
     await pollJobStatus('job/with/special/chars');
 
     expect(mockFetch).toHaveBeenCalledWith(
-      '/api/v1/jobs/job%2Fwith%2Fspecial%2Fchars'
+      '/api/v1/jobs/job%2Fwith%2Fspecial%2Fchars', expect.objectContaining({ cache: 'no-store', credentials: 'same-origin' })
     );
   });
 

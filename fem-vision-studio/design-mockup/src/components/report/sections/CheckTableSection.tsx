@@ -70,7 +70,7 @@ function MaatgevendeHerkomst({ result, namen }: {
   const { t } = useTranslation("ribbon");
   const m = maatgevendVanStaaf(result).maatgevend;
   if (!m) {
-    return <div className="rpt-gov-herkomst">{t("report.maatgevendGeen", "geen toets met een unity check")}</div>;
+    return <div className="rpt-gov-herkomst">{t("report.maatgevendGeen", "No check with a unity ratio")}</div>;
   }
   // De titel in deze cel is de toets die de KERN maatgevend noemt. Wijst de
   // afleiding een andere aan (een geweigerde staaf, waar de kern zijn reden in
@@ -92,7 +92,7 @@ function MaatgevendeHerkomst({ result, namen }: {
   if (m.positieMm !== null) {
     delen.push(
       t("report.maatgevendPositie", "x = {{x}} mm", {
-        x: m.positieMm.toLocaleString("nl-NL", { maximumFractionDigits: 0 }),
+        x: m.positieMm.toLocaleString("en-GB", { maximumFractionDigits: 0 }),
       }),
     );
   }
@@ -153,13 +153,13 @@ function OvergeslagenStaven({ skipped }: { skipped: CheckSkip[] }) {
   return (
     <div className="rpt-skipped">
       <h3 className="rpt-h3">
-        {t("report.skippedTitle", "Niet-getoetste staven")} ({skipped.length})
+        {t("report.skippedTitle", "Unchecked members")} ({skipped.length})
       </h3>
       <ul>
         {skipped.map((s) => (
           <li key={s.beamId}>
             <strong>
-              {t("report.colBeam", "Staaf")} {s.beamId}
+              {t("report.colBeam", "Member")} {s.beamId}
             </strong>{" "}
             — {s.reason}
           </li>
@@ -181,18 +181,18 @@ function NietUitgevoerdeToetsen({ results }: { results: MemberCheckResult[] }) {
   const detailleringseis = t("report.detailleringseis", "detailleringseis");
   return (
     <div className="rpt-skipped rpt-niet-uitgevoerd">
-      <h3 className="rpt-h3">{t("report.nietUitgevoerdTitel", "Niet uitgevoerd")}</h3>
+      <h3 className="rpt-h3">{t("report.nietUitgevoerdTitel", "Not performed")}</h3>
       <p className="rpt-note">
         {t(
           "report.nietUitgevoerdToelichting",
-          "Deze toetsen konden niet worden afgerekend; de reden staat bij de toetsing van de staaf. Ontbreekt een toets die de draagkracht bepaalt, dan is de status van de staaf N.v.t. en niet Voldoet. Een detailleringseis bepaalt de status niet.",
+          "These checks could not be completed; each member check gives the reason. If a check governing resistance is missing, the member status is N/A rather than Pass. A detailing requirement does not determine the status.",
         )}
       </p>
       <ul>
         {regels.map((r) => (
           <li key={r.beamId}>
             <strong>
-              {t("report.colBeam", "Staaf")} {r.beamId}
+              {t("report.colBeam", "Member")} {r.beamId}
             </strong>{" "}
             ({r.sectie}, {r.klasse}): {nietUitgevoerdToetsen(r, detailleringseis)}
           </li>
@@ -221,16 +221,16 @@ export default function CheckTableSection() {
     lastRunAt !== null
       ? t(
           "report.nietsGetoetstNaRun",
-          "Er is getoetst, maar geen enkele staaf kon worden getoetst — zie de niet-getoetste staven hieronder.",
+          "Checks were run, but no member could be checked. See the unchecked members below.",
         )
       : geenToetsbareStaven
         ? t(
             "report.geenToetsbareStaven",
-            "Niets getoetst: dit model bevat geen toetsbare staven (geen staalprofiel, houtklasse, kruislaaghout, betonklasse of vrij materiaal).",
+            "Nothing checked: this model contains no checkable members (no steel profile, timber class, cross-laminated timber, concrete class, or custom material).",
           )
         : t(
             "report.notChecked",
-            "Nog niet getoetst — voer de normtoetsing uit via het tabblad Toetsing.",
+            "Not checked yet. Run the code checks from the Checks tab.",
           );
   // Het overzicht toont ALTIJD één regel per staaf: de maatgevende toets.
   // Dat is wat een overzicht hoort te zijn — wie alle toetsen wil zien, vindt
@@ -265,8 +265,8 @@ export default function CheckTableSection() {
           <table className="rpt-table">
             <thead>
               <tr>
-                <th>{t("report.colBeam", "Staaf")}</th>
-                <th>{t("report.colSection", "Profiel / doorsnede")}</th>
+                <th>{t("report.colBeam", "Member")}</th>
+                <th>{t("report.colSection", "Section / cross-section")}</th>
                 <th>{t("report.colGrade", "Klasse")}</th>
                 <th>{t("report.colCode", "Norm")}</th>
                 <th>{t("report.colGoverning", "Maatgevende toets")}</th>
@@ -282,7 +282,7 @@ export default function CheckTableSection() {
           <p className="rpt-note rpt-maatgevend-toelichting">
             {t(
               "report.maatgevendToelichting",
-              "Per staaf staat de maatgevende toets met de combinatie en de positie x langs de staaf (mm vanaf het begin) waarop de kern haar rekende. Staat er geen combinatie of positie, dan levert de kern die bij deze toets niet (bijvoorbeeld bij de doorbuiging). Toetsen met de status n.v.t. of zonder unity check tellen niet mee als maatgevend.",
+              "Each member lists its governing check, combination and position x along the member (mm from its start). If no combination or position is shown, the engine does not provide it for that check (for example, deflection). Checks marked N/A or without a unity ratio do not govern.",
             )}
           </p>
 

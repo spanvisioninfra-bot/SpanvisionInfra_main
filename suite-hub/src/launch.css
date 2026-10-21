@@ -11,6 +11,11 @@ html,body{margin:0;min-height:100%;background:var(--sv-page);color:var(--sv-text
 .splash-progress span{display:block;width:45%;height:100%;background:var(--sv-text);animation:splash-progress 1.4s ease-in-out infinite}
 #splash-actions{margin-top:24px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 #splash-actions[hidden]{display:none}
+#splash-direct{margin:20px 0 0;font-size:12px;line-height:1.6;color:var(--sv-muted)}
+#splash-direct[hidden]{display:none}
+#splash-direct a{display:inline-block;padding:10px 14px;min-height:44px;box-sizing:border-box;color:var(--sv-text);border:1px solid var(--sv-border);border-radius:7px;text-decoration:none}
+#splash-direct span{display:block;margin-top:8px}
+#splash-direct a:focus-visible{outline:2px solid var(--sv-focus);outline-offset:4px}
 #splash-actions button,#splash-actions a{box-sizing:border-box;min-height:44px;padding:12px 16px;border:1px solid var(--sv-border);border-radius:7px;background:var(--sv-surface);color:var(--sv-text);font:inherit;font-size:12px;text-decoration:none;cursor:pointer}
 #splash-actions :focus-visible{outline:2px solid var(--sv-focus);outline-offset:4px}
 .tool-splash[data-state="error"] .splash-ring{animation:none;border-color:var(--sv-border)}

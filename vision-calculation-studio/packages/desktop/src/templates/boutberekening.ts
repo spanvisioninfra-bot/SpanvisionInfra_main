@@ -39,12 +39,9 @@
  * Variabelenamen komen exact overeen met BoutDesigner.tsx.
  */
 
-export const boutberekening = `"Bolt calculation — resistances van one bout according to NEN-EN 1993-1-8 table 3.4
+export const boutberekening = `"Bolt calculation — single-bolt resistances per NEN-EN 1993-1-8 Table 3.4
 
-'<i>Dit blad rekent de vier weerstanden van één bout uit: op trek, op
-'afschuiving, op stuik in de plaat en op doorponsen van de plaat onder kop of
-'moer. Het is bedoeld als bouwsteen — de verbindingsbladen halen hier hun
-'F<sub>v,Rd</sub> en F<sub>b,Rd</sub> vandaan.</i>
+'<i>Calculates four resistances of a single bolt: tension, shear, plate bearing, and punching of the plate beneath the head or nut. This sheet is a building block: connection sheets use its F<sub>v,Rd</sub> and F<sub>b,Rd</sub> values.</i>
 
 # 1. Inputs
 
@@ -74,39 +71,37 @@ export const boutberekening = `"Bolt calculation — resistances van one bout ac
   M36 = 36
 @end
 
-@select afschuifvlak "Ligging van het afschuifvlak"
+@select afschuifvlak "Shear plane location"
   Shear plane through thread = 1
   Shear plane through shank = 2
 @end
 
-@select boutpositie "Positie in de force direction — determines α_d"
+@select boutpositie "Position along the force direction — determines α_d"
   Eindbout = 1
   Binnenste bout = 2
 @end
 
-@select randpositie "Positie loodrecht op de kracht — determines k_1"
+@select randpositie "Position perpendicular to the force — determines k_1"
   Randbout = 1
   Binnenste bout = 2
 @end
 
 @select overlaptype "Connection form — §3.6.1(10)"
   Overige cases = 1
-  Enkele overlap met one boutrij = 2
+  Single lap with one bolt row = 2
 @end
 
-t_plaat = ?*(mm)', dunste plaatdikte t — ook gebruikt als t_p bij het doorponsen'
+t_plaat = ?*(mm)', thinnest plate thickness t — also used as t_p for punching'
 e_1 = ?*(mm)', eindafstand in de krachtsrichting e_1'
-p_1 = ?*(mm)', steek in de krachtsrichting p_1 — alleen bij een binnenste bout'
-e_2 = ?*(mm)', eindafstand loodrecht op de kracht e_2'
-p_2 = ?*(mm)', steek loodrecht op de kracht p_2 — alleen bij een binnenste bout'
+p_1 = ?*(mm)', pitch along the force direction p_1 — inner bolts only'
+e_2 = ?*(mm)', edge distance perpendicular to the force e_2'
+p_2 = ?*(mm)', pitch perpendicular to the force p_2 — inner bolts only'
 
-n_v = ?', aantal afschuifvlakken van deze bout'
+n_v = ?', number of shear planes in this bolt'
 
-'<i>Laat de twee krachten hieronder op nul staan om alleen de weerstanden te
-'krijgen; dan wordt paragraaf 8 overgeslagen. Het referentieprogramma kent geen
-'krachtinvoer en drukt uitsluitend de weerstanden af.</i>
-F_v,Ed = ?*(kN)', afschuifkracht op de bout — 0 = geen toetsing'
-F_t,Ed = ?*(kN)', trekkracht op de bout — 0 = geen toetsing'
+'<i>Leave both forces below at zero to obtain resistances only; §8 will then be omitted. The reference program has no force inputs and prints resistances only.</i>
+F_v,Ed = ?*(kN)', bolt shear force — 0 = no check'
+F_t,Ed = ?*(kN)', bolt tension force — 0 = no check'
 
 # 2. Material- en boutgegevens
 
@@ -130,13 +125,13 @@ k_2 = 0.9
 #show
 
 d = boutdiameter*mm', nominale boutdiameter'
-d_0 = d0_*mm', gatdiameter bij normale gatspeling'
-A_s = As_ mm^2', spanningsoppervlak van de draad'
-A = pi*d^2/4', oppervlak van de gladde schacht'
-f_ub = fub_ N/mm^2', treksterkte van het boutmateriaal (tabel 3.1)'
-f_yb = fyb_ N/mm^2', vloeigrens van het boutmateriaal (tabel 3.1)'
-f_u = fu_ N/mm^2', treksterkte van het plaatmateriaal'
-d_m = (sw_ + ew_)/2*mm', gemiddelde van de maat over de platte kanten en over de hoeken — §3.6.1(3)'
+d_0 = d0_*mm', hole diameter for normal clearance'
+A_s = As_ mm^2', tensile stress area of the thread'
+A = pi*d^2/4', area of the unthreaded shank'
+f_ub = fub_ N/mm^2', bolt material tensile strength (Table 3.1)'
+f_yb = fyb_ N/mm^2', bolt material yield strength (Table 3.1)'
+f_u = fu_ N/mm^2', plate material tensile strength'
+d_m = (sw_ + ew_)/2*mm', mean of widths across flats and corners — §3.6.1(3)'
 
 d
 d_0
@@ -148,65 +143,53 @@ d_m
 
 # 3. Tension resistance — table 3.4
 
-'<i>De trekweerstand rekent altijd met A<sub>s</sub>: de draad is doorsnedebepalend
-'ongeacht waar het afschuifvlak ligt. k<sub>2</sub> = 0,9 voor een gewone bout;
-'voor een verzonken bout geldt 0,63.</i>
+'<i>Tension resistance always uses A<sub>s</sub>: the threaded section governs regardless of the shear-plane location. k<sub>2</sub> = 0.9 for an ordinary bolt and 0.63 for a countersunk bolt.</i>
 
 F_t,Rd = k_2*f_ub*A_s/γ_M2 to kN
 F_t,Rd
 
 # 4. Afschuifweerstand per afschuifvlak — table 3.4
 
-'<i>Gaat het afschuifvlak door de draad, dan rekent de weerstand met
-'A<sub>s</sub> en hangt α<sub>v</sub> van de boutklasse af. Gaat het door de
-'gladde schacht, dan geldt A en is α<sub>v</sub> = 0,6 voor elke klasse.</i>
+'<i>When the shear plane passes through threads, resistance uses A<sub>s</sub> and α<sub>v</sub> depends on bolt grade. Through an unthreaded shank, it uses A and α<sub>v</sub> = 0.6 for every grade.</i>
 
-A_v = if(afschuifvlak ≡ 1; A_s; A)', doorsnede in het afschuifvlak'
+A_v = if(afschuifvlak ≡ 1; A_s; A)', section at the shear plane'
 α_v = if(afschuifvlak ≡ 1; avd_; 0.6)', afschuiffactor'
 
 A_v
 α_v
 F_v,Rd = α_v*f_ub*A_v/γ_M2 to kN', per afschuifvlak'
 F_v,Rd
-F_v,Rd,tot = n_v*F_v,Rd', over alle afschuifvlakken van deze bout samen'
+F_v,Rd,tot = n_v*F_v,Rd', total over all shear planes in this bolt'
 F_v,Rd,tot
 
 # 5. Stuikweerstand — table 3.4
 
-'<i>Tabel 3.4 kent twee onafhankelijke assen. In de krachtsrichting bepaalt de
-'positie α<sub>d</sub>: een eindbout steunt op e<sub>1</sub>, een binnenste bout
-'op p<sub>1</sub>. Loodrecht op de kracht bepaalt de positie k<sub>1</sub>: een
-'randbout op e<sub>2</sub>, een binnenste bout op p<sub>2</sub>. Beide zijn hier
-'apart in te stellen; k<sub>1</sub> is bovendien op 2,5 begrensd.</i>
+'<i>Table 3.4 treats the two axes independently. Along the force direction, α<sub>d</sub> uses e<sub>1</sub> for an end bolt and p<sub>1</sub> for an inner bolt. Perpendicular to the force, k<sub>1</sub> uses e<sub>2</sub> for an edge bolt and p<sub>2</sub> for an inner bolt. These positions can be set independently; k<sub>1</sub> is capped at 2.5.</i>
 
-k_1,rand = 2.8*e_2/d_0 - 1.7', tak voor een randbout'
-k_1,bin = 1.4*p_2/d_0 - 1.7', tak voor een binnenste bout'
+k_1,rand = 2.8*e_2/d_0 - 1.7', edge-bolt branch'
+k_1,bin = 1.4*p_2/d_0 - 1.7', inner-bolt branch'
 k_1 = min(if(randpositie ≡ 1; k_1,rand; k_1,bin); 2.5)
 
 k_1,rand
 k_1,bin
 k_1
 
-α_d = if(boutpositie ≡ 1; e_1/(3*d_0); p_1/(3*d_0) - 0.25)', e_1-tak bij een eindbout, p_1-tak bij een binnenste bout'
+α_d = if(boutpositie ≡ 1; e_1/(3*d_0); p_1/(3*d_0) - 0.25)', e_1 branch for an end bolt, p_1 branch for an inner bolt'
 α_d
 α_b = min(min(α_d; f_ub/f_u); 1.0)
 α_b
 
-F_b,Rd,tab = k_1*α_b*f_u*d*t_plaat/γ_M2 to kN', volgens tabel 3.4'
+F_b,Rd,tab = k_1*α_b*f_u*d*t_plaat/γ_M2 to kN', per Table 3.4'
 F_b,Rd,tab
 
-'<h6>Begrenzing bij een enkele overlap met één boutrij — §3.6.1(10)</h6>
+'<h6>Single-lap connection with one bolt row — §3.6.1(10) limit</h6>
 
-'<i>Bij een enkele overlapverbinding met slechts één boutrij staat er niets de
-'rotatie in de weg die uit de excentriciteit van het ene afschuifvlak volgt. De
-'norm begrenst de stuikweerstand daarom op 1,5·f<sub>u</sub>·d·t/γ<sub>M2</sub>
-'en eist sluitringen onder zowel de kop als de moer.</i>
+'<i>A single-lap connection with one bolt row can rotate because of the eccentric single shear plane. The code therefore limits bearing resistance to 1.5·f<sub>u</sub>·d·t/γ<sub>M2</sub> and requires washers under both the head and nut.</i>
 
 F_b,Rd,cap = 1.5*f_u*d*t_plaat/γ_M2 to kN', bovengrens uit §3.6.1(10)'
 F_b,Rd,cap
-F_b,Rd,nb = if(overlaptype ≡ 2; min(F_b,Rd,tab; F_b,Rd,cap); F_b,Rd,tab)', volgens tabel 3.4'
-'<i>Splitspunt — k<sub>1</sub> bij de randpositie (register punt 7). de referentie-uitwerking trekt
-'de twee assen van tabel 3.4 samen en neemt altijd de kleinste van beide takken.</i>
+F_b,Rd,nb = if(overlaptype ≡ 2; min(F_b,Rd,tab; F_b,Rd,cap); F_b,Rd,tab)', per Table 3.4'
+'<i>Alternative assumption — edge-position k<sub>1</sub> (register item 7). The reference calculation combines the two axes of Table 3.4 and always takes the smaller branch.</i>
 #hide
 k_1,XC = min(min(k_1,rand; k_1,bin); 2.5)
 F_b,Rd,tab,XC = k_1,XC*α_b*f_u*d*t_plaat/γ_M2 to kN
@@ -220,32 +203,21 @@ F_b,Rd
 
 #if overlaptype ≡ 2
     #if F_b,Rd,tab > F_b,Rd,cap
-        '<b style="color: #b45309">De begrenzing van §3.6.1(10) is maatgevend:</b>
-        'tabel 3.4 geeft 'F_b,Rd,tab' kN, maar bij een enkele overlap met één
-        'boutrij geldt ten hoogste 'F_b,Rd,cap' kN.
-        '<b>Vergeet de sluitringen onder kop én moer niet</b> — die eist §3.6.1(10) erbij.
+        '<b style="color: #b45309">The §3.6.1(10) limit governs:</b> Table 3.4 gives 'F_b,Rd,tab' kN, but a single-lap connection with one bolt row is limited to 'F_b,Rd,cap' kN. <b>Provide washers under both head and nut</b>, as required by §3.6.1(10).
     #else
-        'De begrenzing van §3.6.1(10) ('F_b,Rd,cap' kN) is hier niet maatgevend;
-        'tabel 3.4 geeft al 'F_b,Rd,tab' kN. <b>Sluitringen onder kop én moer
-        'blijven wel vereist.</b>
+        'The §3.6.1(10) limit ('F_b,Rd,cap' kN) does not govern here; Table 3.4 already gives 'F_b,Rd,tab' kN. <b>Washers under both head and nut remain required.</b>
     #end if
 #else
-    '<i>Niet van toepassing: de begrenzing geldt alleen bij een enkele overlap
-    'met één boutrij. Zou die hier gelden, dan was de weerstand op
-    ''F_b,Rd,cap' kN begrensd.</i>
+    '<i>Not applicable: the limit applies only to a single-lap connection with one bolt row. If applicable here, resistance would be capped at 'F_b,Rd,cap' kN.</i>
 #end if
 
 # 6. Ponsweerstand — §3.6.1(3)
 
-'<i>Doorponsen van de plaat onder de kop of de moer. t<sub>p</sub> is de dikte
-'van de plaat waar de kop of de moer op drukt; hier gelijkgesteld aan de
-'ingevoerde plaatdikte.</i>
+'<i>Punching of the plate beneath the head or nut. t<sub>p</sub> is the thickness of the plate bearing against the head or nut; this sheet equates it to the entered plate thickness.</i>
 
 t_p = t_plaat
-B_p,Rd,nb = 0.6*pi*d_m*t_p*f_u/γ_M2 to kN', met d_m volgens §3.6.1(3)'
-'<i>Splitspunt — d<sub>m</sub> (register punt 6). de referentie-uitwerking vult de sleutelwijdte
-'over de platte kanten in waar §3.6.1(3) het gemiddelde van de platte kanten en
-'de hoeken vraagt; dat geeft een lagere, dus veilige, ponsweerstand.</i>
+B_p,Rd,nb = 0.6*pi*d_m*t_p*f_u/γ_M2 to kN', with d_m per §3.6.1(3)'
+'<i>Alternative assumption — d<sub>m</sub> (register item 6). The reference calculation uses width across flats where §3.6.1(3) requires the mean of widths across flats and corners. This gives a lower, conservative punching resistance.</i>
 d_m,XC = sw_*mm', sleutelwijdte — de referentie-uitwerking'
 B_p,Rd,XC = 0.6*pi*d_m,XC*t_p*f_u/γ_M2 to kN', volgens de referentie-uitwerking'
 B_p,Rd = if(rekenwijze ≡ 1; B_p,Rd,XC; B_p,Rd,nb)', gehanteerde ponsweerstand'
@@ -255,8 +227,7 @@ B_p,Rd
 
 # 7. Afstandseisen — table 3.3
 
-'<i>Signalering, geen onderdeel van de weerstanden. Tabel 3.4 blijft alleen
-'geldig binnen deze grenzen. Het referentieprogramma toetst ze niet.</i>
+'<i>These are warnings, separate from resistance calculations. Table 3.4 applies only within these limits. The reference program does not check them.</i>
 
 #hide
 e1min = 1.2*d_0
@@ -277,15 +248,12 @@ tekort = (if(e_1 < e1min; 1; 0) + if(e_2 < e2min; 1; 0) + if(boutpositie ≡ 2; 
 '</table>
 
 #if tekort ≡ 0
-    '<span style="color: green">Alle van toepassing zijnde afstanden liggen binnen tabel 3.3.</span>
+    '<span style="color: green">All applicable distances comply with Table 3.3.</span>
 #else
-    '<span style="color: red">'tekort' afstand(en) buiten tabel 3.3 — de weerstanden hierboven zijn dan niet zonder meer geldig.</span>
+    '<span style="color: red">'tekort' distance(s) fall outside Table 3.3; the resistances above cannot then be used without further assessment.</span>
 #end if
 
-'<i>De maxima voor e<sub>1</sub> en e<sub>2</sub> (4t + 40 mm) gelden alleen bij
-'constructies die aan weer en wind blootstaan; die zijn hier niet getoetst.
-'p<sub>1</sub> en p<sub>2</sub> worden alleen beoordeeld als de bout in die
-'richting een binnenste bout is.</i>
+'<i>The e<sub>1</sub> and e<sub>2</sub> maxima (4t + 40 mm) apply only to structures exposed to weather and are not checked here. p<sub>1</sub> and p<sub>2</sub> are checked only where the bolt is an inner bolt in the relevant direction.</i>
 
 # 8. Checking de bout
 
@@ -295,40 +263,36 @@ belast = (F_v,Ed + F_t,Ed)/(1*kN)
 #show
 
 #if belast ≤ 0
-    '<i>Geen krachten ingevoerd — dit blad geeft alleen de weerstanden. Vul
-    'F<sub>v,Ed</sub> en/of F<sub>t,Ed</sub> in om de eenheidschecks te krijgen.</i>
+    '<i>No forces entered — this sheet gives resistances only. Enter F<sub>v,Ed</sub> and/or F<sub>t,Ed</sub> to obtain unity checks.</i>
 #else
-    'Afschuiving en stuik worden elk apart getoetst; de trek loopt via de bout
-    'én via het doorponsen van de plaat.
+    'Shear and bearing are checked separately; tension is checked through both the bolt and punching of the plate.
 
-    UC_v = F_v,Ed/F_v,Rd,tot', afschuiving van de bout'
+    UC_v = F_v,Ed/F_v,Rd,tot', bolt shear'
     UC_b = F_v,Ed/F_b,Rd', stuik in de plaat'
-    UC_t = F_t,Ed/F_t,Rd', trek in de bout'
-    UC_p = F_t,Ed/B_p,Rd', doorponsen van de plaat'
+    UC_t = F_t,Ed/F_t,Rd', bolt tension'
+    UC_p = F_t,Ed/B_p,Rd', plate punching'
     UC_v
     UC_b
     UC_t
     UC_p
 
-    'Bij gelijktijdige trek en afschuiving geldt de interactie uit tabel 3.4.
-    UC_vt = F_v,Ed/F_v,Rd,tot + F_t,Ed/(1.4*F_t,Rd)', interactie trek + afschuiving'
+    'Combined tension and shear use the interaction expression in Table 3.4.
+    UC_vt = F_v,Ed/F_v,Rd,tot + F_t,Ed/(1.4*F_t,Rd)', combined tension and shear'
     UC_vt
 
     #hide
     UC_max = max(max(max(UC_v; UC_b); max(UC_t; UC_p)); UC_vt)
     #show
     #if UC_max ≤ 1.0
-        '<b style="color: green">Voldoet — maatgevende eenheidscheck 'UC_max'.</b>
+        '<b style="color: green">Passes — governing unity check 'UC_max'.</b>
     #else
-        '<b style="color: red">Voldoet niet — maatgevende eenheidscheck 'UC_max'.</b>
+        '<b style="color: red">Fails — governing unity check 'UC_max'.</b>
     #end if
 #end if
 
-# 9. Afwijking ten opzichte van het referentieprogramma
+# 9. Difference from the reference program
 
-'<i>Dit blad volgt de norm. Op twee punten wijkt de referentie-uitwerking daarvan af; hieronder
-'staat wat dat bij déze invoer betekent. Het volledige register staat in
-'<b>docs/afwijkingen-referentie</b>.</i>
+'<i>This sheet follows the code. The reference calculation differs at two points; the comparisons below show the effect for these inputs. The complete register is in <b>docs/afwijkingen-referentie</b>.</i>
 
 #hide
 'Beide takken staan al bij §6 en §8; hier alleen het verschil, eenheidloos.
@@ -337,77 +301,24 @@ belast = (F_v,Ed + F_t,Ed)/(1*kN)
 Δk = abs(F_b,Rd,nb - F_b,Rd,XC)/(1*kN)
 #show
 
-'<b style="color: #1d4ed8">B<sub>p,Rd</sub> — d<sub>m</sub> volgens §3.6.1(3).</b>
-'de referentie-uitwerking vult voor d<sub>m</sub> de sleutelwijdte over de platte kanten in
-'('d_m,XC' mm voor M'boutdiameter'), terwijl §3.6.1(3) het gemiddelde vraagt van
-'die maat en de maat over de hoeken ('d_m' mm). Dat scheelt hier
-''B_p,Rd,nb' kN tegen 'B_p,Rd,XC' kN — De referentie-uitwerking rekent dus <b>veilig maar niet
-'economisch</b>.
+'<b style="color: #1d4ed8">B<sub>p,Rd</sub> — d<sub>m</sub> per §3.6.1(3).</b> The reference calculation uses width across flats ('d_m,XC' mm for M'boutdiameter'), while §3.6.1(3) requires its mean with width across corners ('d_m' mm). This gives 'B_p,Rd,nb' kN versus 'B_p,Rd,XC' kN; the reference result is <b>conservative but uneconomical</b>.
 
 #if Δk ≤ 0.05
-    '<span style="color: green">De stuikweerstand komt bij deze invoer overeen:
-    'F<sub>b,Rd</sub> = 'F_b,Rd,XC' kN in beide.</span>
+    '<span style="color: green">Bearing resistance agrees for these inputs: F<sub>b,Rd</sub> = 'F_b,Rd,XC' kN in both.</span>
 #else
-    '<b style="color: #1d4ed8">F<sub>b,Rd</sub> — k<sub>1</sub> bij een binnenste bout loodrecht op de kracht.</b>
-    'de referentie-uitwerking heeft de twee assen van tabel 3.4 tot één keuzelijst
-    'samengetrokken en neemt voor k<sub>1</sub> het minimum van beide takken
-    '('k_1,XC'), terwijl de tabel voor een binnenste bout loodrecht op de kracht
-    'alleen de p<sub>2</sub>-tak vraagt ('k_1'). Dat geeft
-    ''F_b,Rd,nb' kN tegen 'F_b,Rd,XC' kN.
-    '<i>Deze situatie is met de referentie-uitwerking niet in te voeren; de vergelijking is
-    'daarom niet tegen een referentieblad te controleren.</i>
+    '<b style="color: #1d4ed8">F<sub>b,Rd</sub> — k<sub>1</sub> for an inner bolt perpendicular to the force.</b> The reference calculation merges the two Table 3.4 axes into one selection and uses the minimum of both branches ('k_1,XC'). The table requires only the p<sub>2</sub> branch for this position ('k_1'). This gives 'F_b,Rd,nb' kN versus 'F_b,Rd,XC' kN. <i>The reference program cannot represent this configuration, so this comparison has not been verified against a reference sheet.</i>
 #end if
 
 # 10. Summary
 
 '<table style="border-collapse:collapse; font-size:13px">
-'<tr><th style="text-align:left; padding:2px 12px 2px 0">Weerstand</th><th style="text-align:right">Waarde</th></tr>
-'<tr><td style="padding:2px 12px 2px 0">F<sub>t,Rd</sub> — trek in de bout</td><td style="text-align:right">'F_t,Rd' kN</td></tr>
-'<tr><td style="padding:2px 12px 2px 0">F<sub>v,Rd</sub> — afschuiving per afschuifvlak</td><td style="text-align:right">'F_v,Rd' kN</td></tr>
-'<tr><td style="padding:2px 12px 2px 0">F<sub>v,Rd</sub> — over alle afschuifvlakken (n<sub>v</sub> = 'n_v')</td><td style="text-align:right">'F_v,Rd,tot' kN</td></tr>
-'<tr><td style="padding:2px 12px 2px 0">F<sub>b,Rd</sub> — stuik in de plaat</td><td style="text-align:right">'F_b,Rd' kN</td></tr>
-'<tr><td style="padding:2px 12px 2px 0">B<sub>p,Rd</sub> — doorponsen</td><td style="text-align:right">'B_p,Rd' kN</td></tr>
+'<tr><th style="text-align:left; padding:2px 12px 2px 0">Resistance</th><th style="text-align:right">Value</th></tr>
+'<tr><td style="padding:2px 12px 2px 0">F<sub>t,Rd</sub> — bolt tension</td><td style="text-align:right">'F_t,Rd' kN</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">F<sub>v,Rd</sub> — shear per shear plane</td><td style="text-align:right">'F_v,Rd' kN</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">F<sub>v,Rd</sub> — over all shear planes (n<sub>v</sub> = 'n_v')</td><td style="text-align:right">'F_v,Rd,tot' kN</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">F<sub>b,Rd</sub> — plate bearing</td><td style="text-align:right">'F_b,Rd' kN</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">B<sub>p,Rd</sub> — punching</td><td style="text-align:right">'B_p,Rd' kN</td></tr>
 '</table>
 
-'<hr/>
-'<i>Aandachtspunten:
-'<ul>
-'<li>Gecalibreerd op <b>zes</b> de referentie-uitwerking-referenties (document1C t/m 6C).
-'Basis S235 · 8.8 · M16 · draad · eindbout · t 20 · e<sub>1</sub> 30 ·
-'p<sub>1</sub> 80 · e<sub>2</sub> 25 · p<sub>2</sub> 60 → F<sub>t,Rd</sub> 90,4 ·
-'F<sub>v,Rd</sub> 60,3 · F<sub>b,Rd</sub> 112,1 kN. Varianten: <b>schacht in het
-'afschuifvlak</b> (A in plaats van A<sub>s</sub> → 77,2) · <b>binnenste bout</b>
-'(α<sub>d</sub> = p<sub>1</sub>/3d<sub>0</sub> − ¼ = 1,231 → α<sub>b</sub> 1,00 →
-'201,7) · <b>randbout</b> (identiek aan de eindbout) · <b>enkele bout</b> ·
-'<b>e<sub>1</sub> 60 met e<sub>2</sub> 50</b> (k<sub>1</sub> op 2,5 én
-'α<sub>b</sub> op 1,00 → 230,4). F<sub>t,Rd</sub>, F<sub>v,Rd</sub> en
-'F<sub>b,Rd</sub> komen in alle zes exact overeen; B<sub>p,Rd</sub> wijkt af door
-'de d<sub>m</sub>-kwestie hierboven.</li>
-'<li><b>Nog niet tegen een referentie getoetst:</b> de boutklassen met
-'α<sub>v</sub> = 0,5 (4.8, 5.8, 6.8, 10.9), andere staalsoorten dan S235, andere
-'diameters dan M16, en de eenheidschecks van paragraaf 8 — het
-'referentieprogramma kent geen krachtinvoer en drukt alleen weerstanden af.</li>
-'<li>De begrenzing van <b>§3.6.1(10)</b> zit erin, maar moet je zelf aanzetten:
-'zij geldt alleen bij een <b>enkele overlapverbinding met één boutrij</b>. De
-'referentiebladen hebben twee boutrijen, dus die stand is niet tegen een
-'referentie getoetst. Vergeet in dat geval de <b>sluitringen onder kop én
-'moer</b> niet — die eist hetzelfde artikel.</li>
-'<li>Twee verwante correcties zitten hier bewust <b>niet</b> in, omdat ze bij de
-'verbinding horen en niet bij de losse bout: <b>§3.8</b> (lange verbindingen,
-'β<sub>Lf</sub> zodra L<sub>j</sub> &gt; 15d) en <b>§3.6.1(12)</b> (vulplaten,
-'β<sub>p</sub> zodra t<sub>p</sub> &gt; d/3). De verbindingsmodules moeten die
-'zelf toepassen op de F<sub>v,Rd</sub> die dit blad levert.</li>
-'<li>De <b>blokschuif</b> (§3.10.2) en het <b>hefboomeffect</b> (prying, §3.11)
-'zitten hier niet in. Bij een trekverbinding met een doorbuigende eindplaat moet
-'de trekkracht in de bout inclusief hefboomkracht worden ingevoerd.</li>
-'<li>F<sub>v,Rd</sub> geldt <b>per afschuifvlak</b> en gaat uit van een
-'stempelverbinding (categorie A). Slipvaste verbindingen (categorie B en C)
-'vragen §3.9 en staan hier niet in.</li>
-'<li>t is de <b>dunste</b> plaat in de stuiktoets. Voor het doorponsen is
-'t<sub>p</sub> strikt genomen de plaat onder de kop of de moer; dit blad
-'gelijkstelt beide, net als het referentieprogramma.</li>
-'<li>Tabel 3.4 gaat uit van een gat met <b>normale</b> gatspeling. Bij een
-'overmaats of slobgat moet F<sub>b,Rd</sub> met 0,8 resp. 0,6 worden
-'vermenigvuldigd (§3.6.1(14)); dat zit hier niet in.</li>
-'</ul></i>
+'<hr/><i>Limitations:<ul><li>Calibrated against <b>six</b> reference calculations (document1C–6C). The S235 / 8.8 / M16 threaded end-bolt case, t 20, e<sub>1</sub> 30, p<sub>1</sub> 80, e<sub>2</sub> 25, p<sub>2</sub> 60, gives F<sub>t,Rd</sub> 90.4, F<sub>v,Rd</sub> 60.3, and F<sub>b,Rd</sub> 112.1 kN. Variants include shank in the shear plane (A instead of A<sub>s</sub>: 77.2), inner bolt (α<sub>d</sub> = p<sub>1</sub>/3d<sub>0</sub> − ¼ = 1.231, capped α<sub>b</sub> = 1.00: 201.7), edge bolt, single bolt, and e<sub>1</sub> 60 with e<sub>2</sub> 50 (k<sub>1</sub> = 2.5, α<sub>b</sub> = 1.00: 230.4). Tension, shear, and bearing agree exactly in all six; punching differs because of d<sub>m</sub>.</li><li><b>Not reference-verified:</b> grades with α<sub>v</sub> = 0.5 (4.8, 5.8, 6.8, 10.9), steel grades other than S235, diameters other than M16, and §8 unity checks. The reference program prints resistances without force input.</li><li>Enable the <b>§3.6.1(10)</b> limit manually for a <b>single-lap connection with one bolt row</b>. Reference sheets have two rows, so this mode is not reference-verified. Washers under both head and nut are required.</li><li>Connection modules must separately apply <b>§3.8</b> long-joint reduction β<sub>Lf</sub> when L<sub>j</sub> &gt; 15d, and <b>§3.6.1(12)</b> packing-plate reduction β<sub>p</sub> when t<sub>p</sub> &gt; d/3, to the F<sub>v,Rd</sub> supplied here.</li><li><b>Block tearing</b> (§3.10.2) and <b>prying</b> (§3.11) are excluded. For a flexible end plate in tension, entered bolt tension must include prying force.</li><li>F<sub>v,Rd</sub> is <b>per shear plane</b> for a bearing connection (category A). Slip-resistant categories B/C require §3.9 and are excluded.</li><li>The bearing check uses the <b>thinnest</b> plate t. For punching, t<sub>p</sub> is strictly the plate beneath the head or nut; this sheet equates both, as in the reference program.</li><li>Table 3.4 assumes <b>normal hole clearance</b>. Oversized or slotted holes require bearing factors 0.8 or 0.6 under §3.6.1(14); these are excluded.</li></ul></i>
 `;

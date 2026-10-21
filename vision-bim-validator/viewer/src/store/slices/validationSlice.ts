@@ -72,13 +72,16 @@ export interface ValidationSlice {
 }
 
 /** Store polling interval handle */
-let pollingInterval: ReturnType<typeof setInterval> | null = null;
+let pollingInterval: ReturnType<typeof setTimeout> | null = null;
+let activeRequest: AbortController | null = null;
 
 function stopPolling(): void {
   if (pollingInterval) {
-    clearInterval(pollingInterval);
+    clearTimeout(pollingInterval);
     pollingInterval = null;
   }
+  activeRequest?.abort();
+  activeRequest = null;
 }
 
 export const createValidationSlice: StateCreator<ValidationSlice> = (
@@ -108,6 +111,8 @@ export const createValidationSlice: StateCreator<ValidationSlice> = (
       return;
     }
 
+    stopPolling();
+    const request = activeRequest = new AbortController();
     set({
       validationPhase: "submitting",
       validationError: null,
@@ -122,7 +127,8 @@ export const createValidationSlice: StateCreator<ValidationSlice> = (
       const idsFile: File | undefined =
         idsSelection.type === "custom" ? idsSelection.file : undefined;
 
-      const response = await submitValidation(ifcFile, idsStandard, idsFile);
+      const response = await submitValidation(ifcFile, idsStandard, idsFile, request.signal);
+      if (request.signal.aborted) return;
 
       set({
         jobId: response.job_id,
@@ -132,13 +138,13 @@ export const createValidationSlice: StateCreator<ValidationSlice> = (
       // Start polling
       const pollFn = async () => {
         const state = get();
-        if (state.validationPhase !== "polling" || !state.jobId) {
-          stopPolling();
+        if (request.signal.aborted || state.validationPhase !== "polling" || state.jobId !== response.job_id) {
           return;
         }
 
         try {
-          const status = await pollJobStatus(state.jobId);
+          const status = await pollJobStatus(response.job_id, request.signal);
+          if (request.signal.aborted) return;
           set({ jobStatus: status });
 
           if (isJobFinished(status)) {
@@ -158,8 +164,12 @@ export const createValidationSlice: StateCreator<ValidationSlice> = (
                 validationPhase: "error",
               });
             }
+          } else {
+            // Schedule after completion so slow requests never overlap.
+            pollingInterval = setTimeout(pollFn, POLLING_INTERVAL);
           }
         } catch (err) {
+          if (request.signal.aborted) return;
           stopPolling();
           set({
             validationError: {
@@ -174,11 +184,10 @@ export const createValidationSlice: StateCreator<ValidationSlice> = (
         }
       };
 
-      // Initial poll + interval
-      stopPolling();
-      pollFn();
-      pollingInterval = setInterval(pollFn, POLLING_INTERVAL);
+      // Request fresh progress immediately, then poll while the job is active.
+      void pollFn();
     } catch (err) {
+      if (request.signal.aborted) return;
       set({
         validationError: {
           message:
@@ -213,6 +222,7 @@ export const createValidationSlice: StateCreator<ValidationSlice> = (
   },
 
   retryValidation: () => {
+    stopPolling();
     set({
       validationPhase: "idle",
       validationError: null,

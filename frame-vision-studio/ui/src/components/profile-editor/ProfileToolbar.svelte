@@ -97,14 +97,14 @@
 
   <div class="tool-group">
     <button class="tool-btn" onclick={() => profileEditor.undo()}
-      title={$_("profileEditor.undo") || "Ongedaan maken (Ctrl+Z)"}>
+      title={$_("profileEditor.undo") || "Undo (Ctrl+Z)"}>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="1 4 1 10 7 10"/>
         <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
       </svg>
     </button>
     <button class="tool-btn" onclick={() => profileEditor.redo()}
-      title={$_("profileEditor.redo") || "Opnieuw (Ctrl+Y)"}>
+      title={$_("profileEditor.redo") || "Redo (Ctrl+Y)"}>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="23 4 23 10 17 10"/>
         <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/>

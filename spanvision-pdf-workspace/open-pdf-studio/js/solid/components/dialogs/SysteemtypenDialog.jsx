@@ -123,9 +123,9 @@ export default function SysteemtypenDialog() {
 
   function handleNieuw() {
     const basis = current() || normalizeSysteemType({
-      id: newSysteemTypeId(), naam: 'Systeemtype', celXMm: 600, celYMm: 600,
+      id: newSysteemTypeId(), naam: "System type", celXMm: 600, celYMm: 600,
     });
-    const copy = duplicateSysteemType(basis, 'Nieuw systeemtype');
+    const copy = duplicateSysteemType(basis, 'New system type');
     werk().typen.push(copy);
     setSelectedId(copy.id);
     setRev(rev() + 1);
@@ -174,7 +174,7 @@ export default function SysteemtypenDialog() {
 
   return (
     <Dialog
-      title="Systeemtypen beheren"
+      title={"Manage system types"}
       dialogClass="systeemtypen-dialog"
       onClose={() => closeDialog('systeemtypen')}
       footer={
@@ -182,25 +182,25 @@ export default function SysteemtypenDialog() {
           <button class="ai-plan-btn" style="width:auto;padding:5px 16px" id="st-btn-ok"
             onClick={() => { toepassen(); closeDialog('systeemtypen'); }}>OK</button>
           <button class="ai-plan-btn" style="width:auto;padding:5px 16px" id="st-btn-toepassen"
-            onClick={toepassen}>Toepassen</button>
+            onClick={toepassen}>Apply</button>
           <button class="ai-plan-btn" style="width:auto;padding:5px 16px" id="st-btn-annuleren"
-            onClick={() => closeDialog('systeemtypen')}>Annuleren</button>
+            onClick={() => closeDialog('systeemtypen')}>Cancel</button>
         </div>
       }
     >
       <div style="display:flex;gap:12px;font-size:12px;max-height:70vh">
         {/* LINKS: live preview via de echte teken-pipeline */}
         <div style="display:flex;flex-direction:column;gap:4px">
-          <label style="font-weight:bold">Voorbeeld (3,6 × 2,4 m)</label>
+          <label style="font-weight:bold">Preview (3.6 × 2.4 m)</label>
           <canvas ref={canvasRef} width={PREVIEW_W} height={PREVIEW_H}
             style="border:1px solid #d4d4d4;background:#fff" />
-          <div style="opacity:.7">Met voorbeeldpanelen: ventilatie (kruis) en licht (arcering).</div>
+          <div style="opacity:.7">Sample panels: ventilation (cross) and lighting (hatching).</div>
         </div>
 
         {/* RECHTS: typenlijst + instellingen van het geselecteerde type */}
         <div style="min-width:300px;display:flex;flex-direction:column;gap:8px;overflow-y:auto">
           <div class="ai-login-field">
-            <label>Typen in dit document</label>
+            <label>Types in this document</label>
             <select size="5" id="st-typen-lijst" style={FIELD_STYLE}
               value={current()?.id || ''}
               onChange={(e) => { setSelectedId(e.target.value); setVerwijderVraag(null); }}>
@@ -210,20 +210,20 @@ export default function SysteemtypenDialog() {
             </select>
             <div style="display:flex;gap:4px;margin-top:4px">
               <button class="ai-plan-btn" style="width:auto;padding:4px 8px" id="st-btn-nieuw"
-                onClick={handleNieuw}>Nieuw</button>
+                onClick={handleNieuw}>New</button>
               <button class="ai-plan-btn" style="width:auto;padding:4px 8px" id="st-btn-dupliceer"
-                onClick={handleDupliceer}>Dupliceren</button>
+                onClick={handleDupliceer}>Duplicate</button>
               <button class="ai-plan-btn" style="width:auto;padding:4px 8px" id="st-btn-verwijder"
                 disabled={typen().length <= 1}
-                onClick={handleVerwijder}>Verwijderen</button>
+                onClick={handleVerwijder}>Delete</button>
             </div>
           </div>
 
           <Show when={verwijderVraag()}>
             <div style="border:1px solid #d4a017;background:#fff8e1;padding:6px">
               <div style="margin-bottom:4px">
-                Dit type wordt door {verwijderVraag().count} instantie(s) gebruikt.
-                Zet ze om naar een ander type, of annuleer.
+                This type is used by {verwijderVraag().count} instance(s).
+                Convert them to another type, or cancel.
               </div>
               <div style="display:flex;gap:4px;align-items:center">
                 <select style="flex:1" id="st-omzet-doel"
@@ -234,35 +234,35 @@ export default function SysteemtypenDialog() {
                   </For>
                 </select>
                 <button class="ai-plan-btn" style="width:auto;padding:4px 8px" id="st-btn-omzetten"
-                  onClick={handleOmzettenEnVerwijderen}>Omzetten en verwijderen</button>
+                  onClick={handleOmzettenEnVerwijderen}>Convert and delete</button>
                 <button class="ai-plan-btn" style="width:auto;padding:4px 8px"
-                  onClick={() => setVerwijderVraag(null)}>Annuleren</button>
+                  onClick={() => setVerwijderVraag(null)}>Cancel</button>
               </div>
             </div>
           </Show>
 
           <Show when={current()}>
             <div class="ai-login-field">
-              <label>Naam</label>
+              <label>Name</label>
               <input type="text" class="ribbon-input" id="st-naam" style={FIELD_STYLE}
                 value={current().naam}
                 onChange={(e) => muteer({ naam: e.target.value })} />
             </div>
 
             <div class="ai-login-field">
-              <label>Categorie</label>
+              <label>Category</label>
               <select id="st-categorie" style={FIELD_STYLE}
                 value={current().categorie}
                 onChange={(e) => muteer({ categorie: e.target.value })}>
-                <option value="plafond">Plafond</option>
-                <option value="vloer">Vloer</option>
-                <option value="wand">Wand</option>
-                <option value="overig">Overig</option>
+                <option value="plafond">Ceiling</option>
+                <option value="vloer">Floor</option>
+                <option value="wand">Wall</option>
+                <option value="overig">Other</option>
               </select>
             </div>
 
             <div class="ai-login-field">
-              <label>IFC-categorie</label>
+              <label>IFC category</label>
               <select id="st-ifc" style={FIELD_STYLE}
                 value={current().ifcCategory}
                 onChange={(e) => muteer({ ifcCategory: e.target.value })}>
@@ -278,7 +278,7 @@ export default function SysteemtypenDialog() {
               <select id="st-ifc-pre" style={FIELD_STYLE}
                 value={current().ifcPredefinedType || ''}
                 onChange={(e) => muteer({ ifcPredefinedType: e.target.value || undefined })}>
-                <option value="">(geen)</option>
+                <option value="">(none)</option>
                 <option value="CEILING">CEILING</option>
                 <option value="FLOORING">FLOORING</option>
                 <option value="FLOOR">FLOOR</option>
@@ -292,15 +292,15 @@ export default function SysteemtypenDialog() {
               <select id="st-layout" style={FIELD_STYLE}
                 value={current().layout || 'raster'}
                 onChange={(e) => muteer({ layout: e.target.value })}>
-                <option value="raster">Raster (cellen in twee richtingen)</option>
-                <option value="strook">Strook (kanaalplaat — één richting)</option>
+                <option value="raster">Grid (cells in two directions)</option>
+                <option value="strook">Strip (hollow-core slab — one direction)</option>
               </select>
             </div>
 
             <Show when={(current().layout || 'raster') === 'strook'}
               fallback={
                 <div class="ai-login-field">
-                  <label>Celmaat (mm)</label>
+                  <label>Cell size (mm)</label>
                   <div style="display:flex;gap:8px;align-items:center">
                     <span>X</span>
                     <input type="number" class="ribbon-input" id="st-cel-x" style={NUM_STYLE}
@@ -314,7 +314,7 @@ export default function SysteemtypenDialog() {
                 </div>
               }>
               <div class="ai-login-field">
-                <label>Strookbreedte (mm)</label>
+                <label>Strip width (mm)</label>
                 <input type="number" class="ribbon-input" id="st-strook-b" style={NUM_STYLE}
                   min="50" max="20000" step="50" value={current().strookBreedteMm}
                   onChange={(e) => muteer({ strookBreedteMm: e.target.value,
@@ -323,9 +323,9 @@ export default function SysteemtypenDialog() {
             </Show>
 
             <div class="ai-login-field">
-              <label>Sparingsregels (grootste zijde, mm)</label>
+              <label>Opening rules (longest side, mm)</label>
               <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                <span>klein t/m</span>
+                <span>small up to</span>
                 <input type="number" class="ribbon-input" id="st-sparing-klein" style={NUM_STYLE}
                   min="10" step="50"
                   value={current().sparingRegels?.kleineSparingMaxMm ?? 400}
@@ -333,7 +333,7 @@ export default function SysteemtypenDialog() {
                     ...current().sparingRegels,
                     kleineSparingMaxMm: parseFloat(e.target.value),
                   } })} />
-                <span>raveel vanaf</span>
+                <span>trimmer from</span>
                 <input type="number" class="ribbon-input" id="st-sparing-raveel" style={NUM_STYLE}
                   min="10" step="50"
                   value={current().sparingRegels?.raveelVanafMm ?? 800}
@@ -342,17 +342,17 @@ export default function SysteemtypenDialog() {
                     raveelVanafMm: parseFloat(e.target.value),
                   } })} />
               </div>
-              <div style="opacity:.7;margin-top:2px">Tussenmaten krijgen een verzwaarde randlijn.</div>
+              <div style="opacity:.7;margin-top:2px">Intermediate sizes receive a reinforced edge line.</div>
             </div>
 
             <div class="ai-login-field">
-              <label>Randprofiel</label>
+              <label>Edge section</label>
               <select id="st-randprofiel" style={FIELD_STYLE}
                 value={current().edgeProfiel}
                 onChange={(e) => muteer({ edgeProfiel: e.target.value })}>
-                <option value="none">Geen</option>
-                <option value="hoeklijn">Hoeklijn</option>
-                <option value="schaduwvoeg">Schaduwvoeg</option>
+                <option value="none">None</option>
+                <option value="hoeklijn">Angle section</option>
+                <option value="schaduwvoeg">Shadow gap</option>
               </select>
             </div>
 
@@ -360,7 +360,7 @@ export default function SysteemtypenDialog() {
                 render-stijl. 'tegel' is de default/reset-waarde van elke
                 cel en kan niet weg. */}
             <div class="ai-login-field">
-              <label>Paneeltypes (assortiment)</label>
+              <label>Panel types (range)</label>
               <For each={current().paneelTypen || []}>
                 {(pt, i) => (
                   <div style="display:flex;gap:4px;align-items:center;margin:2px 0">
@@ -378,9 +378,9 @@ export default function SysteemtypenDialog() {
                         lijst[i()] = { ...pt, renderStijl: e.target.value };
                         muteer({ paneelTypen: lijst });
                       }}>
-                      <option value="tegel">vlak (tegel)</option>
-                      <option value="ventilatie">kruis (ventilatie)</option>
-                      <option value="licht">arcering (licht)</option>
+                      <option value="tegel">plain (tile)</option>
+                      <option value="ventilatie">cross (ventilation)</option>
+                      <option value="licht">hatching (lighting)</option>
                     </select>
                     <button class="ai-plan-btn" style="width:auto;padding:2px 7px"
                       disabled={pt.id === 'tegel'}
@@ -395,8 +395,8 @@ export default function SysteemtypenDialog() {
                 id="st-paneeltype-toevoegen"
                 onClick={() => {
                   muteer({ paneelTypen: [...(current().paneelTypen || []),
-                    { id: newPaneelTypeId(), naam: 'Nieuw paneeltype', renderStijl: 'tegel' }] });
-                }}>Paneeltype toevoegen</button>
+                    { id: newPaneelTypeId(), naam: 'New panel type', renderStijl: 'tegel' }] });
+                }}>Add panel type</button>
             </div>
           </Show>
         </div>

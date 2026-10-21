@@ -259,7 +259,7 @@ export default function VerankeringslengteDesigner() {
         <span className="vd-live">
           {BETON.find((o) => o.v === fck)?.label} · {STAALSOORT.find((o) => o.v === staal)?.label} · Ø{ds} ·
           c = {fmt(cd)} mm · {goed ? "good" : "slechte"} aanhechting ·
-          {type === 1 ? " straight bar" : " anders dan recht"} ·
+          {type === 1 ? " straight bar" : " other than straight"} ·
           f<sub>bd</sub> = {fmt(r.fbd, 2)} N/mm² · σ<sub>sd</sub> = {fmt(sig)} N/mm² ·
           l<sub>b,rqd</sub> = {fmt(r.lbrqd)} · α<sub>2</sub> = {fmt(r.a2, 2)} · l<sub>b,min</sub> = {fmt(r.lbmin)} ·
           <b> l<sub>bd</sub> = {fmt(r.lbd)} mm</b>

@@ -75,7 +75,7 @@ export function parseBhrgtXml(xml: string, sourceFile: string): Bore {
   const dom = new DOMParser().parseFromString(xml, "application/xml");
   const err = dom.querySelector("parsererror");
   if (err) {
-    throw new Error(`Boring XML kon niet worden gelezen: ${err.textContent}`);
+    throw new Error(`Unable to read borehole XML: ${err.textContent}`);
   }
 
   // Local-name lookup helper — case-insensitive, ignores prefixes.

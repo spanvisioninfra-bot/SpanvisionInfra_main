@@ -1,32 +1,29 @@
 import http from 'node:http';
+import { backendServices } from '../deployment/backend-services.mjs';
+import { proxyBackend } from '../deployment/backend-proxy.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { root,brand,digest,fingerprint } from './common.mjs';
 import { startStl, stopStl } from './stl.mjs';
 import { startBim, stopBim } from './bim.mjs';
+import {createHandler} from '../commerce/server.mjs';
+import {readLocalEnvironment} from '../commerce/local-env.mjs';
 const children=[];
 const servers=[];
 const status=brand.modules.map(module=>({...module,available:false,message:'Preview has not started.'}));
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.wasm':'application/wasm','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.ico':'image/x-icon','.woff':'font/woff','.woff2':'font/woff2','.ttf':'font/ttf','.pdf':'application/pdf','.md':'text/plain; charset=utf-8','.txt':'text/plain; charset=utf-8','.ifc':'application/octet-stream'};
 export function serve(directory,port,hub=false,cad=false) {
+ const accountHandler=hub?createHandler({env:{...readLocalEnvironment(),SITE_URL:`http://127.0.0.1:${port}`}}):null;
  const server=http.createServer((req,res)=>{
    res.setHeader('Cache-Control','no-store');
    if(cad){res.setHeader('Cross-Origin-Opener-Policy','same-origin');res.setHeader('Cross-Origin-Embedder-Policy','require-corp');}
+   if(accountHandler&&/^\/api\/(account|billing|admin)(?:\/|\?|$)/.test(req.url||''))return accountHandler(req,res);
    if(hub&&req.url==='/__suite/status'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({modules:status}));return;}
-   if(port===brand.modules.find(item=>item.id==='fem')?.port && /^\/api\/(toetsing|doorsnede)$/.test(req.url)) {
-     if(req.method!=='POST'){res.writeHead(405,{'Allow':'POST'}).end();return;}
-     const upstream=http.request({hostname:'127.0.0.1',port:10000,path:req.url,method:'POST',headers:{'Content-Type':'application/json'}},reply=>{
-       res.writeHead(reply.statusCode||502,{'Content-Type':reply.headers['content-type']||'application/json'});
-       reply.pipe(res);
-     });
-     upstream.setTimeout(35000,()=>upstream.destroy(new Error('Calculation service timed out.')));
-     upstream.on('error',()=>{
-       if(res.headersSent){res.destroy();return;}
-       res.writeHead(503,{'Content-Type':'application/json'});
-       res.end(JSON.stringify({detail:'Start the FEM calculation API on port 10000 to run this check.'}));
-     });
-     req.on('aborted',()=>upstream.destroy());
-     req.pipe(upstream);return;
+   if(port===brand.modules.find(item=>item.id==='fem')?.port && /^\/api\/(toetsing|doorsnede|engine-health)$/.test(req.url)) {
+     const health=req.url==='/api/engine-health';
+     if(req.method!==(health?'GET':'POST')){res.writeHead(405,{'Allow':health?'GET':'POST'}).end();return;}
+     const target=process.env.SPANVISION_FEM_API_TARGET||backendServices.fem.origin;
+     return proxyBackend(req,res,new URL(health?'/health':req.url,target));
    }
    if(req.url==='/__pointcloud/status'&&port===brand.modules.find(item=>item.id==='pointcloud')?.port){
      if([`http://127.0.0.1:${brand.hub.port}`,`http://localhost:${brand.hub.port}`].includes(req.headers.origin))res.setHeader('Access-Control-Allow-Origin',req.headers.origin);

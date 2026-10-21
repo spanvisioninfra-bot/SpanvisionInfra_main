@@ -480,7 +480,7 @@ function DeformFigure({
 
   const caption = tiny
     ? `${captionBase} (≈ 0)`
-    : `${captionBase} (${t("report.deformScaleWord", "vervorming")} ×${fmtScaleNl(F)})`;
+    : `${captionBase} (${t("report.deformScaleWord", "deformation")} ×${fmtScaleNl(F)})`;
 
   return (
     <FigureBlock tr={tr} caption={caption}>
@@ -619,19 +619,19 @@ export default function DiagramsSection() {
         <p className="rpt-note">
           {t(
             "report.envelopeCurvesNote",
-            "Omhullende: per figuur zijn de minimum- én maximumkromme over alle combinaties getekend; reactiewaarden zijn per component de grootste absolute waarde.",
+            "Envelope: each diagram shows the minimum and maximum curves across all combinations. Reaction values are the greatest absolute value for each component.",
           )}
         </p>
       )}
       <p className="rpt-note">
         {t(
           "report.diagramsConvention",
-          "Tekenconventie: momenten aan de trekzijde getekend, waarden met teken (sagging-positief), met elke staaf gerekend van links naar rechts en een staande staaf van voet naar kop; eenheden kNm, kN en mm.",
+          "Sign convention: moments are drawn on the tension side with signed values (sagging positive). Each member runs from left to right, or from base to top for a vertical member; units are kNm, kN, and mm.",
         )}
       </p>
 
       {data.length === 0 ? (
-        <p className="rpt-empty-note">{t("report.noBeams", "Geen staven in het model.")}</p>
+        <p className="rpt-empty-note">{t("report.noBeams", "No members in the model.")}</p>
       ) : (
         <>
           <ForceFigure {...scene} figKey="M" caption={capM} data={data}

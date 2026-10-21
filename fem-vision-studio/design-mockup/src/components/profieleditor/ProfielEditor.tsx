@@ -90,7 +90,7 @@ function legeSamenstelling(): Samenstelling {
 
 function standaardGatOntwerp(): GatOntwerp {
   const basis = basisprofielVan("IPE 300") ?? basisprofielVan("HEA 160");
-  if (!basis) throw new Error("profieldatabase leeg");
+  if (!basis) throw new Error("Profile database is empty");
   return { soort: "gat", basis, gaten: [] };
 }
 

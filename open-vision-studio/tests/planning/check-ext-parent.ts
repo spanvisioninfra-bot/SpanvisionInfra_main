@@ -147,7 +147,7 @@ function thrown(fn: () => void): string | null {
 
   eq('3a ouder onder zijn eigen kind wordt geweigerd',
     thrown(() => api.data.updateTask(ouder, { parentId: kind })),
-    `Extensie "${EXT_ID}": taak '${ouder}' kan niet onder zichzelf of een eigen afstammeling ('${kind}') worden geplaatst`);
+    `Extension "${EXT_ID}": task '${ouder}' cannot be placed under itself or its descendant ('${kind}')`);
   eq('3b ouder onder zijn eigen kleinkind wordt geweigerd',
     thrown(() => api.data.updateTask(ouder, { parentId: klein })) !== null, true);
   eq('3c taak onder zichzelf wordt geweigerd',

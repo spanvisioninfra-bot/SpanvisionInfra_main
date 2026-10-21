@@ -335,7 +335,7 @@ def fetch_buildings(bbox_rd: Bbox, *, max_features: int = 60000,
         buildings = _fetch_buildings_wfs(bbox_rd, max_features, refresh)
         if buildings:
             return buildings
-        log.warning("3DBAG WFS gaf niets terug, val terug op de API")
+        log.warning("3DBAG WFS returned no data; falling back to the API")
     except Exception as exc:  # noqa: BLE001 - any failure should fall back
         log.warning("3DBAG WFS failed (%s), falling back to the slower API", exc)
     return _fetch_buildings_api(bbox_rd, max_features, refresh)

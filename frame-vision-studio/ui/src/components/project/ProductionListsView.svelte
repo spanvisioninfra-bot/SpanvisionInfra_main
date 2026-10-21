@@ -48,7 +48,7 @@
     try {
       vgProduction = await invoke("get_vliesgevel_production", { id });
     } catch (e) {
-      console.error("Vliesgevel productiedata laden mislukt:", e);
+      console.error("Failed to load curtain wall production data:", e);
       vgProduction = null;
     }
   }

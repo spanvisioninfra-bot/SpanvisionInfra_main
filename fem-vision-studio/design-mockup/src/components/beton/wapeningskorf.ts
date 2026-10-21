@@ -826,5 +826,5 @@ export function maat(v: number): string {
 
 /** Getal in nl-notatie met vast aantal decimalen. */
 export function nl(v: number, decimalen: number): string {
-  return v.toLocaleString("nl-NL", { minimumFractionDigits: decimalen, maximumFractionDigits: decimalen });
+  return v.toLocaleString("en-GB", { minimumFractionDigits: decimalen, maximumFractionDigits: decimalen });
 }

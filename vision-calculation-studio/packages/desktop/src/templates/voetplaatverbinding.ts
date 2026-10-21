@@ -13,11 +13,7 @@
 
 export const voetplaatverbinding = `"Base plate connection — checks according to EN 1993-1-8 + EN 1992
 
-'<i>Toetsing van een kolomvoet (voetplaat met ankers op een betonblok) volgens
-'de effectieve-oppervlaktemethode EN 1993-1-8 §6.2.5, met de geconcentreerde
-'drukweerstand van het beton uit EN 1992-1-1 §6.7 en de ankertoetsing uit
-'EN 1993-1-8 Tabel 3.4 / EN 1992-4. Alle invoer is parametrisch; de
-'ankerverdeling stuurt de tekening én de mechanica.</i>
+'<i>Checks a column base (base plate with anchors on a concrete block) using the effective-area method in EN 1993-1-8 §6.2.5, concrete concentrated compression resistance from EN 1992-1-1 §6.7, and anchor checks from EN 1993-1-8 Table 3.4 / EN 1992-4. All inputs are parametric; anchor layout controls both the drawing and the mechanics.</i>
 
 # 1. Column & staalsoort
 
@@ -68,13 +64,13 @@ export const voetplaatverbinding = `"Base plate connection — checks according 
   S355 = 355
 @end
 
-a_las = ?*(mm)', hoeklas a — keeldikte van de las kolom→voetplaat (mm)'
+a_las = ?*(mm)', fillet weld a — throat thickness of column-to-base-plate weld (mm)'
 
-f_y = staalsoort N/mm^2', vloeigrens staal'
-f_u = if(staalsoort ≡ 235; 360; if(staalsoort ≡ 275; 430; 490)) N/mm^2', treksterkte NEN-EN 1993-1-1:2025 tabel 3.1 (t ≤ 40 mm)'
-β_w = if(staalsoort ≡ 235; 0.8; if(staalsoort ≡ 275; 0.85; 0.9))', correlatiefactor las (Tabel 4.1)'
+f_y = staalsoort N/mm^2', steel yield strength'
+f_u = if(staalsoort ≡ 235; 360; if(staalsoort ≡ 275; 430; 490)) N/mm^2', tensile strength per NEN-EN 1993-1-1:2025 Table 3.1 (t ≤ 40 mm)'
+β_w = if(staalsoort ≡ 235; 0.8; if(staalsoort ≡ 275; 0.85; 0.9))', weld correlation factor (Table 4.1)'
 γ_M0 = 1.0
-γ_M2 = 1.25', voor lassen + ankers (netto/breuk)'
+γ_M2 = 1.25', for welds and anchors (net section/fracture)'
 
 #hide
 'Profielmatrix — kolommen: 1:id  2:h(mm)  3:b(mm)  4:t_w(mm)  5:t_f(mm)  6:A(mm²)
@@ -97,8 +93,8 @@ A_kolom
 # 2. Base plate & ankerverdeling
 
 @select layout "Ankerverdeling"
-  Plate = profiel, 2 ankers = 1
-  Plate = profiel, 4 ankers = 2
+  Plate matches section, 2 anchors = 1
+  Plate matches section, 4 anchors = 2
   Plate > section, 4 anchors = 3
   Plate > section, 6 anchors (eerlijk distributed) = 4
   6 anchors — more density left = 5
@@ -106,7 +102,7 @@ A_kolom
 @end
 
 t_p = ?*(mm)', dikte voetplaat (mm)'
-c_rand = ?*(mm)', overstek voetplaat voorbij profiel, per zijde (mm)'
+c_rand = ?*(mm)', base plate projection beyond the section, per side (mm)'
 d_extra = ?*(mm)', extra plaatlengte bij "plaat > profiel" (mm) — anders 0'
 a_anker = ?*(mm)', hart anker tot plaatrand (mm)'
 
@@ -115,11 +111,11 @@ n_anker = if(layout ≡ 1; 2; if(layout ≡ 2; 4; if(layout ≡ 3; 4; 6)))
 plaat_langer = if(layout ≡ 3; 1; if(layout ≡ 4; 1; if(layout ≡ 6; 1; 0)))
 #show
 
-'Aantal ankers in deze verdeling:
+'Number of anchors in this arrangement:
 n_anker
 
-b_p = b_kolom + 2*c_rand', breedte voetplaat (loodrecht op kolom-h)'
-d_p = h + 2*c_rand + plaat_langer*d_extra', lengte voetplaat (langs kolom-h)'
+b_p = b_kolom + 2*c_rand', base plate width (perpendicular to column depth)'
+d_p = h + 2*c_rand + plaat_langer*d_extra', base plate length (along column depth)'
 
 b_p
 d_p
@@ -151,13 +147,13 @@ d_p
 @end
 
 @select gatspeling "Normale gatspeling"
-  Ja (normale gaten) = 1
-  Nee (overmaat) = 0
+  Yes (normal holes) = 1
+  No (oversized holes) = 0
 @end
 
 @select wrijving "Wrijvingsweerstand meenemen"
-  Ja = 1
-  Nee = 0
+  Yes = 1
+  No = 0
 @end
 
 @select verankerbasis "Base anchorage length on"
@@ -165,7 +161,7 @@ d_p
   Trekspanning = 2
 @end
 
-n_v = ?', aantal bouten belast op afschuiving'
+n_v = ?', number of bolts carrying shear'
 
 #hide
 d_anker = Manker*mm', nominale ankerdiameter'
@@ -175,12 +171,12 @@ f_ub = if(ankerklasse ≡ 46; 400; if(ankerklasse ≡ 56; 500; if(ankerklasse �
 β_gat = if(gatspeling ≡ 1; 1.0; 0.7)', reductie afschuiving bij overmaat gaten'
 #show
 
-'Spanningsoppervlak en sterktes van het gekozen anker:
+'Stress area and strengths of the selected anchor:
 A_s
 f_yb
 f_ub
 
-# 4. Concrete & fundering
+# 4. Concrete and foundation
 
 @select betonklasse "Concrete strength class"
   C20/25 = 20
@@ -198,26 +194,26 @@ f_ub
 @end
 
 @select gescheurd "Gescheurd concrete"
-  Ja (cracked) = 1
-  Nee (uncracked) = 0
+  Yes (cracked) = 1
+  No (uncracked) = 0
 @end
 
-h_b = ?*(mm)', hoogte betonblok / fundering (mm)'
+h_b = ?*(mm)', concrete block / foundation height (mm)'
 h_ef = ?*(mm)', effectieve verankeringsdiepte anker (mm)'
 t_g = ?*(mm)', dikte ondersabeling / grout (mm)'
-c_min = ?*(mm)', dekking betonstaal (mm)'
+c_min = ?*(mm)', reinforcement cover (mm)'
 
 f_ck = betonklasse N/mm^2
 α_cc = 1.0', NL Nationale Bijlage'
 γ_c = 1.5
-f_cd = α_cc*f_ck/γ_c', rekenwaarde druksterkte beton'
+f_cd = α_cc*f_ck/γ_c', design concrete compressive strength'
 f_cd
 
 # 5. Load
 
-N_Ed = ?*(kN)', axiale rekenwaarde — drukkracht (+) op de kolomvoet (UGT)'
-M_Ed = ?*(kN*m)', buigend moment op de kolomvoet (UGT)'
-V_Ed = ?*(kN)', dwarskracht (afschuiving) op de kolomvoet (UGT)'
+N_Ed = ?*(kN)', design axial force — compression (+) at the column base (ULS)'
+M_Ed = ?*(kN*m)', bending moment at the column base (ULS)'
+V_Ed = ?*(kN)', shear force at the column base (ULS)'
 
 @select statisch "Structure"
   Statically determinate = 1
@@ -226,9 +222,7 @@ V_Ed = ?*(kN)', dwarskracht (afschuiving) op de kolomvoet (UGT)'
 
 # 6. Model — zijaanzicht
 
-'<i>Zijaanzicht: stalen kolom op de voetplaat (dikte t<sub>p</sub>), op een
-'grout-/sabellaag (t<sub>g</sub>), verankerd in het betonblok (hoogte h<sub>b</sub>)
-'met ankers tot verankeringsdiepte h<sub>ef</sub>. De normaalkracht N drukt verticaal.</i>
+'<i>Side view: steel column on base plate of thickness t<sub>p</sub>, over grout/mortar layer t<sub>g</sub>, anchored into a concrete block of height h<sub>b</sub> to embedment depth h<sub>ef</sub>. Axial force N acts vertically in compression.</i>
 
 #hide
 fnd_x0 = 60
@@ -275,8 +269,7 @@ anc_yb = 300
 
 # 7. Model — bovenaanzicht (ankerverdeling)
 
-'<i>Bovenaanzicht: voetplaat (grijs), kolomprofiel als blauwe H, ankers als
-'cirkels. De positie en het aantal volgen de gekozen ankerverdeling.</i>
+'<i>Top view: gray base plate, blue H-shaped column section, and circular anchors. Their positions and number follow the selected anchor arrangement.</i>
 
 #hide
 cx = 240
@@ -357,25 +350,22 @@ axR2 = px1 - ai - 50
 
 # 8. Concrete compression resistance — EN 1993-1-8 §6.2.5 + EN 1992-1-1 §6.7
 
-'<i>Centrische drukverbinding. Het belaste oppervlak A<sub>c0</sub> (voetplaat) mag
-'de verhoogde betondruk f<sub>jd</sub> opnemen dankzij spreiding in het betonblok.
-'De effectieve drukprent onder de flenzen + lijf wordt bepaald met de bijkomende
-'stuikbreedte c (3-T-stukkenmethode).</i>
+'<i>Concentric compression connection. Loaded area A<sub>c0</sub>, the base plate, can carry increased bearing stress f<sub>jd</sub> through spread in the concrete block. The effective area beneath flanges and web uses added bearing width c in the three-T-stub method.</i>
 
 '<h6>8.1 Randcondities (druk-randeffect)</h6>
 'h<sub>b</sub> = 'h_b' · 2·d<sub>p</sub> = '2*d_p' · 2·b<sub>p</sub> = '2*b_p'
 #if h_b < 2*d_p
-    'h<sub>b</sub> &lt; 2·d<sub>p</sub> → drukspreiding begrensd door randeffect (verwerkt in A<sub>c1</sub>).
+    'h<sub>b</sub> &lt; 2·d<sub>p</sub> → edge effects limit pressure spread; included in A<sub>c1</sub>.
 #end if
 
-'<h6>8.2 Druksterkte beton</h6>
-A_c0 = b_p*d_p', belast oppervlak = voetplaat (A_c0 = b_1·d_1)'
+'<h6>8.2 Concrete compressive strength</h6>
+A_c0 = b_p*d_p', loaded area = base plate (A_c0 = b_1·d_1)'
 b_2 = min(b_p + h_b; 3*b_p)', spreidingsbreedte (begrensd)'
 d_2 = min(d_p + h_b; 3*d_p)', spreidingslengte (begrensd)'
 A_c1 = b_2*d_2', spreidingsoppervlak'
 k_j = min(3; sqrt(A_c1/A_c0))', concentratiefactor §6.7'
 F_Rdu = A_c0*f_cd*k_j', geconcentreerde drukweerstand EN 1992-1-1 (6.63)'
-f_jd = 2/3*F_Rdu/A_c0', rekenwaarde voegdruksterkte (β_j = 2/3)'
+f_jd = 2/3*F_Rdu/A_c0', design joint bearing strength (β_j = 2/3)'
 
 A_c0
 A_c1
@@ -398,12 +388,12 @@ c = t_p*sqrt(f_y/(3*f_jd))', §6.2.5(4) — f_yd = f_y/γ_M0'
 c
 
 '<h6>8.5 Afmetingen drukprent (T-stukken)</h6>
-c_p = (d_p - h)/2', plaatoverstek voorbij de flens, in de richting van d_p'
-b_eff,f = t_f + c + min(c; c_p)', T-stuk 1 en 3 — naar buiten begrensd door het overstek c_p'
-l_eff,f = min(b_kolom + 2*c; b_p)', lengte, begrensd door plaatbreedte'
+c_p = (d_p - h)/2', plate projection beyond the flange in the d_p direction'
+b_eff,f = t_f + c + min(c; c_p)', T stubs 1 and 3 — bounded outward by projection c_p'
+l_eff,f = min(b_kolom + 2*c; b_p)', length limited by the plate width'
 A_pr,f = b_eff,f*l_eff,f', drukprent per flens'
-b_eff,w = t_w + 2*c', breedte drukprent onder lijf (T-stuk 2)'
-l_eff,w = max(0 mm; h - 2*t_f - 2*c)', lengte lijfstrook tussen de flenzen'
+b_eff,w = t_w + 2*c', bearing area width beneath the web (T stub 2)'
+l_eff,w = max(0 mm; h - 2*t_f - 2*c)', web strip length between flanges'
 A_pr,w = b_eff,w*l_eff,w', drukprent lijf'
 A_prent = 2*A_pr,f + A_pr,w', totale drukprent'
 c_p
@@ -417,84 +407,80 @@ N_Rd,c = f_jd*A_prent', drukweerstand kolomvoet'
 N_Rd,c
 
 #if N_Ed ≤ 0 kN
-    'N<sub>Ed</sub> ≤ 0 → geen druk op het beton; drukweerstand niet maatgevend.
+    'N<sub>Ed</sub> ≤ 0 → no concrete compression; compression resistance does not govern.
     UC_druk = 0
 #else
     UC_druk = N_Ed/N_Rd,c
     #if UC_druk ≤ 1.0
-        'UC<sub>druk</sub> = N<sub>Ed</sub>/N<sub>Rd,c</sub> = 'UC_druk'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+        'UC<sub>compression</sub> = N<sub>Ed</sub>/N<sub>Rd,c</sub> = 'UC_druk'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
     #else
-        'UC<sub>druk</sub> = N<sub>Ed</sub>/N<sub>Rd,c</sub> = 'UC_druk'<span style="color: red"> > 1.0 → <b>Voldoet NIET</b></span>
+        'UC<sub>compression</sub> = N<sub>Ed</sub>/N<sub>Rd,c</sub> = 'UC_druk'<span style="color: red"> > 1.0 → <b>Fails</b></span>
     #end if
 #end if
 
 '<h6>8.6 Splijtwapening drukzijde</h6>
 #if N_Ed ≤ 0 kN
-    'Geen drukkracht → splijtwapening niet van toepassing.
+    'No compressive force → splitting reinforcement does not apply.
 #else
-    σ_prent = N_Ed/A_prent', drukspanning op de drukprent'
-    σ_c1 = N_Ed/A_c1', drukspanning op het spreidingsoppervlak'
+    σ_prent = N_Ed/A_prent', bearing stress on the contact area'
+    σ_c1 = N_Ed/A_c1', bearing stress on the spreading area'
     σ_prent
     σ_c1
     #if σ_prent ≤ f_cd
         #if σ_c1 ≤ f_gr,k,min
-            '<span style="color: green">σ<sub>prent</sub> ≤ f<sub>cd</sub> en σ<sub>c1</sub> ≤ 0,2·f<sub>ck</sub> → geen splijtwapening nodig.</span>
+            '<span style="color: green">σ<sub>prent</sub> ≤ f<sub>cd</sub> and σ<sub>c1</sub> ≤ 0.2·f<sub>ck</sub> → no splitting reinforcement required.</span>
         #else
-            '<span style="color: red">σ<sub>c1</sub> > 0,2·f<sub>ck</sub> → splijtwapening nodig.</span>
+            '<span style="color: red">σ<sub>c1</sub> &gt; 0.2·f<sub>ck</sub> → splitting reinforcement required.</span>
         #end if
     #else
-        '<span style="color: red">σ<sub>prent</sub> > f<sub>cd</sub> → splijtwapening nodig.</span>
+        '<span style="color: red">σ<sub>prent</sub> &gt; f<sub>cd</sub> → splitting reinforcement required.</span>
     #end if
 #end if
 
 # 9. Base plate thickness (bending overstek) — §6.2.5
 
-'<i>Het overstek van de voetplaat werkt als uitkraging onder de voegdruk
-'f<sub>jd</sub>. Vereiste plaatdikte uit de elastische randspanning.</i>
+'<i>The base plate projection acts as a cantilever under joint pressure f<sub>jd</sub>. Required plate thickness follows from the elastic edge stress.</i>
 
 t_p,req = c_rand*sqrt(3*f_jd/f_y)', minimale plaatdikte uit overstek-buiging'
 t_p,req
 
 UC_plaat = t_p,req/t_p
 #if UC_plaat ≤ 1.0
-    'UC<sub>plaat</sub> = t<sub>p,req</sub>/t<sub>p</sub> = 'UC_plaat'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>plaat</sub> = t<sub>p,req</sub>/t<sub>p</sub> = 'UC_plaat'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
 #else
     'UC<sub>plaat</sub> = t<sub>p,req</sub>/t<sub>p</sub> = 'UC_plaat'<span style="color: red"> > 1.0 → <b>plaat te dun</b></span>
 #end if
 
 # 10. Anchors in tension — EN 1993-1-8 Table 3.4
 
-'<i>Een buigend moment kan trek in de ankers aan één zijde veroorzaken. De
-'inwendige hefboomsarm z is de afstand tussen de uiterste ankerrijen.</i>
+'<i>A bending moment can tension anchors on one side. Internal lever arm z is the distance between the outer anchor rows.</i>
 
 z = d_p - 2*a_anker', hefboomsarm ankergroep'
 z
-n_trek = if(n_anker ≡ 2; 1; 2)', aantal ankers aan de trekzijde'
+n_trek = if(n_anker ≡ 2; 1; 2)', number of anchors on the tension side'
 
 F_t,totaal = max(0 kN; M_Ed/z - N_Ed/2)', trekkracht aan de getrokken zijde'
 F_t,totaal
-F_t,anker = F_t,totaal/n_trek', trek per anker'
+F_t,anker = F_t,totaal/n_trek', tension per anchor'
 
 F_t,Rd = 0.9*f_ub*A_s/γ_M2', trekweerstand anker (k_2 = 0.9)'
 F_t,Rd
 
 #if F_t,anker ≤ 0 kN
-    'Geen trek in de ankers (drukkracht overheerst) → trektoets niet maatgevend.
+    'No anchor tension (compression dominates) → tension check does not govern.
     UC_trek = 0
 #else
     UC_trek = F_t,anker/F_t,Rd
     #if UC_trek ≤ 1.0
-        'UC<sub>trek</sub> = F<sub>t,anker</sub>/F<sub>t,Rd</sub> = 'UC_trek'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+        'UC<sub>tension</sub> = F<sub>t,anker</sub>/F<sub>t,Rd</sub> = 'UC_trek'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
     #else
-        'UC<sub>trek</sub> = F<sub>t,anker</sub>/F<sub>t,Rd</sub> = 'UC_trek'<span style="color: red"> > 1.0 → <b>Voldoet NIET</b></span>
+        'UC<sub>tension</sub> = F<sub>t,anker</sub>/F<sub>t,Rd</sub> = 'UC_trek'<span style="color: red"> > 1.0 → <b>Fails</b></span>
     #end if
 #end if
 
 # 11. Anchors in shear + wrijving — §6.2.2
 
-'<i>De dwarskracht wordt eerst door wrijving onder de voetplaat opgenomen
-'(C<sub>f,d</sub> = 0,20 voor zandcement-grout, EN 1993-1-8 §6.2.2(6)); de rest
-'door de ankers die op afschuiving meedoen.</i>
+'<i>Shear is first resisted by friction beneath the plate: C<sub>f,d</sub>=0.20 for sand-cement grout, EN 1993-1-8 §6.2.2(6). The remaining shear is carried by the participating anchors.</i>
 
 C_fd = 0.20', wrijvingscoëfficiënt voetplaat/grout'
 F_f,Rd = if(wrijving ≡ 1; C_fd*max(0 kN; N_Ed); 0 kN)', wrijvingsweerstand'
@@ -507,21 +493,20 @@ V_Rd,tot = n_v*F_v,Rd1 + F_f,Rd', totale afschuifweerstand'
 V_Rd,tot
 
 #if V_Ed ≤ 0 kN
-    'V<sub>Ed</sub> = 0 → afschuiving niet maatgevend.
+    'V<sub>Ed</sub> = 0 → shear does not govern.
     UC_afsch = 0
 #else
     UC_afsch = V_Ed/V_Rd,tot
     #if UC_afsch ≤ 1.0
-        'UC<sub>afsch</sub> = V<sub>Ed</sub>/V<sub>Rd,tot</sub> = 'UC_afsch'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+        'UC<sub>afsch</sub> = V<sub>Ed</sub>/V<sub>Rd,tot</sub> = 'UC_afsch'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
     #else
-        'UC<sub>afsch</sub> = V<sub>Ed</sub>/V<sub>Rd,tot</sub> = 'UC_afsch'<span style="color: red"> > 1.0 → <b>Voldoet NIET</b></span>
+        'UC<sub>afsch</sub> = V<sub>Ed</sub>/V<sub>Rd,tot</sub> = 'UC_afsch'<span style="color: red"> > 1.0 → <b>Fails</b></span>
     #end if
 #end if
 
 # 12. Gecombineerd tension + shear — Table 3.4
 
-'<i>Interactie voor een anker dat tegelijk trek en afschuiving krijgt:
-'F<sub>v</sub>/F<sub>v,Rd</sub> + F<sub>t</sub>/(1,4·F<sub>t,Rd</sub>) ≤ 1,0.</i>
+'<i>Interaction for an anchor carrying simultaneous tension and shear: F<sub>v</sub>/F<sub>v,Rd</sub> + F<sub>t</sub>/(1.4·F<sub>t,Rd</sub>) ≤ 1.0.</i>
 
 #hide
 Fv_per = if(n_v ≤ 0; 0 kN; V_Ed/max(1; n_v))
@@ -529,18 +514,16 @@ Ft_per = max(0 kN; F_t,anker)
 #show
 UC_combi = Fv_per/F_v,Rd1 + Ft_per/(1.4*F_t,Rd)
 #if UC_combi ≤ 1.0
-    'UC<sub>trek+afsch</sub> = 'UC_combi'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>tension+afsch</sub> = 'UC_combi'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
 #else
-    'UC<sub>trek+afsch</sub> = 'UC_combi'<span style="color: red"> > 1.0 → <b>Voldoet NIET</b></span>
+    'UC<sub>tension+afsch</sub> = 'UC_combi'<span style="color: red"> > 1.0 → <b>Fails</b></span>
 #end if
 
 # 13. Hoeklassen flens en lijf — EN 1993-1-8 §4.5.2
 
-'<i>Bepaling van de benodigde keeldikte (richtingsmethode). De maatgevende
-'flenskracht F<sub>t,max,Ed</sub> volgt uit normaalkracht + moment; de keeldikte
-'wordt per flens en lijf bepaald en met de gekozen lasdikte a vergeleken.</i>
+'<i>Required weld throat thickness uses the directional method. Governing flange force F<sub>t,max,Ed</sub> follows from axial force and moment. Determine throat thickness for each flange and web and compare it with selected weld size a.</i>
 
-F_t,max,Ed = abs(N_Ed)/2 + abs(M_Ed)/(h - t_f)', maatgevende flenskracht'
+F_t,max,Ed = abs(N_Ed)/2 + abs(M_Ed)/(h - t_f)', governing flange force'
 F_t,max,Ed
 A_f = b_kolom*t_f', flensoppervlak'
 A_w = (h - 2*t_f)*t_w', lijfoppervlak'
@@ -558,15 +541,14 @@ a_req
 
 UC_las = a_req/a_las
 #if UC_las ≤ 1.0
-    'UC<sub>las</sub> = a<sub>req</sub>/a = 'UC_las'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+    'UC<sub>las</sub> = a<sub>req</sub>/a = 'UC_las'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
 #else
     'UC<sub>las</sub> = a<sub>req</sub>/a = 'UC_las'<span style="color: red"> > 1.0 → <b>las te klein</b></span>
 #end if
 
 # 14. Anchorage length anker — EN 1992-1-1 §8.4
 
-'<i>Vereiste verankeringslengte om de ankerkracht via aanhechting in het beton
-'over te dragen. Basis = vloeigrens of treksterkte van het anker.</i>
+'<i>Required embedment length transfers anchor force to concrete through bond, based on anchor yield or tensile strength.</i>
 
 f_ctk = 0.7*0.3*(f_ck/(1 N/mm^2))^(2/3)*(1 N/mm^2)', f_ctk;0,05'
 f_ctd = f_ctk/γ_c
@@ -579,56 +561,37 @@ l_b,req = (d_anker/4)*(σ_sd/f_bd)', basisverankeringslengte §8.4.3 (rechte aan
 l_b,req
 
 #if ankertype ≡ 3
-    'Chemisch/aanhechtingsanker → verankering door aanhechting is maatgevend.
+    'Chemical/bonded anchor → bond anchorage governs.
     UC_verank = l_b,req/h_ef
     #if UC_verank ≤ 1.0
-        'UC<sub>verank</sub> = l<sub>b,req</sub>/h<sub>ef</sub> = 'UC_verank'<span style="color: green"> ≤ 1.0 → <b>Voldoet</b></span>
+        'UC<sub>verank</sub> = l<sub>b,req</sub>/h<sub>ef</sub> = 'UC_verank'<span style="color: green"> ≤ 1.0 → <b>Passes</b></span>
     #else
         'UC<sub>verank</sub> = l<sub>b,req</sub>/h<sub>ef</sub> = 'UC_verank'<span style="color: red"> > 1.0 → <b>verankering te kort</b></span>
     #end if
 #else
-    'Ingegoten ankerbout / hamerkopbout / mechanisch anker → verankering via
-    'ankerkop of expansie (kegelbreuk EN 1992-4), niet via rechte aanhechting.
-    'De l<sub>b,req</sub> hierboven is alleen indicatief. <b>Toets de betonbreukmodi
-    'volgens EN 1992-4 apart</b> (kegel-, splijt-, uittrek- en randbreuk).
+    'Cast-in anchor bolt, hammer-head bolt, or mechanical anchor → anchorage is through the head or expansion, with EN 1992-4 concrete cone failure, rather than straight bond. The l<sub>b,req</sub> above is indicative only. <b>Check EN 1992-4 concrete failure modes separately</b>: cone, splitting, pull-out, and edge failure.
     UC_verank = 0
 #end if
 
 # 15. Summary unity checks
 
 '<table style="border-collapse:collapse; font-size:13px">
-'<tr><th style="text-align:left; padding:2px 12px 2px 0">Toets</th><th style="text-align:right">UC</th></tr>
-'<tr><td style="padding:2px 12px 2px 0">Drukweerstand beton</td><td style="text-align:right">'UC_druk'</td></tr>
-'<tr><td style="padding:2px 12px 2px 0">Voetplaatdikte</td><td style="text-align:right">'UC_plaat'</td></tr>
-'<tr><td style="padding:2px 12px 2px 0">Ankers op trek</td><td style="text-align:right">'UC_trek'</td></tr>
-'<tr><td style="padding:2px 12px 2px 0">Ankers op afschuiving</td><td style="text-align:right">'UC_afsch'</td></tr>
-'<tr><td style="padding:2px 12px 2px 0">Trek + afschuiving</td><td style="text-align:right">'UC_combi'</td></tr>
-'<tr><td style="padding:2px 12px 2px 0">Laskeel</td><td style="text-align:right">'UC_las'</td></tr>
-'<tr><td style="padding:2px 12px 2px 0">Verankeringslengte</td><td style="text-align:right">'UC_verank'</td></tr>
+'<tr><th style="text-align:left; padding:2px 12px 2px 0">Check</th><th style="text-align:right">UC</th></tr>
+'<tr><td style="padding:2px 12px 2px 0">Concrete compression resistance</td><td style="text-align:right">'UC_druk'</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">Base plate thickness</td><td style="text-align:right">'UC_plaat'</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">Anchor tension</td><td style="text-align:right">'UC_trek'</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">Anchor shear</td><td style="text-align:right">'UC_afsch'</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">Tension + shear</td><td style="text-align:right">'UC_combi'</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">Weld throat</td><td style="text-align:right">'UC_las'</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">Anchorage length</td><td style="text-align:right">'UC_verank'</td></tr>
 '</table>
 
 UC_max = max(UC_druk; UC_plaat; UC_trek; UC_afsch; UC_combi; UC_las; UC_verank)
 #if UC_max ≤ 1.0
-    '<b>Maatgevende UC = 'UC_max'</b><span style="color: green"> ≤ 1.0 → <b>verbinding voldoet</b></span>
+    '<b>Governing UC = 'UC_max'</b><span style="color: green"> ≤ 1.0 → <b>verbinding passes</b></span>
 #else
-    '<b>Maatgevende UC = 'UC_max'</b><span style="color: red"> > 1.0 → <b>verbinding voldoet NIET</b></span>
+    '<b>Governing UC = 'UC_max'</b><span style="color: red"> > 1.0 → <b>connection fails</b></span>
 #end if
 
-'<hr/>
-'<i>Vereenvoudigingen en aandachtspunten:
-'<ul>
-'<li>Drukweerstand via de effectieve-oppervlaktemethode (§6.2.5); de
-'spreidingsoppervlakte A<sub>c1</sub> is begrensd op 3·A<sub>c0</sub> en op
-'A<sub>c0</sub> + h<sub>b</sub>-spreiding. Werkelijke randafstanden van het
-'betonblok (randeffect) zijn niet getoetst — controleer h &lt; 2·d<sub>p</sub>.</li>
-'<li>Ankertrek vereenvoudigd met een star plaatmodel (hefboomsarm z tussen de
-'uiterste ankerrijen). Betonbreukmodi van EN 1992-4 (kegelbreuk, splijten,
-'uittrekken, randbreuk) zijn <b>niet</b> opgenomen — bij trek/moment apart
-'toetsen.</li>
-'<li>Wrijvingsweerstand alleen meegenomen bij drukkracht (N<sub>Ed</sub> &gt; 0).</li>
-'<li>Lascontrole vereenvoudigd (resultante trek + afschuiving op de totale
-'lasomtrek) i.p.v. de volledige spanningscomponenten van §4.5.3.2.</li>
-'<li>Tweede-orde-effecten, scheefstand en de stijfheid van de verbinding
-'(§6.3) zijn niet beschouwd.</li>
-'</ul></i>
+'<hr/><i>Simplifications and limitations:<ul><li>Compression resistance uses effective area under §6.2.5. Spreading area A<sub>c1</sub> is limited to3·A<sub>c0</sub> and A<sub>c0</sub> plus spread over h<sub>b</sub>. Actual concrete-block edge distances are not checked; assess h &lt; 2·d<sub>p</sub>.</li><li>Anchor tension uses a rigid plate with lever arm z between outer rows. EN 1992-4 concrete cone, splitting, pull-out, and edge failures are <b>excluded</b>; check separately for tension/moment.</li><li>Friction resistance applies only for compression N<sub>Ed</sub>&gt;0.</li><li>Weld checks use a simplified tension/shear resultant over the total weld perimeter, rather than all §4.5.3.2 stress components.</li><li>Second-order effects, imperfections, and connection stiffness (§6.3) are excluded.</li></ul></i>
 `;

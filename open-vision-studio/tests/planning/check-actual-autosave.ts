@@ -92,7 +92,7 @@ const unavailable = createActualAutoSaveController({
   onFailure: (c, e) => { failures.push(`${c.id}:${(e as Error).message}`); },
 });
 await unavailable.flush();
-eq('9 een niet-schrijfbaar bestaand doel blijft niet stil', failures, ['weg:Het bestaande projectbestand is niet schrijfbaar.']);
+eq('9 een niet-schrijfbaar bestaand doel blijft niet stil', failures, ['weg:The existing project file is not writable.']);
 
 // De keuze is per geopend document, maar geen IFC- of recoveryveld. Een tabwissel mag hem dus
 // niet laten lekken en een verse/herstelde payload begint veilig uit.

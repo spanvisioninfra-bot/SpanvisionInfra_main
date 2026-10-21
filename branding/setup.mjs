@@ -23,7 +23,10 @@ for (const module of modules) {
     commands.push({ command: npmCommand, args: ['exec', '--yes', `--package=${manager}`, '--', 'pnpm', 'install', '--frozen-lockfile'], cwd: directory });
   } else install(module.id === 'calculation' ? path.join(root, module.directory) : appDirectory(module));
 }
-if (!selected || selected.includes('hub')) install(path.join(root, 'suite-hub'));
+if (!selected || selected.includes('hub')) {
+  install(path.join(root, 'commerce'));
+  install(path.join(root, 'suite-hub'));
+}
 for (const module of modules.filter(module => module.id === 'bim' || module.id === 'stl')) {
   const directory = path.join(root, module.directory);
   const python = path.join(directory, windows ? '.venv/Scripts/python.exe' : '.venv/bin/python');

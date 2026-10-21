@@ -43,7 +43,7 @@
       estimates = ests || [];
       kozijnList = koz || [];
     } catch (e) {
-      console.error("Calculatie laden mislukt:", e);
+      console.error("Failed to load calculation:", e);
     }
     loading = false;
   }
@@ -53,7 +53,7 @@
       const cfg = await invoke("get_pricing_config", {});
       if (cfg) pricing = { ...DEFAULT_PRICING, ...cfg };
     } catch (e) {
-      console.error("Prijsconfiguratie laden mislukt:", e);
+      console.error("Failed to load pricing configuration:", e);
     }
   }
 
@@ -93,7 +93,7 @@
       const est = await invoke("get_cost_estimate", { id: kozijn.id, priceTableJson: null });
       if (expandedIndex === i) detailEstimate = est;
     } catch (e) {
-      console.error("Kostendetail laden mislukt:", e);
+      console.error("Failed to load cost details:", e);
       toast.error($_("calculation.detailFailed") + ": " + e);
       if (expandedIndex === i) expandedIndex = -1;
     }

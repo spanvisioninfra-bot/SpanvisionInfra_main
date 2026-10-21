@@ -312,19 +312,19 @@ function checkedUpserts(input: RecoverySaveInput): Map<string, RecoveryDocConten
   const documentIds = new Set<string>();
   for (const document of input.documents) {
     if (!document.id || documentIds.has(document.id)) {
-      throw new Error(`Recovery: ongeldige of dubbele manifestdocument-id ${JSON.stringify(document.id)}.`);
+      throw new Error(`Recovery: invalid or duplicate manifest document id ${JSON.stringify(document.id)}.`);
     }
     documentIds.add(document.id);
   }
   const upserts = new Map<string, RecoveryDocContent>();
   for (const document of input.upserts) {
     if (!documentIds.has(document.id) || upserts.has(document.id)) {
-      throw new Error(`Recovery: upsert ${JSON.stringify(document.id)} hoort niet uniek bij het manifest.`);
+      throw new Error(`Recovery: upsert ${JSON.stringify(document.id)} does not belong uniquely to the manifest.`);
     }
     const metadata = input.documents.find((candidate) => candidate.id === document.id)!;
     if (document.filePath !== metadata.filePath || document.isDirty !== metadata.isDirty
       || document.datesAsRecorded !== metadata.datesAsRecorded) {
-      throw new Error(`Recovery: upsertmetadata voor ${JSON.stringify(document.id)} wijkt af van het manifest.`);
+      throw new Error(`Recovery: upsert metadata for ${JSON.stringify(document.id)} differs from the manifest.`);
     }
     upserts.set(document.id, document);
   }
@@ -366,7 +366,7 @@ export function planTauriV3RecoverySave(
     }
     const previousDocument = previousById.get(metadata.id);
     if (!previousDocument) {
-      throw new Error(`Recovery: ${JSON.stringify(metadata.id)} heeft geen vorige snapshot en geen upsert.`);
+      throw new Error(`Recovery: ${JSON.stringify(metadata.id)} has no previous snapshot and no upsert.`);
     }
     documents.push({
       id: metadata.id, ifc: previousDocument.ifc, filePath: metadata.filePath,
@@ -814,11 +814,11 @@ async function saveWeb(input: RecoverySaveInput): Promise<void> {
         resolve();
       }
     };
-    tx.onerror = () => fail(tx.error ?? new Error('IndexedDB-recoverytransactie mislukt.'));
+    tx.onerror = () => fail(tx.error ?? new Error('IndexedDB recovery transaction failed.'));
     tx.onabort = () => fail(tx.error ?? new Error('IndexedDB-recoverytransactie afgebroken.'));
 
     const allRequest = store.getAll();
-    allRequest.onerror = () => fail(allRequest.error ?? new Error('IndexedDB-recoveryrecords niet leesbaar.'));
+    allRequest.onerror = () => fail(allRequest.error ?? new Error('Unable to read IndexedDB recovery records.'));
     allRequest.onsuccess = () => {
       try {
         const all = allRequest.result as WebRecord[];
@@ -828,7 +828,7 @@ async function saveWeb(input: RecoverySaveInput): Promise<void> {
           .map((record) => record.docId));
         for (const document of input.documents) {
           if (!upserts.has(document.id) && !existing.has(document.id)) {
-            throw new Error(`Recovery: ${JSON.stringify(document.id)} heeft geen webrecord en geen upsert.`);
+            throw new Error(`Recovery: ${JSON.stringify(document.id)} has no web record and no upsert.`);
           }
         }
 

@@ -129,7 +129,7 @@ export default function ReportTab({ scheefstandToelichting, analyseToelichting, 
         t("report.kernPdf", "Rekenrapport"),
         t(
           "report.kernPdfGeenTauri",
-          "Het rekenrapport wordt door de rekenkern gezet en is daarom alleen in de desktop-app beschikbaar. Gebruik in de browser Afdrukken / PDF.",
+          "The calculation engine generates this report, so it is available only in the desktop app. In the browser, use Print / PDF.",
         ),
       );
       return;
@@ -157,7 +157,7 @@ export default function ReportTab({ scheefstandToelichting, analyseToelichting, 
         t("report.kernPdf", "Rekenrapport"),
         t(
           "report.kernPdfNietGetoetst",
-          "Er zijn nog geen toetsresultaten. Druk eerst op Toetsen; het rekenrapport bevat de toetsingen en het betonhoofdstuk.",
+          "No check results yet. Run Checks first; the calculation report includes the checks and concrete chapter.",
         ),
       );
       return;
@@ -256,7 +256,7 @@ export default function ReportTab({ scheefstandToelichting, analyseToelichting, 
         notifyWarning(
           t("report.kernPdf", "Rekenrapport"),
           t("report.kernPdfGeenDekkingslijn", {
-            defaultValue: "Zonder dekkingslijn in het rapport: {{staven}}",
+            defaultValue: "Without a curtailment diagram in the report: {{staven}}",
             staven: dekkingslijnen.mislukt
               .map((m) => `staaf ${m.beamId} — ${m.reason}`)
               .join("; "),
@@ -287,7 +287,7 @@ export default function ReportTab({ scheefstandToelichting, analyseToelichting, 
         <RibbonGroup label={t("report.report", "Rapport")}>
           <RibbonButton
             icon={printIcon}
-            label={t("report.print", "Afdrukken / PDF")}
+            label={t("report.print", "Print / PDF")}
             size="large"
             onClick={handlePrint}
           />
@@ -305,14 +305,14 @@ export default function ReportTab({ scheefstandToelichting, analyseToelichting, 
             size="large"
             title={t(
               "report.kernPdfHint",
-              "Laat de rekenkern de PDF zetten: de toetsingen plus het betonhoofdstuk met de segmenttabellen en de vier figuren, vectorieel getekend.",
+              "Let the calculation engine generate the PDF: verification checks and the concrete chapter, with segment tables and four vector figures.",
             )}
             onClick={() => void handleRekenrapport()}
           />
         </RibbonGroup>
 
         {/* Weergave — papierformaat + oriëntatie (werken door in @page) */}
-        <RibbonGroup label={t("report.display", "Weergave")}>
+        <RibbonGroup label={t("report.display", "View")}>
           <RibbonButtonStack>
             <RibbonButton
               icon={a4Icon}

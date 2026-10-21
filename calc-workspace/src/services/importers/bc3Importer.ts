@@ -444,7 +444,7 @@ export function importBc3(text: string): ImportResult {
       if (!c) {
         warn(
           'unknownConceptInDecomposition',
-          `Onbekend concept '${ch.key}' in decompositie van '${parent.code}' — overgeslagen.`,
+          `Unknown concept '${ch.key}' in decompositie van '${parent.code}' — overgeslagen.`,
           { concept: ch.key, parent: parent.code },
         );
         continue;
@@ -567,7 +567,7 @@ export function importBc3(text: string): ImportResult {
       if (!c) {
         warn(
           'unknownConceptUnder',
-          `Onbekend concept '${ch.key}' onder '${parent.code}' — overgeslagen.`,
+          `Unknown concept '${ch.key}' under '${parent.code}' — overgeslagen.`,
           { concept: ch.key, parent: parent.code },
         );
         return;
@@ -591,13 +591,13 @@ export function importBc3(text: string): ImportResult {
     if (tops.length > 0) {
       warn(
         'noRootStructure',
-        'Geen wortelstructuur (##) met samenstelling gevonden — losse takken op het hoogste niveau geïmporteerd.',
+        'No root structure (##) with a breakdown was found — individual branches were imported at the top level.',
       );
       tops.forEach((c, i) => emit(null, '', c, null, [i + 1], 0));
     } else {
       warn(
         'noProjectStructure',
-        'Geen projectstructuur (##/#) gevonden — concepten als prijzenboek onder één hoofdstuk geïmporteerd.',
+        'No project structure (##/#) was found — concepts were imported as a price book under one chapter.',
       );
       const chapter = add({ rowType: "chapter", parentId: null, depth: 0, code: '01', description: 'Prijzenboek', id: genId() });
       for (const c of all) {
@@ -633,8 +633,8 @@ export function importBc3(text: string): ImportResult {
   if (items.length > 0 && items.every((i) => (i.normUnitPrice ?? 0) === 0 && (i.unitPrice ?? 0) === 0)) {
     warn(
       'noPrices',
-      'Dit bestand bevat geen prijzen — alleen omschrijvingen en hoeveelheden '
-      + '(zoals een mediciones-bibliotheek). Het totaal blijft daarom € 0,00.',
+      'This file contains no prices — only descriptions and quantities '
+      + '(such as a mediciones library). The total therefore remains €0.00.',
     );
   }
 

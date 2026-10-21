@@ -76,7 +76,7 @@ export function validateHelpArticles(
   taken: ReadonlySet<string> = new Set(),
 ): string[] {
   const errors: string[] = [];
-  if (!source.trim()) errors.push('bron zonder naam');
+  if (!source.trim()) errors.push('unnamed source');
   const seen = new Set<string>();
   for (const a of articles) {
     const label = typeof a?.id === 'string' ? a.id : '(zonder id)';

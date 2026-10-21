@@ -78,7 +78,7 @@ function withOnLoadTimeout(work: Promise<void> | void, id: string, timeoutMs: nu
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(() => {
-      reject(new Error(`onLoad van "${id}" reageerde niet binnen ${Math.ceil(timeoutMs / 1000)} s`));
+      reject(new Error(`onLoad for "${id}" did not respond within ${Math.ceil(timeoutMs / 1000)} s`));
     }, timeoutMs);
   });
   return Promise.race([Promise.resolve(work), timeout]).finally(() => clearTimeout(timer));
@@ -115,7 +115,7 @@ export async function removeExtensionFromDb(key: IDBValidKey): Promise<void> {
     const tx = db.transaction('extensions', 'readwrite');
     tx.objectStore('extensions').delete(key);
     tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error ?? new Error('IndexedDB-delete is mislukt'));
+    tx.onerror = () => reject(tx.error ?? new Error('IndexedDB delete failed'));
     tx.onabort = () => reject(tx.error ?? new Error('IndexedDB-delete is afgebroken'));
   });
 }
@@ -146,11 +146,11 @@ export function encodeIdbKey(key: IDBValidKey): string {
     return `s${bytes.byteLength}:${bytesToHex(bytes)}`;
   }
   if (typeof key === 'number') {
-    if (!Number.isFinite(key)) throw new TypeError('IndexedDB-getalsleutel moet eindig zijn');
+    if (!Number.isFinite(key)) throw new TypeError('IndexedDB numeric key must be finite');
     return `n${Object.is(key, -0) ? '0' : String(key)}`;
   }
   if (key instanceof Date) {
-    if (!Number.isFinite(key.getTime())) throw new TypeError('IndexedDB-datumsleutel moet geldig zijn');
+    if (!Number.isFinite(key.getTime())) throw new TypeError('IndexedDB date key must be valid');
     return `d${key.toISOString()}`;
   }
   if (key instanceof ArrayBuffer) {
@@ -169,7 +169,7 @@ export function encodeIdbKey(key: IDBValidKey): string {
     }).join('');
     return `a${parts.length}:${encoded}`;
   }
-  throw new TypeError('Onbekend IndexedDB-sleuteltype');
+  throw new TypeError('Unknown IndexedDB key type');
 }
 
 /** Objectproperty-veilige, stabiele identiteit; verwijderen gebruikt altijd de originele sleutel. */
@@ -189,9 +189,9 @@ export async function getAllExtensionRecordsFromDb(): Promise<RawStoredExtension
       records.push({ storageKey: cursor.primaryKey, value: cursor.value });
       cursor.continue();
     };
-    req.onerror = () => reject(req.error ?? new Error('IndexedDB-cursor is mislukt'));
+    req.onerror = () => reject(req.error ?? new Error('IndexedDB cursor failed'));
     tx.oncomplete = () => resolve(records);
-    tx.onerror = () => reject(tx.error ?? new Error('IndexedDB-read is mislukt'));
+    tx.onerror = () => reject(tx.error ?? new Error('IndexedDB read failed'));
     tx.onabort = () => reject(tx.error ?? new Error('IndexedDB-read is afgebroken'));
   });
 }
@@ -209,7 +209,7 @@ export async function getExtensionRecordFromDb(
         ? { storageKey: cursor.primaryKey, value: cursor.value }
         : undefined);
     };
-    req.onerror = () => reject(req.error ?? new Error('IndexedDB-recordlezing is mislukt'));
+    req.onerror = () => reject(req.error ?? new Error('IndexedDB record read failed'));
     tx.onabort = () => reject(tx.error ?? new Error('IndexedDB-recordlezing is afgebroken'));
   });
 }
@@ -266,7 +266,7 @@ export function executeExtensionCode(mainCode: string): ExtensionPlugin {
       // ook op window voor devtools-inspectie.
       return getExtensionSdk();
     }
-    throw new Error(`Module "${moduleName}" is niet beschikbaar in de extensie-sandbox`);
+    throw new Error(`Module "${moduleName}" is unavailable in the extension sandbox`);
   };
 
   try {
@@ -286,12 +286,12 @@ export function executeExtensionCode(mainCode: string): ExtensionPlugin {
     const fn = new Function('module', 'exports', 'require', ...AFGESCHERMD, mainCode);
     fn(moduleObj, moduleExports, requireFn, ...AFGESCHERMD.map(() => undefined));
   } catch (err) {
-    throw new Error(`Uitvoeren van extensie-code mislukt: ${err}`);
+    throw new Error(`Extension code execution failed: ${err}`);
   }
 
   const plugin = (moduleObj.exports as { default?: unknown }).default || moduleObj.exports;
   if (typeof (plugin as ExtensionPlugin).onLoad !== 'function') {
-    throw new Error('Extensie moet een onLoad-functie exporteren');
+    throw new Error('The extension must export an onLoad function');
   }
 
   return plugin as ExtensionPlugin;
@@ -323,7 +323,7 @@ export async function enableExtension(
 
   try {
     const raw = await storage.get(id);
-    if (!raw) throw new Error(`Extensie "${id}" niet gevonden in opslag`);
+    if (!raw) throw new Error(`Extension "${id}" was not found in storage`);
     const parsed = parseStoredExtension(raw.value, raw.storageKey);
     if (!parsed.ok) {
       quarantineRecord(id, raw, parsed.error);
@@ -338,7 +338,7 @@ export async function enableExtension(
     const minVersion = stored.manifest.minAppVersion;
     if (minVersion && compareVersions(APP_VERSION, minVersion) < 0) {
       throw new Error(
-        `Vereist Open Vision Studio ≥ ${minVersion} (huidige versie: ${APP_VERSION})`,
+        `Requires Open Vision Studio ≥ ${minVersion} (current version: ${APP_VERSION})`,
       );
     }
 
@@ -349,7 +349,7 @@ export async function enableExtension(
     // geïnstalleerde extensie in één update slopen — maar wordt wél zichtbaar gelogd.
     const compat = checkApiCompatibility(stored.manifest.apiVersion);
     if (!compat.ok) {
-      throw new Error(`${compat.reason} (extensie-API van deze app: ${EXTENSION_API_VERSION})`);
+      throw new Error(`${compat.reason} (this app's extension API: ${EXTENSION_API_VERSION})`);
     }
     if (compat.legacy) {
       appLog.emit('warn', 'Extensies',
@@ -436,7 +436,7 @@ export async function disableExtension(
   try {
     const raw = await storage.get(id);
     if (!raw) {
-      reportStorageWriteFailure(id, new Error(`Extensie "${id}" niet gevonden in opslag`));
+      reportStorageWriteFailure(id, new Error(`Extension "${id}" was not found in storage`));
       return;
     }
     const parsed = parseStoredExtension(raw.value, raw.storageKey);

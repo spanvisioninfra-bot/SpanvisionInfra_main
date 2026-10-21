@@ -242,7 +242,7 @@ export const netwapeningTemplate = {
   fixedSize: true,
   params: [
     { key: 'diameter', label: 'Diameter (mm)', labelEn: 'Diameter (mm)', type: 'number', default: 8, min: 1, step: 1 },
-    { key: 'afstand', label: 'H.o.h.-afstand (mm)', labelEn: 'Spacing (mm)', type: 'number', default: 150, min: 1, step: 5 },
+    { key: 'afstand', label: "Center-to-center spacing (mm)", labelEn: 'Spacing (mm)', type: 'number', default: 150, min: 1, step: 5 },
     { key: 'lengte', label: "Length (mm)", labelEn: 'Length (mm)', type: 'number', default: 1600, min: 1, step: 10 },
     ...markerParams,
   ],

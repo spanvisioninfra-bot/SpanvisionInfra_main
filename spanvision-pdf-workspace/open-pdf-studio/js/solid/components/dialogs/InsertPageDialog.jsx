@@ -127,13 +127,13 @@ export default function InsertPageDialog() {
           </select>
         </div>
         <div class="insert-page-row">
-          <label class="insert-page-label">{t('insertPage.orientation') || 'Richting:'}</label>
+          <label class="insert-page-label">{t('insertPage.orientation') || "Orientation:"}</label>
           <select
             class="insert-page-select"
             value={orientation()}
             onChange={(e) => setOrientation(e.target.value)}
           >
-            <option value="auto">{t('insertPage.autoOrientation') || 'Automatisch'}</option>
+            <option value="auto">{t('insertPage.autoOrientation') || "Automatic"}</option>
             <option value="portrait">{t('insertPage.portrait') || 'Staand'}</option>
             <option value="landscape">{t('insertPage.landscape') || 'Liggend'}</option>
           </select>

@@ -428,18 +428,18 @@ function canonicalJson(value: unknown): string | null {
   const normalize = (candidate: unknown): unknown => {
     if (candidate === null || typeof candidate === 'string' || typeof candidate === 'boolean') return candidate;
     if (typeof candidate === 'number') {
-      if (!Number.isFinite(candidate)) throw new TypeError('niet-eindig getal');
+      if (!Number.isFinite(candidate)) throw new TypeError('non-finite number');
       return candidate;
     }
     if (Array.isArray(candidate)) {
-      if (ancestors.has(candidate)) throw new TypeError('cyclische waarde');
+      if (ancestors.has(candidate)) throw new TypeError("cyclic value");
       ancestors.add(candidate);
       const result = candidate.map(normalize);
       ancestors.delete(candidate);
       return result;
     }
-    if (!candidate || typeof candidate !== 'object') throw new TypeError('geen JSON-waarde');
-    if (ancestors.has(candidate)) throw new TypeError('cyclische waarde');
+    if (!candidate || typeof candidate !== 'object') throw new TypeError('not a JSON value');
+    if (ancestors.has(candidate)) throw new TypeError("cyclic value");
     ancestors.add(candidate);
     const result: Record<string, unknown> = {};
     for (const key of Object.keys(candidate).sort()) {

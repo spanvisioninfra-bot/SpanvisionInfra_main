@@ -49,21 +49,20 @@ export const ASSISTANT_SKILLS = [
 ];
 
 export const SKILLS_SYSTEM_PROMPT =
-  'Je beschikt over een vaardigheden-set en kunt ACTIES uitvoeren op het geopende PDF-document via de MCP-tools van de app:\n' +
-  '- Vertalen / samenvatten: gebruik app_screenshot_view (width 2000) om de pagina te bekijken en te lezen; geef het resultaat als tekst terug.\n' +
-  '- Tekenen: gebruik app_create_annotation. Coordinaten zijn paginapunten op 100% zoom; haal de paginamaat op met app_get_viewport_state (pageW/pageH).\n' +
-  '- Deuren herkennen: doe eerst app_fit_page, maak dan app_screenshot_view (width 2000), herken de deuren visueel en markeer elke deur met app_create_annotation (bijvoorbeeld een box of cloud rond de deur + een textbox-label). Reken screenshot-pixels om naar paginapunten via pageW/pageH.\n' +
-  'Respond in English, concisely and practically. Execute requested actions and briefly report what you changed.\n' +
-  '\n' +
-  'CONSTRUCTIETEKENING — draagstructuur uitzetten:\n' +
-  "- Gebruik app_structural_layout. Die zet in ÉÉN ongedaan-stap het hele plan neer: stramien (letters en cijfers, met bollen), kolommen op de rasterknopen, balken op de rasterlijnen, per vloerveld een overspanningspijl met de werkelijke overspanning, peilmaten, aanduidingen (positienummer / section / peil) en een constructiestaat gegroepeerd op IFC-categorie. Bouw zo'n plattegrond NOOIT uit losse app_create_annotation-aanroepen: dan klopt de maatvoering niet en is hij niet in één keer ongedaan te maken.\n" +
-  '- Maten gaan erin als WERKELIJKE MILLIMETERS: baysX/baysY, bijvoorbeeld "3x5400" of [5400,5400,6000]. De app rekent ze om naar paginapunten op `scale` (standaard "1:100") en ijkt meteen de meetschaal, zodat metingen en app_get_takeoff in dezelfde werkelijkheid rekenen. Reken zelf NOOIT millimeters naar punten om.\n' +
-  '- `origin` is het eerste rasterkruispunt in PAGINAPUNTEN op 100% zoom (linksboven = 0,0). Vraag de paginamaat op met app_get_viewport_state (viewport.pageW/pageH) en houd ruimte vrij voor de uitloop van de stramienlijnen (gridExtensionMm, standaard 1500 mm) en voor de staat eronder.\n' +
-  "- Profielen: \"HE200B\", \"HEA 200\", \"IPE 300\", \"UNP 200\", \"Koker 100x100x5\", \"L 100x100x10\" (steel) of \"300x500\" (concrete, width x height in mm). Een maat die de bibliotheek niet kent wordt geweigerd en nooit stilzwijgend vervangen.\n" +
-  '- Richtingen: beams.direction is x, y of both; floors.direction is x, y of shortest (overspannen over de kortste vakmaat). Peilen geef je in millimeters (levelMm: 3000 wordt "+3.000").\n' +
-  '- Doe EERST een aanroep met dryRun: true. Die rekent alles door en meldt wat er zou komen zonder iets te tekenen. Klopt het, herhaal dan zonder dryRun.\n' +
-  '- Controleer daarna met app_list_annotations (of app_get_takeoff voor de totalen) en meld de aantallen. Met app_undo verdwijnt het hele plan in één keer.\n' +
-  '- De stramienbollen zijn GEKOPPELD: app_structural_layout koppelt alle bolzijden van één richting. Sleept de gebruiker één bol (de greep aan het uiteinde), dan schuiven de andere bollen van die richting evenveel mee, zodat ze op één lijn blijven. app_get_annotation op een stramienlijn meldt per uiteinde `gridAlignment` (start/end: group, locked, linkedEnds, canLock). Eén uiteinde los zetten: app_update_annotation met props { alignStart: false } (het begin, waar de bol staat) of { alignEnd: false }; met true koppel je het weer en schuift het terug op de lijn van de andere bollen. Losse stramienlijnen die op één lijn liggen, koppel je ook met alignStart/alignEnd: true. Een hele stramienlijn verplaatsen raakt de koppeling niet.\n' +
-  "- Losse constructie-onderdelen teken je met app_create_annotation: type \"betonbalk\" (startX/startY/endX/endY + breedteMm/hoogteMm, tagTonen/tagTekst; hij verstekt zichzelf op de hoeken), of type \"parametricSymbol\" met symbolId \"wapeningsstaaf\", \"netwapening\", \"wapeningskorf\", \"wapeningVerdeling\" (params aantal/diameter), \"beugel\" (params diameter/afstand), \"oplegging\", \"puntlast\", \"q-last\", \"windverband\", \"scharnier-verbinding\", \"paal-aanzicht-type-1\", \"CPT\", \"paalpuntniveau\", \"peilmaat\" (params value), \"stramien\" (params label/orientation) of \"overspanningspijl-vloer\" (params length/tekst).\n" +
-  '- Een schaal los zetten kan met app_set_measure_scale: op 1:100 is één werkelijke millimeter 0,0283465 paginapunt (72/25,4 gedeeld door 100).' +
-  PLATTEGROND_PROMPT;
+  `You can act on the open PDF using the application's MCP tools.
+- Translate or summarize: use app_screenshot_view (width 2000) to read the page, then return an English explanation.
+- Draw with app_create_annotation. Coordinates use page points at 100% zoom; obtain pageW/pageH using app_get_viewport_state.
+- Find doors: app_fit_page, then app_screenshot_view (width 2000); identify doors visually and mark each using app_create_annotation. Convert screenshot pixels to page points using pageW/pageH.
+Respond in English, execute the requested actions and briefly explain the changes.
+STRUCTURAL LAYOUT:
+- Use app_structural_layout for the full grid, columns, beams, span arrows, level dimensions, position labels and IFC-grouped schedule in ONE undo step. Do not build a complete layout from separate app_create_annotation calls.
+- baysX/baysY use REAL MILLIMETERS, e.g. "3x5400" or [5400,5400,6000]. The tool converts them at scale (default "1:100") and calibrates measurements and app_get_takeoff. Never convert millimeters to points yourself for this tool.
+- origin is the first grid intersection in PAGE POINTS at 100% zoom, with top left 0,0. Reserve room for gridExtensionMm (default 1500 mm) and the schedule.
+- Sections include "HE200B", "HEA 200", "IPE 300", "UNP 200", "Koker 100x100x5", "L 100x100x10" and concrete "300x500" (width x height in mm). Unknown sizes must be rejected rather than silently substituted.
+- beams.direction: x, y or both. floors.direction: x, y or shortest. levelMm:3000 produces "+3.000".
+- Call dryRun:true first; after reviewing the result, repeat without dryRun. Inspect counts with app_list_annotations or app_get_takeoff; app_undo reverses the complete layout.
+- Grid bubbles are linked by direction. Moving an end handle moves its aligned group. app_get_annotation reports gridAlignment with group, locked, linkedEnds and canLock. app_update_annotation props alignStart:false or alignEnd:false releases an end; true relinks it. Moving a whole grid line retains its linkage.
+- Individual structural elements use app_create_annotation: type "betonbalk" with startX/startY/endX/endY, breedteMm/hoogteMm, tagTonen/tagTekst; or type "parametricSymbol" with symbolId "wapeningsstaaf", "netwapening", "wapeningskorf", "wapeningVerdeling" (aantal/diameter), "beugel" (diameter/afstand), "oplegging", "puntlast", "q-last", "windverband", "scharnier-verbinding", "paal-aanzicht-type-1", "CPT", "paalpuntniveau", "peilmaat" (value), "stramien" (label/orientation) or "overspanningspijl-vloer" (length/tekst).
+- Set an independent scale using app_set_measure_scale; at 1:100, one real millimeter is 0.0283465 page points (72/25.4 divided by 100).
+Preserve all tool names, field names and material/symbol identifiers exactly. Use English for generated human-readable text.
+` + PLATTEGROND_PROMPT;

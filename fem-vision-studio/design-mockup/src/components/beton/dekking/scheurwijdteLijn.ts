@@ -131,7 +131,7 @@ export async function haalScheurwijdteLijn(
   );
   if (antwoorden.length !== sneden.length) {
     throw new Error(
-      `De rekenkern gaf ${antwoorden.length} antwoorden op ${sneden.length} sneden; de lijn is niet betrouwbaar samen te stellen.`,
+      `The calculation engine returned ${antwoorden.length} responses for ${sneden.length} sections; the curve cannot be assembled reliably.`,
     );
   }
 

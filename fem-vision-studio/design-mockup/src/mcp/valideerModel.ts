@@ -1372,12 +1372,12 @@ export function valideerModel(rauw: unknown, opties: ValidatieOpties = {}): Vali
   const beamIds = new Set(beams.map((b) => b.id));
   const plateIds = new Set(plates.map((p) => p.id));
 
-  if (nodes.length === 0) errors.push("Het model bevat geen knopen.");
+  if (nodes.length === 0) errors.push("The model has no nodes.");
   if (beams.length === 0 && plates.length === 0) {
-    errors.push("Het model bevat geen staven en geen platen — er valt niets te rekenen.");
+    errors.push("The model has no members or plates to analyze.");
   }
   if (loadCases.length === 0) {
-    errors.push("Het model bevat geen belastinggevallen.");
+    errors.push("The model has no load cases.");
   }
 
   // Samenvallende knopen: twee knopen op dezelfde plek zijn niet met elkaar

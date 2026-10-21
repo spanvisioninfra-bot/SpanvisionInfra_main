@@ -56,7 +56,7 @@ export const doorTemplate = {
   params: [
     { key: 'width', label: 'Kozijnmaat', labelEn: 'Frame size', type: 'number', default: 900, min: 100, max: 4000, step: 10, unit: 'mm' },
     { key: 'wallThickness', label: 'Wanddikte', labelEn: 'Wall thickness', type: 'number', default: 100, min: 20, max: 1000, step: 10, unit: 'mm' },
-    { key: 'swing', label: 'Draairichting', labelEn: 'Swing', type: 'enum', options: [
+    { key: 'swing', label: "Opening direction", labelEn: 'Swing', type: 'enum', options: [
         { value: 'left', label: "Left" },
         { value: 'right', label: "Right" }
       ], default: 'left' },
@@ -70,8 +70,8 @@ export const doorTemplate = {
     { key: 'kozijnPositieMm', label: 'Positie vanaf buitenkant (-1 = midden)', labelEn: 'Position from outside face (-1 = centred)', type: 'number', default: -1, min: -1, max: 1000, step: 5, unit: 'mm' },
     { key: 'aanslagMm', label: 'Aanslag buitenblad', labelEn: 'Outer leaf overlap', type: 'number', default: 0, min: 0, max: 100, step: 1, unit: 'mm' },
     { key: 'binnenSpelingMm', label: 'Speling binnenblad', labelEn: 'Inner leaf clearance', type: 'number', default: 0, min: 0, max: 100, step: 1, unit: 'mm' },
-    { key: 'deurbladDikteMm', label: 'Deurblad dikte', labelEn: 'Door leaf thickness', type: 'number', default: 40, min: 10, max: 120, step: 1, unit: 'mm' },
-    { key: 'showWall', label: 'Toon muur', labelEn: 'Show wall', type: 'boolean', default: false },
+    { key: 'deurbladDikteMm', label: "Door leaf thickness", labelEn: 'Door leaf thickness', type: 'number', default: 40, min: 10, max: 120, step: 1, unit: 'mm' },
+    { key: 'showWall', label: 'Show wall', labelEn: 'Show wall', type: 'boolean', default: false },
   ],
   // Returns array of draw commands. bbox: {x,y,width,height}
   render(params, bbox) {

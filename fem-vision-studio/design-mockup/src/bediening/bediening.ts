@@ -144,7 +144,7 @@ function wachtOpStore<S>(
     if (voldoet(nu)) { los(nu); return; }
     const timer = window.setTimeout(() => {
       af();
-      weiger(new Error(`wachten op ${wat} verliep na ${Math.round(ms / 1000)} s`));
+      weiger(new Error(`waiting for ${wat} timed out after ${Math.round(ms / 1000)} s`));
     }, ms);
     const af = store.subscribe((s) => {
       if (voldoet(s)) { window.clearTimeout(timer); af(); los(s); }
@@ -240,12 +240,12 @@ export async function voerUit(
   const a = () => ref.current;
   const getal = (k: string): number => {
     const v = args[k];
-    if (typeof v !== "number" || !Number.isFinite(v)) throw new Error(`\`${k}\` ontbreekt of is geen getal`);
+    if (typeof v !== "number" || !Number.isFinite(v)) throw new Error(`“${k}” is missing or is not a number`);
     return v;
   };
   const staaf = (id: number): Beam => {
     const b = a().fem.beams.find((x) => x.id === id);
-    if (!b) throw new Error(`geen staaf met id ${id}`);
+    if (!b) throw new Error(`no member with id ${id}`);
     return b;
   };
 
@@ -298,7 +298,7 @@ export async function voerUit(
 
     case "model_laden": {
       const tekst = args.tekst;
-      if (typeof tekst !== "string") throw new Error("`tekst` ontbreekt");
+      if (typeof tekst !== "string") throw new Error("`tekst` is missing");
       await a().laadProjectTekst(tekst, typeof args.pad === "string" ? args.pad : undefined);
       await verseRender();
       const f = a().fem;
@@ -325,14 +325,14 @@ export async function voerUit(
       const beamIds: Array<number | null> = [];
       for (const s of staven) {
         const van = nodeIds[s.from - 1], naar = nodeIds[s.to - 1];
-        if (van === undefined || naar === undefined) throw new Error(`staaf ${s.from}→${s.to}: knoopindex buiten bereik`);
+        if (van === undefined || naar === undefined) throw new Error(`member ${s.from}→${s.to}: node index out of range`);
         const id = f.addBeam(van, naar);
         if (id != null && s.updates) f.updateBeam(id, s.updates);
         beamIds.push(id);
       }
       for (const s of (args.supports as Array<{ node: number; type: SupportType; k?: number }> | undefined) ?? []) {
         const nid = nodeIds[s.node - 1];
-        if (nid === undefined) throw new Error(`oplegging op knoop ${s.node}: buiten bereik`);
+        if (nid === undefined) throw new Error(`support at node ${s.node}: out of range`);
         f.addSupport(nid, s.type, s.k);
       }
       for (const naam of (args.load_cases as string[] | undefined) ?? []) f.addLoadCase(naam);
@@ -366,7 +366,7 @@ export async function voerUit(
       const id = getal("beamId");
       staaf(id);
       const korf = args.korf as ReinforcementCage | undefined;
-      if (!korf || typeof korf !== "object") throw new Error("`korf` ontbreekt");
+      if (!korf || typeof korf !== "object") throw new Error("`korf` is missing");
       // De korf hangt aan `checkConfig.betonKorf`, niet aan de staaf zelf —
       // dezelfde plek waar het startmodel en de eigenschappendialoog hem
       // zetten. De rest van checkConfig blijft staan.
@@ -379,7 +379,7 @@ export async function voerUit(
     case "analysetype_zetten": {
       const v = args.analysetype;
       if (v !== "eersteOrde" && v !== "tweedeOrdeGeometrisch" && v !== "tweedeOrdeFysisch") {
-        throw new Error(`onbekend analysetype ${String(v)}`);
+        throw new Error(`unknown analysis type ${String(v)}`);
       }
       a().fem.setAnalysetype(v);
       await verseRender();
@@ -402,7 +402,7 @@ export async function voerUit(
       const fout = a().laatsteRekenfout();
       const cr = a().fem.combinationResults;
       if (!uitkomst.gelukt || fout || !cr) {
-        throw new Error(`doorrekenen mislukt: ${fout ?? "de rekengang leverde geen combinatieresultaten"}`);
+        throw new Error(`calculation failed: ${fout ?? "the calculation produced no combination results"}`);
       }
       const t = useCheckStore.getState();
       return {
@@ -447,7 +447,7 @@ export async function voerUit(
       } catch {
         const s = useDekkingslijnStore.getState();
         if (!(s.beamId === id && !s.bezig && (s.antwoord || s.fout))) {
-          throw new Error("het dekkingslijnvenster kwam niet in beweging — is het een betonstaaf met korf?");
+          throw new Error("The cover-line window did not respond. Is this a concrete member with a reinforcement cage?");
         }
       }
       const klaar = await wachtOpStore(useDekkingslijnStore,
@@ -461,7 +461,7 @@ export async function voerUit(
 
     case "weergave_zetten": {
       const v = args.view;
-      if (typeof v !== "string") throw new Error("`view` ontbreekt");
+      if (typeof v !== "string") throw new Error("`view` is missing");
       a().setActiveView(v);
       await verseRender();
       return { weergave: a().activeView };

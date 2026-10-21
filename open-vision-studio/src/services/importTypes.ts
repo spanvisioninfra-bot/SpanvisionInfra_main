@@ -389,6 +389,6 @@ export function isMultiDocumentImport(value: OpenedImport): value is MultiDocume
 export function activeImportResult(value: OpenedImport): ImportResult {
   if (!isMultiDocumentImport(value)) return value;
   const active = value.results[value.activeDocumentIndex];
-  if (!active) throw new Error('Meervoudige import bevat geen actief document');
+  if (!active) throw new Error('Multi-document import has no active document');
   return active;
 }

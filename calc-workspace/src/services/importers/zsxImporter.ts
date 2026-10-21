@@ -33,13 +33,13 @@ export function importZsx(xml: string): ZsxImportResult {
   const resources: ResourceLibraryItem[] = [];
 
   if (!root) {
-    warnings.push('ZSX document heeft geen root element.');
+    warnings.push('The ZSX document has no root element.');
     return { resources, warnings };
   }
 
   const middelen = children(root, 'Middel');
   if (middelen.length === 0) {
-    warnings.push('ZSX bevat geen <Middel> elementen.');
+    warnings.push('The ZSX file contains no <Middel> elements.');
   }
 
   middelen.forEach((m) => {

@@ -174,7 +174,7 @@ log("  — (h) de enige kanttekening is dat er niet getoetst is");
 const kanttekeningen = verzamelIfcBeperkingen(model);
 checkEq("precies een kanttekening", kanttekeningen.length, 1);
 checkTrue("en die gaat over de ontbrekende toetsresultaten",
-  /Geen toetsresultaten/.test(kanttekeningen[0]));
+  /No design-check results/.test(kanttekeningen[0]));
 
 // ─────────────────────────────────────────────────────────────────────────
 log("\n[2] De boomstructuur toont hetzelfde model als het bestand");
@@ -185,7 +185,7 @@ checkEq("wortel = IfcProject", boom.type, "IfcProject");
 checkEq("wortelnaam = projectnaam", boom.naam, "Loods Noord");
 const knopenTak = plat.find(k => k.type === "IfcStructuralPointConnection");
 const stavenTak = plat.find(k => k.type === "IfcStructuralCurveMember");
-const steunTak  = plat.find(k => k.naam === "Opleggingen");
+const steunTak  = plat.find(k => k.naam === "Supports");
 checkEq("tak Knopen telt het echte aantal", knopenTak?.aantal, model.nodes.length);
 checkEq("tak Knopen heeft evenveel kinderen", knopenTak?.kinderen?.length, model.nodes.length);
 checkEq("tak Staven telt het echte aantal", stavenTak?.aantal, model.beams.length);
@@ -201,7 +201,7 @@ const boomTekst = plat.map(k => `${k.type} ${k.naam}`).join("\n");
 checkTrue("geen verzonnen verdiepingen in de boom",
   !/Ground Floor|First Floor|Default Site|Sample Project/.test(boomTekst));
 checkTrue("knoop 3 staat met zijn coördinaat in de boom",
-  boomTekst.includes("Knoop 3 — x 6,000 m, z 5,000 m"));
+  boomTekst.includes("Node 3 — x 6,000 m, z 5,000 m"));
 
 // ─────────────────────────────────────────────────────────────────────────
 log("\n[3] Export structureel — draagsysteem zonder belastingen");
@@ -219,9 +219,9 @@ const structBeperking = verzamelIfcBeperkingen(model, { zonderLasten: true });
 checkEq("twee punten gemeld: de lasten en de ontbrekende toetsing",
   structBeperking.length, 2);
 checkTrue("melding noemt de aantallen",
-  structBeperking[0].includes("3 belastingen") && structBeperking[0].includes("2 belastinggevallen"));
+  structBeperking[0].includes("3 loads") && structBeperking[0].includes("2 load cases"));
 checkTrue("de tweede melding gaat over de toetsing",
-  /Geen toetsresultaten/.test(structBeperking[1]));
+  /No design-check results/.test(structBeperking[1]));
 
 // ─────────────────────────────────────────────────────────────────────────
 log("\n[4] Wat niet in IFC past, wordt gemeld (niet stil weggelaten)");
@@ -235,15 +235,15 @@ const metPlaten = {
 };
 const beperkingen = verzamelIfcBeperkingen(metPlaten);
 const alleRegels = beperkingen.join("\n");
-checkTrue("platen worden gemeld", /2 platen/.test(alleRegels));
-checkTrue("randbelasting op een plaat wordt gemeld", /randbelasting/.test(alleRegels));
-checkTrue("eigen gewicht wordt gemeld", /Eigen gewicht/.test(alleRegels));
-checkTrue("combinaties worden gemeld", /4 belastingcombinaties/.test(alleRegels));
+checkTrue("platen worden gemeld", /2 plates/.test(alleRegels));
+checkTrue("randbelasting op een plaat wordt gemeld", /plate edge load/.test(alleRegels));
+checkTrue("eigen gewicht wordt gemeld", /Self-weight/.test(alleRegels));
+checkTrue("combinaties worden gemeld", /4 load combinations/.test(alleRegels));
 checkTrue("onbekende doorsnede wordt gemeld", /XYZ-onbekend/.test(alleRegels));
 checkTrue("en dat die staaf ook geen bouwkundig element krijgt",
-  /geen IfcBeam of IfcColumn/.test(alleRegels));
+  /no IfcBeam or IfcColumn/.test(alleRegels));
 checkTrue("ontbrekende toetsresultaten worden gemeld",
-  /Geen toetsresultaten/.test(alleRegels));
+  /No design-check results/.test(alleRegels));
 checkEq("zes punten gemeld", beperkingen.length, 6);
 
 const kapotModel = {
@@ -253,9 +253,9 @@ const kapotModel = {
 };
 const kapotRegels = verzamelIfcBeperkingen(kapotModel).join("\n");
 checkTrue("staaf naar een niet-bestaande knoop wordt gemeld",
-  /staaf\/staven verwijzen naar een knoop die niet bestaat/.test(kapotRegels));
+  /member\(s\) reference a node that does not exist/.test(kapotRegels));
 checkTrue("last naar een niet-bestaande knoop wordt gemeld",
-  /belasting\(en\) verwijzen naar een knoop of staaf die niet bestaat/.test(kapotRegels));
+  /load\(s\) reference a node or member that does not exist/.test(kapotRegels));
 
 // ─────────────────────────────────────────────────────────────────────────
 log("\n[5] Deellast, lokale lijnlast en staafgebonden puntlast");
@@ -308,7 +308,7 @@ checkEq("validatie: geen fouten", valideerIfc(ifcLasten).fouten.length, 0);
 const lastBeperking = verzamelIfcBeperkingen(lastModel);
 checkEq("de lasten passen alle drie in het bestand", lastBeperking.length, 1);
 checkTrue("de enige melding gaat over de ontbrekende toetsing",
-  /Geen toetsresultaten/.test(lastBeperking[0]));
+  /No design-check results/.test(lastBeperking[0]));
 
 // ─────────────────────────────────────────────────────────────────────────
 log("\n[6] De validator vindt een kapot bestand ook echt kapot");
@@ -355,17 +355,17 @@ checkEq("een doorsnedeset per staaf",
 
 log("  — de boom toont de bouwkundige staven ernaast");
 const platB = platteBoom(bouwIfcBoom(model));
-const bouwTak = platB.find(k => k.naam === "Bouwkundige staven");
+const bouwTak = platB.find(k => k.naam === "Physical members");
 checkEq("tak 'Bouwkundige staven' telt het echte aantal",
   bouwTak?.aantal, model.beams.length);
 const elementTeksten = (bouwTak?.kinderen ?? []).map(k => `${k.type} ${k.naam}`);
 checkTrue("staaf 5 (de luifel) staat er als ligger met zijn koker",
-  elementTeksten.some(t => t.startsWith("IfcBeam Ligger 5") && t.includes("SHS 60x60x4")));
+  elementTeksten.some(t => t.startsWith("IfcBeam Beam 5") && t.includes("SHS 60x60x4")));
 checkTrue("staaf 1 staat er als kolom",
-  elementTeksten.some(t => t.startsWith("IfcColumn Kolom 1")));
+  elementTeksten.some(t => t.startsWith("IfcColumn Column 1")));
 checkEq("zonder bouwkundig model verdwijnt de tak uit de boom",
   platteBoom(bouwIfcBoom(model, { zonderBouwkundig: true }))
-    .filter(k => k.naam === "Bouwkundige staven").length, 0);
+    .filter(k => k.naam === "Physical members").length, 0);
 
 log("  — een betonstaaf met korf toont zijn wapening");
 const betonModel = {
@@ -389,8 +389,8 @@ const betonModel = {
 const wapeningTak = platteBoom(bouwIfcBoom(betonModel))
   .find(k => k.type === "IfcReinforcingBar");
 checkTrue("de korf staat onder de ligger in de boom",
-  wapeningTak !== undefined && /onder 3/.test(wapeningTak.naam) &&
-  /boven 2/.test(wapeningTak.naam) && /beugel/.test(wapeningTak.naam));
+  wapeningTak !== undefined && /bottom 3/.test(wapeningTak.naam) &&
+  /top 2/.test(wapeningTak.naam) && /stirrup/.test(wapeningTak.naam));
 const betonIfc = bouwIfcRekenmodel(betonModel);
 checkEq("het bestand draagt zes wapeningsstaven",
   tel(betonIfc, "IFCREINFORCINGBAR"), 6);
@@ -398,7 +398,7 @@ checkEq("validatie: geen fouten", valideerIfc(betonIfc).fouten.length, 0);
 checkEq("validatie: geen waarschuwingen", valideerIfc(betonIfc).waarschuwingen.length, 0);
 const betonRegels = verzamelIfcBeperkingen(betonModel).join("\n");
 checkTrue("de samengevatte beugelreeks wordt eerlijk gemeld",
-  /Beugels van 1 betonstaaf/.test(betonRegels));
+  /Stirrups for 1 concrete member/.test(betonRegels));
 
 log(`\n${failed === 0 ? "✅" : "❌"} ${passed} geslaagd, ${failed} gefaald\n`);
 process.exit(failed === 0 ? 0 : 1);

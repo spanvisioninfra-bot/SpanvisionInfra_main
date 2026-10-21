@@ -170,7 +170,7 @@ export default function PropertiesPanel() {
                 {/* Real-world size of the region itself, in its own scale +
                     units — editable, resizes the region (top-left anchored). */}
                 <div class="property-group">
-                  <label>Breedte ({annotProps.scaleRegionUnits || 'mm'})</label>
+                  <label>Width ({annotProps.scaleRegionUnits || 'mm'})</label>
                   <input type="number" step="1" min="1"
                     value={annotProps.scaleRegionWidth ?? ''}
                     disabled={annotProps.locked === true || annotProps.locked === 'mixed'}
@@ -178,7 +178,7 @@ export default function PropertiesPanel() {
                   />
                 </div>
                 <div class="property-group">
-                  <label>Hoogte ({annotProps.scaleRegionUnits || 'mm'})</label>
+                  <label>Height ({annotProps.scaleRegionUnits || 'mm'})</label>
                   <input type="number" step="1" min="1"
                     value={annotProps.scaleRegionHeight ?? ''}
                     disabled={annotProps.locked === true || annotProps.locked === 'mixed'}

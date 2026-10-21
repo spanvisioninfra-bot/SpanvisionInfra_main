@@ -336,7 +336,7 @@ function UnitsTabContent({
     <div className="settings-section">
       <h3>{t("units.angle", "Hoekmodus")}</h3>
       <div className="settings-row">
-        <span className="settings-label">{t("units.angleMode", "Hoek-eenheid")}</span>
+        <span className="settings-label">{t("units.angleMode", "Angle unit")}</span>
         <ThemedSelect
           value={units.angleMode}
           options={[
@@ -349,7 +349,7 @@ function UnitsTabContent({
         />
       </div>
       <div className="settings-row">
-        <span className="settings-label">{t("units.returnAngleUnits", "Hoeken mét eenheid teruggeven")}</span>
+        <span className="settings-label">{t("units.returnAngleUnits", "Return angles with their unit")}</span>
         <input
           type="checkbox"
           checked={units.returnAngleUnits}
@@ -359,7 +359,7 @@ function UnitsTabContent({
 
       <h3 style={{ marginTop: 16 }}>{t("units.defaults", "Default display units")}</h3>
       <div className="settings-row">
-        <span className="settings-label">{t("units.length", "Lengte")}</span>
+        <span className="settings-label">{t("units.length", "Length")}</span>
         <ThemedSelect
           value={units.defaultLength}
           options={[

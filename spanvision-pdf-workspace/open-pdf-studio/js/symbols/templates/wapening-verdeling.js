@@ -3,7 +3,7 @@
 // labelled "n Ø d" (e.g. "3 Ø 12"). Count and diameter are parameters.
 export const wapeningVerdelingTemplate = {
   id: 'wapeningVerdeling',
-  name: 'Wapening verdeling',
+  name: 'Reinforcement distribution',
   nameEn: 'Rebar distribution',
   category: 'NL',
   defaultSize: { width: 220, height: 70 },

@@ -89,8 +89,8 @@ const propertyRelationLine = (content: string, setId: string) => {
   if (!line) throw new Error(`Relatie voor Pset #${setId} ontbreekt in fixture`);
   return line;
 };
-expect('7 corrupte base64: project opent, archief weg mét signaal (structure)', dropsArchiveWith(ifc.replace(archive.byteChunks[0]!, `!${archive.byteChunks[0]!.slice(1)}`), 'ongeldige base64', 'structure'));
-expect('8 hernoemde chunk: archief weg mét signaal (structure)', dropsArchiveWith(ifc.replace('ByteChunk000001', 'ByteChunkAfwezig'), 'geordend', 'structure'));
+expect('7 corrupte base64: project opent, archief weg mét signaal (structure)', dropsArchiveWith(ifc.replace(archive.byteChunks[0]!, `!${archive.byteChunks[0]!.slice(1)}`), 'invalid base64', 'structure'));
+expect('8 hernoemde chunk: archief weg mét signaal (structure)', dropsArchiveWith(ifc.replace('ByteChunk000001', 'ByteChunkAfwezig'), 'ordered', 'structure'));
 expect('9 FOUTCODE hash-mismatch: corrupte bronhash ⇒ archief weg mét signaal', dropsArchiveWith(ifc.replace(archive.sha256, `0${archive.sha256.slice(1)}`), 'Sha256', 'hash-mismatch'));
 expect('10 verkeerde manifestchunkgrootte: archief weg mét signaal (structure)', dropsArchiveWith(ifc.replace('IFCINTEGER(196608)', 'IFCINTEGER(196607)'), 'ByteChunkSize', 'structure'));
 expect('10a FOUTCODE schema-version: onbekende archiefschemaversie ⇒ archief weg mét signaal',
@@ -102,12 +102,12 @@ const reorderedChunks = ifc
   .replace('ByteChunk000001', 'ByteChunk000000')
   .replace('ByteChunkTMP', 'ByteChunk000001');
 expect('10c verwisselde chunkvolgorde (herordenend programma) ⇒ structure, vóór decode',
-  dropsArchiveWith(reorderedChunks, 'geordend', 'structure'));
+  dropsArchiveWith(reorderedChunks, 'ordered', 'structure'));
 const validButChangedChunk = `${archive.byteChunks[0]![0] === 'A' ? 'B' : 'A'}${archive.byteChunks[0]!.slice(1)}`;
 expect('10d geldige base64 met gewijzigde bytes ⇒ hash-mismatch',
   dropsArchiveWith(ifc.replace(archive.byteChunks[0]!, validButChangedChunk), 'Sha256', 'hash-mismatch'));
 expect('10e selector naar ontbrekende documentview ⇒ metadata-invalid, nooit stil',
-  dropsArchiveWith(ifc.replace("IFCTEXT('P6-ARCHIVE')", "IFCTEXT('P6-ONTBREEKT')"), 'documentview', 'metadata-invalid'));
+  dropsArchiveWith(ifc.replace("IFCTEXT('P6-ARCHIVE')", "IFCTEXT('P6-ONTBREEKT')"), 'missing document view', 'metadata-invalid'));
 const hugeCount = 4_294_967_296;
 const hugeLength = hugeCount * 196_608;
 const hugeBytes = replaceIntegerProperty(
@@ -115,22 +115,22 @@ const hugeBytes = replaceIntegerProperty(
   'ByteChunkCount', hugeCount,
 );
 expect('11 enorme coherente bytecount ⇒ truncated, vóór Array.from/allocatie',
-  dropsArchiveWith(hugeBytes, 'propertybudget', 'truncated'));
+  dropsArchiveWith(hugeBytes, 'property budget', 'truncated'));
 const injectedDiagnostics = ifc.replace('ByteChunk000000', 'DiagnosticsChunk000000');
 expect('12 schema-2 accepteert geen ingespoten uitgebreide diagnosticschunk (structure)',
-  dropsArchiveWith(injectedDiagnostics, 'geordend', 'structure'));
+  dropsArchiveWith(injectedDiagnostics, 'ordered', 'structure'));
 
 const projectLine = ifc.split('\n').find(line => line.includes('=IFCPROJECT('));
 if (!projectLine) throw new Error('IFCPROJECT ontbreekt in fixture');
 const duplicateProject = ifc.replace(projectLine, `${projectLine}\n${projectLine.replace(/^#[A-Za-z0-9_]+=/, '#999991=')}`);
 expect('13 archive-IFC met twee IFCPROJECT-entiteiten ⇒ structure',
-  dropsArchiveWith(duplicateProject, 'exact één IFCPROJECT', 'structure'));
+  dropsArchiveWith(duplicateProject, 'exactly one IFCPROJECT', 'structure'));
 
 const selectorSetId = psetId(ifc, 'OPS_XerDocument');
 const selectorRelation = propertyRelationLine(ifc, selectorSetId);
 const danglingSelector = ifc.replace(selectorRelation, selectorRelation.replace(/\(#[A-Za-z0-9_]+\),#[A-Za-z0-9_]+\);$/, '(#999992),#' + selectorSetId + ');'));
 expect('14 selectorrelatie naar een dangling project ⇒ structure',
-  dropsArchiveWith(danglingSelector, 'hangt niet één-op-één', 'structure'));
+  dropsArchiveWith(danglingSelector, 'not linked one-to-one', 'structure'));
 
 const archiveSetId = psetId(ifc, 'OPS_XerSourceArchive');
 const duplicateRelation = ifc.replace(
@@ -138,7 +138,7 @@ const duplicateRelation = ifc.replace(
   selectorRelation.replace(new RegExp(`#${selectorSetId}\\);$`), `#${archiveSetId});`),
 );
 expect('15 dubbele propertyrelatie naar het archief ⇒ structure',
-  dropsArchiveWith(duplicateRelation, 'hangt niet één-op-één', 'structure'));
+  dropsArchiveWith(duplicateRelation, 'not linked one-to-one', 'structure'));
 
 // ── Per foutcode één gerichte case (eigenaarsbesluit 2026-09-24) ─────────────────────────────
 /** Verwijder properties (op naam) uit een pset — zoals een herschrijvend IFC-programma dat grote
@@ -160,9 +160,9 @@ const dropPsetProperties = (content: string, psetName: string, drop: (name: stri
   }).join('\n');
 };
 expect('17 FOUTCODE truncated: laatste bronchunk ontbreekt ⇒ afgeknot archief, project opent',
-  dropsArchiveWith(dropPsetProperties(ifc, 'OPS_XerSourceArchive', name => name === 'ByteChunk000001'), 'propertybudget', 'truncated'));
+  dropsArchiveWith(dropPsetProperties(ifc, 'OPS_XerSourceArchive', name => name === 'ByteChunk000001'), 'property budget', 'truncated'));
 expect('18 FOUTCODE bytes-missing: herschreven door ander programma (pset aanwezig, álle bronbytes weg)',
-  dropsArchiveWith(dropPsetProperties(ifc, 'OPS_XerSourceArchive', name => name.startsWith('ByteChunk0')), 'geen enkele', 'bytes-missing'));
+  dropsArchiveWith(dropPsetProperties(ifc, 'OPS_XerSourceArchive', name => name.startsWith('ByteChunk0')), 'none is present', 'bytes-missing'));
 const archiveRelation = propertyRelationLine(ifc, archiveSetId);
 const archivePsetLine = ifc.split('\n').find(line => line.startsWith(`#${archiveSetId}=`))!;
 const withoutArchivePset = ifc.replace(`${archiveRelation}\n`, '').replace(`${archivePsetLine}\n`, '');
@@ -176,7 +176,7 @@ const selectorPsetLine = ifc.split('\n').find(line => line.startsWith(`#${select
 const withoutSelectorPset = ifc.replace(`${selectorRelation}\n`, '').replace(`${selectorPsetLine}\n`, '');
 expect('18b FOUTCODE structure: selector (OPS_XerDocument) weg, archief-pset geldig',
   !withoutSelectorPset.includes("'OPS_XerDocument'") && withoutSelectorPset.includes("'OPS_XerSourceArchive'")
-  && dropsArchiveWith(withoutSelectorPset, 'selector ontbreekt', 'structure'));
+  && dropsArchiveWith(withoutSelectorPset, 'selector is missing', 'structure'));
 {
   // Critreview archief-fallback (b): het detail is begrensd, ook bij een reusachtige foutmelding.
   const verdict = archiveDropped(

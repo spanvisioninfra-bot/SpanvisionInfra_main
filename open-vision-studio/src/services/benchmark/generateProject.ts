@@ -92,7 +92,7 @@ function buildCalendar(startYear: number): WorkCalendar {
   }
   return {
     id: 'cal-benchmark',
-    name: 'Benchmark-kalender',
+    name: "Benchmark calendar",
     description: 'ma-vr 07:00-16:00 met feestdagen (benchmark)',
     workDays: [1, 2, 3, 4, 5],
     workStartHour: 7,
@@ -131,7 +131,7 @@ export function generateBenchmarkProject(size: number, opts: BenchmarkOptions = 
   const project: Project = {
     id: 'proj-benchmark',
     name: `Benchmark ${size} tasks`,
-    description: 'Gegenereerd testproject voor de ingebouwde benchmark',
+    description: "Generated test project for the built-in benchmark",
     startDate: projectStart,
     endDate: projectStart,
     calendarId: calendar.id,

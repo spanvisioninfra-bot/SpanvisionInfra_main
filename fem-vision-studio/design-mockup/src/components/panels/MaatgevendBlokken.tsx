@@ -53,10 +53,10 @@ const TEKEN: Record<UcKlasse, string> = { goed: "✓", letop: "!", overschreden:
 /** Twee decimalen, decimaalkomma; een onbegrensde UC als ∞. */
 export function fmtUcPaneel(uc: number): string {
   if (!Number.isFinite(uc) || uc === Number.MAX_VALUE) return "∞";
-  return uc.toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return uc.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-const fmtMm = (v: number) => v.toLocaleString("nl-NL", { maximumFractionDigits: 0 });
+const fmtMm = (v: number) => v.toLocaleString("en-GB", { maximumFractionDigits: 0 });
 
 /** De unity check als balkje met het streepje UC = 1,0 op twee derde. */
 export function UcBalkje({ uc }: { uc: number }) {

@@ -248,7 +248,7 @@ log("\n[2] De projectgegevens komen op het omslag");
     project: { name: "", projectNumber: "", engineer: "", company: "", date: "" },
     checkResults: [staal(1)],
   });
-  checkGelijk("een naamloos project krijgt een naam", leeg.project_name, "Naamloos");
+  checkGelijk("een naamloos project krijgt een naam", leeg.project_name, "Untitled");
   checkWaar(
     "een lege datum wordt vandaag",
     /^\d{4}-\d{2}-\d{2}$/.test(leeg.date),

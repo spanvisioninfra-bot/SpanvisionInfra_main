@@ -185,7 +185,7 @@ export default function TweepaalsPoerDesigner() {
           <label title={"Quasi-permanent load for crack width"}>F<sub>qp</sub> (kN)
             <input type="number" step={100} value={Fqp} onChange={(e) => set("F_qp", parseFloat(e.target.value))} />
           </label>
-          <span className="gd-note">Pile reaction {fmt(R)} kN · diagonaal onder {fmt(theta)}° · tie force from equilibrium ≈ {fmt(Ftrek)} kN.</span>
+          <span className="gd-note">Pile reaction {fmt(R)} kN · diagonal at {fmt(theta)}° · tie force from equilibrium ≈ {fmt(Ftrek)} kN.</span>
         </div>
 
         <div ref={wrapRef} className="vd-canvases" style={{ flex: 1, minWidth: 0, gap, borderLeft: "1px solid var(--theme-border-subtle, #d1d5db)", paddingLeft: 18 }}>
@@ -284,7 +284,7 @@ export default function TweepaalsPoerDesigner() {
         <span className="vd-live">
           {BETONLABEL[fck]} · {STAALSOORT.find((o) => o.v === staal)?.label} · poer {fmt(lPoer)}×{fmt(bPoer)}×{fmt(hPoer)} mm ·
           {kolVorm === 1 ? `circular column Ø${fmt(dKol)}` : `column ${fmt(dKol)}×${fmt(dKol)}`} ·
-          palen {fmt(bPaal)}×{fmt(lPaal)} h.o.h. {fmt(lHoh)} · dekking {fmt(cDek)} ·
+          palen {fmt(bPaal)}×{fmt(lPaal)} h.o.h. {fmt(lHoh)} · cover {fmt(cDek)} ·
           {nL}Ø{fmt(dL)} = {fmt(As)} mm² · Ø{fmt(dBg)}-{fmt(sBg)} ({nSn}sn.) ·
           F<sub>Ed</sub> = {fmt(FEd)} kN → {fmt(R)} kN per pile · F<sub>qp</sub> = {fmt(Fqp)} kN ·
           z ≈ {fmt(zArm)} mm · θ = {fmt(theta)}° · trekband ≈ {fmt(Ftrek)} kN ·

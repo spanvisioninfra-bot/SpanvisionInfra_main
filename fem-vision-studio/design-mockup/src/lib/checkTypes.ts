@@ -53,7 +53,7 @@ export function gradeLabel(r: MemberCheckResult): string {
   if (isSteelCheckResult(r)) return r.steel_grade;
   if (isConcreteCheckResult(r)) return r.concrete_class;
   if (isStressCheckResult(r)) {
-    const f = r.f_toel_mpa.toLocaleString("nl-NL", { maximumFractionDigits: 2 });
+    const f = r.f_toel_mpa.toLocaleString("en-GB", { maximumFractionDigits: 2 });
     return `${r.material_name}, f = ${f} N/mm²`;
   }
   return r.strength_class;

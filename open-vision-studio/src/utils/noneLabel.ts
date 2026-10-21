@@ -5,7 +5,7 @@
 // Ook de vertaalde resourcetype-labels (bandkop bij groeperen op Resourcetype) reizen mee.
 import type { ResourceType } from '@/types/resource';
 
-let noneLabel = '(geen)';
+let noneLabel = "(none)";
 
 export function setNoneLabelValue(label: string): void {
   if (label) noneLabel = label;

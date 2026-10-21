@@ -79,7 +79,7 @@ export function ChatPanel() {
   // command-line-argument mee (cmd.exe limiteert dat tot ~8K), dus de grote,
   // dynamische begrotingsinhoud zit NIET hier maar in het user-bericht (stdin).
   const buildSystemPrompt = useCallback(() => {
-    return `Je bent de ${BRAND.organization} calculatieassistent in ${BRAND.product} (begrotingsprogramma voor de Nederlandse bouw). Je werkt in het document dat nu open staat; de actuele inhoud staat in het gebruikersbericht.
+    return `You are the ${BRAND.organization} estimating assistant in ${BRAND.product}. Work in the currently open document; its current contents are included in the user message. Keep all explanations and generated descriptions in English. Preserve the action protocol's field names and values exactly.
 ${ACTIE_PROTOCOL}
 Respond in English, concisely and practically; amounts exclude VAT unless requested otherwise.`;
   }, []);
@@ -91,9 +91,9 @@ Respond in English, concisely and practically; amounts exclude VAT unless reques
     const staartItems = store.items.filter(i => i.rowType.startsWith('staart_'));
     return `${BEGROTEN_KENNIS}
 
-Huidige begroting:
+Current estimate:
 ${buildBudgetContext(store.schedule, store.items)}
-Staartkosten: ${staartItems.map(s => `${s.description} ${s.staartPercentage ?? ''}%`).join(', ') || "(none)"}`;
+Overheads and markups: ${staartItems.map(s => `${s.description} ${s.staartPercentage ?? ''}%`).join(', ') || "(none)"}`;
   }, []);
 
   /** Bereken het ruwe assistent-antwoord. Alle context is op verzendmoment
@@ -111,7 +111,7 @@ Staartkosten: ${staartItems.map(s => `${s.description} ${s.staartPercentage ?? '
 
     // (1) Spanvision Infra-account
     if (OPENAEC_ENABLED && accountsUser) {
-      const prompt = `${contextBlock}\n\n${historyText}\n\nAssistent:`;
+      const prompt = `${contextBlock}\n\n${historyText}\n\nAssistant:`;
       return (await accountsAiComplete(prompt, buildSystemPrompt())) || i18next.t('chat.noAnswer');
     }
 
@@ -140,8 +140,8 @@ Staartkosten: ${staartItems.map(s => `${s.description} ${s.staartPercentage ?? '
     // (2) geen AI — lokaal antwoord uit de snapshot
     const total = chapters.reduce((s, c) => s + c.total, 0);
     const lower = text.toLowerCase();
-    const fmtTotal = Math.round(total).toLocaleString('nl-NL');
-    const chapterList = chapters.map(c => `- ${c.code} ${c.description}: €${Math.round(c.total).toLocaleString('nl-NL')}`).join('\n');
+    const fmtTotal = Math.round(total).toLocaleString('en-GB');
+    const chapterList = chapters.map(c => `- ${c.code} ${c.description}: €${Math.round(c.total).toLocaleString('en-GB')}`).join('\n');
     if (lower.includes('totaal') || lower.includes('kosten') || lower.includes('prijs')) {
       return i18next.t('chat.localTotal', { total: fmtTotal, list: chapterList });
     }
@@ -150,12 +150,12 @@ Staartkosten: ${staartItems.map(s => `${s.description} ${s.staartPercentage ?? '
     }
     if (lower.includes('duurste') || lower.includes('grootste')) {
       const sorted = [...chapters].sort((a, b) => b.total - a.total);
-      const list = sorted.slice(0, 5).map((c, i) => `${i + 1}. ${c.code} ${c.description}: €${Math.round(c.total).toLocaleString('nl-NL')} (${total ? Math.round(c.total / total * 100) : 0}%)`).join('\n');
+      const list = sorted.slice(0, 5).map((c, i) => `${i + 1}. ${c.code} ${c.description}: €${Math.round(c.total).toLocaleString('en-GB')} (${total ? Math.round(c.total / total * 100) : 0}%)`).join('\n');
       return i18next.t('chat.localTop', { list });
     }
     if (lower.includes('m2') || lower.includes('per vierkante meter') || lower.includes('bvo')) {
       return bvo && bvo > 0
-        ? i18next.t('chat.localBvo', { bvo, value: Math.round(total / bvo).toLocaleString('nl-NL') })
+        ? i18next.t('chat.localBvo', { bvo, value: Math.round(total / bvo).toLocaleString('en-GB') })
         : i18next.t('chat.localNoBvo');
     }
     return i18next.t('chat.localHelp');
@@ -176,7 +176,7 @@ Staartkosten: ${staartItems.map(s => `${s.description} ${s.staartPercentage ?? '
     const historyText = priorMessages
       .filter(m => m.status !== 'pending')
       .map(m => `${m.role === 'user' ? "User" : 'Assistent'}: ${m.content}`)
-      .concat(`Gebruiker: ${text}`).join('\n\n');
+      .concat(`User: ${text}`).join('\n\n');
     const chatHistory = priorMessages
       .filter(m => m.status !== 'pending')
       .map(m => ({ role: m.role, content: m.content }));
@@ -232,7 +232,7 @@ Staartkosten: ${staartItems.map(s => `${s.description} ${s.staartPercentage ?? '
             className="chat-credits"
             title={t('chat.creditsTitle')}
           >
-            {t('chat.tokens', { amount: aiCredits.toLocaleString('nl-NL') })}
+            {t('chat.tokens', { amount: aiCredits.toLocaleString('en-GB') })}
           </span>
         )}
         <button className="chat-close" onClick={toggleChatPanel}>✕</button>

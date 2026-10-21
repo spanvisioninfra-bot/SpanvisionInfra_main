@@ -966,7 +966,7 @@ async def download_bcf(job_id: str):
 
 @app.post("/api/v2/projects")
 async def create_project(
-    name: str = Form("Nieuw project", description="Project name"),
+    name: str = Form("New project", description="Project name"),
 ):
     """Create a new project."""
     project = project_manager.create_project(name)

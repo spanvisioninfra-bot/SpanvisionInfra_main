@@ -336,8 +336,8 @@ export type GevalInvoer = Pick<LoadCase, "id" | "name" | "type" | "categorie" | 
  */
 export const STANDAARD_BELASTINGGEVALLEN: readonly GevalInvoer[] = [
   { id: 1, name: "Permanent (G)", type: "dead" },
-  { id: 2, name: "Variabel (Q)", type: "live" },
-  { id: 3, name: "Sneeuw (S)", type: "snow" },
+  { id: 2, name: "Variable (Q)", type: "live" },
+  { id: 3, name: "Snow (S)", type: "snow" },
   { id: 4, name: "Wind (W)", type: "wind" },
 ];
 

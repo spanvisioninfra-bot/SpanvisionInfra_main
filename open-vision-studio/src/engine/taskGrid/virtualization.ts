@@ -28,7 +28,7 @@ export function computeVirtualWindow(input: VirtualWindowInput): VirtualWindow {
     return { startIndex: 0, endIndexExclusive: 0, topSpacerHeight: 0, bottomSpacerHeight: 0, mountedRows: [] };
   }
   if (!(input.rowHeight > 0) || !(input.viewportHeight >= 0)) {
-    throw new RangeError('rowHeight moet positief zijn en viewportHeight mag niet negatief zijn');
+    throw new RangeError('rowHeight must be positive and viewportHeight must not be negative');
   }
   const overscan = Math.max(0, Math.floor(input.overscan ?? 8));
   const maxScrollTop = Math.max(0, totalRows * input.rowHeight - input.viewportHeight);

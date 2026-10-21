@@ -85,7 +85,7 @@ function GebiedTabel({
           <th>
             b<sub>eff</sub> [mm]
           </th>
-          <th>{t("report.beffZoneVanIngevoerd", "van de ingevoerde breedte")}</th>
+          <th>{t("report.beffZoneVanIngevoerd", "of the entered width")}</th>
         </tr>
       </thead>
       <tbody>
@@ -132,7 +132,7 @@ export default function BeffAfleiding({ uitkomst }: { uitkomst: BeffStaafUitkoms
         <p className="rpt-beff-mislukt">
           {t("report.beffMislukt", {
             defaultValue:
-              "De meewerkende flensbreedte is NIET afgeleid: {{reden}}. Er is gerekend met de ingevoerde flensbreedte van {{breedte}} mm. Volgens 5.3.2.1(3) is de meewerkende breedte hoogstens gelijk aan de werkelijke flensbreedte en doorgaans kleiner; met de volle breedte rekenen is daarmee de onveilige kant.",
+              "The effective flange width was NOT derived: {{reden}}. The calculation used the flange width entered, {{breedte}} mm. Per 5.3.2.1(3) the effective width is at most equal to the actual flange width and usually smaller; using the full width is therefore on the unsafe side.",
             reden: uitkomst.reden,
             breedte: mm(uitkomst.ingevoerdeBreedteMm),
           })}
@@ -154,7 +154,7 @@ export default function BeffAfleiding({ uitkomst }: { uitkomst: BeffStaafUitkoms
       <p className="rpt-beff-inleiding">
         {t("report.beffInleiding", {
           defaultValue:
-            "Ingevoerde flensbreedte {{ingevoerd}} mm; gerekend is met b_eff = {{beff}} mm. De liggerlijn waar deze staaf deel van uitmaakt heeft {{aantal}} overspanning(en) ({{spans}}), begin {{start}}, eind {{eind}}. Het staafmidden ligt op x = {{x}} mm langs die lijn.",
+            "Flange width entered {{ingevoerd}} mm; the calculation used b_eff = {{beff}} mm. The beam line this member belongs to has {{aantal}} span(s) ({{spans}}), start {{start}}, end {{eind}}. The member midpoint is at x = {{x}} mm along that line.",
           ingevoerd: mm(u.ingevoerdeBreedteMm),
           beff: mm(u.bEffMm),
           aantal: u.line.spans_mm.length,
@@ -174,7 +174,7 @@ export default function BeffAfleiding({ uitkomst }: { uitkomst: BeffStaafUitkoms
             <li>
               {t("report.beffStaven", {
                 defaultValue:
-                  "De liggerlijn bestaat uit de staven {{staven}}; de steunpunten liggen op de knopen {{knopen}}.",
+                  "The beam line consists of members {{staven}}; the supports are at nodes {{knopen}}.",
                 staven: u.staafIds.join(", "),
                 knopen: u.steunpuntKnopen.join(", "),
               })}
@@ -184,7 +184,7 @@ export default function BeffAfleiding({ uitkomst }: { uitkomst: BeffStaafUitkoms
             <li>
               {t("report.beffStaafEnkel", {
                 defaultValue:
-                  "De liggerlijn is deze ene staaf; de steunpunten liggen op de knopen {{knopen}}.",
+                  "The beam line is this single member; the supports are at nodes {{knopen}}.",
                 knopen: u.steunpuntKnopen.join(", "),
               })}
             </li>
@@ -210,7 +210,7 @@ export default function BeffAfleiding({ uitkomst }: { uitkomst: BeffStaafUitkoms
       <p className="rpt-beff-tabelnoot">
         {t("report.beffZonesNoot", {
           defaultValue:
-            "b_eff verschilt per gebied. Deze staaf rekent met één waarde, die van het gebied waarin het staafmidden ligt; 5.3.2.1(4) staat een constante breedte per overspanning toe waarbij de waarde van de velddoorsnede wordt aangehouden. Boven een steunpunt is b_eff kleiner dan de aangehouden waarde, en daar is de doorsnede dus te stijf gerekend.",
+            "b_eff differs per region. This member uses a single value, that of the region containing the member midpoint; 5.3.2.1(4) permits a constant width per span, taking the value applicable to the span section. Over a support b_eff is smaller than the value used, so the cross-section has been taken as too stiff there.",
         })}
       </p>
     </div>

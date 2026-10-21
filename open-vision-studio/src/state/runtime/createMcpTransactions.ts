@@ -208,7 +208,7 @@ function createMcpDraft(
     const tempIds = new Set<string>();
     for (const item of items) {
       if (tempIds.has(item.tempId)) {
-        throw new Error(`draft.addTasks: dubbele tempId '${item.tempId}' binnen de call`);
+        throw new Error(`draft.addTasks: duplicate tempId '${item.tempId}' within the call`);
       }
       tempIds.add(item.tempId);
     }
@@ -219,7 +219,7 @@ function createMcpDraft(
       const p = item.parentId ?? null;
       if (p !== null && !existingIds.has(p) && !tempIds.has(p)) {
         throw new Error(
-          `draft.addTasks: onbekende parentId '${p}' (geen bestaand taak-id en geen tempId uit de call)`,
+          `draft.addTasks: unknown parentId '${p}' (neither an existing task id nor a tempId from this call)`,
         );
       }
     }
@@ -228,7 +228,7 @@ function createMcpDraft(
     for (const item of items) {
       if (item.isMilestone && item.time && item.time.scheduleDuration > 0) {
         throw new Error(
-          `draft.addTasks: mijlpaal '${item.tempId}' mag geen duur > 0 hebben (scheduleDuration=${item.time.scheduleDuration})`,
+          `draft.addTasks: milestone '${item.tempId}' must not have duration > 0 (scheduleDuration=${item.time.scheduleDuration})`,
         );
       }
     }
@@ -348,7 +348,7 @@ function createMcpDraft(
       if (newParentId !== null) {
         if (!s.tasks.some((t) => t.id === newParentId)) throw new Error(`draft.moveTask: onbekende ouder '${newParentId}'`);
         if (isSelfOrDescendant(s.tasks, newParentId, id)) {
-          throw new Error(`draft.moveTask: '${id}' kan niet onder zichzelf of een eigen afstammeling`);
+          throw new Error(`draft.moveTask: '${id}' cannot be placed under itself or its descendant`);
         }
       }
       const plan = planPhaseTransitions(s, firstChildGains(s.tasks, [{ childId: id, parentId: newParentId }]));
@@ -613,13 +613,13 @@ function createMcpDraft(
   ensureCustomTaskType(type: CustomTaskType): void {
     store.setState((s) => {
       const normalized = { id: type.id.trim(), name: type.name.trim() };
-      if (!normalized.id || !normalized.name) throw new Error('draft.ensureCustomTaskType: id en naam mogen niet leeg zijn');
+      if (!normalized.id || !normalized.name) throw new Error('draft.ensureCustomTaskType: ID and name must not be empty');
       const { sameId, sameNameOtherId } = customTaskTypeClashes(s.customTaskTypes, normalized);
       if (sameId) {
-        if (sameId.name !== normalized.name) throw new Error(`draft.ensureCustomTaskType: id '${normalized.id}' heeft al naam '${sameId.name}'`);
+        if (sameId.name !== normalized.name) throw new Error(`draft.ensureCustomTaskType: id '${normalized.id}' already has name '${sameId.name}'`);
         return;
       }
-      if (sameNameOtherId) throw new Error(`draft.ensureCustomTaskType: naam '${normalized.name}' heeft al id '${sameNameOtherId.id}'`);
+      if (sameNameOtherId) throw new Error(`draft.ensureCustomTaskType: name '${normalized.name}' already has id '${sameNameOtherId.id}'`);
       s.customTaskTypes.push(normalized);
       markDocumentEdited(s);
     });
@@ -664,7 +664,7 @@ function createMcpDraft(
     let changed = 0;
     store.setState((s) => {
       const idx = s.calendars.findIndex((c) => c.id === id);
-      if (idx < 0) throw new Error(`draft.updateCalendar: onbekende kalender-id '${id}'`);
+      if (idx < 0) throw new Error(`draft.updateCalendar: unknown calendar id '${id}'`);
       // Tweeling van resourceSlice.ts's `updateCalendar`: momentopnamen vóór de mutatie.
       const byTask = assignmentsByTask(s.assignments);
       const affected = tasksOnCalendar(s, id).map((task) => ({ task, before: captureCalendarChange(task, byTask.get(task.id) ?? [], s) }));
@@ -690,7 +690,7 @@ function createMcpDraft(
     const id = generateId('res');
     store.setState((s) => {
       if (!isValidUnits(res.maxUnits)) {
-        throw new Error(`draft.addResource: ongeldige maxUnits ${String(res.maxUnits)} (strikt positief vereist)`);
+        throw new Error(`draft.addResource: invalid maxUnits ${String(res.maxUnits)} (must be strictly positive)`);
       }
       insertResource(s, res, id);
       markDocumentEdited(s);
@@ -716,7 +716,7 @@ function createMcpDraft(
       const idx = s.resources.findIndex((r) => r.id === id);
       if (idx < 0) throw new Error(`draft.updateResource: onbekende resource-id '${id}'`);
       if ('maxUnits' in updates && !isValidUnits(updates.maxUnits)) {
-        throw new Error(`draft.updateResource: ongeldige maxUnits ${String(updates.maxUnits)} (strikt positief vereist)`);
+        throw new Error(`draft.updateResource: invalid maxUnits ${String(updates.maxUnits)} (must be strictly positive)`);
       }
       const target = s.resources[idx] as unknown as Record<string, unknown>;
       for (const [key, value] of Object.entries(updates)) {
@@ -773,10 +773,10 @@ function createMcpDraft(
       const task = s.tasks.find((t) => t.id === taskId);
       if (!task) throw new Error(`draft.assignResource: onbekende taskId '${taskId}'`);
       if (task.isMilestone || isSummaryTask(task)) {
-        throw new Error(`draft.assignResource: kan geen resource toewijzen aan een mijlpaal/samenvattingstaak '${taskId}'`);
+        throw new Error(`draft.assignResource: cannot assign a resource to milestone/summary task '${taskId}'`);
       }
       if (!isValidUnits(unitsPerDay)) {
-        throw new Error(`draft.assignResource: ongeldige unitsPerDay ${String(unitsPerDay)} (strikt positief vereist)`);
+        throw new Error(`draft.assignResource: invalid unitsPerDay ${String(unitsPerDay)} (must be strictly positive)`);
       }
       // Zelfde lichaam als de store-actie (`assignmentMutations.ts`, incl. de werkregel); verlies
       // via de lease.
@@ -821,7 +821,7 @@ function createMcpDraft(
       const finishBasis = hourInputFinishBasis(task); // vóór `commitTrianglePlan`.
       const plan = planWorkEdit(task, s.assignments, s, assignmentId, remainingWorkMinutes);
       if (!plan) {
-        throw new Error(`draft.setAssignmentWork: werk ${String(remainingWorkMinutes)} geweigerd (strikt positief vereist; de werkregel geldt niet op mijlpalen, hangmatten, samenvattingen of ELAPSEDTIME-taken)`);
+        throw new Error(`draft.setAssignmentWork: work ${String(remainingWorkMinutes)} rejected (must be strictly positive; work lines do not apply to milestones, hammocks, summary tasks or ELAPSEDTIME tasks)`);
       }
       if (commitTrianglePlan(task, s.assignments, plan).durationChanged) afterTriangleDurationChange(s, task, oldWorkMinutes, finishBasis);
       s.taskTypesVisible = true; // een gezette regel ontsluit de UI
@@ -877,7 +877,7 @@ function createMcpDraft(
       const newTask = s.tasks.find((t) => t.id === newTaskId);
       if (!newTask) throw new Error(`draft.moveAssignment: onbekende taskId '${newTaskId}'`);
       if (newTask.isMilestone || isSummaryTask(newTask)) {
-        throw new Error(`draft.moveAssignment: doeltaak '${newTaskId}' is een mijlpaal/samenvattingstaak`);
+        throw new Error(`draft.moveAssignment: doeltaak '${newTaskId}' is a milestone/summary task`);
       }
       const alreadyOnTarget = s.assignments.some(
         (a) => a.taskId === newTaskId && a.resourceId === assignment.resourceId,
@@ -1010,7 +1010,7 @@ export function createMcpTransactions(context: AppStoreContext): McpTransactions
 
   const requireCurrentLease = (): McpTransactionLease => {
     if (!currentLease) {
-      throw new Error('MCP-draft vereist een actieve run op hetzelfde factoryobject');
+      throw new Error('An MCP draft requires an active run on the same factory object');
     }
     return currentLease;
   };
@@ -1068,7 +1068,7 @@ export function createMcpTransactions(context: AppStoreContext): McpTransactions
       try {
         value = fn() as T;
         if (isThenable(value)) {
-          throw new Error('MCP-transactiecallback moet strikt synchroon zijn en mag geen Promise/thenable retourneren');
+          throw new Error('The MCP transaction callback must be synchronous and must not return a Promise or thenable');
         }
         // Wijzigde de callback per saldo projectdata? Gemeten VÓÓR de eindherberekening: `runCPM`
         // alléén is nooit een wijziging. Dit is de ene plek waar elke MCP-schrijfactie langskomt — ook

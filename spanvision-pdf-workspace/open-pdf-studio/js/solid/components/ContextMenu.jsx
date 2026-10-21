@@ -340,11 +340,11 @@ function AnnotationMenuContent() {
           ))}
           <MenuItem label={huidig === 'component'
             ? `Ander component… (nu: ${rawOv?.naam || rawOv?.symbolId})`
-            : 'Ander component…'}
+            : "Another component…"}
             checkbox checked={huidig === 'component'}
             onClick={anderComponent} />
           <Show when={sparingToevoegen}>
-            <MenuItem label="Sparing toevoegen" onClick={sparingToevoegen} />
+            <MenuItem label={"Add opening"} onClick={sparingToevoegen} />
           </Show>
           <Separator />
         </>

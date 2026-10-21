@@ -114,7 +114,7 @@ export function paginateCanvasToTile(
   pageCanvas.width = pageCanvasW;
   pageCanvas.height = pageCanvasH;
   const ctx = pageCanvas.getContext('2d');
-  if (!ctx) throw new Error('paginateCanvasToTile: kon 2D-context niet verkrijgen');
+  if (!ctx) throw new Error('paginateCanvasToTile: unable to obtain a 2D context');
 
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, pageCanvasW, pageCanvasH);

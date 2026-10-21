@@ -696,17 +696,17 @@ function parseMoveTask(args: unknown): { id: string; newParentId: string | null;
 function moveTaskCore(ctx: McpContext, p: { id: string; newParentId: string | null; position?: number }): MutationOutcome {
   const { id, newParentId, position } = p;
   const st = ctx.app.store.getState();
-  if (!st.tasks.some((t) => t.id === id)) throw new McpStepError('NOT_FOUND', `taak '${id}' bestaat niet`);
+  if (!st.tasks.some((t) => t.id === id)) throw new McpStepError('NOT_FOUND', `task '${id}' does not exist`);
   if (newParentId !== null) {
     if (!st.tasks.some((t) => t.id === newParentId)) {
-      throw new McpStepError('NOT_FOUND', `nieuwe ouder '${newParentId}' bestaat niet`);
+      throw new McpStepError('NOT_FOUND', `new parent '${newParentId}' does not exist`);
     }
     // Cykel-preventie: newParentId mag niet id zelf of een afstammeling van id zijn. `ancestorIds`
     // is cyclusveilig: een corrupte parentId-cyclus elders in de boom liet deze wandeling hangen.
     const parentById = new Map(st.tasks.map((t) => [t.id, t.parentId]));
     const ownDescendant = newParentId === id
       || [...ancestorIds(newParentId, (tid) => parentById.get(tid))].includes(id);
-    if (ownDescendant) throw new McpStepError('VALIDATION', 'kan een taak niet onder zichzelf of een eigen afstammeling plaatsen');
+    if (ownDescendant) throw new McpStepError('VALIDATION', "cannot place a task under itself or its descendant");
   }
   // Zelfde voorafregel als de UI: een relatie op een fase geldt voor elke taak erin, dus verhangen
   // kan een kring maken. Zonder deze toets vangt pas de eindberekening dat, met de Engelse

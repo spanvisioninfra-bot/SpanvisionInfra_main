@@ -22,7 +22,7 @@
     try {
       topics = await invoke("get_bcf_topics", {}) || [];
     } catch (e) {
-      console.error("BCF topics laden mislukt:", e);
+      console.error("Failed to load BCF topics:", e);
     }
     loading = false;
   }

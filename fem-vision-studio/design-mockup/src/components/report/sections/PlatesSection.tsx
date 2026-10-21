@@ -95,7 +95,7 @@ export default function PlatesSection() {
 
       {sorted.length === 0 ? (
         <p className="rpt-empty-note">
-          {t("report.noPlates", "Geen platen in het model.")}
+          {t("report.noPlates", "No plates in the model.")}
         </p>
       ) : (
         <>
@@ -105,7 +105,7 @@ export default function PlatesSection() {
                 <th>{t("report.colId", "Id")}</th>
                 <th>{t("report.colCorners", "Hoekknopen")}</th>
                 <th className="rpt-num">t [mm]</th>
-                <th>{t("report.colPlateMaterial", "Materiaal")}</th>
+                <th>{t("report.colPlateMaterial", "Material")}</th>
                 <th className="rpt-num">E₁ [N/mm²]</th>
                 <th className="rpt-num">E₂ [N/mm²]</th>
                 <th className="rpt-num">G₁₂ [N/mm²]</th>
@@ -158,7 +158,7 @@ export default function PlatesSection() {
                     <td>
                       {p.openingen && p.openingen.length > 0
                         ? p.openingen.map((o) => `${o.id}: ${openingOmschrijving(t, o.punten)}`).join("; ")
-                        : t("report.noOpenings", "geen")}
+                        : t("report.noOpenings", "none")}
                     </td>
                   </tr>
                 );
@@ -180,7 +180,7 @@ export default function PlatesSection() {
           <p className="rpt-note" style={{ marginTop: "1mm" }}>
             {t(
               "report.plateLoadNote",
-              "Randlasten (ook deel- en trapeziumlasten) en puntlasten op een plaatrand worden volgens de lineaire vormfuncties van de randelementen omgezet in knoopkrachten op de randknopen; een staafeinde dat tussen twee randknopen op een plaatrand ligt — de omtrek of de rand van een opening — wordt kinematisch aan die rand gekoppeld (lineaire interpolatie). Een vrij staafeinde tussen 1 en 50 mm van een plaatrand wordt niet gekoppeld maar geweigerd.",
+              "Edge loads (including partial and trapezoidal loads) and point loads on a plate edge are converted to nodal forces at the edge nodes using the linear shape functions of the edge elements. A member end between two edge nodes on a plate boundary, including an opening, is kinematically coupled to that edge by linear interpolation. A free member end between 1 and 50 mm from a plate edge is rejected rather than coupled.",
             )}
           </p>
         </>

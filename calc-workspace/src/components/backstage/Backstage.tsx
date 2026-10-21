@@ -241,10 +241,10 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
         }
         store.setResourceLibrary(Array.from(byCode.values()));
         if (result.warnings.length > 0) {
-          console.warn(`[Import ZSX] ${result.warnings.length} waarschuwingen:`, result.warnings);
+          console.warn(`[Import ZSX] ${result.warnings.length} warnings:`, result.warnings);
           showImportWarnings(result, fileName);
         }
-        console.log(`[Import ZSX] ${result.resources.length} middelen geladen uit ${fileName}`);
+        console.log(`[Import ZSX] ${result.resources.length} resources loaded from ${fileName}`);
       } catch (err: any) {
         console.error('[Import ZSX] failed:', err);
         alert(t('importPanel.importFailed', { error: err?.message || err }));
@@ -287,9 +287,9 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
         }
         // NOTE: no norms slice yet — v0.7.0 follow-up will persist these into
         // the resource library. For now we log + show a status dialog.
-        console.log(`[Import NSX] ${result.norms.length} normen geladen uit ${fileName}`, result);
+        console.log(`[Import NSX] ${result.norms.length} standards loaded from ${fileName}`, result);
         if (result.warnings.length > 0) {
-          console.warn(`[Import NSX] ${result.warnings.length} waarschuwingen:`, result.warnings);
+          console.warn(`[Import NSX] ${result.warnings.length} warnings:`, result.warnings);
           showImportWarnings(result, fileName);
         }
         alert(t('importPanel.nsxImported', { count: result.norms.length }));
@@ -373,7 +373,7 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
     store.setItems(recalculateItems(result.items));
     store.updateDocument(store.activeDocumentId, { fileName: mappingData.sourceName, isModified: true });
     if (result.warnings.length > 0) {
-      console.warn('[Import Excel/CSV] waarschuwingen:', result.warnings);
+      console.warn("[Import Excel/CSV] warnings:", result.warnings);
       showImportWarnings(result, mappingData.sourceName);
     }
     setMappingData(null);
@@ -391,10 +391,10 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
         for (const r of result.resources) byCode.set(r.code, r);
         store.setResourceLibrary(Array.from(byCode.values()));
         if (result.warnings.length > 0) {
-          console.warn('[Import BMEcat] waarschuwingen:', result.warnings);
+          console.warn("[Import BMEcat] warnings:", result.warnings);
           showImportWarnings(result, fileName);
         }
-        console.log(`[Import BMEcat] ${result.resources.length} middelen geladen uit ${fileName}`);
+        console.log(`[Import BMEcat] ${result.resources.length} resources loaded from ${fileName}`);
       } catch (err: any) {
         console.error('[Import BMEcat] failed:', err);
         alert(t('importPanel.importFailed', { error: err?.message || err }));
@@ -440,7 +440,7 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
           isModified: true,
         });
         if (result.warnings.length > 0) {
-          console.warn(`[Import ${formatLabel}] ${result.warnings.length} waarschuwingen:`, result.warnings);
+          console.warn(`[Import ${formatLabel}] ${result.warnings.length} warnings:`, result.warnings);
           showImportWarnings(result, fileName || formatLabel);
         }
       };
@@ -492,7 +492,7 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
       store.setItems(recalculateItems(result.items));
       store.updateDocument(store.activeDocumentId, { fileName, isModified: true });
       if (result.warnings.length > 0) {
-        console.warn(`[Import FIEBDC-3] ${result.warnings.length} waarschuwingen:`, result.warnings);
+        console.warn(`[Import FIEBDC-3] ${result.warnings.length} warnings:`, result.warnings);
         showImportWarnings(result, fileName || 'FIEBDC-3');
       }
     };
@@ -596,7 +596,7 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
         URL.revokeObjectURL(url);
       }
       if (result.warnings.length > 0) {
-        console.warn(`[Export ${formatLabel}] ${result.warnings.length} waarschuwingen:`, result.warnings);
+        console.warn(`[Export ${formatLabel}] ${result.warnings.length} warnings:`, result.warnings);
       }
     } catch (err: any) {
       console.error(`[Export ${formatLabel}] failed:`, err);

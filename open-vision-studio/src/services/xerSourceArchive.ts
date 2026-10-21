@@ -322,7 +322,7 @@ export function encodeXerArchiveMetadataPayload(archive: XerSourceArchive): Uint
 export function parseXerArchiveMetadataPayload(value: unknown): XerArchiveMetadataPayloadV1 {
   const payload = objectOf(value, 'archive-metadata');
   exactKeys(payload, ['schemaVersion', 'diagnostics', 'readModel'], 'archive-metadata');
-  if (payload.schemaVersion !== 1) invalid('archive-metadata.schemaVersion is onbekend');
+  if (payload.schemaVersion !== 1) invalid("archive-metadata.schemaVersion is unknown");
   const diagnostics = payload.diagnostics;
   const readModel = payload.readModel;
   validateXerArchiveDiagnosticsV1(diagnostics);
@@ -375,11 +375,11 @@ export function bindXerImportMetadataToArchive(
   sourceProjectId: string,
 ): XerImportMetadata {
   const view = archive.diagnostics.documentViews[sourceProjectId];
-  if (!view) invalid('selector wijst naar ontbrekende documentview');
+  if (!view) invalid("selector references a missing document view");
   const sourceArchive = archive.readModel.scheduleOptionsSourceArchive;
   const sourceRows = view.scheduleOptions.sourceRowIndexes.map((index, position) => {
     const row = sourceArchive.rows[index];
-    if (!row) invalid(`documentview sourceRowIndexes[${position}] wijst buiten de X5-filecache`);
+    if (!row) invalid(`documentview sourceRowIndexes[${position}] points outside the X5 file cache`);
     return row;
   });
   Object.freeze(sourceRows);
@@ -428,14 +428,14 @@ export function decodeXerSourceArchive(archive: XerSourceArchive): Uint8Array {
     offset += chunk.byteLength;
   }
   if (offset !== archive.byteLength) {
-    throw new Error('XER-bronarchief heeft een ongeldige byteLength.');
+    throw new Error('The XER source archive has an invalid byteLength.');
   }
   return result;
 }
 
 export function decodeXerBase64Chunk(value: string): Uint8Array {
   if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(value)) {
-    throw new Error('XER-bronarchief bevat ongeldige base64.');
+    throw new Error('The XER source archive contains invalid base64.');
   }
   const binary = atob(value);
   const bytes = new Uint8Array(binary.length);
@@ -553,13 +553,13 @@ function invalid(message: string): never {
 function objectOf(value: unknown, path: string): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)
     || (Object.getPrototypeOf(value) !== Object.prototype && Object.getPrototypeOf(value) !== null)) {
-    invalid(`${path} is geen gewoon object`);
+    invalid(`${path} is not a plain object`);
   }
   return value as Record<string, unknown>;
 }
 
 function arrayOf(value: unknown, path: string): unknown[] {
-  if (!Array.isArray(value)) invalid(`${path} is geen array`);
+  if (!Array.isArray(value)) invalid(`${path} is not an array`);
   return value;
 }
 
@@ -569,22 +569,22 @@ function exactKeys(value: Record<string, unknown>, allowed: readonly string[], p
 }
 
 function stringOf(value: unknown, path: string, allowEmpty = true): string {
-  if (typeof value !== 'string' || (!allowEmpty && value.length === 0)) invalid(`${path} is geen geldige tekenreeks`);
+  if (typeof value !== 'string' || (!allowEmpty && value.length === 0)) invalid(`${path} is not a valid string`);
   return value;
 }
 
 function booleanOf(value: unknown, path: string): boolean {
-  if (typeof value !== 'boolean') invalid(`${path} is geen boolean`);
+  if (typeof value !== 'boolean') invalid(`${path} is not a boolean`);
   return value;
 }
 
 function nonNegativeInteger(value: unknown, path: string): number {
-  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) invalid(`${path} is geen niet-negatief safe integer`);
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) invalid(`${path} is not a non-negative safe integer`);
   return value;
 }
 
 function finiteNumber(value: unknown, path: string): number {
-  if (typeof value !== 'number' || !Number.isFinite(value)) invalid(`${path} is geen eindig getal`);
+  if (typeof value !== 'number' || !Number.isFinite(value)) invalid(`${path} is not a finite number`);
   return value;
 }
 
@@ -612,7 +612,7 @@ function oneOf<T extends string>(value: unknown, choices: readonly T[], path: st
 function jsonValue(value: unknown, path: string): void {
   if (value === null || typeof value === 'string' || typeof value === 'boolean') return;
   if (typeof value === 'number') {
-    if (!Number.isFinite(value)) invalid(`${path} bevat geen eindig getal`);
+    if (!Number.isFinite(value)) invalid(`${path} contains no finite number`);
     return;
   }
   if (Array.isArray(value)) {
@@ -855,7 +855,7 @@ function validateRateSource(value: unknown, path: string): void {
   if (source.effectiveDate !== undefined) stringOf(source.effectiveDate, `${path}.effectiveDate`);
   nullableFiniteNumber(source.maxUnitsPerTime, `${path}.maxUnitsPerTime`);
   const costs = arrayOf(source.costs, `${path}.costs`);
-  if (costs.length !== 5) invalid(`${path}.costs is geen tuple van lengte 5`);
+  if (costs.length !== 5) invalid(`${path}.costs is not a tuple of length 5`);
   costs.forEach((cost, index) => nullableFiniteNumber(cost, `${path}.costs[${index}]`));
 }
 
@@ -866,11 +866,11 @@ function validateCurveSource(value: unknown, path: string): void {
   for (const key of ['sourceId', 'internalId', 'name'] as const) stringOf(source[key], `${path}.${key}`);
   nonNegativeInteger(source.line, `${path}.line`);
   const rawPoints = arrayOf(source.rawPoints, `${path}.rawPoints`);
-  if (rawPoints.length !== 21) invalid(`${path}.rawPoints is geen tuple van lengte 21`);
+  if (rawPoints.length !== 21) invalid(`${path}.rawPoints is not a tuple of length 21`);
   rawPoints.forEach((point, index) => stringOf(point, `${path}.rawPoints[${index}]`));
   if (source.numericPoints !== undefined) {
     const numericPoints = arrayOf(source.numericPoints, `${path}.numericPoints`);
-    if (numericPoints.length !== 21) invalid(`${path}.numericPoints is geen tuple van lengte 21`);
+    if (numericPoints.length !== 21) invalid(`${path}.numericPoints is not a tuple of length 21`);
     numericPoints.forEach((point, index) => finiteNumber(point, `${path}.numericPoints[${index}]`));
   }
 }
@@ -929,7 +929,7 @@ function validateDocumentView(value: unknown, projectId: string, path: string): 
     'sourceProjectId', 'defaultCurrencyCode', 'tableReport', 'calendarIssues', 'enumFallbacks',
     'scheduleOptions', 'externalRelations', 'externalLinks', 'report', 'resources',
   ], path);
-  if (stringOf(view.sourceProjectId, `${path}.sourceProjectId`, false) !== projectId) invalid(`${path}.sourceProjectId past niet bij projectselector`);
+  if (stringOf(view.sourceProjectId, `${path}.sourceProjectId`, false) !== projectId) invalid(`${path}.sourceProjectId does not match the project selector`);
   stringOf(view.defaultCurrencyCode, `${path}.defaultCurrencyCode`);
   validateTableReport(view.tableReport, `${path}.tableReport`);
   arrayOf(view.calendarIssues, `${path}.calendarIssues`).forEach((issueValue, index) => {
@@ -967,7 +967,7 @@ function validateDocumentView(value: unknown, projectId: string, path: string): 
 export function validateXerArchiveDiagnosticsV1(value: unknown): asserts value is XerArchiveDiagnosticsV1 {
   const diagnostics = objectOf(value, 'diagnostics');
   exactKeys(diagnostics, ['schemaVersion', 'file', 'documentViews', 'opaqueExtensions'], 'diagnostics');
-  if (diagnostics.schemaVersion !== 1) invalid('diagnostics.schemaVersion is onbekend');
+  if (diagnostics.schemaVersion !== 1) invalid("diagnostics.schemaVersion is unknown");
   const file = objectOf(diagnostics.file, 'diagnostics.file');
   exactKeys(file, ['tableReport', 'scheduleOptions', 'relationResolutionIssues', 'resourceCatalogIssues', 'metadataCatalogIssues', 'importReport'], 'diagnostics.file');
   validateTableReport(file.tableReport, 'diagnostics.file.tableReport');
@@ -987,7 +987,7 @@ export function validateXerArchiveDiagnosticsV1(value: unknown): asserts value i
   validateImportReport(file.importReport, 'diagnostics.file.importReport');
   const views = objectOf(diagnostics.documentViews, 'diagnostics.documentViews');
   for (const [projectId, view] of Object.entries(views)) {
-    if (!projectId) invalid('diagnostics.documentViews bevat een lege projectselector');
+    if (!projectId) invalid("diagnostics.documentViews contains an empty project selector");
     validateDocumentView(view, projectId, `diagnostics.documentViews.${projectId}`);
   }
   if (diagnostics.opaqueExtensions !== undefined) jsonValue(objectOf(diagnostics.opaqueExtensions, 'diagnostics.opaqueExtensions'), 'diagnostics.opaqueExtensions');
@@ -1029,7 +1029,7 @@ function validateTaskProjection(value: unknown, path: string): void {
     const fields = objectOf(projection.customFields, `${path}.customFields`);
     for (const [key, field] of Object.entries(fields)) {
       if (typeof field === 'number') finiteNumber(field, `${path}.customFields.${key || '<empty>'}`);
-      else if (typeof field !== 'string' && typeof field !== 'boolean') invalid(`${path}.customFields.${key || '<empty>'} heeft een ongeldige waarde`);
+      else if (typeof field !== 'string' && typeof field !== 'boolean') invalid(`${path}.customFields.${key || '<empty>'} has an invalid value`);
     }
   }
   if (projection.notes !== undefined) {
@@ -1047,7 +1047,7 @@ function validateTaskProjection(value: unknown, path: string): void {
 export function validateXerArchiveReadModelV1(value: unknown): asserts value is XerArchiveReadModelV1 {
   const model = objectOf(value, 'readModel');
   exactKeys(model, ['schemaVersion', 'numberFormat', 'scheduleOptionsSourceArchive', 'resourceCatalog', 'metadataCatalog', 'taskSourceRowsByProject'], 'readModel');
-  if (model.schemaVersion !== 1) invalid('readModel.schemaVersion is onbekend');
+  if (model.schemaVersion !== 1) invalid("readModel.schemaVersion is unknown");
   const numberFormat = objectOf(model.numberFormat, 'readModel.numberFormat');
   exactKeys(numberFormat, ['decimal', 'group', 'source', 'currencyCode'], 'readModel.numberFormat');
   const decimal = oneOf(numberFormat.decimal, ['.', ','], 'readModel.numberFormat.decimal');
@@ -1126,7 +1126,7 @@ function validateArchiveMetadataRelations(
   };
   const sameIntegerSequence = (actual: readonly number[], expected: readonly number[], path: string) => {
     if (actual.length !== expected.length || actual.some((value, index) => value !== expected[index])) {
-      invalid(`${path} is geen volledige canonieke indexreeks`);
+      invalid(`${path} is not a complete canonical index sequence`);
     }
   };
 
@@ -1141,8 +1141,8 @@ function validateArchiveMetadataRelations(
       const rowProjectId = row.cells.proj_id?.trim() ?? '';
       const taskId = row.cells.task_id?.trim() ?? '';
       if (rowProjectId !== projectId) invalid(`readModel.taskSourceRowsByProject.${projectId}[${index}] kruist de projectselector`);
-      if (!taskId || taskIds.has(taskId)) invalid(`readModel.taskSourceRowsByProject.${projectId} bevat een lege of dubbele taakidentiteit`);
-      if (row.line <= previousLine) invalid(`readModel.taskSourceRowsByProject.${projectId} staat niet in bronvolgorde`);
+      if (!taskId || taskIds.has(taskId)) invalid(`readModel.taskSourceRowsByProject.${projectId} contains an empty or duplicate task identity`);
+      if (row.line <= previousLine) invalid(`readModel.taskSourceRowsByProject.${projectId} is not in source order`);
       taskIds.add(taskId);
       previousLine = row.line;
     }
@@ -1156,15 +1156,15 @@ function validateArchiveMetadataRelations(
   let previousProjection: { projectId: string; taskId: string } | undefined;
   for (const projection of readModel.metadataCatalog.taskProjections) {
     const identity = `${projection.projectId}\u0000${projection.taskId}`;
-    if (projectionIdentities.has(identity)) invalid(`readModel.metadataCatalog.taskProjections bevat dubbele identiteit ${projection.projectId}/${projection.taskId}`);
+    if (projectionIdentities.has(identity)) invalid(`readModel.metadataCatalog.taskProjections contains duplicate identity ${projection.projectId}/${projection.taskId}`);
     const projectionTaskIds = taskIdsByProject.get(projection.projectId);
     if (projectionTaskIds && !projectionTaskIds.has(projection.taskId)) {
-      invalid(`readModel.metadataCatalog.taskProjections wijst naar ontbrekende TASK-identiteit ${projection.projectId}/${projection.taskId}`);
+      invalid(`readModel.metadataCatalog.taskProjections references a missing TASK identity ${projection.projectId}/${projection.taskId}`);
     }
     projectionIdentities.add(identity);
     if (previousProjection && (previousProjection.projectId > projection.projectId
       || (previousProjection.projectId === projection.projectId && previousProjection.taskId > projection.taskId))) {
-      invalid('readModel.metadataCatalog.taskProjections staat niet in canonieke project-/taakvolgorde');
+      invalid("readModel.metadataCatalog.taskProjections is not in canonical project/task order");
     }
     previousProjection = projection;
     const group = expectedProjections.get(projection.projectId) ?? [];
@@ -1174,21 +1174,21 @@ function validateArchiveMetadataRelations(
   const actualProjectionKeys = Object.keys(readModel.metadataCatalog.taskProjectionsByProject);
   if (actualProjectionKeys.length !== expectedProjections.size
     || actualProjectionKeys.some(projectId => !expectedProjections.has(projectId))) {
-    invalid('readModel.metadataCatalog.taskProjectionsByProject partitioneert de canonieke projecties niet volledig');
+    invalid("readModel.metadataCatalog.taskProjectionsByProject does not fully partition the canonical projections");
   }
   for (const [projectId, expected] of expectedProjections) {
     const actual = readModel.metadataCatalog.taskProjectionsByProject[projectId];
     if (!actual || actual.length !== expected.length
       || actual.some((projection, index) => projection.projectId !== projectId
         || !sameValue(projection, expected[index]))) {
-      invalid(`readModel.metadataCatalog.taskProjectionsByProject.${projectId} is geen canonieke projectpartitie`);
+      invalid(`readModel.metadataCatalog.taskProjectionsByProject.${projectId} is not a canonical project partition`);
     }
   }
 
   const sourceArchive = readModel.scheduleOptionsSourceArchive;
   const rowCount = sourceArchive.rows.length;
   const assertIndex = (index: number, path: string) => {
-    if (index >= rowCount) invalid(`${path} wijst buiten de X5-filecache`);
+    if (index >= rowCount) invalid(`${path} points outside the X5 file cache`);
   };
   const projectIndexes = new Map<string, number[]>();
   const scheduleIndexes = new Map<string, number[]>();
@@ -1200,11 +1200,11 @@ function validateArchiveMetadataRelations(
     const projectId = row.cells.proj_id?.trim() ?? '';
     if (row.table === 'SCHEDOPTIONS') {
       scheduleTableStarted = true;
-      if (row.line <= previousScheduleLine) invalid('readModel.scheduleOptionsSourceArchive.SCHEDOPTIONS staat niet in oorspronkelijke bronvolgorde');
+      if (row.line <= previousScheduleLine) invalid("readModel.scheduleOptionsSourceArchive.SCHEDOPTIONS is not in original source order");
       previousScheduleLine = row.line;
     } else {
-      if (scheduleTableStarted) invalid('readModel.scheduleOptionsSourceArchive.rows doorbreekt PROJECT-voor-SCHEDOPTIONS-volgorde');
-      if (row.line <= previousProjectLine) invalid('readModel.scheduleOptionsSourceArchive.PROJECT staat niet in oorspronkelijke bronvolgorde');
+      if (scheduleTableStarted) invalid("readModel.scheduleOptionsSourceArchive.rows violates PROJECT-before-SCHEDOPTIONS order");
+      if (row.line <= previousProjectLine) invalid("readModel.scheduleOptionsSourceArchive.PROJECT is not in original source order");
       previousProjectLine = row.line;
     }
     const target = row.table === 'PROJECT' ? projectIndexes : scheduleIndexes;
@@ -1229,7 +1229,7 @@ function validateArchiveMetadataRelations(
       lines: rowIndexes.map(index => sourceArchive.rows[index]!.line),
     }));
   if (!sameValue(sourceArchive.diagnostics, expectedScheduleDiagnostics)) {
-    invalid('readModel.scheduleOptionsSourceArchive.diagnostics is geen canonieke duplicaatdiagnostiek');
+    invalid("readModel.scheduleOptionsSourceArchive.diagnostics is not canonical duplicate diagnostics");
   }
   if (!sameValue(diagnostics.file.scheduleOptions, sourceArchive.diagnostics)) {
     invalid('diagnostics.file.scheduleOptions wijkt af van de ene X5-filecache');
@@ -1242,7 +1242,7 @@ function validateArchiveMetadataRelations(
   let previousAssignmentLine = -1;
   for (const [index, row] of canonicalAssignmentRows.entries()) {
     if (row.line <= previousAssignmentLine) {
-      invalid(`readModel.resourceCatalog.rows.assignments[${index}] staat niet in oorspronkelijke TASKRSRC-bronvolgorde`);
+      invalid(`readModel.resourceCatalog.rows.assignments[${index}] is not in original TASKRSRC source order`);
     }
     previousAssignmentLine = row.line;
   }
@@ -1276,7 +1276,7 @@ function validateArchiveMetadataRelations(
     // afwezige bronsignaal is legacy-onbeslisbaar; een aanwezige lege of gemuteerde groep is hard.
     if (!endpointTaskIds) return;
     if (!endpointTaskIds.has(endpointTaskId)) {
-      invalid(`${path} wijst naar ontbrekend ${endpointKind} TASK-eindpunt ${endpointProjectId}/${endpointTaskId}`);
+      invalid(`${path} references missing ${endpointKind === 'extern' ? 'external' : 'local'} TASK endpoint ${endpointProjectId}/${endpointTaskId}`);
     }
   };
   for (const [projectId, view] of Object.entries(diagnostics.documentViews)) {
@@ -1289,7 +1289,7 @@ function validateArchiveMetadataRelations(
         invalid(`diagnostics.documentViews.${projectId}.externalRelations[${index}] kruist de projectselector`);
       }
       if (!taskIdsByProject.get(projectId)?.has(relation.localTaskId)) {
-        invalid(`diagnostics.documentViews.${projectId}.externalRelations[${index}] wijst naar ontbrekend lokaal TASK-eindpunt`);
+        invalid(`diagnostics.documentViews.${projectId}.externalRelations[${index}] references a missing local TASK endpoint`);
       }
       assertOpenEndpointTask(
         relation.externalProjectId,
@@ -1325,12 +1325,12 @@ function validateArchiveMetadataRelations(
     sameIntegerSequence(view.scheduleOptions.sourceRowIndexes, expectedSourceIndexes,
       `diagnostics.documentViews.${projectId}.scheduleOptions.sourceRowIndexes`);
     if (rowCount > 0 && (projectIndexes.get(projectId)?.length ?? 0) !== 1) {
-      invalid(`diagnostics.documentViews.${projectId} heeft niet exact één PROJECT-bronrij`);
+      invalid(`diagnostics.documentViews.${projectId} does not have exactly one PROJECT source row`);
     }
     const projectScheduleIndexes = scheduleIndexes.get(projectId) ?? [];
     const expectedSource = projectScheduleIndexes.length === 1 ? 'schedoptions' : 'xer-defaults';
     if (view.scheduleOptions.source !== expectedSource) {
-      invalid(`diagnostics.documentViews.${projectId}.scheduleOptions.source past niet bij de X5-bronrijen`);
+      invalid(`diagnostics.documentViews.${projectId}.scheduleOptions.source does not match the X5 source rows`);
     }
     const expectedDiagnostics = sourceArchive.diagnostics.filter(item => item.projectId === projectId);
     if (!sameValue(view.scheduleOptions.diagnostics, expectedDiagnostics)) {
@@ -1341,7 +1341,7 @@ function validateArchiveMetadataRelations(
       (row.cells.proj_id?.trim() ?? '') === projectId);
     const assignments = view.resources?.assignments ?? [];
     if (assignments.length !== expectedAssignmentRows.length) {
-      invalid(`diagnostics.documentViews.${projectId}.resources.assignments is geen volledige projectpartitie`);
+      invalid(`diagnostics.documentViews.${projectId}.resources.assignments is not a complete project partition`);
     }
     const assignmentIds = new Set<string>();
     assignments.forEach((assignment, index) => {
@@ -1350,11 +1350,11 @@ function validateArchiveMetadataRelations(
         invalid(`diagnostics.documentViews.${projectId}.resources.assignments[${index}] kruist de projectselector`);
       }
       if (assignmentIds.has(assignment.sourceId)) {
-        invalid(`diagnostics.documentViews.${projectId}.resources.assignments bevat dubbele identiteit ${assignment.sourceId}`);
+        invalid(`diagnostics.documentViews.${projectId}.resources.assignments contains duplicate identity ${assignment.sourceId}`);
       }
       assignmentIds.add(assignment.sourceId);
       if (!sameValue(assignment.rawRow, expectedAssignmentRows[index])) {
-        invalid(`diagnostics.documentViews.${projectId}.resources.assignments[${index}] staat niet in canonieke bronvolgorde`);
+        invalid(`diagnostics.documentViews.${projectId}.resources.assignments[${index}] is not in canonical source order`);
       }
       const rawRow = expectedAssignmentRows[index]!;
       const sourceId = xerAssignmentSourceId(rawRow.cells, rawRow.line);
@@ -1371,7 +1371,7 @@ function validateArchiveMetadataRelations(
         || assignment.entity.kind !== entityKind
         || assignment.entity.sourceId !== entitySourceId
         || assignment.entity.internalId !== entityInternalId) {
-        invalid(`diagnostics.documentViews.${projectId}.resources.assignments[${index}] wijkt af van de canonieke TASKRSRC-identiteit`);
+        invalid(`diagnostics.documentViews.${projectId}.resources.assignments[${index}] differs from the canonical TASKRSRC identity`);
       }
       for (const [field, rawField] of [
         ['curveSourceId', 'curv_id'], ['rateType', 'rate_type'],
@@ -1407,23 +1407,23 @@ function validateArchiveMetadataRelations(
         && issue.code === 'XER_ASSIGNMENT_TASK_MISSING';
       if (!exactEnvelope || (!exactCode && !optionalLegacyTaskIssue)
         || seenSkipIssueIdentities.has(identity)) {
-        invalid(`diagnostics.documentViews.${projectId}.resources.issues is geen exacte TASKRSRC-skipdiagnostiek`);
+        invalid(`diagnostics.documentViews.${projectId}.resources.issues is not exact TASKRSRC skip diagnostics`);
       }
       seenSkipIssueIdentities.add(identity);
     }
     for (const [identity, expected] of expectedByIdentity) {
       if (expected && expected !== 'LEGACY_TASK_UNKNOWN' && !seenSkipIssueIdentities.has(identity)) {
-        invalid(`diagnostics.documentViews.${projectId}.resources.issues is geen exacte TASKRSRC-skipdiagnostiek`);
+        invalid(`diagnostics.documentViews.${projectId}.resources.issues is not exact TASKRSRC skip diagnostics`);
       }
     }
 
     const linkKeys = new Set<string>();
     for (const [index, link] of view.externalLinks.entries()) {
       const key = linkKey(link);
-      if (linkKeys.has(key)) invalid(`diagnostics.documentViews.${projectId}.externalLinks bevat dubbele relatie ${link.id}`);
+      if (linkKeys.has(key)) invalid(`diagnostics.documentViews.${projectId}.externalLinks contains duplicate relation ${link.id}`);
       linkKeys.add(key);
       if (link.predecessor.projectId !== projectId && link.successor.projectId !== projectId) {
-        invalid(`diagnostics.documentViews.${projectId}.externalLinks[${index}] heeft geen lokaal eindpunt`);
+        invalid(`diagnostics.documentViews.${projectId}.externalLinks[${index}] has no local endpoint`);
       }
       assertOpenEndpointTask(
         link.predecessor.projectId,
@@ -1438,7 +1438,7 @@ function validateArchiveMetadataRelations(
         link.successor.projectId === projectId ? 'lokaal' : 'extern',
       );
       if (taskIdsByProject.has(projectId) && !sourceLinks.has(key)) {
-        invalid(`diagnostics.documentViews.${projectId}.externalLinks[${index}] is niet afgeleid uit een bewaarde TASKPRED-bronrelatie`);
+        invalid(`diagnostics.documentViews.${projectId}.externalLinks[${index}] is not derived from a preserved TASKPRED source relation`);
       }
       const known = linksByKey.get(key);
       if (known && !sameValue(known.link, link)) invalid(`diagnostics.documentViews.externalLinks bevat botsende relatie ${link.id}`);
@@ -1449,12 +1449,12 @@ function validateArchiveMetadataRelations(
   for (const [key, { link, owners }] of linksByKey) {
     for (const endpoint of [link.predecessor.projectId, link.successor.projectId]) {
       if (diagnostics.documentViews[endpoint] && !owners.has(endpoint)) {
-        invalid(`diagnostics.documentViews.externalLinks.${link.id} ontbreekt in endpointproject ${endpoint}`);
+        invalid(`diagnostics.documentViews.externalLinks.${link.id} is missing in endpoint project ${endpoint}`);
       }
     }
     const hasCanonicalOwner = [...owners].some(projectId => taskIdsByProject.has(projectId));
     if (hasCanonicalOwner && !sourceLinks.has(key)) {
-      invalid(`diagnostics.documentViews.externalLinks.${link.id} mist zijn TASKPRED-bronrelatie`);
+      invalid(`diagnostics.documentViews.externalLinks.${link.id} is missing its TASKPRED source relation`);
     }
   }
   for (const [key, link] of sourceLinks) {
@@ -1464,10 +1464,10 @@ function validateArchiveMetadataRelations(
       && taskIdsByProject.get(link.successor.projectId)?.has(link.successor.taskId);
     if (!predecessorIsOpen || !successorIsOpen) continue;
     const derived = linksByKey.get(key);
-    if (!derived) invalid(`diagnostics.documentViews.externalLinks mist afleiding voor bronrelatie ${link.id}`);
+    if (!derived) invalid(`diagnostics.documentViews.externalLinks is missing a derivation for source relation ${link.id}`);
     for (const endpoint of [link.predecessor.projectId, link.successor.projectId]) {
       if (!derived.owners.has(endpoint)) {
-        invalid(`diagnostics.documentViews.externalLinks.${link.id} ontbreekt in bronendpoint ${endpoint}`);
+        invalid(`diagnostics.documentViews.externalLinks.${link.id} is missing in source endpoint ${endpoint}`);
       }
     }
   }

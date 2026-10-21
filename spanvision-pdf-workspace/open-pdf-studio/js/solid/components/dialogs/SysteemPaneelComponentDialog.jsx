@@ -31,20 +31,20 @@ export default function SysteemPaneelComponentDialog() {
 
   return (
     <Dialog
-      title="Paneel vervangen door component"
+      title={"Replace panel with component"}
       dialogClass="systeem-paneel-component-dialog"
       onClose={() => closeDialog('systeem-paneel-component')}
       footer={
         <div style="display:flex;gap:6px;justify-content:flex-end;width:100%">
           <button class="ai-plan-btn" style="width:auto;padding:5px 16px"
-            onClick={() => closeDialog('systeem-paneel-component')}>Annuleren</button>
+            onClick={() => closeDialog('systeem-paneel-component')}>Cancel</button>
         </div>
       }
     >
       <div style="width:420px;font-size:12px">
         <div class="ai-login-field">
           <input type="text" class="ribbon-input" id="spc-zoek"
-            placeholder="Zoeken (naam, id of categorie)…"
+            placeholder={"Search (name, ID or category)…"}
             style="width:100%;box-sizing:border-box"
             value={zoek()} onInput={(e) => setZoek(e.target.value)} />
         </div>

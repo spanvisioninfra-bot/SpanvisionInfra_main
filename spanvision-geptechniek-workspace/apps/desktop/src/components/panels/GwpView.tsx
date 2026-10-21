@@ -245,7 +245,7 @@ function GldTimeseriesPanel({ gwp }: { gwp: Gwp }) {
       })
       .catch((e: unknown) => {
         if (!cancelled) {
-          setError(`Kon GLD's niet ophalen: ${e instanceof Error ? e.message : String(e)}`);
+          setError(`Could not retrieve groundwater level data: ${e instanceof Error ? e.message : String(e)}`);
         }
       })
       .finally(() => {

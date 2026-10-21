@@ -28,15 +28,19 @@ function renderContent(text) {
 function describeAiError(err) {
   const raw = String(err?.message ?? err ?? '').trim();
   if (/Claude API 401|invalid x-api-key|authentication_error/i.test(raw)) {
-    return '⚠️ Ongeldige Claude (Anthropic) API-sleutel. Controleer de sleutel via het 🔑-knopje rechtsboven in het paneel.';
+    return '⚠️ Invalid Claude (Anthropic) API key. Check the key using the 🔑 button at the top right of this panel.';
   }
   if (/Claude API 4\d\d|Claude API 5\d\d/i.test(raw)) {
-    return `⚠️ De Claude-API gaf een fout.\n\n_Detail: ${raw}_`;
+    return `⚠️ The Claude API returned an error.
+
+_Detail: ${raw}_`;
   }
   if (/onbereikbaar|connection|econn|refused|failed to connect|timed out|failed to fetch/i.test(raw)) {
-    return '⚠️ Geen verbinding met de AI-dienst.';
+    return '⚠️ Unable to connect to the AI service.';
   }
-  return `⚠️ AI-aanroep mislukt.\n\n_Detail: ${raw || "unknown error"}_`;
+  return `⚠️ AI request failed.
+
+_Detail: ${raw || "unknown error"}_`;
 }
 
 export default function AssistantPanel() {
@@ -58,7 +62,7 @@ export default function AssistantPanel() {
   });
 
   function systemPrompt() {
-    return 'Je bent de Spanvision assistant in Spanvision Infra · PDF (een PDF-annotatie-editor). Help de gebruiker met vragen over het geopende PDF-document en algemene taken.\n\n' + SKILLS_SYSTEM_PROMPT;
+    return 'You are the Spanvision assistant in Spanvision Infra · PDF, a PDF annotation editor. Answer the user in English and help with the open PDF document and general tasks.\n\n' + SKILLS_SYSTEM_PROMPT;
   }
 
   function saveKey() {

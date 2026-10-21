@@ -35,12 +35,7 @@
 
 export const kruipfactor = `"Creep factor — φ(∞,t₀) according to NEN-EN 1992-1-1 bijlage B
 
-'<i>Kruip is de langzaam toenemende vervorming van beton onder een blijvende
-'drukspanning. De kruipcoëfficiënt φ geeft aan hoeveel maal de elastische
-'vervorming er uiteindelijk bij komt: ε<sub>cc</sub> = φ·σ<sub>c</sub>/E<sub>c</sub>.
-'Bijlage B splitst φ<sub>0</sub> in drie factoren — het effect van de relatieve
-'vochtigheid en de elementdikte (φ<sub>RH</sub>), de betonsterkte (β(f<sub>cm</sub>))
-'en de ouderdom bij belasten (β(t<sub>0</sub>)).</i>
+'<i>Creep is the gradual increase in concrete deformation under sustained compression. The creep coefficient φ defines the additional strain: ε<sub>cc</sub> = φ·σ<sub>c</sub>/E<sub>c</sub>. Annex B splits φ<sub>0</sub> into relative humidity and member thickness φ<sub>RH</sub>, concrete strength β(f<sub>cm</sub>), and age at loading β(t<sub>0</sub>).</i>
 
 # 1. Inputs
 
@@ -67,9 +62,9 @@ export const kruipfactor = `"Creep factor — φ(∞,t₀) according to NEN-EN 1
   R — rapid verhardend (42,5 R; 52,5 N/R) = 3
 @end
 
-RH = ?', relatieve vochtigheid van de omgeving RH [%]'
-t_0 = ?', ouderdom van het beton bij belasten t_0 [dagen]'
-h_0 = ?*(mm)', theoretische dikte van het element h_0 (= 2·A_c/u)'
+RH = ?', ambient relative humidity RH [%]'
+t_0 = ?', concrete age at loading t_0 [days]'
+h_0 = ?*(mm)', notional member size h_0 (= 2·A_c/u)'
 
 f_ck = betonkwaliteit N/mm^2', karakteristieke cilinderdruksterkte'
 f_cm = f_ck + 8 N/mm^2', gemiddelde druksterkte — (3.1)'
@@ -90,8 +85,7 @@ fcm_ = f_cm/(1 N/mm^2)
 
 # 2. Correctiefactoren for de concrete strength
 
-'<i>Bij f<sub>cm</sub> > 35 N/mm² dempen de factoren α<sub>1</sub>…α<sub>3</sub> de
-'kruip: sterker beton kruipt relatief minder.</i>
+'<i>For f<sub>cm</sub> &gt; 35 N/mm², α<sub>1</sub>…α<sub>3</sub> reduce creep: stronger concrete creeps relatively less.</i>
 
 α_1 = (35/fcm_)^0.7
 α_2 = (35/fcm_)^0.2
@@ -100,19 +94,17 @@ fcm_ = f_cm/(1 N/mm^2)
 α_2
 α_3
 
-# 3. The three deelfactoren van φ₀
+# 3. The three component factors of φ₀
 
-'<h6>3.1 Relatieve vochtigheid en elementdikte — (B<span>.</span>3)</h6>
+'<h6>3.1 Relatieve vochtigheid and elementdikte — (B<span>.</span>3)</h6>
 
-'<i>Droge lucht en een dunne doorsnede laten het beton sneller uitdrogen en dus
-'meer kruipen. Bij f<sub>cm</sub> ≤ 35 geldt (B<span>.</span>3a), daarboven (B<span>.</span>3b) met α<sub>1</sub>
-'en α<sub>2</sub>.</i>
+'<i>Dry air and a thin section accelerate drying and increase creep. Use (B<span>.</span>3a) for f<sub>cm</sub> ≤ 35, or (B<span>.</span>3b) with α<sub>1</sub> and α<sub>2</sub> above that limit.</i>
 
 #if fcm_ ≤ 35
     'f<sub>cm</sub> = 'f_cm' ≤ 35 N/mm² → (B<span>.</span>3a)
     φ_RH = 1 + (1 - RH/100)/(0.1*h0_^(1/3))
 #else
-    'f<sub>cm</sub> = 'f_cm' > 35 N/mm² → (B<span>.</span>3b), met α<sub>1</sub> en α<sub>2</sub>
+    'f<sub>cm</sub> = 'f_cm' > 35 N/mm² → (B<span>.</span>3b), with α<sub>1</sub> and α<sub>2</sub>
     φ_RH = (1 + (1 - RH/100)/(0.1*h0_^(1/3))*α_1)*α_2
 #end if
 φ_RH
@@ -121,11 +113,9 @@ fcm_ = f_cm/(1 N/mm^2)
 β_fcm = 16.8/sqrt(fcm_)
 β_fcm
 
-'<h6>3.3 Ouderdom bij belasten — (B<span>.</span>5) met de cementcorrectie (B<span>.</span>9)</h6>
+'<h6>3.3 Age at loading — (B<span>.</span>5), with cement correction (B<span>.</span>9)</h6>
 
-'<i>Snel verhardend cement (R) is bij dezelfde ouderdom al verder uitgehard en
-'kruipt minder; langzaam verhardend (S) juist meer. (B<span>.</span>9) verrekent dat door de
-'ouderdom te verschuiven. Bij klasse N is α = 0 en verandert er niets.</i>
+'<i>At the same age, rapid-hardening cement R has hardened further and creeps less; slow-hardening cement S creeps more. Expression (B<span>.</span>9) accounts for this by adjusting age. For class N, α = 0 and age is unchanged.</i>
 
 t_0,cor = max(0.5; t_0*(9/(2 + t_0^1.2) + 1)^α_cem)', gecorrigeerde ouderdom (B<span>.</span>9)'
 t_0,cor
@@ -141,15 +131,12 @@ t_0,cor
 
 # 5. Ontwikkeling in de time
 
-'<i>β<sub>c</sub> geeft welk deel van de basiskruip op tijdstip t is
-'gerealiseerd; hij loopt van 0 op t = t<sub>0</sub> naar 1 op t = ∞. Het
-'gerapporteerde eindresultaat is φ(t;t<sub>0</sub>) — niet φ<sub>0</sub>.</i>
+'<i>β<sub>c</sub> is the fraction of basic creep developed by time t, increasing from 0 at t = t<sub>0</sub> to 1 at t = ∞. The reported result is φ(t;t<sub>0</sub>), rather than φ<sub>0</sub>.</i>
 
-t = ?', beschouwd tijdstip t [dagen] — 100000 ≈ het eindstadium'
+t = ?', time considered t [days] — 100000 ≈ final state'
 t
 
-'<i>Ook β<sub>H</sub> kent twee vormen: bij f<sub>cm</sub> ≤ 35 zonder
-'α<sub>3</sub> (B<span>.</span>8a), daarboven mét (B<span>.</span>8b).</i>
+'<i>β<sub>H</sub> also has two branches: for f<sub>cm</sub> ≤ 35, use (B<span>.</span>8a) without α<sub>3</sub>; above 35, use (B<span>.</span>8b) with it.</i>
 #hide
 β_H,romp = 1.5*(1 + (0.012*RH)^18)*h0_
 α_H = if(fcm_ ≤ 35; 1; α_3)', α_3 telt alleen mee boven f_cm = 35'
@@ -162,10 +149,7 @@ t
 # 6. Kruipcoëfficiënt
 
 φ_t,nb = φ_0*β_c', volgens bijlage B'
-'<i>Splitspunt (register punt 1 en 2). de referentie-uitwerking vult in (B.5) de onbewerkte
-'t<sub>0</sub> in — de cementcorrectie (B.9) wordt wél afgedrukt maar niet
-'gebruikt — en laat β<sub>H</sub> onafhankelijk van de RH. Beide takken staan
-'hieronder; de projectgegevens bepalen welke telt.</i>
+'<i>Alternative assumptions (register items 1 and 2): the reference calculation inserts unadjusted t<sub>0</sub> into (B.5), printing but not using cement correction (B.9), and makes β<sub>H</sub> independent of RH. Both branches are shown below; project settings select the governing method.</i>
 #hide
 'de referentie-uitwerking vult in (B.5) de ONgecorrigeerde t_0 in, ook al is (B.9) uitgerekend.
 β_t0,XC = 1/(0.1 + t_0^0.20)
@@ -183,17 +167,15 @@ t
 
 '<b>φ(t;t<sub>0</sub>) = φ<sub>0</sub> · β<sub>c</sub> = 'φ_0' · 'β_c' = <b>'φ_t'</b></b>
 
-'<i>Effectieve elasticiteitsmodulus voor langeduureffecten (§7.4.3(5)):</i>
+'<i>Effective modulus of elasticity for long-term effects (§7.4.3(5)):</i>
 E_cm = 22000*((fcm_)/10)^0.3 N/mm^2', (3.14) — secantmodulus'
-E_c,eff = E_cm/(1 + φ_t)', effectieve E-modulus onder blijvende belasting'
+E_c,eff = E_cm/(1 + φ_t)', effective modulus under sustained loading'
 E_cm
 E_c,eff
 
-# 7. Afwijking ten opzichte van het referentieprogramma
+# 7. Difference from the reference program
 
-'<i>Dit blad volgt NEN-EN 1992-1-1 bijlage B. Op twee punten wijkt de referentie-uitwerking
-'daarvan af; hieronder staat wat dat bij déze invoer betekent. Het volledige
-'register staat in <b>docs/afwijkingen-referentie</b>.</i>
+'<i>This sheet follows NEN-EN 1992-1-1 Annex B. The reference calculation differs at two points. The comparisons below show their effects for these inputs; the complete register is in <b>docs/afwijkingen-referentie</b>.</i>
 
 #hide
 Δφ = abs(φ_t,nb - φ_t,XC)
@@ -203,85 +185,47 @@ afw = if(Δφ > 0.005; 1; if(Δβ_H > 0.5; 1; 0))
 #show
 
 #if afw ≡ 0
-    '<span style="color: green">Bij deze invoer geeft de referentie-uitwerking hetzelfde resultaat:
-    'φ = 'φ_t,XC'. Geen afwijking.</span>
+    '<span style="color: green">The reference calculation gives the same result for these inputs:
+'φ = 'φ_t,XC'. No difference.</span>
 #else
-    '<b style="color: #1d4ed8">Bij deze invoer wijkt de referentie-uitwerking van de norm af.</b>
-    'Dit blad volgt bijlage B; de waarde hiernaast is dus de juiste. Het verschil
-    'staat hieronder zodat het bij een vergelijking te verklaren is.
-    '<table style="border-collapse:collapse; font-size:13px">
-    '<tr><th style="text-align:left; padding:2px 12px 2px 0">Grootheid</th><th style="text-align:right; padding-right:14px">dit blad — volgens de norm</th><th style="text-align:right">de referentie-uitwerking — afwijkend</th></tr>
-    '<tr><td style="padding:2px 12px 2px 0">β(t<sub>0</sub>)</td><td style="text-align:right; padding-right:14px">'β_t0'</td><td style="text-align:right">'β_t0,XC'</td></tr>
-    '<tr><td style="padding:2px 12px 2px 0">β<sub>H</sub></td><td style="text-align:right; padding-right:14px">'β_H'</td><td style="text-align:right">'β_H,XC'</td></tr>
-    '<tr><td style="padding:2px 12px 2px 0"><b>φ(t;t<sub>0</sub>)</b></td><td style="text-align:right; padding-right:14px"><b>'φ_t,nb'</b></td><td style="text-align:right"><b>'φ_t,XC'</b></td></tr>
-    '</table>
+    '<b style="color: #1d4ed8">The reference calculation differs from the code for these inputs.</b>
+'This sheet follows Annex B; its value is the code result. The difference
+'is shown below to explain the comparison.
+'<table style="border-collapse:collapse; font-size:13px">
+'<tr><th style="text-align:left; padding:2px 12px 2px 0">Quantity</th><th style="text-align:right; padding-right:14px">this sheet — per code</th><th style="text-align:right">reference calculation — differing</th></tr>
+'<tr><td style="padding:2px 12px 2px 0">β(t<sub>0</sub>)</td><td style="text-align:right; padding-right:14px">'β_t0'</td><td style="text-align:right">'β_t0,XC'</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">β<sub>H</sub></td><td style="text-align:right; padding-right:14px">'β_H'</td><td style="text-align:right">'β_H,XC'</td></tr>
+'<tr><td style="padding:2px 12px 2px 0"><b>φ(t;t<sub>0</sub>)</b></td><td style="text-align:right; padding-right:14px"><b>'φ_t,nb'</b></td><td style="text-align:right"><b>'φ_t,XC'</b></td></tr>
+'</table>
     #if cementklasse ≡ 2
     #else
-        '· <b>Cementcorrectie (B<span>.</span>9).</b> Dit blad rekent β(t<sub>0</sub>) met de
-        'gecorrigeerde ouderdom t<sub>0</sub> = 't_0,cor' dagen, zoals (B<span>.</span>9)
-        'voorschrijft. De referentie-uitwerking rekent de correctie wél uit maar vult in (B<span>.</span>5)
-        'de onbewerkte 't_0' dagen in, waardoor de cementklasse daar geen effect
-        'heeft.
+        '· <b>Cement correction (B<span>.</span>9).</b> This sheet calculates β(t<sub>0</sub>) using the
+'adjusted age t<sub>0</sub> = 't_0,cor' days, as required by (B<span>.</span>9)
+'The reference calculates this correction but inserts (B<span>.</span>5)
+'the unadjusted 't_0' days into the calculation, so cement class has no effect
+'there.
     #end if
     #if Δβ_H ≤ 0.5
     #else
-        '· <b>β<sub>H</sub> uit (B<span>.</span>8).</b> Dit blad rekent de term
-        '(0,012·RH)<sup>18</sup> mee; bij RH = 'RH' % levert die 'Δβ_H' extra op.
-        'de referentie-uitwerking laat die term buiten beschouwing. Bij een lange
-        'belastingduur werkt dit nauwelijks door in φ, bij een korte wél.
+        '· <b>β<sub>H</sub> from (B<span>.</span>8).</b> This sheet includes the term
+'(0,012·RH)<sup>18</sup> ; at RH = 'RH'% it contributes 'Δβ_H' extra.
+'The reference omits this term. For a long
+'load duration the effect on φ is small, but it matters for short durations.
     #end if
 #end if
 
 # 8. Summary
 
 '<table style="border-collapse:collapse; font-size:13px">
-'<tr><th style="text-align:left; padding:2px 12px 2px 0">Grootheid</th><th style="text-align:right">Waarde</th></tr>
-'<tr><td style="padding:2px 12px 2px 0">φ<sub>RH</sub> — vochtigheid + dikte</td><td style="text-align:right">'φ_RH'</td></tr>
-'<tr><td style="padding:2px 12px 2px 0">β(f<sub>cm</sub>) — betonsterkte</td><td style="text-align:right">'β_fcm'</td></tr>
-'<tr><td style="padding:2px 12px 2px 0">β(t<sub>0</sub>) — ouderdom bij belasten</td><td style="text-align:right">'β_t0'</td></tr>
-'<tr><td style="padding:2px 12px 2px 0">φ<sub>0</sub> — basiskruipcoëfficiënt</td><td style="text-align:right">'φ_0'</td></tr>
+'<tr><th style="text-align:left; padding:2px 12px 2px 0">Quantity</th><th style="text-align:right">Value</th></tr>
+'<tr><td style="padding:2px 12px 2px 0">φ<sub>RH</sub> — humidity + thickness</td><td style="text-align:right">'φ_RH'</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">β(f<sub>cm</sub>) — concrete strength</td><td style="text-align:right">'β_fcm'</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">β(t<sub>0</sub>) — age at loading</td><td style="text-align:right">'β_t0'</td></tr>
+'<tr><td style="padding:2px 12px 2px 0">φ<sub>0</sub> — basic creep coefficient</td><td style="text-align:right">'φ_0'</td></tr>
 '<tr><td style="padding:2px 12px 2px 0">β<sub>H</sub> · β<sub>c</sub></td><td style="text-align:right">'β_H' · 'β_c'</td></tr>
-'<tr><td style="padding:2px 12px 2px 0"><b>φ(t;t<sub>0</sub>) — kruipcoëfficiënt</b></td><td style="text-align:right"><b>'φ_t'</b></td></tr>
+'<tr><td style="padding:2px 12px 2px 0"><b>φ(t;t<sub>0</sub>) — creep coefficient</b></td><td style="text-align:right"><b>'φ_t'</b></td></tr>
 '<tr><td style="padding:2px 12px 2px 0">E<sub>c,eff</sub></td><td style="text-align:right">'E_c,eff'</td></tr>
 '</table>
 
-'<hr/>
-'<i>Aandachtspunten:
-'<ul>
-'<li>Gecalibreerd op zes de referentie-uitwerking-referenties (t<sub>0</sub> = 28 d, h<sub>0</sub> = 300 mm):
-'<b>C45/55 · N · RH 50</b> → φ 1,614 · <b>C20/25 · N · RH 50</b> → φ 2,703 (tak (B<span>.</span>3a) + (B<span>.</span>8a)) ·
-'<b>C45/55 · N · RH 30</b> → φ<sub>RH</sub> 1,640 · φ 1,845 ·
-'<b>C45/55 · N · RH 70</b> → φ<sub>RH</sub> 1,229 · φ 1,382 ·
-'<b>C45/55 · R</b> en <b>· S</b> → zie hieronder. Beide takken van (B<span>.</span>3) én van
-'(B<span>.</span>8) en de volledige RH-afhankelijkheid zijn daarmee geverifieerd.</li>
-'<li><b>Het gerapporteerde getal is φ(t;t<sub>0</sub>), niet φ<sub>0</sub>.</b>
-'Het referentieblad rekent met t = 100000 dagen (≈ 274 jaar, praktisch t = ∞) en
-'komt zo op 1,614 → 1,61. Met φ<sub>0</sub> = 1,617 zou er 1,62 staan.</li>
-'<li><b>β<sub>H</sub> kent twee vormen.</b> Bij f<sub>cm</sub> ≤ 35 geldt (B<span>.</span>8a)
-'zónder α<sub>3</sub> — C20/25 geeft 1,5·1,0001·300 + 250 = 700. Daarboven geldt
-'(B<span>.</span>8b) mét α<sub>3</sub>: C45/55 geeft 450 + 250·0,813 = 653. De begrenzing is
-'navenant 1500 resp. 1500·α<sub>3</sub>.</li>
-'<li><b>Bewuste afwijking 1 — cementklasse S en R.</b> Het referentieblad rekent
-'(B<span>.</span>9) netjes uit (R: t<sub>0</sub> 28 → 32,5 d · S: 28 → 24,2 d) maar vult
-'vervolgens in (B<span>.</span>5) tóch de onbewerkte 28 in. Daardoor heeft de cementklasse in
-'de referentie-uitwerking geen enkel effect: N, R en S geven alle drie 1,61. Dit blad volgt de
-'norm en gebruikt de gecorrigeerde t<sub>0</sub> — klasse R geeft φ = 1,57,
-'klasse S geeft φ = 1,66. Bij klasse N (α = 0) is er geen verschil.</li>
-'<li><b>Bewuste afwijking 2 — β<sub>H</sub> is bij de referentie-uitwerking
-'RH-onafhankelijk.</b> De term (0,012·RH)<sup>18</sup> draagt er nooit bij: bij
-'RH 30, 50 én 70 % print het blad steeds β<sub>H</sub> = 653. Volgens de norm
-'hoort daar bij RH = 70 % 673 te staan. Bij t = 100000 dagen is β<sub>c</sub>
-'toch al ≈ 0,998, dus het eindresultaat verschilt niet (1,382 in beide gevallen);
-'bij korte belastingduur zou het wél schelen. Dit blad rekent de term gewoon
-'mee.</li>
-'<li>De cementcorrectie (B<span>.</span>9) grijpt alleen aan op β(t<sub>0</sub>), niet op
-'β<sub>c</sub>(t;t<sub>0</sub>) — daar staat de werkelijke ouderdom bij belasten.</li>
-'<li>h<sub>0</sub> is directe invoer, net als in de referentie-uitwerking. Bereken hem zelf als
-'h<sub>0</sub> = 2·A<sub>c</sub>/u, met u de aan uitdroging blootgestelde omtrek.</li>
-'<li>Bijlage B is opgesteld voor 40 % ≤ RH ≤ 100 % en normale
-'beton­samenstellingen. Daarbuiten rekenen de formules door — het referentieblad
-'accepteert RH = 30 % zonder meer — maar de uitkomst valt dan buiten het
-'geldigheidsgebied. Bij hogesterktebeton met silica of bij verhoogde
-'temperaturen gelden de aanvullende regels van bijlage B.</li>
-'</ul></i>
+'<hr/><i>Limitations:<ul><li>Six reference cases were calibrated at t<sub>0</sub>=28 days and h<sub>0</sub>=300 mm: C45/55/N/RH50 gives φ=1.614; C20/25/N/RH50 gives 2.703 using (B.3a)/(B.8a); C45/55/N/RH30 gives φ<sub>RH</sub>=1.640 and φ=1.845; RH70 gives 1.229 and 1.382. Cement R/S cases are discussed below. Both branches of (B.3)/(B.8) and RH dependence were verified.</li><li><b>The reported result is φ(t;t<sub>0</sub>), not φ<sub>0</sub>.</b> The reference uses t=100000 days (about 274 years, effectively ∞), giving 1.614 → 1.61. φ<sub>0</sub>=1.617 would round to 1.62.</li><li><b>β<sub>H</sub> has two forms.</b> Up to f<sub>cm</sub>=35, (B.8a) excludes α<sub>3</sub>: C20/25 gives 1.5·1.0001·300 + 250 = 700. Above 35, (B.8b) includes α<sub>3</sub>: C45/55 gives 450 + 250·0.813 = 653. Limits are 1500 and 1500·α<sub>3</sub>.</li><li><b>Difference 1 — cement S/R.</b> The reference calculates (B.9), adjusting 28 days to 32.5 for R or 24.2 for S, but still uses unadjusted 28 in (B.5). N/R/S therefore all give 1.61. This sheet uses corrected t<sub>0</sub> per the code: R gives φ=1.57, S gives 1.66. For N (α=0), results agree.</li><li><b>Difference 2 — reference β<sub>H</sub> is independent of RH.</b> It omits (0.012·RH)<sup>18</sup>, printing 653 at RH30/50/70%. The code requires 673 at RH70%. At t=100000 days, β<sub>c</sub>≈0.998 so both final results round to 1.382; short durations differ. This sheet includes the term.</li><li>Cement correction (B.9) affects β(t<sub>0</sub>) only; β<sub>c</sub>(t;t<sub>0</sub>) uses actual loading age.</li><li>Enter h<sub>0</sub> directly, as in the reference, calculated as 2·A<sub>c</sub>/u with u the drying perimeter.</li><li>Annex B covers 40% ≤ RH ≤ 100% and ordinary concrete mixes. Formulas still evaluate outside this range, but results are outside their scope, even though the reference accepts RH30%. High-strength concrete with silica or elevated temperatures requires the additional Annex B rules.</li></ul></i>
 `;

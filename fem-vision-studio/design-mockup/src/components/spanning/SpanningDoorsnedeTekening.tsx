@@ -77,7 +77,7 @@ const FILL_EQ = "#f6d9c2";
 const LIMIET = "#b91c1c";
 
 function fmt(v: number, digits = 1): string {
-  return v.toLocaleString("nl-NL", { maximumFractionDigits: digits });
+  return v.toLocaleString("en-GB", { maximumFractionDigits: digits });
 }
 
 function maat(v: number): string {

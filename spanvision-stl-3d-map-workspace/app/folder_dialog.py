@@ -20,7 +20,7 @@ PICK_FLAG = "--pick-folder"
 _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
 
-def show_dialog(initial: str = "", title: str = "Kies een map") -> str:
+def show_dialog(initial: str = "", title: str = "Choose a folder") -> str:
     """Run the actual dialog. Only call this from a process of its own."""
     import tkinter as tk
     from tkinter import filedialog
@@ -36,7 +36,7 @@ def show_dialog(initial: str = "", title: str = "Kies een map") -> str:
     return chosen or ""
 
 
-def pick_folder(initial: str = "", title: str = "Kies een map") -> str | None:
+def pick_folder(initial: str = "", title: str = "Choose a folder") -> str | None:
     """Ask the user for a folder. Returns None if they cancelled or it failed."""
     handle = tempfile.NamedTemporaryFile(prefix="3dmaps-dir-", suffix=".txt",
                                          delete=False, mode="w", encoding="utf-8")
@@ -63,7 +63,7 @@ def pick_folder(initial: str = "", title: str = "Kies een map") -> str | None:
 def main(argv: list[str]) -> int:
     """argv: <initial> <title> <result_file>"""
     initial = argv[0] if len(argv) > 0 else ""
-    title = argv[1] if len(argv) > 1 else "Kies een map"
+    title = argv[1] if len(argv) > 1 else "Choose a folder"
     chosen = show_dialog(initial, title)
     if len(argv) > 2:
         Path(argv[2]).write_text(chosen, encoding="utf-8")

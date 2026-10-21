@@ -159,7 +159,7 @@ export async function paginateVectorToPdfBytes(
       captured = new PdfVectorDraw2D(w, h, pool, baseDir, arabicFonts, cjk);
       return captured;
     }, footerLayoutWidth);
-    if (!captured) throw new Error('paginateVectorToPdfBytes: renderReport riep de Draw2D-fabriek niet aan');
+    if (!captured) throw new Error('paginateVectorToPdfBytes: renderReport did not call the Draw2D factory');
     return { d2d: captured as PdfVectorDraw2D, dims };
   };
 

@@ -182,7 +182,7 @@ export async function sendMessage(text) {
         `Mogelijke oplossingen:\n` +
         `• Ollama lokaal: start 'ollama serve' en zorg dat een model is gedownload (bijv. 'ollama pull llama3.1')\n` +
         `• OpenAI: stel endpoint in op https://api.openai.com/v1 met API-key\n` +
-        `• Klik op ⚙️ om het AI endpoint te wijzigen`;
+        "• Click ⚙️ to change the AI endpoint";
     }
     aiMessages.update((msgs) => [
       ...msgs,
@@ -246,7 +246,7 @@ async function executeToolCall(name, args) {
         height || 1400,
         sjabloon || "standaard-67-meranti"
       );
-      toast.success(`Kozijn aangemaakt: ${width}×${height}mm`);
+      toast.success(`Frame created: ${width}×${height}mm`);
       return k;
     }
 

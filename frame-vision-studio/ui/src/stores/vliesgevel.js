@@ -35,7 +35,7 @@ export async function loadVliesgevels() {
     vliesgevels.set(Array.isArray(list) ? list : []);
     return list;
   } catch (e) {
-    console.error("Vliesgevels laden failed:", e);
+    console.error("Failed to load curtain walls:", e);
     return [];
   }
 }
@@ -183,6 +183,6 @@ async function refreshVgGeometry(id) {
     const geom = await invoke("get_vliesgevel_geometry", { id });
     currentVgGeometry.set(geom);
   } catch (e) {
-    console.error("Vliesgevel geometrie laden failed:", e);
+    console.error("Failed to load curtain wall geometry:", e);
   }
 }

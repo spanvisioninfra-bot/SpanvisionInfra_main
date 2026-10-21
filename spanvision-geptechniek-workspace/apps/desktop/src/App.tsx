@@ -276,7 +276,7 @@ function App() {
           console.error("Browser drop open failed for", f.name, err);
           const msg = err instanceof Error ? err.message : String(err);
           alert(
-            `Kon ${f.name} niet openen in browser-modus:\n${msg}\n\n` +
+            `Kon ${f.name} cannot open in browser mode:\n${msg}\n\n` +
             "Tip: BHR-GT XML + GMW XML + GEF werken in de browser. " +
             "BRO CPT XML and project files require the desktop application.",
           );

@@ -265,7 +265,7 @@ async function expectBatchSchemaReject(
   assertEq(sc.code, 'VALIDATION', `de batch-fout moet VALIDATION zijn: ${JSON.stringify(sc).slice(0, 300)}`);
   const err = String(sc.error);
   assert(
-    err.includes(`stap ${stepNr}: ongeldige argumenten voor ${tool} —`),
+    err.includes(`step ${stepNr}: invalid arguments for ${tool} —`),
     `de fout moet stapnummer én tool noemen in de poort-vorm, kreeg: ${err}`,
   );
   assert(err.includes(pathToken), `de fout moet het pad '${pathToken}' noemen, kreeg: ${err}`);
