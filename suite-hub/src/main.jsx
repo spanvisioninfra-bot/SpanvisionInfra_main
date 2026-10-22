@@ -188,7 +188,7 @@ function App() {
       <Show when={screen()==='modules'}>
         <section class="company-tools-page">
           <section class="company-catalog" aria-labelledby="tools-title">
-            <div class="catalog-heading" data-sv-reveal><div><span class="eyebrow">SPANVISION INFRA TOOLKIT</span><h1 id="tools-title">All tools <span>{brand.modules.length}</span></h1><p>Choose a tool to open its workspace in a new tab.</p></div><button class="button button-outline" onClick={refreshStatus}>Check availability<Arrow/></button></div>
+            <div class="catalog-heading" data-sv-reveal><div><span class="eyebrow">SPANVISION INFRA TOOLKIT</span><h1 id="tools-title">All tools <span>{brand.modules.length}</span></h1><p>Choose a tool for your project, wherever you work. Each workspace opens in a new tab.</p></div><button class="button button-outline" onClick={refreshStatus}>Check availability<Arrow/></button></div>
             <Modules/>
             <p class="catalog-note">{localPreview?'Files and saved preferences stay with each workspace.':'Browser drafts stay with each workspace. BIM and map processing uses temporary cloud storage; download your results to keep them.'}</p>
           </section>

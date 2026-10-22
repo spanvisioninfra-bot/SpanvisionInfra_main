@@ -177,7 +177,7 @@
       "dist": "dist",
       "port": 8765,
       "path": "/",
-      "description": "Select a Netherlands map area, place your design and export printable STL and 3MF models."
+      "description": "Select a map area for your project location, place your design and export printable STL and 3MF models."
     },
     {
       "id": "field",
