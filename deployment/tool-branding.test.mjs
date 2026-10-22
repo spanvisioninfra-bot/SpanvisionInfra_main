@@ -38,6 +38,9 @@ test('branding installation is idempotent, embeds the tool icon and leaves appli
       const second = await fs.readFile(path.join(directory, 'index.html'), 'utf8');
       assert.equal(first, second);
       assert.equal((second.match(/id="sv-tool-identity-data"/g) || []).length, 1);
+      assert.equal((second.match(/id="sv-light-mode-ui"/g) || []).length, 1);
+      assert.ok(second.includes('light-mode.css?v='));
+      assert.ok((await fs.stat(path.join(directory, '__spanvision-ui/light-mode.css'))).size > 0);
       const identity = JSON.parse(second.match(/id="sv-tool-identity-data"[^>]*>([^<]+)<\/script>/)[1]);
       assert.equal(identity.id, id);
       assert.equal(identity.version, '1.0');

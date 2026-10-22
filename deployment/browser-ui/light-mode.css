@@ -1,0 +1,108 @@
+/* Light-mode UI repairs. Model, drawing, map and printed document colours remain data. */
+@media screen {
+  :root[data-sv-mode="light"][data-sv-tool] {
+    --sv-muted:#4b596b;
+    --theme-text-secondary:var(--sv-muted);--theme-text-dim:var(--sv-muted);
+    --theme-text-muted:var(--sv-muted);--theme-text-faint:var(--sv-muted);
+    --theme-placeholder-text:var(--sv-muted);--theme-placeholder-heading:var(--sv-text-soft);
+    --theme-ribbon-group-label:var(--sv-muted);--theme-ribbon-group-label-color:var(--sv-muted);
+    --text-secondary:var(--sv-muted);--text-muted:var(--sv-muted);--scaffold-gray:var(--sv-muted);
+    --theme-status-bg:var(--sv-surface);--theme-status-border:var(--sv-border);
+    --theme-status-text:var(--sv-text-soft);--theme-status-text-label:var(--sv-muted);
+  }
+  :root[data-sv-mode="light"][data-sv-tool] :is(input,textarea)::placeholder {color:var(--sv-muted);opacity:1}
+  :root[data-sv-mode="light"][data-sv-tool] :is(.statusbar,.status-bar) {background:var(--sv-surface);color:var(--sv-text-soft)}
+  :root[data-sv-mode="light"][data-sv-tool] :is(.status-item-label,.status-label) {color:var(--sv-muted)}
+  :root[data-sv-mode="light"][data-sv-tool] .ribbon-btn.active :is(.ribbon-btn-icon,.ribbon-btn-label) {color:var(--sv-text)}
+  :root[data-sv-mode="light"][data-sv-tool="cad"] #loading .sub {color:var(--sv-muted)}
+
+  /* The website's legacy local-profile and OCR screens used fixed dark colours. */
+  :root[data-sv-mode="light"][data-sv-tool="hub"] :is(.preview-badge,.scan-intro,.account-heading p,.account-details p,.profile-header p,.drawing-label,.drawing-footer,.tools-help,.page-intro p) {color:var(--sv-muted)}
+  :root[data-sv-mode="light"][data-sv-tool="hub"] :is(.account-card,.account-details article,.preview-disclosure) {background:var(--sv-surface);border-color:var(--sv-border);color:var(--sv-text-soft)}
+  :root[data-sv-mode="light"][data-sv-tool="hub"] .profile-header {border-color:var(--sv-border)}
+  :root[data-sv-mode="light"][data-sv-tool="hub"] .avatar {background:var(--sv-raised);border-color:var(--sv-border);color:var(--sv-text)}
+  :root[data-sv-mode="light"][data-sv-tool="hub"] .preview-body label {color:var(--sv-text-soft)}
+  :root[data-sv-mode="light"][data-sv-tool="hub"] .preview-body label.region-selector {color:var(--sv-muted)}
+  :root[data-sv-mode="light"][data-sv-tool="hub"] .preview-body :is(input,select) {background:var(--sv-surface);border-color:var(--sv-border);color:var(--sv-text)}
+  :root[data-sv-mode="light"][data-sv-tool="hub"] .quiet-link {color:var(--sv-muted)!important}
+  :root[data-sv-mode="light"][data-sv-tool="hub"] .account-nav .selected {background:var(--sv-raised);color:var(--sv-text);border-color:var(--sv-text)}
+  :root[data-sv-mode="light"][data-sv-tool="hub"] .preview-footer a:hover {color:var(--sv-text)}
+  :root[data-sv-mode="light"][data-sv-tool="hub"] .drawing-bar {background:var(--sv-raised);color:var(--sv-text)}
+  :root[data-sv-mode="light"][data-sv-tool="hub"] .drawing-footer>span:last-child {color:var(--sv-text-soft)}
+
+  /* Keep syntax categories distinct with ink intended for a pale editor surface.
+     Inline entity colours are UI metadata, separate from the IFC model colours. */
+  :root[data-sv-mode="light"][data-sv-tool] .step-keyword {color:#6d28d9!important}
+  :root[data-sv-mode="light"][data-sv-tool] :is(.ifc-tree-type,.ifc-dashboard-tree-type) {color:var(--sv-ifc-type,#6d28d9)!important}
+  :root[data-sv-mode="light"][data-sv-tool] :is(.ifc-tree-type,.ifc-dashboard-tree-type)[style*="52, 211, 153"] {--sv-ifc-type:#115e59}
+  :root[data-sv-mode="light"][data-sv-tool] :is(.ifc-tree-type,.ifc-dashboard-tree-type)[style*="96, 165, 250"] {--sv-ifc-type:#1d4ed8}
+  :root[data-sv-mode="light"][data-sv-tool] :is(.ifc-tree-type,.ifc-dashboard-tree-type)[style*="56, 189, 248"] {--sv-ifc-type:#075985}
+  :root[data-sv-mode="light"][data-sv-tool] :is(.ifc-tree-type,.ifc-dashboard-tree-type)[style*="251, 191, 36"] {--sv-ifc-type:#854d0e}
+  :root[data-sv-mode="light"][data-sv-tool] :is(.ifc-tree-type,.ifc-dashboard-tree-type)[style*="251, 146, 60"] {--sv-ifc-type:#9a3412}
+  :root[data-sv-mode="light"][data-sv-tool] :is(.ifc-tree-type,.ifc-dashboard-tree-type)[style*="244, 114, 182"] {--sv-ifc-type:#9d174d}
+  :root[data-sv-mode="light"][data-sv-tool] :is(.ifc-tree-type,.ifc-dashboard-tree-type)[style*="74, 222, 128"] {--sv-ifc-type:#166534}
+  :root[data-sv-mode="light"][data-sv-tool] :is(.ifc-tree-type,.ifc-dashboard-tree-type)[style*="248, 113, 113"] {--sv-ifc-type:#b91c1c}
+  :root[data-sv-mode="light"][data-sv-tool] :is(.step-entity-ref,.ifc-dashboard-step-ref) {color:#1d4ed8!important}
+  :root[data-sv-mode="light"][data-sv-tool] .step-entity-type {color:#115e59!important}
+  :root[data-sv-mode="light"][data-sv-tool] .step-string {color:#854d0e!important}
+  :root[data-sv-mode="light"][data-sv-tool] .step-enum {color:#9a3412!important}
+  :root[data-sv-mode="light"][data-sv-tool] .ifc-viewer-linenum {opacity:1}
+  :root[data-sv-mode="light"][data-sv-tool="cad2d"] :is(.ifc-dashboard-tree-label,.ifc-dashboard-tree-badge,.ifc-dashboard-stat,.ifc-dashboard-step-stats,.ifc-dashboard-step-empty-hint,.ifc-stat-label) {color:var(--sv-muted)}
+  :root[data-sv-mode="light"][data-sv-tool="cad2d"] .cad-statusbar :is(.text-red-300,.text-red-400) {color:#b91c1c}
+  :root[data-sv-mode="light"][data-sv-tool="cad2d"] .cad-statusbar :is(.text-green-300,.text-green-400) {color:#166534}
+  :root[data-sv-mode="light"][data-sv-tool="cad2d"] .cad-statusbar :is(.text-blue-300,.text-blue-400) {color:#1d4ed8}
+  :root[data-sv-mode="light"][data-sv-tool="cad2d"] [data-tablet-nav-button] {color:var(--sv-text)}
+  :root[data-sv-mode="light"][data-sv-tool="cad2d"] [data-tablet-nav-button][aria-pressed="true"] {background:var(--sv-text);color:var(--sv-surface)}
+  :root[data-sv-mode="light"][data-sv-tool="cad2d"] .tablet-workspace [class~="bg-black/70"] .text-gray-400 {color:#e2e8f0}
+  :root[data-sv-mode="light"][data-sv-tool="cad2d"] .tablet-workspace [class~="bg-gray-100/95"] :is(.text-gray-400,.text-gray-500) {color:var(--sv-muted)}
+  :root[data-sv-mode="light"][data-sv-tool="planner"] .text-red-400 {color:#b91c1c}
+
+  :root[data-sv-mode="light"][data-sv-tool="pdf"] :is(.document-tabs-empty,.document-tabs-add,.ribbon-input-label,.workspace-eyebrow,.workspace-preview-link,#placeholder>p,.bs-about-version,.bs-about-description,.bs-about-company-desc,.bs-about-copyright,.bs-about-license) {color:var(--sv-muted)}
+  :root[data-sv-mode="light"][data-sv-tool="pdf"] .chat-fab {background:var(--sv-text);color:var(--sv-surface)}
+  :root[data-sv-mode="light"][data-sv-tool="pdf"] #placeholder p {opacity:1}
+  :root[data-sv-mode="light"][data-sv-tool="calc"] {--theme-chapter-text:#166534}
+  :root[data-sv-mode="light"][data-sv-tool="calc"] .grid-cell.editable-value {color:#1e40af}
+  :root[data-sv-mode="light"][data-sv-tool="calc"] :is(.grid-header-abbr,.grid-cell.type-cell) {opacity:1}
+  :root[data-sv-mode="light"][data-sv-tool="calc"] .grid-cell.type-cell {color:#17202b}
+
+  /* Frame's header, workspace tabs and empty-state labels share these roles. */
+  :root[data-sv-mode="light"][data-sv-tool="frame"] {--text-on-dark:var(--sv-text-soft)}
+  :root[data-sv-mode="light"][data-sv-tool="frame"] :is(.ws-tab,.panel-tab) {color:var(--sv-muted)}
+  :root[data-sv-mode="light"][data-sv-tool="frame"] :is(.ws-tab.active,.panel-tab.active) {color:var(--sv-text)}
+  :root[data-sv-mode="light"][data-sv-tool="frame"] .badge.neutral {color:var(--sv-muted)}
+  :root[data-sv-mode="light"][data-sv-tool="frame"] :is(.summary-value.pass-val,.summary-value.waste-good) {color:#166534}
+  :root[data-sv-mode="light"][data-sv-tool="frame"] :is(.summary-value.fail-val,.summary-value.score.poor) {color:#991b1b}
+  :root[data-sv-mode="light"][data-sv-tool="frame"] :is(.empty-state .hint,.category-header .count) {opacity:1}
+
+  :root[data-sv-mode="light"][data-sv-tool="fem"] .ifc-rapport-kop.ok {color:#116149}
+  :root[data-sv-mode="light"][data-sv-tool="fem"] :is(.lc-tab-phi-label,.lc-tab-type-results,.lc-tab-type-snow) {color:#17202b}
+  :root[data-sv-mode="light"][data-sv-tool="fem"] .dof-badge.rigid {color:#991b1b}
+  :root[data-sv-mode="light"][data-sv-tool="fem"] .fem-tree-melding-fout .fem-tree-leaf-label {color:#991b1b}
+  :root[data-sv-mode="light"][data-sv-tool="fem"] :is(.insights-matrix td.zero,.report-section-toggle.is-nvt,.report-section-nvt) {opacity:1}
+  :root[data-sv-mode="light"][data-sv-tool="calculation"] .tree-item-onuitgegeven .tree-item-label {opacity:1}
+
+  :root[data-sv-mode="light"][data-sv-tool="geo"] :is(.panel-empty,.empty-state h2,.empty-state p,.project-header-sub) {color:var(--sv-muted)}
+  :root[data-sv-mode="light"][data-sv-tool="geo"] .report-empty-state {background:var(--sv-canvas);color:var(--sv-text-soft)}
+  :root[data-sv-mode="light"][data-sv-tool="geo"] .report-empty-title {color:var(--sv-text)}
+  :root[data-sv-mode="light"][data-sv-tool="geo"] .report-empty-subtitle {color:var(--sv-muted)}
+  :root[data-sv-mode="light"][data-sv-tool="geo"] .ifc-pane-badge-ifc4x3 {color:#854d0e}
+  :root[data-sv-mode="light"][data-sv-tool="geo"] .tekprops-scale-chip.active {background:var(--sv-text);color:var(--sv-surface)}
+  :root[data-sv-mode="light"][data-sv-tool="geo"] .tek-db-cell-val.amber {color:#854d0e}
+  :root[data-sv-mode="light"][data-sv-tool="geo"] .tek-dbp-edit::placeholder {color:#d1d5db}
+  :root[data-sv-mode="light"][data-sv-tool="geo"] .tek-dbp-type {color:#fcd34d}
+  :root[data-sv-mode="light"][data-sv-tool="geo"] :is(.report-empty-subtitle,.report-meta-label,.status-item-label) {opacity:1!important}
+  :root[data-sv-mode="light"][data-sv-tool="speech"] .statusbar-link {opacity:1}
+
+  /* Field retains a dark toolbar in its native light theme. */
+  :root[data-sv-mode="light"][data-sv-tool="field"] :is(.app-toolbar,.tab-strip) {--text-secondary:#d1d5db;--scaffold-gray:#d1d5db}
+  :root[data-sv-mode="light"][data-sv-tool="field"] .brand-name small {color:#d1d5db}
+  :root[data-sv-mode="light"][data-sv-tool="field"] :is(.btn-primary,.btn-success,#export-pdf,#new-handover-btn,#new-inspection-btn) {background:var(--sv-text);border-color:var(--sv-text);color:var(--sv-surface)}
+  :root[data-sv-mode="light"][data-sv-tool="field"] .status-open {color:#78350f}
+  :root[data-sv-mode="light"][data-sv-tool="field"] #project-import-btn {opacity:1!important}
+
+  :root[data-sv-mode="light"][data-sv-tool="pile"] :is(.project-tree-label,.project-tree-group-toggle) {color:var(--sv-muted)}
+  :root[data-sv-mode="light"][data-sv-tool="pile"] .pile-plan-row.active {background:var(--sv-raised);color:var(--sv-text)}
+  :root[data-sv-mode="light"][data-sv-tool="pile"] .pile-plan-row.active .pile-plan-select {background:transparent;color:var(--sv-text)}
+  :root[data-sv-mode="light"][data-sv-tool="pile"] .pile-plan-meta {color:var(--sv-muted)}
+  :root[data-sv-mode="light"][data-sv-tool="pile"] .legend-item.is-unused {opacity:1;color:var(--sv-muted)}
+}

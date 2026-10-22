@@ -8,6 +8,7 @@ interface ThemeToggleProps {
 export function ThemeToggle({ theme, onCycle }: ThemeToggleProps) {
   return (
     <button
+      data-tablet-nav-button
       onClick={onCycle}
       className="flex flex-col items-center justify-center w-[44px] h-[44px] rounded-xl text-gray-300 active:bg-white/10 active:scale-95 transition-transform"
       title={`Theme: ${theme}`}

@@ -53,6 +53,9 @@ export default function TabletApp() {
 
   // Phase 2 states
   const [theme, setTheme] = useState<ThemeMode>(() => {
+    const sharedMode = document.documentElement.dataset.svMode;
+    if (sharedMode === 'light') return 'light';
+    if (sharedMode === 'dark') return 'spanvision-mono';
     try { return (localStorage.getItem('tablet-theme') as ThemeMode) || 'spanvision-mono'; } catch { return 'spanvision-mono'; }
   });
   const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
@@ -91,6 +94,26 @@ export default function TabletApp() {
   // Theme resolution
   const resolvedTheme = useMemo(() => resolveTheme(theme), [theme, systemDark]);
   const isLight = resolvedTheme === 'light';
+
+  // The phone viewer and the website use one appearance choice. Retain the
+  // native Auto setting when its resolved mode already matches the website.
+  useEffect(() => {
+    const sync = () => {
+      const light = document.documentElement.dataset.svMode === 'light';
+      setTheme(current => (resolveTheme(current) === 'light') === light ? current : light ? 'light' : 'spanvision-mono');
+    };
+    window.addEventListener('spanvision:mode-change', sync);
+    window.addEventListener('spanvision:mode-observed', sync);
+    return () => {
+      window.removeEventListener('spanvision:mode-change', sync);
+      window.removeEventListener('spanvision:mode-observed', sync);
+    };
+  }, []);
+  useEffect(() => {
+    const appearance = (window as Window & { SpanvisionAppearance?: { getMode: () => string; setMode: (mode: string) => void } }).SpanvisionAppearance;
+    const mode = isLight ? 'light' : 'dark';
+    if (appearance && appearance.getMode() !== mode) appearance.setMode(mode);
+  }, [isLight]);
 
   // Listen for system theme changes when in auto mode
   useEffect(() => {

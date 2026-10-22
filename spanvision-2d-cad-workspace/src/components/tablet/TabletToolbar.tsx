@@ -38,6 +38,8 @@ function RailButton({
 }) {
   return (
     <button
+      data-tablet-nav-button
+      aria-pressed={active}
       onClick={onClick}
       disabled={disabled}
       className={`flex flex-col items-center justify-center w-[44px] h-[44px] rounded-xl transition-all active:scale-95 ${
@@ -79,6 +81,7 @@ export function TabletToolbar({
 
   return (
     <div
+      data-tablet-navigation
       className={`fixed top-0 left-0 h-full w-[56px] flex flex-col items-center justify-between py-2 ${
         isLight ? 'bg-gray-200/90' : 'bg-gray-900/90'
       } backdrop-blur-md shadow-lg`}

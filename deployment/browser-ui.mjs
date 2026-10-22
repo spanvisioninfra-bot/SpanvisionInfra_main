@@ -9,7 +9,7 @@ const release=JSON.parse(await fs.readFile(new URL('../branding/release.json',im
 const toolIcons=JSON.parse(await fs.readFile(new URL('../branding/tool-icons.json',import.meta.url),'utf8'));
 export async function installWorkspaceUi(directory,{entries=['index.html'],optionalEntries=[],prefix='/__spanvision-ui/'}={}) {
   await fs.cp(assets,path.join(directory,'__spanvision-ui'),{recursive:true});
-  const version=createHash('sha256').update(await fs.readFile(path.join(assets,'workspace-ui.css'))).update(await fs.readFile(path.join(assets,'tool-identity.js'))).update(JSON.stringify({release,toolIcons})).digest('hex').slice(0,12);
+  const version=createHash('sha256').update(await fs.readFile(path.join(assets,'workspace-ui.css'))).update(await fs.readFile(path.join(assets,'light-mode.css'))).update(await fs.readFile(path.join(assets,'tool-identity.js'))).update(JSON.stringify({release,toolIcons})).digest('hex').slice(0,12);
   for(const entry of [...entries,...optionalEntries]) {
     const file=path.join(directory,entry);
     let html;
@@ -24,6 +24,7 @@ export async function installWorkspaceUi(directory,{entries=['index.html'],optio
     const markup=`<!-- Spanvision workspace UI -->
 <link rel="preload" href="${prefix}Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link id="sv-workspace-ui" rel="stylesheet" href="${prefix}workspace-ui.css?v=${version}">
+<link id="sv-light-mode-ui" rel="stylesheet" href="${prefix}light-mode.css?v=${version}">
 ${identity?`<script id="sv-tool-identity-data" type="application/json">${identity}</script>\n<script src="${prefix}tool-identity.js?v=${version}" defer></script>\n`:''}<!-- /Spanvision workspace UI -->
 `;
     await fs.writeFile(file,html.replace(/<\/head>/i,markup+'</head>'));
