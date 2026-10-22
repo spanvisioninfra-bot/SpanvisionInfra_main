@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 from .cloud_sessions import CloudSessions, SessionMapping, SessionObject
+from .tool_access import ToolAccess
 
 SERVICE = os.environ.get('SPANVISION_SERVICE', 'bim')
 ROOT = Path(__file__).resolve().parent.parent
@@ -30,4 +31,4 @@ elif SERVICE == 'stl':
 else:
     raise RuntimeError('SPANVISION_SERVICE must be bim or stl')
 
-app = CloudSessions(api, secure=os.environ.get('SPANVISION_CLOUD_INSECURE_TEST') != '1')
+app = ToolAccess(CloudSessions(api, secure=os.environ.get('SPANVISION_CLOUD_INSECURE_TEST') != '1'), SERVICE)

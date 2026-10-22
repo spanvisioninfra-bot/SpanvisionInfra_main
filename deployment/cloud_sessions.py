@@ -84,6 +84,10 @@ class CloudSessions:
             sid = cookie[self.cookie_name].value if self.cookie_name in cookie else None
         except (ValueError, KeyError):
             sid = None
+        cookie_sid = sid
+        account = scope.get('spanvision.account_id')
+        if account and sid:
+            sid = hashlib.sha256((account + ':' + sid).encode()).hexdigest()
         with _lock:
             now = time.monotonic()
             for old in list(_activity):
@@ -95,7 +99,8 @@ class CloudSessions:
             busy = is_new and len(_states) >= 256
             # Bound the number of in-memory workspaces on a small preview instance.
             if is_new and not busy:
-                sid = secrets.token_hex(32)
+                cookie_sid = secrets.token_hex(32)
+                sid = hashlib.sha256((account + ':' + cookie_sid).encode()).hexdigest() if account else cookie_sid
                 _states[sid] = {}
             if not busy:
                 _activity[sid] = (now, _activity.get(sid, (now, 0))[1] + 1)
@@ -117,7 +122,7 @@ class CloudSessions:
                     extra.append((b'cache-control', b'private, no-store'))
                 if is_new:
                     secure = '; Secure' if self.secure else ''
-                    extra.append((b'set-cookie', f'{self.cookie_name}={sid}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400{secure}'.encode()))
+                    extra.append((b'set-cookie', f'{self.cookie_name}={cookie_sid}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400{secure}'.encode()))
                 message['headers'] = list(message.get('headers', [])) + extra
             await send(message)
 

@@ -5,6 +5,7 @@ import { installBrowserIdentity } from './browser-identity.mjs';
 import { installWorkspaceUi } from './browser-ui.mjs';
 import { packageCommerce } from './package-commerce.mjs';
 import { backendRoutes } from './backend-services.mjs';
+import { packageToolAccess } from './package-tool-access.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const brand = JSON.parse(await fs.readFile(path.join(root, 'branding/brand.json'), 'utf8'));
@@ -28,6 +29,7 @@ const routes = [
   { src: '/.*', headers: { 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'strict-origin-when-cross-origin' }, continue: true },
   { handle: 'filesystem' },
 ];
+if(id!=='hub')routes.unshift(await packageToolAccess(vercelOutput,id));
 routes.splice(1, 0, ...backendRoutes(id));
 if (id === 'cad') routes.push({ src: '/app(?:/.*)?', dest: '/app/index.html' });
 else routes.push({ src: '/(.*)', dest: '/index.html' });

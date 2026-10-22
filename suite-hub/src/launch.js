@@ -9,6 +9,34 @@ const splash = document.querySelector('.tool-splash');
 const status = document.getElementById('splash-status');
 const actions = document.getElementById('splash-actions');
 let controller;
+const launchRequestId=crypto.randomUUID();
+const accountLink=document.getElementById('splash-account');
+const plansLink=document.getElementById('splash-plans');
+accountLink.href='/?returnTool='+encodeURIComponent(id||'')+'#login';
+
+async function authorizeTool(signal){
+  const response=await fetch('/api/account/tool-launch',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({tool:id,requestId:launchRequestId}),signal});
+  const grant=await response.json();
+  if(!response.ok){
+    if(response.status===401)accountLink.hidden=false;
+    throw new Error(grant.error||'Tool access could not be checked. Please try again.');
+  }
+  if(!grant.allowed){
+    plansLink.hidden=false;
+    if(grant.trial?.status==='daily_limit')throw new Error(grant.trial.day===1?'You have used today’s 3 trial launches. Your next trial day starts '+new Date(grant.trial.nextResetAt).toLocaleString()+'. You can also choose a paid plan.':'You have used today’s 3 trial launches on your final trial day. Choose Studio or Team to continue using the tools.');
+    throw new Error('Your two-day trial has ended. Choose Studio or Team to continue using the tools.');
+  }
+  return grant;
+}
+
+function enterAuthorizedTool(url,ticket){
+  const destination=new URL(url),form=document.createElement('form');
+  form.method='POST';form.action=destination.origin+'/__spanvision/access';
+  for(const [name,value] of Object.entries({ticket,next:destination.pathname+destination.search+destination.hash})){
+    const input=document.createElement('input');input.type='hidden';input.name=name;input.value=value;form.append(input);
+  }
+  document.body.append(form);form.submit();
+}
 
 function delay(milliseconds, signal) {
   return new Promise((resolve, reject) => {
@@ -46,6 +74,7 @@ async function openWorkspace() {
   splash.dataset.state = 'loading';
   splash.setAttribute('aria-busy', 'true');
   actions.hidden = true;
+  accountLink.hidden=true;plansLink.hidden=true;
   status.textContent = 'Opening workspace…';
   const started = performance.now();
   let stage = 'availability';
@@ -67,7 +96,13 @@ async function openWorkspace() {
     }
     await delay(Math.max(0, 700 - (performance.now() - started)), request.signal);
     if (request.signal.aborted) throw new Error('Tool availability took too long to respond. Please try again.');
-    location.replace(url);
+    if(isLocalPreview(location.hostname))location.replace(url);
+    else{
+      stage='access';clearTimeout(timeout);timeout=setTimeout(()=>request.abort(),30000);
+      status.textContent='Checking your trial or paid plan…';
+      const grant=await authorizeTool(request.signal);
+      enterAuthorizedTool(url,grant.ticket);
+    }
   } catch (error) {
     if (request !== controller) return;
     splash.dataset.state = 'error';

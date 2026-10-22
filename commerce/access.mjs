@@ -23,7 +23,7 @@ export function planAccess(user,subscriptions=[],override=null,now=Date.now()){
   }
   let level=0,end=null;
   for(const subscription of subscriptions){
-    if(!['active','trialing'].includes(subscription.status)||(subscription.current_period_end&&!(Date.parse(subscription.current_period_end)>now)))continue;
+    if(subscription.status!=='active'||(subscription.current_period_end&&!(Date.parse(subscription.current_period_end)>now)))continue;
     const plan=text(subscription.plan_key).startsWith('TEAM_')?'team':text(subscription.plan_key).startsWith('STUDIO_')?'studio':null;
     if(plan&&levels.indexOf(plan)>level){level=levels.indexOf(plan);end=subscription.current_period_end||null;}
   }

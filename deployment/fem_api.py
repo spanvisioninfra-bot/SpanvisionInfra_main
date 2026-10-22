@@ -12,6 +12,9 @@ ENGINE_DIR = Path(os.environ.get('SPANVISION_FEM_ENGINE_DIR', ROOT / 'fem-vision
 MAX_INPUT = 2 * 1024 * 1024
 MAX_OUTPUT = 8 * 1024 * 1024
 app = FastAPI(title='Spanvision Infra FEM engine bridge')
+if os.environ.get('SPANVISION_CLOUD') == '1':
+    from .tool_access import ToolAccess
+    app.add_middleware(ToolAccess, tool='fem')
 _slots = asyncio.Semaphore(1)
 
 if os.name == 'posix':

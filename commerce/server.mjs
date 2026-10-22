@@ -4,6 +4,7 @@ import {publicUser,planAccess,SUPER_ADMIN_EMAIL,signInDestination} from './acces
 import {neonAuthUrl,neonSelected,neonAuth,neonRequest} from './neon-auth.mjs';
 import {databaseConfigured,neonStore,bindNeonStore} from './neon-store.mjs';
 import {passwordPolicy} from './password-policy.mjs';
+import {toolIds,trialPolicy,issueToolTicket,readToolTicket} from './tool-trial.mjs';
 
 const cookieName='sv_account';
 class RequestError extends Error {constructor(status,message){super(message);this.status=status;}}
@@ -20,7 +21,7 @@ function site(env){
   return url.origin;
 }
 function authBase(env){
-  if(!configured(env))fail(503,'Account setup is in progress. You can still open the tools without signing in.');
+  if(!configured(env))fail(503,'Account setup is in progress. Tool access requires a verified account.');
   const url=new URL(env.SUPABASE_URL);
   if(url.protocol!=='https:'||url.username||url.password)fail(503,'Account setup is in progress.');
   return url.origin;
@@ -59,7 +60,7 @@ async function upstream(url,options,fetcher){
 }
 async function auth(env,endpoint,body,fetcher,token){
   if(neonSelected(env)){
-    if(!configured(env))fail(503,'Account setup is in progress. You can still open the tools without signing in.');
+    if(!configured(env))fail(503,'Account setup is in progress. Tool access requires a verified account.');
     try{return await neonAuth(env,endpoint,body,fetcher,site(env),token);}catch{fail(502,'The account service is temporarily unavailable. Please try again.');}
   }
   const headers={apikey:env.SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'};
@@ -152,6 +153,26 @@ async function planRecords(userIds,env,fetcher){
   ]);
   if(!Array.isArray(subscriptions)||!Array.isArray(overrides))fail(502,'Plan information is temporarily unavailable.');
   return {subscriptions,overrides};
+}
+async function toolAccess(user,env,fetcher){
+  const data=await planRecords([user.id],env,fetcher);
+  return planAccess(user,data.subscriptions,data.overrides[0]);
+}
+async function verifyToolAccess(body,env,fetcher){
+  const ticket=readToolTicket(body.ticket,env.SESSION_SECRET);
+  if(!ticket||ticket.tool!==body.tool)fail(401,'Open the tool from your Spanvision Infra account.');
+  const rows=await db(env,`tool_launch_grants?id=eq.${ticket.grant}&user_id=eq.${ticket.sub}&select=id,tool_id,access_source,expires_at&limit=1`,fetcher);
+  const grant=rows[0];
+  if(!grant||grant.tool_id!==ticket.tool||!(Date.parse(grant.expires_at)>Date.now()))fail(402,'Your tool session has ended. Open the tool again from your account.');
+  if(grant.access_source==='trial'){
+    const trial=await db(env,'rpc/tool_trial_status',fetcher,{method:'POST',body:JSON.stringify({account_id:ticket.sub})});
+    if(trial.status==='expired')fail(402,'Your two-day trial has ended. Choose Studio or Team to continue.');
+  }else{
+    const user={id:ticket.sub,role:grant.access_source==='super_admin'&&ticket.sub===env.SUPER_ADMIN_USER_ID?'super_admin':'member'};
+    const access=await toolAccess(user,env,fetcher);
+    if(!['studio','team'].includes(access.plan))fail(402,'Choose a paid plan to continue using the tools.');
+  }
+  return {allowed:true,tool:ticket.tool,userId:ticket.sub,expiresAt:new Date(Math.min(ticket.exp*1000,Date.parse(grant.expires_at))).toISOString()};
 }
 async function adminRoute(route,method,url,body,current,env,fetcher){
   if(current.session.recovery)fail(403,'Set your new password before opening admin controls.');
@@ -261,7 +282,7 @@ async function applyWebhook(provider,raw,req,env,fetcher){
 }
 async function createCheckout(user,choice,env,fetcher){
   if(env.PRICING_APPROVED!=='true')fail(409,'These are draft prices. Payments are not open yet.');
-  if(choice.plan.id==='explorer')fail(400,'The Explorer workspace is free.');
+  if(choice.plan.id==='explorer')fail(400,'The Explorer trial does not need checkout. Choose Studio or Team for paid access.');
   if(!billingReady(env,choice))fail(503,'Payments for this region are not available yet.');
   const active=await db(env,`billing_subscriptions?user_id=eq.${user.id}&status=in.(active,trialing,authenticated,pending,created,past_due,halted)&select=provider_subscription_id&limit=1`,fetcher);
   if(active.length)fail(409,'You already have a subscription or checkout in progress. Open billing before starting another.');
@@ -322,7 +343,11 @@ export function createHandler({env=process.env,fetcher=fetch,store}={}){
       let result;
       if(route==='/api/account/config'&&method==='GET'){
         const ready=configured(env);
-        result={authAvailable:ready,authProvider:neonSelected(env)?'neon':'supabase',databaseAvailable:storageReady(env),passwordPolicy,pricingApproved:env.PRICING_APPROVED==='true',plans,regions,checkoutAvailable:Object.fromEntries(regions.map(region=>[region.id,env.PRICING_APPROVED==='true'&&billingReady(env,selection('studio',region.id,'monthly'))]))};
+        result={authAvailable:ready,authProvider:neonSelected(env)?'neon':'supabase',databaseAvailable:storageReady(env),passwordPolicy,trialPolicy,pricingApproved:env.PRICING_APPROVED==='true',plans,regions,checkoutAvailable:Object.fromEntries(regions.map(region=>[region.id,env.PRICING_APPROVED==='true'&&billingReady(env,selection('studio',region.id,'monthly'))]))};
+      }else if(route==='/api/account/tool-verify'&&method==='POST'){
+        // Server-to-server validation uses a signed, tool-bound ticket rather than browser cookies.
+        const body=jsonBody(await rawBody(req,4096));
+        result=await verifyToolAccess(body,env,fetcher);
       }else if(route.startsWith('/api/billing/webhook/')&&method==='POST'){
         const provider=route.split('/').at(-1);if(!['stripe','razorpay'].includes(provider))fail(404,'Endpoint not found.');
         result=await applyWebhook(provider,await rawBody(req,524288),req,env,fetcher);
@@ -333,6 +358,18 @@ export function createHandler({env=process.env,fetcher=fetch,store}={}){
         const body=method==='POST'?jsonBody(await rawBody(req,16384)):{};
         if(route==='/api/account/session'&&method==='GET'){
           result={user:configured(env)?(await identity(req,res,env,fetcher,true))?.user||null:null};
+        }else if(route==='/api/account/tool-status'&&method==='GET'){
+          const current=await identity(req,res,env,fetcher);
+          if(current.session.recovery)fail(403,'Set your password before opening tools.');
+          result={policy:trialPolicy,access:await toolAccess(current.user,env,fetcher),trial:await db(env,'rpc/tool_trial_status',fetcher,{method:'POST',body:JSON.stringify({account_id:current.user.id})})};
+        }else if(route==='/api/account/tool-launch'&&method==='POST'){
+          const current=await identity(req,res,env,fetcher);
+          if(current.session.recovery||!current.user.emailVerified)fail(403,'Verify your email and finish signing in before opening tools.');
+          if(!toolIds.includes(body.tool)||!uuid(body.requestId))fail(400,'Choose a valid tool and launch request.');
+          const access=await toolAccess(current.user,env,fetcher);
+          const grant=await db(env,'rpc/claim_tool_launch',fetcher,{method:'POST',body:JSON.stringify({account_id:current.user.id,selected_tool:body.tool,launch_request:body.requestId,
+            access_source:['studio','team'].includes(access.plan)?access.source:'trial',access_expires:access.expiresAt})});
+          result={...grant,policy:trialPolicy,...(grant.allowed?{ticket:issueToolTicket(grant,current.user,body.tool,env.SESSION_SECRET)}:{})};
         }else if(route.startsWith('/api/admin/')){
           result=await adminRoute(route,method,url,body,await identity(req,res,env,fetcher),env,fetcher);
         }else if(route==='/api/account/sign-in'&&method==='POST'){

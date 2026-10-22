@@ -1,6 +1,8 @@
 // This module runs only in the account function. Nothing here is bundled into the browser.
 const schema = 'spanvision_commerce';
 const tables = {
+  tool_trials: ['user_id', 'started_at'],
+  tool_launch_grants: ['id', 'user_id', 'request_id', 'tool_id', 'access_source', 'trial_day', 'expires_at', 'created_at'],
   billing_customers: ['user_id', 'provider', 'provider_customer_id'],
   billing_subscriptions: ['provider', 'provider_subscription_id', 'user_id', 'plan_key', 'status', 'current_period_end', 'observed_at'],
   billing_events: ['provider', 'event_id', 'processed_at'],
@@ -59,7 +61,12 @@ export function createNeonStore(query, env = {}) {
       if (table.startsWith('rpc/')) {
         if (method !== 'POST') throw new Error('Unsupported database operation.');
         let sql, params;
-        if (table === 'rpc/claim_billing_checkout') {
+        if (table === 'rpc/tool_trial_status') {
+          sql = `select ${schema}.tool_trial_status($1) as result`; params = [body.account_id];
+        } else if (table === 'rpc/claim_tool_launch') {
+          sql = `select ${schema}.claim_tool_launch($1,$2,$3,$4,$5) as result`;
+          params = [body.account_id, body.selected_tool, body.launch_request, body.access_source, body.access_expires];
+        } else if (table === 'rpc/claim_billing_checkout') {
           sql = `select ${schema}.claim_billing_checkout($1,$2) as result`; params = [body.account_id, body.selected_plan];
         } else if (table === 'rpc/apply_billing_subscription') {
           sql = `select ${schema}.apply_billing_subscription($1::jsonb) as result`; params = [JSON.stringify(body.record)];

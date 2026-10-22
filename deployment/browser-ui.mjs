@@ -21,11 +21,12 @@ export async function installWorkspaceUi(directory,{entries=['index.html'],optio
     const tool=brand.modules.find(module=>module.id===id);
     const identity=tool?JSON.stringify({id:tool.id,label:tool.label,version:release.version,icon:toolIcons[tool.id]}).replaceAll('<','\\u003c'):null;
     if(tool&&!toolIcons[tool.id])throw new Error(`Missing landing-page icon for ${tool.id}`);
+    const sessionVersion=createHash('sha256').update(await fs.readFile(path.join(assets,'tool-session.js'))).digest('hex').slice(0,12);
     const markup=`<!-- Spanvision workspace UI -->
 <link rel="preload" href="${prefix}Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link id="sv-workspace-ui" rel="stylesheet" href="${prefix}workspace-ui.css?v=${version}">
 <link id="sv-light-mode-ui" rel="stylesheet" href="${prefix}light-mode.css?v=${version}">
-${identity?`<script id="sv-tool-identity-data" type="application/json">${identity}</script>\n<script src="${prefix}tool-identity.js?v=${version}" defer></script>\n`:''}<!-- /Spanvision workspace UI -->
+${identity?`<script id="sv-tool-identity-data" type="application/json">${identity}</script>\n<script src="${prefix}tool-identity.js?v=${version}" defer></script>\n<script src="${prefix}tool-session.js?v=${sessionVersion}" defer></script>\n`:''}<!-- /Spanvision workspace UI -->
 `;
     await fs.writeFile(file,html.replace(/<\/head>/i,markup+'</head>'));
   }

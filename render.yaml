@@ -12,6 +12,7 @@ services:
       paths:
         - deployment/Dockerfile.fem
         - deployment/fem_api.py
+        - deployment/tool_access.py
         - fem-vision-studio/src-tauri/**
   - type: web
     name: spanvision-bim

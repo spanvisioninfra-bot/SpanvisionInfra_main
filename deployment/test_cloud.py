@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+from datetime import datetime, timezone, timedelta
+from unittest.mock import patch
 
 temporary = tempfile.TemporaryDirectory(prefix='spanvision-cloud-test-')
 os.environ['SPANVISION_CLOUD_INSECURE_TEST'] = '1'
@@ -14,12 +16,22 @@ from deployment.cloud_app import app, SERVICE
 
 
 class CloudIsolationTests(unittest.TestCase):
+    def setUp(self):
+        def verified(ticket):
+            if ticket not in ('isolated-first', 'isolated-second'):
+                return {'allowed': False, 'status': 401}
+            return {'allowed': True, 'tool': SERVICE, 'userId': ticket,
+                    'expiresAt': (datetime.now(timezone.utc)+timedelta(hours=1)).isoformat()}
+        verifier = patch.object(app, 'verify', side_effect=verified)
+        verifier.start()
+        self.addCleanup(verifier.stop)
+
     def test_private_browser_workspaces(self):
-        with TestClient(app) as first:
-            second = TestClient(app)
+        with TestClient(app, base_url='https://testserver', cookies={'__Host-sv-tool': 'isolated-first'}) as first:
+            second = TestClient(app, base_url='https://testserver', cookies={'__Host-sv-tool': 'isolated-second'})
             health = '/health' if SERVICE == 'bim' else '/api/ping'
             self.assertEqual(first.get(health).status_code, 200)
-            self.assertFalse(first.cookies, 'health checks must not allocate browser sessions')
+            self.assertIsNone(first.cookies.get('spanvision-workspace-test'), 'health checks must not allocate browser sessions')
             if SERVICE == 'bim':
                 response = first.post('/api/v2/projects', data={'name': 'Private BIM project'})
                 self.assertEqual(response.status_code, 201, response.text)
