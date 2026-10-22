@@ -1,5 +1,5 @@
-import { BRAND } from '../../config/brand';
-import appIcon from '../../assets/app-icon.svg';
+
+
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppStore } from "../../state/appStore";
@@ -99,7 +99,6 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
     (fn?: () => void) => { onClose(); fn?.(); },
     [onClose]
   );
-
 
   // Paneel-default alléén bij het open-gaan zetten. Niet samenvoegen met het
   // keydown-effect hieronder: dat heeft onClose als dependency en her-runt bij
@@ -647,7 +646,7 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
           <Divider />
           <MenuItem icon={ICONS.preferences} label={t("preferences")} shortcut="Ctrl+," onClick={() => actionAndClose(onOpenSettings)} />
           <Divider />
-          <MenuItem icon={ICONS.about} label={t("about")} active={activePanel === "about"} onClick={() => setActivePanel("about")} />
+
           <Divider />
           <MenuItem icon={ICONS.exit} label={t("exit")} shortcut="Alt+F4" onClick={() => {
             onClose();
@@ -697,7 +696,7 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
             )}
           </div>
         )}
-        {activePanel === "about" && <AboutPanel />}
+
         {activePanel === "extensions" && <ExtensionManagerPanel />}
         {activePanel === "cloud" && <CloudPanel onClose={onClose} />}
         {activePanel === "import" && (
@@ -931,33 +930,6 @@ export default function Backstage({ open, onClose, onOpenSettings }: BackstagePr
         onClose={() => setMappingData(null)}
         onConfirm={handleMappingConfirm}
       />
-    </div>
-  );
-}
-
-function AboutPanel() {
-  const { t } = useTranslation("backstage");
-  return (
-    <div className="bs-about-panel">
-      <h2 className="bs-about-title">{t("aboutPanel.title")}</h2>
-      <div className="bs-about-app">
-        <div className="bs-about-logo">
-          <img src={appIcon} alt={BRAND.initials} />
-        </div>
-        <div className="bs-about-app-info">
-          <h1 className="bs-about-app-name">{BRAND.product}</h1>
-          <p className="bs-about-version">{t("aboutPanel.version")} {__APP_VERSION__}</p>
-        </div>
-      </div>
-      <p className="bs-about-tagline">{t("aboutPanel.tagline")}</p>
-      <p className="bs-about-description">{t("aboutPanel.description")}</p>
-      <div className="bs-about-company">
-        <h3 className="bs-about-company-name">{BRAND.organization}</h3>
-        <p className="bs-about-company-desc">{t("aboutPanel.companyDescription")}</p>
-      </div>
-      <div className="bs-about-footer">
-        <p className="bs-about-copyright">{t("aboutPanel.copyright")}</p>
-      </div>
     </div>
   );
 }

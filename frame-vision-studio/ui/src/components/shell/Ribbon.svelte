@@ -764,6 +764,9 @@
 
 <style>
   .ribbon {
+    flex-shrink: 0;
+    min-width: 0;
+    max-width: 100%;
     background: var(--bg-ribbon);
     border-bottom: var(--border-featured);
   }
@@ -773,9 +776,13 @@
     gap: 0;
     padding: 0 var(--sp-2);
     border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .tab {
+    flex-shrink: 0;
+    white-space: nowrap;
     padding: var(--sp-2) var(--sp-4);
     font-size: 12px;
     font-weight: 600;
@@ -814,9 +821,13 @@
     padding: var(--sp-2) var(--sp-3);
     min-height: 72px;
     gap: var(--sp-3);
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .ribbon-group {
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     gap: var(--sp-1);
@@ -867,6 +878,7 @@
   }
 
   .ribbon-divider {
+    flex-shrink: 0;
     width: 1px;
     height: 56px;
     background: var(--hover-overlay);

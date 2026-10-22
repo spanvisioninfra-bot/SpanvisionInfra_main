@@ -687,7 +687,6 @@ function renderBuild(res) {
 function applyTheme(theme){if(theme)document.documentElement.dataset.theme=theme;else document.documentElement.removeAttribute('data-theme');try{localStorage.setItem('oststl.theme',theme);}catch{}$('theme-select').value=theme;}
 $('theme-select').onchange=event=>applyTheme(event.target.value);
 $('theme-select').value=document.documentElement.getAttribute('data-theme')||'';
-const about=$('about-dialog');$('btn-about').onclick=()=>about.showModal();$('btn-about-close').onclick=()=>about.close();
 
 let appInfo = null;
 async function loadAppInfo() {
@@ -700,7 +699,6 @@ async function loadAppInfo() {
       $('export-dir').value = 'Browser download';
       const label = document.querySelector('label[for="export-dir"]');
       if (label) label.textContent = 'Download location';
-      document.querySelector('#about-dialog .hint').textContent = 'Browser downloads · STL / 3MF export';
     }
     $('app-version').textContent = 'v' + appInfo.version;
     if(appInfo.services.feedbackEnabled&&appInfo.feedback_url){$('btn-feedback').classList.remove('hidden');$('btn-feedback').onclick=()=>window.open(appInfo.feedback_url,'_blank','noopener,noreferrer');}

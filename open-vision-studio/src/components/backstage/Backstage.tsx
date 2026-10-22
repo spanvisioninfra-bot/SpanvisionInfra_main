@@ -152,7 +152,7 @@ export function Backstage() {
         <div className="backstage-nav-divider" />
 
         <ActionItem icon={<X size={14} />} label={tMenu('backstage.closeProject')} onClick={() => leave(handleCloseProject)} />
-        <a className="backstage-nav-item studio-notices-link" href={`${import.meta.env.BASE_URL}open-source-notices.txt`} target="_blank" rel="noopener noreferrer"><span className="backstage-nav-icon"><Info size={14} /></span>{tCommon('settings.openSourceNotices')}</a>
+
       </aside>
 
       <main className="backstage-main">

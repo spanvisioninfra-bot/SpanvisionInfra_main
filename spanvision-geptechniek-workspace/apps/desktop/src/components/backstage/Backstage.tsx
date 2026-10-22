@@ -1,4 +1,4 @@
-import { BRAND, BrandMark } from "../../branding";
+import { BRAND } from "../../branding";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
@@ -490,12 +490,7 @@ export default function Backstage({ open, onClose, onOpenSettings, onOpenFile }:
             onClick={() => actionAndClose(onOpenSettings)}
           />
           <Divider />
-          <MenuItem
-            icon={ICONS.about}
-            label={t("about")}
-            active={activePanel === "about"}
-            onClick={() => setActivePanel("about")}
-          />
+
           <Divider />
           <MenuItem
             icon={ICONS.exit}
@@ -521,7 +516,7 @@ export default function Backstage({ open, onClose, onOpenSettings, onOpenFile }:
               onOpenAny={openAny}
             />
           )}
-          {activePanel === "about" && <AboutPanel />}
+
           {activePanel === "import" && <ImportPanel />}
           {activePanel === "export" && <ExportPanel />}
           {activePanel === "extensions" && <ExtensionManagerPanel />}
@@ -531,18 +526,6 @@ export default function Backstage({ open, onClose, onOpenSettings, onOpenFile }:
       <div className="backstage-dismiss-area" onClick={onClose} />
     </div>
   );
-}
-
-function AboutPanel() {
-  const { t } = useTranslation("backstage");
-  return <div className="bs-about-panel">
-    <h2 className="bs-about-title">{t("aboutPanel.title")}</h2>
-    <div className="bs-about-app"><div className="bs-about-logo"><BrandMark size={64}/></div>
-      <div className="bs-about-app-info"><h1 className="bs-about-app-name">{BRAND.product}</h1><p className="bs-about-version">v{BRAND.version}</p></div></div>
-    <p className="bs-about-tagline">Ground conditions. Clear decisions.</p><p className="bs-about-description">{t("aboutPanel.description")}</p>
-    <div className="bs-about-company"><h3>{BRAND.organization}</h3><p>{t("aboutPanel.companyDescription")}</p></div>
-    <details className="geo-about-notices"><summary>Open-source notices</summary><p>Based on Open Geotechniek Studio and OpenAEC libraries. Original copyright and licensing records are preserved.</p><a href="/notices.md" target="_blank" rel="noopener noreferrer">Read notices</a></details>
-  </div>;
 }
 
 function ImportPanel() {

@@ -446,7 +446,7 @@ export function SettingsPanelContent() {
 
             <div className="settings-section">
               <h3>{t('settings.version')}</h3>
-              <a className="settings-link" href={`${import.meta.env.BASE_URL}open-source-notices.txt`} target="_blank" rel="noopener noreferrer">{t('settings.openSourceNotices')}</a>
+
               <p className="scrollzoom-hint">{t('settings.versionHint')}</p>
               <div className="settings-row">
                 <span>{__APP_VERSION__}</span>

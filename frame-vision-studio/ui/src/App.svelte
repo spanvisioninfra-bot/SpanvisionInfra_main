@@ -507,7 +507,12 @@
 <style>
   .workspace-tabs {
     display: flex;
+    flex-shrink: 0;
+    min-width: 0;
+    max-width: 100%;
     flex-wrap: wrap;
+    overflow-x: auto;
+    overflow-y: hidden;
     background: var(--bg-surface-alt);
     border-bottom: var(--border-default);
     padding: 0 var(--sp-3);
@@ -516,6 +521,8 @@
 
   .ws-tab {
     display: flex;
+    flex-shrink: 0;
+    white-space: nowrap;
     align-items: center;
     gap: var(--sp-2);
     padding: var(--sp-2) var(--sp-4);

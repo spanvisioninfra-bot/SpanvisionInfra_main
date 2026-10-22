@@ -4,7 +4,7 @@ import { openDialog } from '../../stores/dialogStore.js';
 import ImportPanel from './ImportPanel.jsx';
 import ExportPanel from './ExportPanel.jsx';
 import OpenPanel from './OpenPanel.jsx';
-import { openPDFFile } from '../../../pdf/loader.js';
+
 import { savePDF, savePDFAs } from '../../../pdf/saver.js';
 import { showPreferencesDialog } from '../../../core/preferences.js';
 import { showDocPropertiesDialog, showNewDocDialog, showPrintDialog } from '../../../ui/chrome/dialogs.js';
@@ -130,7 +130,7 @@ export default function AppMenu() {
             <Divider />
             <MenuItem icon={ICONS.preferences} label={t('preferences')} shortcut="Ctrl+," onClick={() => actionAndClose(showPreferencesDialog)} />
             <Divider />
-            <MenuItem icon={ICONS.about} label={t('about')} onClick={() => actionAndClose(() => openDialog('about'))} />
+
             <MenuItem icon={ICONS.about} label={t('whatsNew.title')} onClick={() => actionAndClose(() => import('../../../help/whats-new-trigger.js').then(m => m.openWhatsNewManual()))} />
             <Divider />
             <MenuItem icon={ICONS.exit} label={t('exit')} shortcut="Alt+F4" onClick={handleExit} />

@@ -1,6 +1,5 @@
 // Manage module — customization and drawing cleanup tools.
 
-mod about;
 mod audit;
 mod cui_export;
 mod cui_import;
@@ -84,7 +83,6 @@ impl CadModule for ManageModule {
                         // added to a group, so the dialog could only be reached
                         // by typing OPTIONS or from the start page.
                         RibbonItem::LargeTool(options::tool()),
-                        RibbonItem::LargeTool(about::tool()),
                     ],
                 },
             ]

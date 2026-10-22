@@ -1,9 +1,7 @@
 <script>
   import { dialogFocus } from "../../lib/dialog.js";
-  import { BRAND } from "../../lib/brand.js";
   import { _ , locale } from "svelte-i18n";
   import { showSettings, theme, setTheme, THEMES } from "../../stores/ui.js";
-  import { APP_VERSION } from "../../lib/version.js";
 
   let activeCategory = "general";
   let dialogEl;
@@ -60,12 +58,6 @@
             </svg>
             {$_('settings.cat.general')}
           </button>
-          <button class="nav-item" class:active={activeCategory === "about"} onclick={() => activeCategory = "about"}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/>
-            </svg>
-            {$_('settings.cat.about')}
-          </button>
         </div>
 
         <div class="window-content">
@@ -86,16 +78,6 @@
               </select>
             </div>
 
-          {:else if activeCategory === "about"}
-            <div class="about">
-              <img class="about-icon" src={BRAND.mark} alt="" />
-              <div class="about-text">
-                <strong>{BRAND.product}</strong>
-                <span>v{APP_VERSION}</span>
-                <span class="muted">{BRAND.organization}</span>
-                <a class="muted" href={BRAND.notices} target="_blank" rel="noopener noreferrer">{$_("brand.notices")}</a>
-              </div>
-            </div>
           {/if}
         </div>
       </div>
@@ -235,30 +217,6 @@
   .form-control:focus {
     outline: none;
     border-color: var(--amber);
-  }
-
-  .about {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .about-icon {
-    width: 48px;
-    height: 48px;
-  }
-
-  .about-text {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    font-size: 12px;
-    color: var(--text-primary);
-  }
-
-  .about-text .muted {
-    color: var(--text-muted);
-    font-size: 11px;
   }
 
   .window-footer {

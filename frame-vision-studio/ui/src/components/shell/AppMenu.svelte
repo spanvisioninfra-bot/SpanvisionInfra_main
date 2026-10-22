@@ -154,8 +154,6 @@
 
           <div class="footer-brand">
             <span>{BRAND.organization}</span>
-            <span class="dot"></span>
-            <a href={BRAND.notices} target="_blank" rel="noopener noreferrer">{$_("brand.notices")}</a>
           </div>
         </div>
       </div>

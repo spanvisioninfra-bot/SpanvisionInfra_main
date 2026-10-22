@@ -264,10 +264,6 @@ impl OpenCADStudio {
                 return Some(crate::sys::open_url(url, self.main_window));
             }
 
-            "ABOUT" => {
-                return Some(Task::done(Message::AboutOpen));
-            }
-
             "PLUGINS" | "PLUGINMANAGER" => {
                 return Some(Task::done(Message::PluginManagerOpen));
             }
@@ -1254,7 +1250,7 @@ impl OpenCADStudio {
 }
 
 // ── Draw Order: interactive command ──────────────────────────
- 
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum DrawOrderStep {
     SelectObjects,
@@ -1527,8 +1523,6 @@ mod tests {
     use crate::app::OpenCADStudio;
     use codec::objects::ObjectType;
     use codec::EntityType;
-
-
 
     fn fresh_app() -> OpenCADStudio {
         let mut app = OpenCADStudio::new_for_test();

@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useRecentFiles, type RecentFile } from "../../hooks/useRecentFiles";
 import "./Backstage.css";
-import BrandMark from "../BrandMark";
-import { APP_VERSION, IS_DESKTOP } from "../../branding";
+
+import { IS_DESKTOP } from "../../branding";
 import { saveProject } from "../../lib/saveProject";
 import { useProjectStore } from "../../store/projectStore";
 import { useAfdrukken } from "../../store/printStore";
@@ -166,12 +166,7 @@ export default function Backstage({ open, onClose, onOpenSettings, onOpenFile, o
             onClick={() => actionAndClose(onOpenSettings)}
           />
           <Divider />
-          <MenuItem
-            icon={ICONS.about}
-            label={t("about")}
-            active={activePanel === "about"}
-            onClick={() => setActivePanel("about")}
-          />
+
           <Divider />
           {IS_DESKTOP && <MenuItem
             icon={ICONS.exit}
@@ -197,45 +192,12 @@ export default function Backstage({ open, onClose, onOpenSettings, onOpenFile, o
               onClearAll={clearRecentFiles}
             />
           )}
-          {activePanel === "about" && <AboutPanel />}
+
           {activePanel === "export" && <ExportPanel />}
         </div>
       )}
       {/* Click anywhere outside the menu/panel to close */}
       <div className="backstage-dismiss-area" onClick={onClose} />
-    </div>
-  );
-}
-
-function AboutPanel() {
-  const { t } = useTranslation("backstage");
-
-
-  return (
-    <div className="bs-about-panel">
-      <h2 className="bs-about-title">{t("aboutPanel.title")}</h2>
-      <div className="bs-about-app">
-        <div className="bs-about-logo"><BrandMark size={64} /></div>
-        <div className="bs-about-app-info">
-          <h1 className="bs-about-app-name">{t("aboutPanel.appName")}</h1>
-          <p className="bs-about-version">{t("aboutPanel.version")} {APP_VERSION}</p>
-        </div>
-      </div>
-      <p className="bs-about-tagline">{t("aboutPanel.tagline")}</p>
-      <p className="bs-about-description">{t("aboutPanel.description")}</p>
-      <div className="bs-about-company">
-        <h3 className="bs-about-company-name">{t("aboutPanel.companyName")}</h3>
-        <p className="bs-about-company-desc">{t("aboutPanel.companyDescription")}</p>
-        <p className="bs-about-company-meta">
-          {t("aboutPanel.stichting")}
-        </p>
-      </div>
-      <div className="bs-about-links"><a href="/open-source-notices.txt" target="_blank" rel="noopener noreferrer" className="bs-about-link">{t("aboutPanel.notices")}</a></div>
-      <div className="bs-about-footer">
-        <p className="bs-about-copyright">
-          {t("aboutPanel.copyright")}
-        </p>
-      </div>
     </div>
   );
 }

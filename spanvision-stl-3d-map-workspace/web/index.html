@@ -18,7 +18,7 @@
   <div class="spacer"></div>
   <div class="header-controls"><a class="pill" id="update-pill" href="#" target="_blank" rel="noopener noreferrer">Update available</a>
   <label class="theme-label">Theme<select id="theme-select" aria-label="Interface theme"><option value="spanvision-mono">Spanvision Mono</option><option value="dark">Dark</option><option value="light">Light</option><option value="">System</option></select></label>
-  <button class="iconbtn hidden" id="btn-feedback">Feedback</button><button class="iconbtn" id="btn-about">About</button></div>
+  <button class="iconbtn hidden" id="btn-feedback">Feedback</button></div>
  </header>
  <nav class="mobile-tabs" aria-label="Workspace view"><button id="tab-map" aria-pressed="true" aria-controls="map">Map</button><button id="tab-settings" aria-pressed="false" aria-controls="panel">Settings</button></nav>
  <div id="work" data-view="map">
@@ -46,6 +46,5 @@
  <div id="statusbar"><span id="status" role="status" aria-live="polite">Ready. Select a location to begin.</span><span class="status-brand">STL / SPANVISION INFRA</span></div>
 </div>
 <div id="busy" class="hidden" role="status" aria-live="polite"><div class="spinner"></div><span id="busy-text">Working…</span></div>
-<dialog id="about-dialog" aria-labelledby="about-title"><div class="dialog-heading"><img src="/static/stl-mark.svg" alt="STL"><button id="btn-about-close" class="iconbtn" aria-label="Close about">×</button></div><p class="eyebrow">SPANVISION INFRA</p><h2 id="about-title">STL-3D map workspace</h2><p>Explore your location and create printable models from supported regional building data. The 3DBAG source currently covers the Netherlands.</p><p class="hint">Local geometry processing · STL / 3MF export</p><a class="notice-link" href="/api/notices" target="_blank" rel="noopener noreferrer">Open-source notices ↗</a></dialog>
 <script src="/static/vendor/leaflet/leaflet.js"></script><script type="module" src="/static/app.js"></script>
 </body></html>

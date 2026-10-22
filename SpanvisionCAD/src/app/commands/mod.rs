@@ -367,7 +367,6 @@ pub fn start_allowed(cmd: &str) -> bool {
             | "QUIT"
             | "REPORT"
             | "CHANGELOG"
-            | "ABOUT"
             | "PLUGINS"
             | "PLUGINMANAGER"
             | "DONATE"
@@ -683,7 +682,6 @@ inventory::submit!(crate::command::CommandRegistration {
         "FINDNONPURGEABLE",
         "3DORBIT",
         "3O",
-        "ABOUT",
         "ATTACH",
         "ATTDISP",
         "ATTEXT",

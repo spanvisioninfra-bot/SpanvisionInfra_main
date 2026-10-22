@@ -1,4 +1,4 @@
-import OpenSourceNotices from "../OpenSourceNotices.tsx";
+
 import { useState, useEffect } from "react";
 import { flushSync } from "react-dom";
 import { useTranslation } from "react-i18next";
@@ -13,7 +13,7 @@ import type { ImportSummary } from "../../.././core/projectFile";
 import type { PilePlanImportPatch } from "../../../core/pilePlanImportContract.ts";
 import type { Cpt, LoadPoint, PileConfigurationKey } from "../../../core/projectTypes.ts";
 import type { ProjectFileCommands } from "../../../domain/project/projectPersistence.ts";
-import { PRODUCT_INFO } from "../../../productInfo.ts";
+
 import "./Backstage.css";
 
 const ICONS = {
@@ -173,12 +173,7 @@ export default function Backstage({ open, onClose, onOpenSettings, onOpenFile, o
             }}
           />
           <Divider />
-          <MenuItem
-            icon={ICONS.about}
-            label={t("about")}
-            active={activePanel === "about"}
-            onClick={() => setActivePanel("about")}
-          />
+
           {commands.save ? <>
             <Divider />
             <MenuItem
@@ -218,7 +213,7 @@ export default function Backstage({ open, onClose, onOpenSettings, onOpenFile, o
               }}
             />
           )}
-          {activePanel === "about" && <AboutPanel />}
+
           {activePanel === "import" && <ProjectImportPanel defaultCurrencyCode={defaultCurrencyCode} initialSource={initialImportSource} onImportProject={async (mode, name, sources, properties) => {
             return onImportProject(mode, name, sources, properties);
           }} />}
@@ -246,43 +241,6 @@ export default function Backstage({ open, onClose, onOpenSettings, onOpenFile, o
       )}
       {/* Click anywhere outside the menu/panel to close */}
       <div className="backstage-dismiss-area" onClick={onClose} />
-    </div>
-  );
-}
-
-function AboutPanel() {
-  const { t } = useTranslation("backstage");
-
-
-  return (
-    <div className="bs-about-panel">
-      <h2 className="bs-about-title">{t("aboutPanel.title")}</h2>
-      <div className="bs-about-app">
-        <div className="bs-about-logo">
-          <img src="/ppw-mark.svg" alt="PPW" width="64" height="64" />
-        </div>
-        <div className="bs-about-app-info">
-          <h1 className="bs-about-app-name">{PRODUCT_INFO.name}</h1>
-          <p className="bs-about-version">
-            {t("aboutPanel.version")} {PRODUCT_INFO.version} · {PRODUCT_INFO.status}
-          </p>
-        </div>
-      </div>
-      <p className="bs-about-tagline">{t("aboutPanel.tagline")}</p>
-      <p className="bs-about-description">{t("aboutPanel.description")}</p>
-      <div className="bs-about-company">
-        <h3 className="bs-about-company-name">{PRODUCT_INFO.organization}</h3>
-        <p className="bs-about-company-desc">{t("aboutPanel.companyDescription")}</p>
-        <p className="bs-about-company-meta">
-          {t("aboutPanel.stichting")}
-        </p>
-      </div>
-      <div className="bs-about-links"><OpenSourceNotices /></div>
-      <div className="bs-about-footer">
-        <p className="bs-about-copyright">
-          {t("aboutPanel.copyright", { license: PRODUCT_INFO.license })}
-        </p>
-      </div>
     </div>
   );
 }

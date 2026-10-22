@@ -1,4 +1,4 @@
-import { BRAND, BrandMark } from "../../branding";
+import { BRAND } from "../../branding";
 import { useState, useEffect, useRef, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { LANGUAGES, changeLanguage } from "../../i18n/config";
@@ -26,7 +26,7 @@ const THEME_OPTIONS = [
    Voorbeeld met domein-tab:
      const TAB_IDS = ["general", "appearance", "calculation", "about"] as const;
    ─────────────────────────────────────────────────────────── */
-const TAB_IDS = ["general", "appearance", "extensions", "about"] as const;
+const TAB_IDS = ["general", "appearance", "extensions"] as const;
 
 export function applyTheme(theme?: string) {
   document.documentElement.setAttribute("data-theme", theme || BRAND.theme);
@@ -157,7 +157,7 @@ export default function SettingsDialog({
             <AppearanceTabContent theme={draftTheme} onThemeSelect={handleThemePreview} />
           )}
           {activeTab === "extensions" && <ExtensionsTabContent />}
-          {activeTab === "about" && <AboutTabContent />}
+
         </div>
       </div>
     </Modal>
@@ -363,11 +363,3 @@ function ExtensionsTabContent() {
 // Open GEO Studio — naam, versie en links staan in i18n keys
 // in locales/{lang}/settings.json, sectie "about".
 // ─────────────────────────────────────────────────────────────
-function AboutTabContent() {
-  const { t } = useTranslation("settings");
-  return <div className="settings-section">
-    <BrandMark size={48}/><h3>{BRAND.product}</h3>
-    <p>{BRAND.organization} · v{BRAND.version}</p><p>{t("about.description")}</p>
-    <details className="geo-about-notices"><summary>Open-source notices</summary><p>This workspace edition is based on Open Geotechniek Studio and shared OpenAEC libraries. Original copyright and licensing records are preserved in the bundled notices.</p><a href="/notices.md" target="_blank" rel="noopener noreferrer">Read notices</a></details>
-  </div>;
-}

@@ -1,8 +1,8 @@
-import { Show } from "solid-js";
+
 import { useI18n } from "../lib/i18n";
 import brand from "../brand.json";
 
-type View = "landing" | "suggestions" | "login" | "signup" | "account" | "home" | "settings" | "dictionary" | "models" | "mic-test" | "meeting" | "transcribe" | "tts" | "about";
+type View = "landing" | "suggestions" | "login" | "signup" | "account" | "home" | "settings" | "dictionary" | "models" | "mic-test" | "meeting" | "transcribe" | "tts";
 
 interface SidebarProps {
   currentView: View;
@@ -112,17 +112,6 @@ export default function Sidebar(props: SidebarProps) {
           <span>{t("sidebar.settings")}</span>
         </button>
 
-        <button
-          class={`sidebar-item ${props.currentView === "about" ? "active" : ""}`} aria-label={t("sidebar.about")}
-          onClick={() => props.onViewChange("about")}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="16" x2="12" y2="12" />
-            <line x1="12" y1="8" x2="12.01" y2="8" />
-          </svg>
-          <span>{t("sidebar.about")}</span>
-        </button>
       </nav>
 
     </aside>

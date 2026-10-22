@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../../stores/authStore";
 import { BRAND } from '../../../config/brand';
-import { BrandMark } from '../../BrandMark';
+
 import { useStore } from "../../../store";
 import {
   createProject as apiCreateProject,
@@ -145,7 +145,6 @@ export default function Backstage({
   onNavigate,
 }: BackstageProps) {
   const { t } = useTranslation("backstage");
-  const [activePanel, setActivePanel] = useState<string>("none");
   const [openExpanded, setOpenExpanded] = useState(false);
   const [saveAsExpanded, setSaveAsExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -166,7 +165,6 @@ export default function Backstage({
 
   useEffect(() => {
     if (!open) {
-      setActivePanel("none");
       setOpenExpanded(false);
       setSaveAsExpanded(false);
       return;
@@ -468,12 +466,6 @@ export default function Backstage({
           <Divider />
 
           {/* Over */}
-          <MenuItem
-            icon={ICONS.about}
-            label={t("about")}
-            active={activePanel === "about"}
-            onClick={() => setActivePanel("about")}
-          />
 
           <Divider />
 
@@ -490,7 +482,7 @@ export default function Backstage({
         </div>
       </div>
       <div className="backstage-content" onClick={handleContentClick}>
-        {activePanel === "about" && <AboutPanel />}
+
       </div>
 
       {/* Hidden file input for local open */}
@@ -506,45 +498,3 @@ export default function Backstage({
 }
 
 // ── About Panel ────────────────────────────────────────────
-
-function AboutPanel() {
-  const { t } = useTranslation("backstage");
-  return (
-    <div className="bs-about-panel">
-      <h2 className="bs-about-title">{t("aboutPanel.title")}</h2>
-      <div className="bs-about-app">
-        <div className="bs-about-logo">
-          <BrandMark />
-        </div>
-        <div className="bs-about-app-info">
-          <h1 className="bs-about-app-name">{t("aboutPanel.appName")}</h1>
-          <p className="bs-about-version">{t("aboutPanel.version")} {BRAND.version}</p>
-        </div>
-      </div>
-      <p className="bs-about-tagline">{t("aboutPanel.tagline")}</p>
-      <p className="bs-about-description">{t("aboutPanel.description")}</p>
-      <div className="bs-about-company">
-        <h3 className="bs-about-company-name">{t("aboutPanel.companyName")}</h3>
-        <p className="bs-about-company-desc">{t("aboutPanel.companyDescription")}</p>
-      </div>
-      <div className="bs-about-links">
-        <a href={BRAND.website} className="bs-about-link" target="_blank" rel="noreferrer">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z" />
-          </svg>
-          {t("aboutPanel.website")}
-        </a>
-        <a href={BRAND.help} className="bs-about-link" target="_blank" rel="noreferrer">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" />
-          </svg>
-          {t("aboutPanel.github")}
-        </a>
-      </div>
-      <div className="bs-about-footer">
-        <p className="bs-about-copyright">{t("aboutPanel.copyright")}</p>
-      </div>
-    </div>
-  );
-}

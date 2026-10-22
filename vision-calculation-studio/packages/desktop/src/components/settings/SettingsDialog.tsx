@@ -6,7 +6,7 @@ import Modal from "../Modal";
 import ThemedSelect from "../ThemedSelect";
 import "../ThemedSelect.css";
 import "./SettingsDialog.css";
-import { APP_NAME, APP_VERSION, ORGANIZATION_NAME, DEFAULT_THEME } from "../../branding";
+import { DEFAULT_THEME } from "../../branding";
 
 const THEME_OPTIONS = [
   { value: DEFAULT_THEME, labelKey: "appearance.spanvisionMono", swatches: ["#000000", "#121212", "#1B1B1B", "#FFFFFF"] },
@@ -24,7 +24,7 @@ const THEME_OPTIONS = [
    Voorbeeld met domein-tab:
      const TAB_IDS = ["general", "appearance", "calculation", "about"] as const;
    ─────────────────────────────────────────────────────────── */
-const TAB_IDS = ["general", "appearance", "units", "about"] as const;
+const TAB_IDS = ["general", "appearance", "units"] as const;
 
 /** Persisted under the "units" settings key. Defaults match CalcPAD's. */
 export interface UnitsSettings {
@@ -186,7 +186,7 @@ export default function SettingsDialog({
           {activeTab === "units" && (
             <UnitsTabContent units={draftUnits} onChange={setDraftUnits} />
           )}
-          {activeTab === "about" && <AboutTabContent />}
+
         </div>
       </div>
     </Modal>
@@ -407,20 +407,3 @@ function UnitsTabContent({
 // Pas naam, versie en beschrijving aan via i18n keys
 // in locales/{lang}/settings.json, sectie "about"
 // ─────────────────────────────────────────────────────────────
-function AboutTabContent() {
-  const { t } = useTranslation("settings");
-  return (
-    <div className="settings-section">
-      <h3>{APP_NAME}</h3>
-      <div style={{ fontSize: 11, lineHeight: 1.8 }}>
-        <p><strong>{t("about.version")}:</strong> {APP_VERSION}</p>
-        <p>{ORGANIZATION_NAME}</p>
-        <p><strong>{t("about.framework")}:</strong> Tauri + React + TypeScript</p>
-        <p><strong>{t("about.license")}:</strong> MIT</p>
-        <p style={{ marginTop: 8, color: "var(--theme-dialog-content-secondary)" }}>
-          {t("about.description")}
-        </p>
-      </div>
-    </div>
-  );
-}

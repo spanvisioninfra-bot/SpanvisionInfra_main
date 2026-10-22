@@ -12,7 +12,7 @@ import ModelManager from "./components/ModelManager";
 import MicTest from "./components/MicTest";
 import MeetingRecorder from "./components/MeetingRecorder";
 import TitleBar from "./components/TitleBar";
-import About from "./components/About";
+
 import FileTranscriber from "./components/FileTranscriber";
 import TextToSpeech from "./components/TextToSpeech";
 import StatusBar from "./components/StatusBar";
@@ -96,7 +96,7 @@ function formatBothHotkeys(): string {
   return "Ctrl + Win  /  Ctrl + Shift + Space";
 }
 
-type View = "landing" | "suggestions" | "login" | "signup" | "account" | "home" | "settings" | "dictionary" | "models" | "mic-test" | "meeting" | "transcribe" | "tts" | "about";
+type View = "landing" | "suggestions" | "login" | "signup" | "account" | "home" | "settings" | "dictionary" | "models" | "mic-test" | "meeting" | "transcribe" | "tts";
 
 // ─── Transcription time estimator ──────────────────────────
 // Models transcription time as a LINEAR function of audio length:
@@ -187,8 +187,8 @@ function getEstimatedSeconds(model: string, recordingMs: number): number {
 
 export default function App() {
   const { t, setLocale } = useI18n();
-  const views: View[]=["landing","suggestions","login","signup","account","home","settings","dictionary","models","mic-test","meeting","transcribe","tts","about"];
-  const route=():View=>{if(["login","signup"].includes(location.hash.slice(1))){history.replaceState(history.state,"",location.pathname+location.search+"#account");return "account";}const value=location.hash.slice(1)==="workspace"?"home":location.hash.slice(1);return views.includes(value as View)?value as View:runtime.native?"home":"landing";};
+  const views: View[]=["landing", "suggestions", "login", "signup", "account", "home", "settings", "dictionary", "models", "mic-test", "meeting", "transcribe", "tts"];
+  const route=():View=>{if(location.hash==="#about"){history.replaceState(history.state,"",location.pathname+location.search+"#workspace");return "home";}if(["login","signup"].includes(location.hash.slice(1))){history.replaceState(history.state,"",location.pathname+location.search+"#account");return "account";}const value=location.hash.slice(1)==="workspace"?"home":location.hash.slice(1);return views.includes(value as View)?value as View:runtime.native?"home":"landing";};
   const [view, setViewInternal] = createSignal<View>(route());
   const [navigationOpen,setNavigationOpen]=createSignal(false);
   const closeNavigation=()=>{setNavigationOpen(false);document.querySelector<HTMLButtonElement>(".mobile-menu")?.focus();};
@@ -514,7 +514,7 @@ export default function App() {
 
         <main class="main-content" id="main-content">
         <Show when={["landing","suggestions","login","signup","account"].includes(view())}><BrandPages view={view()} navigate={value=>setView(value as View)} onSample={text=>{setSampleText(text);setView("home");}} /></Show>
-        <Show when={runtime.preview && !["landing","suggestions","login","signup","account","about"].includes(view())}><div class="capability-note"><span class="eyebrow">BROWSER PREVIEW</span><span>{["home","transcribe","dictionary","settings"].includes(view())?"Explore sample transcripts and local preferences. Audio stays on your device.":"Use the desktop app for live capture and local processing. This screen is a preview."}</span></div></Show>
+        <Show when={runtime.preview && !["landing","suggestions","login","signup","account"].includes(view())}><div class="capability-note"><span class="eyebrow">BROWSER PREVIEW</span><span>{["home","transcribe","dictionary","settings"].includes(view())?"Explore sample transcripts and local preferences. Audio stays on your device.":"Use the desktop app for live capture and local processing. This screen is a preview."}</span></div></Show>
         <Show when={view() === "home"}>
           <Show when={runtime.preview} fallback={<TranscriptionView
             transcriptions={transcriptions()}
@@ -561,10 +561,6 @@ export default function App() {
 
         <Show when={view() === "tts"}>
           <fieldset class="runtime-fieldset" disabled={runtime.preview}><TextToSpeech settings={settings()} /></fieldset>
-        </Show>
-
-        <Show when={view() === "about"}>
-          <About />
         </Show>
 
         <Show when={view() === "models"}>

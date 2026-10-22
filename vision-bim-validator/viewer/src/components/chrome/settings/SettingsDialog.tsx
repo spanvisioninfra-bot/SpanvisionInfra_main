@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { LANGUAGES, changeLanguage } from "../../../i18n/config";
 import { getSetting, setSetting, applyTheme, getCanvasColor } from "../../../utils/settingsStore";
 import Modal from "../Modal";
-import { BRAND } from '../../../config/brand';
+
 import ThemedSelect from "../ThemedSelect";
 import "../ThemedSelect.css";
 import "./SettingsDialog.css";
@@ -13,7 +13,7 @@ const THEME_OPTIONS = [
   { value: "light", labelKey: "appearance.light", swatches: ["#F5F6F8", "#FFFFFF", "#EEF1F5", "#17202B"] },
 ];
 
-const TAB_IDS = ["general", "appearance", "about"] as const;
+const TAB_IDS = ["general", "appearance"] as const;
 
 interface SettingsDialogProps {
   open: boolean;
@@ -125,7 +125,7 @@ export default function SettingsDialog({
                   <p className="settings-hint">Your model materials and validation highlights keep their original colors.</p>
                 </div></>
             )}
-            {activeTab === "about" && <AboutTabContent />}
+
           </div>
         </div>
       </Modal>
@@ -246,23 +246,6 @@ function ThemeDropdown({
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-function AboutTabContent() {
-  const { t } = useTranslation("settings");
-  return (
-    <div className="settings-section">
-      <h3>{t("about.appName")}</h3>
-      <div style={{ fontSize: 11, lineHeight: 1.8 }}>
-        <p><strong>{t("about.version")}:</strong> {BRAND.version}</p>
-        <p><strong>{t("about.framework")}:</strong> React + TypeScript + That Open Engine</p>
-        <p><strong>{t("about.license")}:</strong> MIT</p>
-        <p style={{ marginTop: 8, color: "var(--theme-dialog-content-secondary)" }}>
-          {t("about.description")}
-        </p>
-      </div>
     </div>
   );
 }

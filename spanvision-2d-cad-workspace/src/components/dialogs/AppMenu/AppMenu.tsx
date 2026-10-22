@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react
 import { useFileOperations } from '../../../hooks/file/useFileOperations';
 import { getRecentFiles, clearRecentFiles, removeRecentFile, type RecentFileEntry } from '../../../services/file/recentFiles';
 import { isDesktopShell } from '../../../utils/platform';
-import { BRAND } from '../../../config/brand';
+
 import { ProjectInfoPanel } from '../ProjectInfoDialog';
 import { ExtensionManagerPanel } from './ExtensionManagerPanel';
 import { useAppStore } from '../../../state/appStore';
@@ -277,20 +277,6 @@ function RecentFilesPanel({ onOpenFile, onClose }: { onOpenFile: (path: string) 
   );
 }
 
-function AboutPanel() {
-  return <div className="p-8 max-w-xl text-cad-text">
-    <img src="/logo.svg" alt={BRAND.mark} className="w-14 h-14 mb-5" />
-    <p className="text-xs text-cad-text-dim mb-2">{BRAND.organization}</p>
-    <h1 className="text-xl font-semibold mb-2">{BRAND.product}</h1>
-    <p className="text-sm text-cad-text-dim mb-6">Web edition · v{BRAND.version} · Spanvision Mono</p>
-    <p className="text-sm text-cad-text-dim mb-4">A browser workspace for precise 2D drawings. Projects open from local files. Recovery drafts and review markup stay in this browser.</p>
-    <div className="flex flex-wrap gap-5 text-sm underline underline-offset-4">
-      <a href="/LICENSE.md" target="_blank" rel="noopener noreferrer">Source license</a>
-      <a href="/legal.html" target="_blank" rel="noopener noreferrer">Legal and licenses</a>
-    </div>
-  </div>;
-}
-
 export function AppMenu({ isOpen, onClose, initialView, onOpenSheetTemplateImport }: AppMenuProps) {
   const { handleNew, handleOpen, handleOpenPath, handleSave, handleSaveAs, handleExportSVG, handleExportDXF, handleExportIFC, handleExportJSON, handleImportDXF, handleImportDXFAsUnderlay, handlePrint, handleExit } = useFileOperations();
   const [activeView, setActiveView] = useState<AppMenuView>('none');
@@ -463,13 +449,7 @@ export function AppMenu({ isOpen, onClose, initialView, onOpenSheetTemplateImpor
             onMouseEnter={() => setActiveView('shortcuts')}
             active={activeView === 'shortcuts'}
           />
-          <AppMenuItem
-            icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>}
-            label="About"
-            onClick={() => setActiveView('about')}
-            onMouseEnter={() => setActiveView('about')}
-            active={activeView === 'about'}
-          />
+
           {isDesktopShell() && <AppMenuItem
             icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>}
             label="Exit"
@@ -768,7 +748,7 @@ export function AppMenu({ isOpen, onClose, initialView, onOpenSheetTemplateImpor
         )}
         {activeView === 'projectInfo' && <ProjectInfoPanel isOpen={true} />}
         {activeView === 'units' && <UnitsPanel />}
-        {activeView === 'about' && <AboutPanel />}
+
         {activeView === 'extensions' && <ExtensionManagerPanel />}
         {activeView.startsWith('ext:') && (() => {
           const panelId = activeView.slice(4);

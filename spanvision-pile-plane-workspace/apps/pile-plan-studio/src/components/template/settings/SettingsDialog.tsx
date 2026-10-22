@@ -1,8 +1,8 @@
-import OpenSourceNotices from "../OpenSourceNotices.tsx";
+
 import { useState, useEffect, useRef, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { LANGUAGES, changeLanguage } from "../../../i18n/config";
-import { PRODUCT_INFO } from "../../../productInfo.ts";
+
 import type { UserLanguage } from "../../../domain/settings/userSettings.ts";
 import type { McpConnection } from "../../../app/mcp/desktopBridge.ts";
 import {
@@ -33,7 +33,7 @@ const THEME_OPTIONS = [
    Voorbeeld met domein-tab:
      const TAB_IDS = ["general", "appearance", "calculation", "about"] as const;
    ─────────────────────────────────────────────────────────── */
-const TAB_IDS = ["general", "appearance", "about"] as const;
+const TAB_IDS = ["general", "appearance"] as const;
 const CURRENCY_OPTIONS = ["EUR", "GBP", "USD"];
 
 import { applyCanvasBackground, type CanvasBackground } from "../../../domain/settings/canvasBackground.ts";
@@ -244,7 +244,7 @@ export default function SettingsDialog({
               onInterfaceScalePreview={handleInterfaceScalePreview}
             />
           )}
-          {activeTab === "about" && <AboutTabContent />}
+
         </div>
       </div>
     </Modal>
@@ -465,24 +465,6 @@ function ThemeDropdown({
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-function AboutTabContent() {
-  const { t } = useTranslation("settings");
-  return (
-    <div className="settings-section">
-      <h3>{PRODUCT_INFO.name}</h3>
-      <div style={{ fontSize: 11, lineHeight: 1.8 }}>
-        <p style={{ marginBottom: 8, color: "var(--theme-dialog-content-secondary)" }}>
-          {t("about.description")}
-        </p>
-        <p><strong>{t("about.version")}:</strong> {PRODUCT_INFO.version}</p>
-        <p><strong>{t("about.status")}:</strong> {PRODUCT_INFO.status}</p>
-        <p><strong>{t("about.organization")}:</strong> {PRODUCT_INFO.organization}</p>
-        <p><strong>{t("about.license")}:</strong> {PRODUCT_INFO.license}</p><OpenSourceNotices />
-      </div>
     </div>
   );
 }

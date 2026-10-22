@@ -19,7 +19,7 @@ const THEME_OPTIONS = [
    Voorbeeld met domein-tab:
      const TAB_IDS = ["general", "appearance", "calculation", "about"] as const;
    ─────────────────────────────────────────────────────────── */
-const TAB_IDS = ["general", "appearance", "about"] as const;
+const TAB_IDS = ["general", "appearance"] as const;
 
 export function applyTheme(theme?: string) {
   document.documentElement.setAttribute("data-theme", theme === 'light' ? 'light' : 'spanvision-mono');
@@ -150,7 +150,7 @@ export default function SettingsDialog({
           {activeTab === "appearance" && (
             <AppearanceTabContent theme={draftTheme} onThemeSelect={handleThemePreview} />
           )}
-          {activeTab === "about" && <AboutTabContent />}
+
         </div>
       </div>
     </Modal>
@@ -286,19 +286,3 @@ function ThemeDropdown({
 // Pas naam, versie en beschrijving aan via i18n keys
 // in locales/{lang}/settings.json, sectie "about"
 // ─────────────────────────────────────────────────────────────
-function AboutTabContent() {
-  const { t } = useTranslation("settings");
-  return (
-    <div className="settings-section">
-      <h3>{t("about.appName")}</h3>
-      <div style={{ fontSize: 11, lineHeight: 1.8 }}>
-        <p><strong>{t("about.version")}:</strong> 0.1.0</p>
-        <p><strong>{t("about.framework")}:</strong> Tauri + React + TypeScript</p>
-        <p><strong>{t("about.license")}:</strong> MIT</p>
-        <p style={{ marginTop: 8, color: "var(--theme-dialog-content-secondary)" }}>
-          {t("about.description")}
-        </p>
-      </div>
-    </div>
-  );
-}

@@ -71,7 +71,7 @@ export default function SettingsDialog({ open, onClose, theme, onThemeChange }: 
     onClose();
   };
 
-  const TAB_IDS = ["general", "appearance", "grid", "files", "about"] as const;
+  const TAB_IDS = ["general", "appearance", "grid", "files"] as const;
 
   return (
     <Modal open={open} onClose={handleCancel} title={t("title")} className="settings-dialog">
@@ -136,17 +136,6 @@ export default function SettingsDialog({ open, onClose, theme, onThemeChange }: 
                   <option key={opt.value} value={opt.value}>{t(opt.labelKey)}</option>
                 ))}
               </select>
-            </div>
-          )}
-          {activeTab === "about" && (
-            <div className="settings-section">
-              <h3>{t("about.appName")}</h3>
-              <div style={{ fontSize: 11, lineHeight: 1.8 }}>
-                <p><strong>{t("about.version")}:</strong> {__APP_VERSION__}</p>
-                <p><strong>{t("about.framework")}:</strong> Tauri + React + TypeScript</p>
-                <p><strong>{t("about.license")}:</strong> MIT</p>
-                <p style={{ marginTop: 8, color: "var(--theme-dialog-content-secondary)" }}>{t("about.description")}</p>
-              </div>
             </div>
           )}
         </div>

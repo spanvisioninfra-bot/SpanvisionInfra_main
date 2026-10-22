@@ -2595,16 +2595,16 @@ mod tests {
             "test needs the welcome tab"
         );
 
-        // ABOUT schedules its modal; it must pass the welcome-page gate.
+        // OPTIONS schedules its modal; it must pass the welcome-page gate.
         let start = app.command_line.history.len();
         let _ = app.update(Message::RibbonToolClick {
-            tool_id: "ABOUT".to_string(),
-            event: ModuleEvent::Command("ABOUT".to_string()),
+            tool_id: "OPTIONS".to_string(),
+            event: ModuleEvent::Command("OPTIONS".to_string()),
         });
         assert_eq!(
             app.command_line.history.len(),
             start,
-            "ABOUT must not be refused on the welcome page"
+            "OPTIONS must not be refused on the welcome page"
         );
 
         // …but a tool that does need a drawing is still turned away (#299).
@@ -2644,7 +2644,7 @@ mod tests {
             "DONATE",
             "REPORT",
             "WEBVERSION",
-            "ABOUT",
+            "OPTIONS",
             "CHANGELOG",
             "CUI",
             "ALIASEDIT",

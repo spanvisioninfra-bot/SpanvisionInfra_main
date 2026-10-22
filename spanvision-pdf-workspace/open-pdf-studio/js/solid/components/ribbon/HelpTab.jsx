@@ -45,13 +45,7 @@ export default function HelpTab() {
             label={t('help.shortcuts')}
             onClick={() => openDialog('shortcuts')}
           />
-          <RibbonButton
-            id="ribbon-about"
-            title={t('help.aboutTitle')}
-            icon={aboutIcon}
-            label={t('help.about')}
-            onClick={() => openDialog('about')}
-          />
+
           <RibbonButton
             id="ribbon-whats-new"
             disabled={!BRAND.releasesApiUrl}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useRecentFiles, type RecentFile } from "../../hooks/useRecentFiles";
-import { fetchAppVersion } from "../../lib/appVersion";
+
 import ExtensionManagerPanel from "./ExtensionManagerPanel";
 import "./Backstage.css";
 
@@ -185,12 +185,7 @@ export default function Backstage({ open, onClose, onOpenSettings, onOpenFile,
             onClick={() => actionAndClose(onOpenSettings)}
           />
           <Divider />
-          <MenuItem
-            icon={ICONS.about}
-            label={t("about")}
-            active={activePanel === "about"}
-            onClick={() => setActivePanel("about")}
-          />
+
           <Divider />
           <MenuItem
             icon={ICONS.exit}
@@ -216,7 +211,7 @@ export default function Backstage({ open, onClose, onOpenSettings, onOpenFile,
               onBrowse={onOpen ? () => actionAndClose(onOpen) : undefined}
             />
           )}
-          {activePanel === "about" && <AboutPanel />}
+
           {activePanel === "import" && <ImportPanel />}
           {activePanel === "export" && <ExportPanel />}
           {activePanel === "extensions" && <ExtensionManagerPanel />}
@@ -224,99 +219,6 @@ export default function Backstage({ open, onClose, onOpenSettings, onOpenFile,
       )}
       {/* Click anywhere outside the menu/panel to close */}
       <div className="backstage-dismiss-area" onClick={onClose} />
-    </div>
-  );
-}
-
-function AboutPanel() {
-  const { t } = useTranslation("backstage");
-  // App-versie uit dezelfde bron als TitleBar/StatusBar (Tauri getVersion,
-  // met package.json-fallback in de browser) — geen hardcoded versienummer.
-  const [version, setVersion] = useState("");
-  useEffect(() => {
-    fetchAppVersion().then(setVersion).catch(() => setVersion(""));
-  }, []);
-
-  const openExternal = (url: string) => async (e: React.MouseEvent) => {
-    e.preventDefault();
-    try {
-      const { openUrl } = await import("@tauri-apps/plugin-opener");
-      await openUrl(url);
-    } catch {
-      window.open(url, "_blank", "noopener,noreferrer");
-    }
-  };
-
-  return (
-    <div className="bs-about-panel">
-      <h2 className="bs-about-title">{t("aboutPanel.title")}</h2>
-      <div className="bs-about-app">
-        <div className="bs-about-logo">
-          {/* Open FEM2D Studio logo — gestyleerd portaal-frame met scharnier-
-              opleggingen, FE-knopen en doorbuigingscurve. */}
-          <svg
-            viewBox="0 0 64 64"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect x="0" y="0" width="64" height="64" rx="12" fill="var(--theme-accent)" />
-            <line x1="14" y1="18" x2="14" y2="46" stroke="white" strokeWidth="3.5" strokeLinecap="round" />
-            <line x1="50" y1="18" x2="50" y2="46" stroke="white" strokeWidth="3.5" strokeLinecap="round" />
-            <line x1="14" y1="18" x2="50" y2="18" stroke="white" strokeWidth="3.5" strokeLinecap="round" />
-            <circle cx="14" cy="18" r="2.5" fill="white" />
-            <circle cx="50" cy="18" r="2.5" fill="white" />
-            <circle cx="32" cy="18" r="2.2" fill="white" />
-            <polygon points="14,46 10.5,52 17.5,52" fill="white" />
-            <polygon points="50,46 46.5,52 53.5,52" fill="white" />
-            <line x1="6" y1="54" x2="22" y2="54" stroke="white" strokeWidth="1.5" />
-            <line x1="42" y1="54" x2="58" y2="54" stroke="white" strokeWidth="1.5" />
-            <path d="M 14 18 Q 32 27 50 18"
-              stroke="white" strokeWidth="1.2" fill="none"
-              opacity="0.55" strokeDasharray="2 2" />
-          </svg>
-        </div>
-        <div className="bs-about-app-info">
-          <h1 className="bs-about-app-name">{t("aboutPanel.appName")}</h1>
-          <p className="bs-about-version">{t("aboutPanel.version")}{version ? ` ${version}` : ""}</p>
-        </div>
-      </div>
-      <p className="bs-about-tagline">{t("aboutPanel.tagline")}</p>
-      <p className="bs-about-description">{t("aboutPanel.description")}</p>
-      <div className="bs-about-company">
-        <h3 className="bs-about-company-name">{t("aboutPanel.companyName")}</h3>
-        <p className="bs-about-company-desc">{t("aboutPanel.companyDescription")}</p>
-        <p className="bs-about-company-meta">
-          {t("aboutPanel.stichting")}
-        </p>
-      </div>
-      <div className="bs-about-links">
-        <a
-          href="https://www.open-aec.com/"
-          className="bs-about-link"
-          onClick={openExternal("https://www.open-aec.com/")}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z" />
-          </svg>
-          {t("aboutPanel.website")}
-        </a>
-        <a
-          href="https://github.com/OpenAEC-Foundation"
-          className="bs-about-link"
-          onClick={openExternal("https://github.com/OpenAEC-Foundation")}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" />
-          </svg>
-          {t("aboutPanel.github")}
-        </a>
-      </div>
-      <div className="bs-about-footer">
-        <p className="bs-about-copyright">
-          {t("aboutPanel.copyright")}
-        </p>
-      </div>
     </div>
   );
 }

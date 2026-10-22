@@ -30,7 +30,7 @@ import ResizePagesDialog from './dialogs/ResizePagesDialog.jsx';
 import CompressDialog from './dialogs/CompressDialog.jsx';
 import FeedbackDialog from './dialogs/FeedbackDialog.jsx';
 import MessageDialog from './dialogs/MessageDialog.jsx';
-import AboutDialog from './dialogs/AboutDialog.jsx';
+
 import WhatsNewDialog from './dialogs/WhatsNewDialog.jsx';
 import ShortcutsDialog from './dialogs/ShortcutsDialog.jsx';
 import ExtensionsDialog from './dialogs/ExtensionsDialog.jsx';
@@ -91,7 +91,7 @@ const DIALOG_MAP = {
   'compress': CompressDialog,
   'feedback': FeedbackDialog,
   'message': MessageDialog,
-  'about': AboutDialog,
+
   'whats-new': WhatsNewDialog,
   'shortcuts': ShortcutsDialog,
   'extensions': ExtensionsDialog,
