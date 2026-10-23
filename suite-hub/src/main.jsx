@@ -18,8 +18,6 @@ import './admin.css';
 
 const organization=brand.hub.organization||brand.organization;
 function Arrow() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>; }
-function MailIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>; }
-function ExternalLinkIcon() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>; }
 function Mark(props) { return <a class="brand-lockup" href="#landing" aria-label={`${organization} home`}><img class="company-mark" src={props.mode==='light'?'/spanvision-mark-light.svg':'/spanvision-mark.svg'} width="44" height="44" alt="" aria-hidden="true"/><span>{organization}<small>Engineering tools</small></span></a>; }
 function TrialNotice() {
   const message=`Your two-day trial includes ${trialToolIds.length} tools, with 3 launches shared across them each day. BIM, STL-3D and FEM are coming soon for trial users. AI features are also coming soon; the regular features of trial tools remain available.`;
@@ -38,15 +36,13 @@ function SocialIcon(props) {
 }
 function SocialLinks() {
   const links=[{platform:'instagram',label:'Instagram',url:brand.hub.socialLinks?.instagram},{platform:'facebook',label:'Facebook',url:brand.hub.socialLinks?.facebook}];
-  return <nav class="footer-social" aria-label="Spanvision Infra social pages"><span class="footer-section-label">Follow us</span><For each={links.filter(link=>link.url)}>{link=><a class="footer-social-link" data-platform={link.platform} href={link.url} target="_blank" rel="noopener noreferrer" aria-label={`${organization} on ${link.label} (opens in a new tab)`}><span class="footer-social-icon"><SocialIcon platform={link.platform}/></span><span class="footer-social-copy"><strong>{link.label}</strong><small>{link.platform==='instagram'?'View profile':'View page'}</small></span></a>}</For></nav>;
+  return <nav class="footer-social" aria-label="Spanvision Infra social pages"><For each={links.filter(link=>link.url)}>{link=><a class="footer-social-link" data-platform={link.platform} href={link.url} target="_blank" rel="noopener noreferrer" aria-label={`${organization} on ${link.label} (opens in a new tab)`}><span class="footer-social-icon"><SocialIcon platform={link.platform}/></span><span>{link.label}</span></a>}</For></nav>;
 }
 function ContactLinks() {
   const email=brand.hub.contactEmail;
   const composeUrl=`https://mail.google.com/mail/?${new URLSearchParams({view:'cm',fs:'1',to:email})}`;
   return <div class="footer-contact"><span class="footer-section-label">Contact</span>
-    <a class="footer-email" href={composeUrl} target="_blank" rel="noopener noreferrer" aria-label={`Email ${email} in Gmail (opens in a new tab)`}>
-      <span class="footer-contact-icon"><MailIcon/></span><span class="footer-email-copy"><strong>{email}</strong><small>Write an email in Gmail</small></span><ExternalLinkIcon/>
-    </a>
+    <a class="footer-email" href={composeUrl} target="_blank" rel="noopener noreferrer" aria-label={`Email ${email} in Gmail (opens in a new tab)`}>{email}</a>
   </div>;
 }
 
@@ -236,7 +232,7 @@ function App() {
       <Show when={screen()==='profile'}><section class="account-page"><span class="preview-badge">LOCAL PROFILE</span><div class="account-heading"><div><span class="eyebrow">YOUR WORKSPACE</span><h1>Your local profile.</h1><p>Set a display name and choose your preferred appearance.</p></div><a href="#modules" class="button button-light">Open workspace<Arrow/></a></div><div class="account-grid"><aside class="account-nav"><span class="selected" aria-current="page">Profile</span><a href="#modules">All tools<Arrow/></a></aside><div class="account-card"><div class="profile-header"><span class="avatar">{name().split(' ').filter(Boolean).map(s=>s[0]).join('').slice(0,2)||'SI'}</span><div><h2>{name()||'Your workspace'}</h2><p>Local profile · {organization}</p></div></div><form novalidate onSubmit={submitProfile}><label>Display name<input name="name" value={name()} maxlength="80" autocomplete="name" placeholder="Your name"/></label><label>Organization<input value={organization} readonly/></label><label>Interface theme<select aria-label="Interface theme" value={mode()} onChange={event=>window.SpanvisionAppearance.setMode(event.currentTarget.value)}><option value="light">Light</option><option value="dark">Dark</option></select></label><Show when={error()}><p role="alert" class="form-error">{error()}</p></Show><Show when={success()}><p role="status" class="form-success">{success()}</p></Show><button class="button button-light">Save profile<Arrow/></button></form></div><div class="account-details"><article><span class="eyebrow">LOCAL BY DESIGN</span><h3>Your files. Your control.</h3><p>Your profile saves in this browser. Tool access uses your verified online account, and each workspace keeps its own drafts. Download project files to back them up or move them to another device.</p></article><article><span class="eyebrow">APPEARANCE</span><div class="palette"><i/><i/><i/><i/></div><p>{mode()==='light'?'Light':'Dark'} mode<br/>A clear space for detailed work.</p></article></div></div></section></Show>
       <Show when={!validScreens.includes(screen())}><section class="suggestions-page"><h1>Page not found.</h1><a href="#landing" class="button button-light">Back to overview<Arrow/></a></section></Show>
     </main>
-    <footer class="preview-footer"><div class="footer-main"><Mark mode={mode()}/><ContactLinks/><SocialLinks/></div><div class="footer-bottom"><span>© 2026 {organization}</span></div></footer>
+    <footer class="preview-footer"><div class="footer-main"><Mark mode={mode()}/><span class="footer-copyright">© 2026 {organization}</span><ContactLinks/><SocialLinks/></div></footer>
     <dialog ref={modal} class="scan-dialog" aria-labelledby="scan-title" onKeyDown={trapScanFocus} onCancel={event=>{event.preventDefault();closeScan();}}>
       <div class="scan-heading"><h2 id="scan-title">Scan & make searchable</h2><button class="scan-close" aria-label="Close scan" onClick={closeScan}>×</button></div><p class="scan-intro">Turn a scanned PDF into a document you can search.</p>
       <input hidden ref={upload} type="file" accept="application/pdf,image/*" onChange={event=>{const file=event.target.files?.[0];if(file){setScanFile(file);setFilename(file.name);setScanResult(null);setScanState('ready');setScanError('');}}}/>
