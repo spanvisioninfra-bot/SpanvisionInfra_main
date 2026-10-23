@@ -10,6 +10,7 @@ const output=path.join(root,'qa/deployment/output/tool-trial-2026-10-22');
 await fs.mkdir(path.join(output,'temp'),{recursive:true});
 const browser=await chromium.launch({channel:'msedge',headless:true,env:{...process.env,TEMP:path.join(output,'temp'),TMP:path.join(output,'temp')}});
 const manifest=JSON.parse(await fs.readFile(path.join(root,'deployment/production.json')));
+const contactBrand=JSON.parse(await fs.readFile(path.join(root,'branding/brand.json'))).hub;
 const origin='https://www.spanvisioninfra.com';
 const user={id:'browser_trial_member',email:'member@example.test',name:'Member',emailVerified:true,role:'member'};
 const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.woff2':'font/woff2'};
@@ -18,14 +19,18 @@ try{
   for(const [mode,width] of [['dark',1440],['light',390]]){
     for(const scenario of ['anonymous','daily_limit','daily_limit_second','expired','allowed','retry','account','pricing','faq','faq_guest','catalog','catalog_guest','catalog_paid','catalog_admin','coming_soon_bim','coming_soon_stl','coming_soon_fem','backend_paid','backend_admin']){
       const context=await browser.newContext({viewport:{width,height:950},reducedMotion:'reduce'});
-      const page=await context.newPage(),errors=[],launches=[],handoffs=[],warmups=[];
+      const page=await context.newPage(),errors=[],launches=[],handoffs=[],warmups=[],externalTargets=[];
       const isAdmin=['catalog_admin','backend_admin'].includes(scenario),isPaid=['catalog_paid','backend_paid'].includes(scenario);
       page.on('pageerror',error=>errors.push(error.message));
-      await page.route('**/*',async route=>{
+      await context.route('**/*',async route=>{
         const url=new URL(route.request().url());
         if(['https://spanvision-frame.vercel.app','https://spanvision-fem.vercel.app','https://spanvision-bim.onrender.com','https://spanvision-stl.onrender.com'].includes(url.origin)){
           handoffs.push({url:url.href,method:route.request().method(),body:new URLSearchParams(route.request().postData()||'')});
           return route.fulfill({status:200,contentType:'text/html',body:'<h1>Tool launched</h1>'});
+        }
+        if(['https://mail.google.com','https://www.instagram.com','https://www.facebook.com'].includes(url.origin)){
+          if(route.request().isNavigationRequest())externalTargets.push(url.href);
+          return route.fulfill({status:200,contentType:'text/html',body:'<h1>External destination</h1>'});
         }
         if(url.origin!==origin)return route.abort();
         let data;
@@ -110,13 +115,26 @@ try{
             await item.locator('summary').click();await item.locator('p').waitFor({state:'visible'});
           }
           await faq.getByText(scenario==='faq_guest'?/Checkout is being configured/:/hosted checkout available for your billing region/).waitFor();
-          const email=page.locator('footer').getByRole('link',{name:'mandeep@spanvisioninfra.com',exact:true});
-          assert.equal(await email.getAttribute('href'),'mailto:mandeep@spanvisioninfra.com');
-          assert.equal(await email.locator('svg').count(),1);
-          // Prevent the OS mail client from opening during the controlled click check.
-          await email.evaluate(link=>link.addEventListener('click',event=>{event.preventDefault();window.__svTestEmailTarget=link.href;},{once:true}));
-          await email.locator('svg').click();
-          assert.equal(await page.evaluate(()=>window.__svTestEmailTarget),'mailto:mandeep@spanvisioninfra.com');
+          const footer=page.locator('footer'),email=footer.locator('.footer-email');
+          const composeUrl=new URL(await email.getAttribute('href'));
+          assert.equal(composeUrl.origin,'https://mail.google.com');
+          assert.equal(composeUrl.searchParams.get('view'),'cm');assert.equal(composeUrl.searchParams.get('fs'),'1');
+          assert.equal(composeUrl.searchParams.get('to'),contactBrand.contactEmail);
+          assert.equal(await footer.getByRole('link',{name:'Use your mail app',exact:true}).getAttribute('href'),'mailto:'+contactBrand.contactEmail);
+          assert.equal(await email.locator('.footer-contact-icon svg').count(),1);
+          // Popup destinations are fulfilled above; no email client, real provider or message is opened.
+          const [mailPage]=await Promise.all([context.waitForEvent('page'),email.locator('.footer-contact-icon').click()]);
+          await mailPage.getByRole('heading',{name:'External destination'}).waitFor();
+          assert.equal(new URL(mailPage.url()).searchParams.get('to'),contactBrand.contactEmail);await mailPage.close();
+          for(const platform of ['instagram','facebook']){
+            const link=footer.locator(`[data-platform="${platform}"]`);
+            assert.equal(await link.getAttribute('href'),contactBrand.socialLinks[platform]);
+            assert.equal(await link.getAttribute('target'),'_blank');assert.match(await link.getAttribute('rel'),/noopener/);
+            const [socialPage]=await Promise.all([context.waitForEvent('page'),platform==='instagram'?link.locator('.footer-social-icon').click():link.press('Enter')]);
+            await socialPage.getByRole('heading',{name:'External destination'}).waitFor();
+            assert.equal(socialPage.url(),contactBrand.socialLinks[platform]);await socialPage.close();
+          }
+          assert.equal(externalTargets.length,3);
           assert.equal(launches.length,0);assert.equal(warmups.length,0);
           await faq.scrollIntoViewIfNeeded();
         }else if(scenario==='account'){
