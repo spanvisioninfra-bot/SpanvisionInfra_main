@@ -47,7 +47,6 @@ function ContactLinks() {
     <a class="footer-email" href={composeUrl} target="_blank" rel="noopener noreferrer" aria-label={`Email ${email} in Gmail (opens in a new tab)`}>
       <span class="footer-contact-icon"><MailIcon/></span><span class="footer-email-copy"><strong>{email}</strong><small>Write an email in Gmail</small></span><ExternalLinkIcon/>
     </a>
-    <a class="footer-mail-app" href={`mailto:${email}`}>Use your mail app</a>
   </div>;
 }
 

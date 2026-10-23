@@ -120,7 +120,7 @@ try{
           assert.equal(composeUrl.origin,'https://mail.google.com');
           assert.equal(composeUrl.searchParams.get('view'),'cm');assert.equal(composeUrl.searchParams.get('fs'),'1');
           assert.equal(composeUrl.searchParams.get('to'),contactBrand.contactEmail);
-          assert.equal(await footer.getByRole('link',{name:'Use your mail app',exact:true}).getAttribute('href'),'mailto:'+contactBrand.contactEmail);
+          assert.equal(await footer.getByRole('link',{name:'Use your mail app',exact:true}).count(),0);
           assert.equal(await email.locator('.footer-contact-icon svg').count(),1);
           // Popup destinations are fulfilled above; no email client, real provider or message is opened.
           const [mailPage]=await Promise.all([context.waitForEvent('page'),email.locator('.footer-contact-icon').click()]);
