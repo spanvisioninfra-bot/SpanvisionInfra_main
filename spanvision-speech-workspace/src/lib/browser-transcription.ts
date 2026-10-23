@@ -1,4 +1,6 @@
+import { requireAiFeature } from '../../../deployment/ai-feature-access.mjs';
 export async function transcribeAudioFile(file: File, signal: AbortSignal, onStatus: (message: string) => void): Promise<string> {
+  await requireAiFeature();
   if (file.size > 50 * 1024 * 1024) throw new Error('Choose a recording smaller than 50 MB.');
   const cancelled = () => { if (signal.aborted) throw new DOMException('Transcription cancelled', 'AbortError'); };
   cancelled();

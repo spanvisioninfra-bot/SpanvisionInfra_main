@@ -18,7 +18,7 @@ export async function verify(ticket,tool,origin,fetcher=fetch,now=Date.now()){
   const data=await response.json(),expiry=Date.parse(data.expiresAt);
   if(data.allowed!==true||data.tool!==tool||!(expiry>now))return {allowed:false,status:401};
   if(checks.size>=128)checks.delete(checks.keys().next().value);
-  const value={allowed:true,expiresAt:data.expiresAt};
+  const value={allowed:true,expiresAt:data.expiresAt,features:data.features||{}};
   checks.set(key,{until:Math.min(now+15000,expiry),value});
   return value;
 }

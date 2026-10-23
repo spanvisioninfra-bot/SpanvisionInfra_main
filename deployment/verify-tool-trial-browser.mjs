@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
-import {plans,regions,trialPolicy,trialComingSoonTools} from '../commerce/catalog.mjs';
+import {plans,regions,trialPolicy,trialComingSoonTools,aiFeatures} from '../commerce/catalog.mjs';
 
 const root=path.resolve(import.meta.dirname,'..'),dist=path.join(root,'suite-hub/dist');
 const output=path.join(root,'qa/deployment/output/tool-trial-2026-10-22');
@@ -59,6 +59,7 @@ try{
             for(const id of trialComingSoonTools)await page.locator(`[data-module="${id}"] a`).waitFor();
             assert.equal(await cards.getByRole('button',{name:'Coming soon',exact:true}).count(),0);
             assert.equal(await cards.locator('a').count(),16);
+            assert.equal(await cards.locator('[data-ai-status="coming-soon"]').count(),0);
           }else{
             await page.locator('[data-module="cad"] a').waitFor();
             assert.equal(await cards.getByRole('button',{name:'Coming soon',exact:true}).count(),3);
@@ -69,6 +70,7 @@ try{
               assert.match(await card.innerText(),/Not included in the trial/);
             }
             assert.equal(await cards.locator('a').count(),13);
+            assert.equal(await cards.locator('[data-ai-status="coming-soon"]').count(),Object.keys(aiFeatures).length);
           }
           assert.match(await page.locator('.company-catalog').innerText(),/trial includes 13 tools/);
           assert.equal(launches.length,0);

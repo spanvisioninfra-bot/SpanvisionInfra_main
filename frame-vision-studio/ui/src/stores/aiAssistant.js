@@ -18,6 +18,7 @@ import {
   currentKozijn,
 } from "./kozijn.js";
 import { toast } from "./toast.js";
+import { requireAiFeature } from "../../../../deployment/ai-feature-access.mjs";
 
 export const aiMessages = writable([]);
 export const aiLoading = writable(false);
@@ -67,6 +68,7 @@ export async function sendMessage(text) {
   aiLoading.set(true);
 
   try {
+    await requireAiFeature();
     // Build messages array for API
     const msgs = get(aiMessages);
     const apiMessages = [

@@ -1,6 +1,7 @@
 <script>
   import { _ } from "svelte-i18n";
   import { onMount, tick } from "svelte";
+  import { aiChecking, subscribeAiFeature } from "../../../../../deployment/ai-feature-access.mjs";
   import {
     aiMessages, aiLoading, aiConfigured,
     aiEndpoint, aiModel, aiKey,
@@ -10,6 +11,7 @@
   let inputText = $state("");
   let showConfig = $state(false);
   let messagesEl;
+  let aiAccess = $state(aiChecking);
 
   // Config form state
   let cfgEndpoint = $state($aiEndpoint || "http://localhost:11434/v1");
@@ -27,10 +29,11 @@
   // Show config on first use
   onMount(() => {
     if (!$aiConfigured) showConfig = true;
+    return subscribeAiFeature(value => { aiAccess = value; });
   });
 
   function handleSend() {
-    if (!inputText.trim() || $aiLoading) return;
+    if (!aiAccess.available || !inputText.trim() || $aiLoading) return;
     const text = inputText;
     inputText = "";
     sendMessage(text);
@@ -77,7 +80,7 @@
   </div>
 
   <!-- Config panel -->
-  {#if showConfig}
+  {#if showConfig && aiAccess.available}
     <div class="config-panel">
       <label class="config-field">
         <span>API Endpoint</span>
@@ -113,7 +116,9 @@
 
   <!-- Messages -->
   <div class="messages" bind:this={messagesEl}>
-    {#if $aiMessages.length === 0}
+    {#if !aiAccess.available}
+      <div class="empty-state ai-access-notice" role="status"><p>{aiAccess.message}</p></div>
+    {:else if $aiMessages.length === 0}
       <div class="empty-state">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
           <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
@@ -165,10 +170,10 @@
       onkeydown={handleKeyDown}
       placeholder={$_("ai.placeholder") || "Typ een opdracht..."}
       rows="1"
-      disabled={$aiLoading || !$aiConfigured}
+      disabled={!aiAccess.available || $aiLoading || !$aiConfigured}
     ></textarea>
     <button class="send-btn" onclick={handleSend}
-      disabled={$aiLoading || !inputText.trim() || !$aiConfigured}>
+      disabled={!aiAccess.available || $aiLoading || !inputText.trim() || !$aiConfigured}>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="22" y1="2" x2="11" y2="13"/>
         <polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -305,6 +310,7 @@
   .empty-state p {
     font-size: 12px;
   }
+  .ai-access-notice { color: var(--text-primary); line-height: 1.7; padding: 12px; }
 
   .suggestions {
     display: flex;

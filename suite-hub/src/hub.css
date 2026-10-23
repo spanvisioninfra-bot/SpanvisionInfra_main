@@ -57,6 +57,7 @@ html[data-sv-mode="light"] .auth-form-wrap input,html[data-sv-mode="light"] .acc
 .catalog-heading{margin-bottom:28px}.catalog-heading .button{border-radius:7px}
 #tools-title{scroll-margin-top:28px}
 .module-card{border-radius:12px;padding:25px;background:var(--sv-surface)}
+.module-ai-status{display:grid;gap:5px;margin:0 0 20px;padding:12px;border:1px solid var(--sv-border);border-radius:8px;color:var(--sv-text);font-size:12px;line-height:1.6;overflow-wrap:anywhere}.module-ai-status strong{font-weight:500}.module-ai-status span{color:var(--sv-muted);font-size:11px}
 .tool-glyph{display:grid;place-items:center;width:56px;height:56px;border:1px solid var(--sv-border);border-radius:14px;color:var(--sv-text);background:linear-gradient(145deg,var(--sv-raised),var(--sv-surface));flex-shrink:0}
 .tool-icon{display:block;flex-shrink:0}
 .company-catalog .module-card h3{margin-top:24px;font-size:clamp(24px,2.1vw,30px)}

@@ -5,7 +5,7 @@ import { readLocalProfile, saveLocalProfile } from './local-profile';
 import MarketingHome, {Pricing,FAQ} from './MarketingHome';
 import {AuthGateway,OnlineAccount} from './AccountGateway';
 import {createAccountState,accountRequest} from './account-client';
-import {trialComingSoonTools,trialComingSoonMessage,trialToolIds} from '../../commerce/catalog.mjs';
+import {trialComingSoonTools,trialComingSoonMessage,trialToolIds,aiFeatures} from '../../commerce/catalog.mjs';
 import AdminPanel from './AdminPanel';
 import ToolIcon from './ToolIcon';
 import release from '../../branding/release.json';
@@ -65,6 +65,7 @@ function App() {
   const localPreview=isLocalPreview(location.hostname);
   const openUrl=module=>toolLaunchUrl(module,status()[module.id],mode(),location);
   const comingSoon=module=>!localPreview&&trialComingSoonTools.includes(module.id)&&account.user()?.role!=='super_admin'&&!['studio','team'].includes(toolPlan()?.plan);
+  const aiComingSoon=module=>aiFeatures[module.id]&&!localPreview&&account.user()?.role!=='super_admin'&&!['studio','team'].includes(toolPlan()?.plan);
   async function refreshToolPlan(){
     const request=++planRequest,user=account.user();
     if(!user){setToolPlan(null);return;}
@@ -189,6 +190,7 @@ function App() {
     return <div class="module-grid"><For each={brand.modules}>{module=><article class="module-card" data-module={module.id}>
       <div class="module-top"><span class="tool-glyph"><ToolIcon id={module.id}/></span><span class="module-release">v{release.version}</span></div>
       <h3>{module.label}</h3><p>{module.description}</p>
+      <Show when={aiComingSoon(module)}><div class="module-ai-status" data-ai-status="coming-soon"><strong>{aiFeatures[module.id]} — Coming soon</strong><span>AI is not included in the trial.</span></div></Show>
       <div class="module-bottom"><ToolLink module={module}/><small>{comingSoon(module)?'Not included in the trial.':status()[module.id]?.available?'Opens in a new tab':status()[module.id]?.message||'Checking the local preview…'}</small></div>
     </article>}</For></div>;
   }
@@ -206,7 +208,7 @@ function App() {
         <section class="company-tools-page">
           <section class="company-catalog" aria-labelledby="tools-title">
             <div class="catalog-heading" data-sv-reveal><div><span class="eyebrow">SPANVISION INFRA TOOLKIT</span><h1 id="tools-title">All tools <span>{brand.modules.length}</span></h1><p>Choose a tool for your project, wherever you work. Each workspace opens in a new tab.</p></div><button class="button button-outline" onClick={refreshStatus}>Check availability<Arrow/></button></div>
-            <p class="catalog-note">Your two-day trial includes {trialToolIds.length} tools, with 3 launches shared across them each day. BIM, STL-3D and FEM are coming soon for trial users.</p>
+            <p class="catalog-note">Your two-day trial includes {trialToolIds.length} tools, with 3 launches shared across them each day. BIM, STL-3D and FEM are coming soon for trial users. AI features are also coming soon; the regular features of trial tools remain available.</p>
             <Modules/>
             <p class="catalog-note">{localPreview?'Files and saved preferences stay with each workspace.':'Browser drafts stay with each workspace. BIM and map processing uses temporary cloud storage; download your results to keep them.'}</p>
           </section>

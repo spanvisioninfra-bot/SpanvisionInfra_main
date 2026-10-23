@@ -45,6 +45,15 @@ test('invalid, expired and unavailable grants fail closed; heartbeat is private'
   const expired=await verify('expired','cad',origin,async()=>Response.json({allowed:true,tool:'cad',expiresAt:'2000-01-01'}));assert.equal(expired.allowed,false);
 });
 
+test('session heartbeat preserves centrally verified AI policy independently of tool access',async()=>{
+  for(const available of [false,true]){
+    const response=await guard(request('/__spanvision/session',{headers:{Cookie:'__Host-sv-tool=ai-policy-'+available}}),{tool:'frame',env,fetcher:async()=>Response.json({allowed:true,tool:'frame',expiresAt:new Date(Date.now()+60000).toISOString(),features:{ai:{available,status:available?'requires_configuration':'coming_soon'}}})});
+    assert.equal(response.status,200);
+    const session=await response.json();assert.equal(session.allowed,true);assert.equal(session.features.ai.available,available);
+    assert.equal(response.headers.get('cache-control'),'private, no-store');
+  }
+});
+
 test('private middleware packaging contains no account secrets and covers every request',async()=>{
   const directory=await fs.mkdtemp(path.join(os.tmpdir(),'spanvision-access-test-'));
   try{

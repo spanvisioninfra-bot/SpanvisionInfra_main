@@ -9,6 +9,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { executeMcpTool } from '../../api/mcp/server';
 import { getMcpToolsByCategory } from '../../api/mcp/tools';
 import { BRAND } from '../../config/brand';
+import { requireAiFeature } from '../../../../deployment/ai-feature-access.mjs';
 
 interface ShellResult {
   success: boolean;
@@ -200,6 +201,7 @@ export async function executeClaudeCadCommand(userPrompt: string): Promise<{
 }> {
   try {
     // Generate system prompt dynamically with current API
+    await requireAiFeature();
     const systemPrompt = generateSystemPrompt();
 
     // Call Claude CLI with the CAD system prompt

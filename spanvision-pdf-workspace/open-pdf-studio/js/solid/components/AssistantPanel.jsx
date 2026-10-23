@@ -2,7 +2,8 @@
 // answer, tried in order:
 //   1. Claude (Anthropic) -> direct API with a locally stored API key
 //   2. MCP relay          -> an external MCP client answers via the app server
-import { createSignal, For, Show, createEffect } from 'solid-js';
+import { createSignal, For, Show, createEffect, onMount, onCleanup } from 'solid-js';
+import { aiChecking, subscribeAiFeature, requireAiFeature } from '../../../../../deployment/ai-feature-access.mjs';
 import { registerAssistantSubmit, registerAssistantMessages, enqueueAssistantQuestion, relayClientActive } from '../../assistant-mcp-relay.js';
 import { ASSISTANT_SKILLS, SKILLS_SYSTEM_PROMPT } from '../../assistant-skills.js';
 import { getActiveDocument } from '../../core/state.js';
@@ -49,6 +50,8 @@ export default function AssistantPanel() {
   const [messages, setMessages] = createSignal([{ role: 'assistant', content: GREETING }]);
   const [input, setInput] = createSignal('');
   const [loading, setLoading] = createSignal(false);
+  const [aiAccess,setAiAccess] = createSignal(aiChecking);
+  onMount(()=>onCleanup(subscribeAiFeature(setAiAccess)));
   const readKey = () => { try { return localStorage.getItem(ANTHROPIC_KEY_LS) || ''; } catch (_) { return ''; } };
   const [apiKey, setApiKey] = createSignal(readKey());
   const [showKey, setShowKey] = createSignal(false);
@@ -78,6 +81,9 @@ export default function AssistantPanel() {
   async function send(explicitText) {
     const text = (typeof explicitText === 'string' ? explicitText : input()).trim();
     if (!text || loading()) return;
+    setLoading(true);
+    try { await requireAiFeature(); }
+    catch (error) { setMessages(m=>[...m,{role:'assistant',content:error.message}]);setLoading(false);return; }
     const key = apiKey();
 
     setMessages((m) => [...m, { role: 'user', content: text }]);
@@ -173,7 +179,7 @@ export default function AssistantPanel() {
                 {activeDocName() ? `Document: ${activeDocName()} · ${providerLabel()}` : providerLabel()}
               </span>
             </div>
-            <button class="chat-close" title="Configure your Anthropic API key" onClick={() => setShowKey(!showKey())} aria-label="Configure assistant connection">⚙</button>
+            <button class="chat-close" title="Configure your Anthropic API key" disabled={!aiAccess().available} onClick={() => setShowKey(!showKey())} aria-label="Configure assistant connection">⚙</button>
             <button class="chat-close" aria-label="Close assistant" title={t('close') || 'Close'} onClick={() => setOpen(false)}>✕</button>
           </div>
 
@@ -192,6 +198,7 @@ export default function AssistantPanel() {
           </Show>
 
           <div class="chat-messages">
+            <Show when={!aiAccess().available}><div class="chat-message chat-assistant" role="status"><div class="chat-bubble">{aiAccess().message}</div></div></Show>
             <For each={messages()}>
               {(msg) => (
                 <div class={`chat-message chat-${msg.role}`}>
@@ -205,7 +212,7 @@ export default function AssistantPanel() {
             <div ref={messagesEnd} />
           </div>
 
-          <Show when={!loading()}>
+          <Show when={aiAccess().available && !loading()}>
             <div class="chat-chips">
               <For each={ASSISTANT_SKILLS}>
                 {(skill) => <button class="chat-chip" title={skill.hint} onClick={() => runSkill(skill)}>{skill.label}</button>}
@@ -217,13 +224,14 @@ export default function AssistantPanel() {
             <textarea
               ref={inputEl}
               class="chat-input"
+              disabled={!aiAccess().available}
               value={input()}
               onInput={(e) => setInput(e.currentTarget.value)}
               onKeyDown={onKeyDown}
               placeholder="Ask about this PDF…"
               rows={2}
             />
-            <button class="chat-send" aria-label="Send message" onClick={send} disabled={loading() || !input().trim()}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m4 4 17 8-17 8 3-8-3-8Zm3 8h14"/></svg></button>
+            <button class="chat-send" aria-label="Send message" onClick={send} disabled={!aiAccess().available || loading() || !input().trim()}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m4 4 17 8-17 8 3-8-3-8Zm3 8h14"/></svg></button>
           </div>
         </div>
       </div>

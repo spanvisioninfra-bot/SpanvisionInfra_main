@@ -72,7 +72,8 @@ test('Neon trial migration and HTTP access enforce shared limits, 24/48h boundar
     assert.deepEqual(freshStatus.policy.comingSoonTools,trialComingSoonTools);
     const firstTrial=await (await launch(fresh,{tool:'frame'})).json();
     assert.equal(firstTrial.allowed,true);assert.equal(firstTrial.trial.remaining,2);
-    assert.equal((await post('tool-verify',{ticket:firstTrial.ticket,tool:'frame'})).status,200);
+    const frameSession=await post('tool-verify',{ticket:firstTrial.ticket,tool:'frame',features:{ai:{available:true}},plan:'team'});
+    assert.equal(frameSession.status,200);assert.equal((await frameSession.json()).features.ai.available,false);
     for(const tool of trialComingSoonTools)assert.equal((await launch(fresh,{tool})).status,403);
     assert.equal((await store.request('rpc/tool_trial_status',{method:'POST',body:JSON.stringify({account_id:fresh})})).remaining,2);
     // A correctly signed ticket issued before this policy cannot keep a backend trial open.
@@ -89,7 +90,7 @@ test('Neon trial migration and HTTP access enforce shared limits, 24/48h boundar
       assert.equal((await post('tool-verify',{ticket:grant.ticket,tool})).status,200);
     }
     let verified=await post('tool-verify',{ticket:privileged.ticket,tool:'cad'},{Origin:'https://tool.example'});
-    assert.equal(verified.status,200);assert.equal((await verified.json()).userId,admin);
+    assert.equal(verified.status,200);const adminSession=await verified.json();assert.equal(adminSession.userId,admin);assert.equal(adminSession.features.ai.available,true);
     assert.equal((await post('tool-verify',{ticket:privileged.ticket,tool:'pdf'})).status,401);
     assert.equal((await post('tool-verify',{ticket:privileged.ticket+'x',tool:'cad'})).status,401);
     await pg.query("update spanvision_commerce.tool_launch_grants set expires_at=clock_timestamp()-interval '1 second' where id=$1",[readToolTicket(privileged.ticket,secret).grant]);

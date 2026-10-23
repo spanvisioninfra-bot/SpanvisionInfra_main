@@ -20,6 +20,7 @@
       const response=await fetch('/__spanvision/session',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(12000)});
       const access=await response.json();
       if(!response.ok||access.allowed!==true){lock(response.status===503?'We could not verify access. Reconnect and try again.':'Open a new trial session or choose a paid plan.',access.launchUrl);return;}
+      window.dispatchEvent(new CustomEvent('sv-tool-session',{detail:access}));
       clearTimeout(expiryTimer);
       expiryTimer=setTimeout(()=>lock('Open a new trial session or choose a paid plan.',access.launchUrl),Math.max(0,Date.parse(access.expiresAt)-Date.now()));
     }catch{lock('We could not verify access. Reconnect and try again.');}

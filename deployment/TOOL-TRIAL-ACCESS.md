@@ -6,6 +6,10 @@ Opening a tool from the catalogue requests a launch. Reloading an already author
 
 Usage is stored in PostgreSQL. The launch operation locks the account row and uses an idempotency key so concurrent tabs and retries cannot create extra uses. The counter follows the account across devices and browser-data resets.
 
+AI features are **Coming soon for trial users**, separately from tool availability. The 13 regular trial tools, the two-day window and the three shared daily launches are unchanged. The catalogue labels the AI assistants in Frame, Calc and PDF, AI drawing commands in 2D CAD, Speech recognition, and the external AI connections in CAD, Planner, FEM, Geotech and Pile. External connections are desktop integrations, not hosted AI models.
+
+The verified tool-session response carries feature access derived from the stored grant, not a browser-supplied plan. Hosted AI entry points check it before provider calls, local speech model loading or drawing actions; their panels show the trial message and disable AI input. Paid/admin grants may use already configured integrations; this policy does not configure providers or make desktop-only connections work on the website. Local development and desktop workflows remain available. There is no new SQL migration. Rebuild and redeploy the hub plus CAD2D, PDF, Calc, Frame and Speech, and refresh the shared session middleware in tool packages. Direct third-party services used with a user's own credentials and previously downloaded desktop copies are outside hosted access controls.
+
 All deployed static tool requests pass through Vercel middleware before files or backend rewrites. BIM, STL and the FEM engine also enforce access on Render, with only their health endpoints public. A short-lived server check cache lasts at most 15 seconds. The shared browser guard checks access every 30 seconds and covers an already open page when its session ends. Tools receive a tool-bound access ticket through a POST handoff and keep it in a secure HttpOnly host cookie. Tool projects receive no database or account-provider secrets. Local development previews remain available on localhost.
 
 ## Enable in production
@@ -42,6 +46,7 @@ foreach ($tool in @('cad','cad2d','pdf','ifc','calc','planner','fem','frame','ca
 - `python -m unittest deployment.test_tool_access deployment.test_upload_limits`: cloud guards and upload bounds. Use the existing BIM Python environment.
 - `SPANVISION_SERVICE=bim python -m unittest deployment.test_cloud`: real BIM workspace, import, processing and validation routes behind controlled test access, using temporary data only.
 - `node deployment/verify-tool-trial-browser.mjs`: controlled desktop dark/mobile light checks for sign-in, daily limit, expiry, ticket handoff, retry, account usage and the existing paid-plan selection. Results are in the ignored `qa/deployment/output/tool-trial-2026-10-22/` directory.
+- `node deployment/verify-ai-feature-browser.mjs`: the actual Frame, Calc, PDF and Speech panels with controlled trial and paid sessions in both themes. Confirms AI input is disabled only for trials and makes no real AI-provider requests. Results are in the ignored `qa/deployment/output/ai-features-2026-10-23/` directory.
 
 The account/access checks, isolated SQL checks, generic cloud guards, real BIM routes and hub production build pass locally. The full STL backend integration check could not start because the existing local STL Python environment is incomplete (`pyproj.Transformer` is unavailable). Its shared access guard is covered by the isolated tests; verify the full STL service after Render installs the complete pinned requirements during its build.
 

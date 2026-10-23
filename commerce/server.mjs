@@ -1,5 +1,5 @@
 import {createCipheriv,createDecipheriv,createHash,createHmac,randomBytes,timingSafeEqual} from 'node:crypto';
-import {plans,regions,selection,trialComingSoonTools,trialComingSoonMessage} from './catalog.mjs';
+import {plans,regions,selection,trialComingSoonTools,trialComingSoonMessage,toolFeatures} from './catalog.mjs';
 import {publicUser,planAccess,SUPER_ADMIN_EMAIL,signInDestination} from './access.mjs';
 import {neonAuthUrl,neonSelected,neonAuth,neonRequest} from './neon-auth.mjs';
 import {databaseConfigured,neonStore,bindNeonStore} from './neon-store.mjs';
@@ -173,7 +173,7 @@ async function verifyToolAccess(body,env,fetcher){
     const access=await toolAccess(user,env,fetcher);
     if(!['studio','team'].includes(access.plan))fail(402,'Choose a paid plan to continue using the tools.');
   }
-  return {allowed:true,tool:ticket.tool,userId:ticket.sub,expiresAt:new Date(Math.min(ticket.exp*1000,Date.parse(grant.expires_at))).toISOString()};
+  return {allowed:true,tool:ticket.tool,userId:ticket.sub,features:toolFeatures(ticket.tool,grant.access_source),expiresAt:new Date(Math.min(ticket.exp*1000,Date.parse(grant.expires_at))).toISOString()};
 }
 async function adminRoute(route,method,url,body,current,env,fetcher){
   if(current.session.recovery)fail(403,'Set your new password before opening admin controls.');

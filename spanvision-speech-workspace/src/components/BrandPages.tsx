@@ -1,4 +1,5 @@
-import { createSignal, createEffect, For, Show, onCleanup } from "solid-js";
+import { createSignal, createEffect, For, Show, onCleanup, onMount } from "solid-js";
+import { aiChecking, subscribeAiFeature } from '../../../deployment/ai-feature-access.mjs';
 import brand from "../brand.json";
 import { runtime } from "../lib/runtime";
 import { readLocalProfile, saveLocalProfile } from "../../../branding/local-profile.js";
@@ -20,6 +21,8 @@ export function PreviewWorkspace(props:{text:string;onChange:(text:string)=>void
 }
 
 export function AudioImport(props:{onSample:(text:string)=>void;compact?:boolean}) {
+  const [aiAccess,setAiAccess]=createSignal(aiChecking);
+  onMount(()=>onCleanup(subscribeAiFeature(setAiAccess)));
   const [file,setFile]=createSignal<File|null>(null);
   const [state,setState]=createSignal<"ready"|"processing"|"complete">("ready");
   const [status,setStatus]=createSignal(""); const [error,setError]=createSignal("");
@@ -48,12 +51,13 @@ export function AudioImport(props:{onSample:(text:string)=>void;compact?:boolean
     <Show when={props.compact}><button class="btn btn-outline" onClick={open}>Import audio <Arrow/></button></Show>
     <dialog ref={dialog} class="speech-dialog" aria-labelledby="audio-import-title" onCancel={event=>{event.preventDefault();close();}}>
       <div class="dialog-heading"><div><span class="eyebrow">SPEECH WORKSPACE</span><h2 id="audio-import-title">Transcribe audio</h2></div><button class="btn icon-button" aria-label="Close audio import" onClick={close}>×</button></div>
+      <Show when={!aiAccess().available}><p role="status" class="form-message">{aiAccess().message}</p></Show>
       <p>Recognition runs in your browser. The first use downloads the English speech model. Your recording is not uploaded. Review the resulting text for accuracy.</p>
       <Show when={state()==="ready"}><label class="file-picker">Choose audio<input type="file" accept="audio/*,.wav,.mp3,.m4a,.flac,.ogg,.webm" onChange={event=>{setFile(event.currentTarget.files?.[0]??null);setError("");}}/></label><div class="selected-file">{file()?.name||"Choose a recording"}</div></Show>
       <Show when={state()==="processing"}><div role="status">{status()}</div><progress aria-label="Transcription progress"/></Show>
       <Show when={state()==="complete"}><p role="status">Transcription complete. Review the text before using it.</p><div class="sample-excerpt">{text()||"No speech was detected. Try a clearer recording."}</div></Show>
       <Show when={error()}><p role="alert" class="form-message">{error()}</p></Show>
-      <div class="dialog-actions"><button class="btn btn-outline" onClick={close}>{state()==="complete"?"Close":"Cancel"}</button><Show when={state()==="ready"}><button class="btn btn-primary" onClick={start}>Transcribe recording</button></Show><Show when={state()==="complete"&&text()}><button class="btn btn-primary" onClick={()=>{close();props.onSample(text());}}>Open transcript <Arrow/></button></Show></div>
+      <div class="dialog-actions"><button class="btn btn-outline" onClick={close}>{state()==="complete"?"Close":"Cancel"}</button><Show when={state()==="ready"}><button class="btn btn-primary" disabled={!aiAccess().available} onClick={start}>Transcribe recording</button></Show><Show when={state()==="complete"&&text()}><button class="btn btn-primary" onClick={()=>{close();props.onSample(text());}}>Open transcript <Arrow/></button></Show></div>
     </dialog>
   </>;
 }

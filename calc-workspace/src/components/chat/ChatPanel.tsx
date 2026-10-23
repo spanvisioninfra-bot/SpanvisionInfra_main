@@ -7,6 +7,7 @@ import { buildBudgetContext, ACTIE_PROTOCOL, parseActies, applyActies } from '@/
 import { BEGROTEN_KENNIS } from '@/services/assistant/begrotenKennis';
 import { OPENAEC_ENABLED } from '@/services/buildFlags';
 import './ChatPanel.css';
+import { aiChecking, subscribeAiFeature, requireAiFeature } from '../../../../deployment/ai-feature-access.mjs';
 
 import type { ChatMessage } from '@/state/slices/chatSlice';
 
@@ -49,6 +50,8 @@ function describeAiError(err: unknown): string {
 export function ChatPanel() {
   const { t } = useTranslation();
   const [input, setInput] = useState('');
+  const [aiAccess,setAiAccess] = useState(aiChecking);
+  useEffect(()=>subscribeAiFeature(setAiAccess),[]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const toggleChatPanel = useAppStore(s => s.toggleChatPanel);
@@ -107,6 +110,7 @@ Overheads and markups: ${staartItems.map(s => `${s.description} ${s.staartPercen
     chapters: { code: string; description: string; total: number }[],
     bvo: number | undefined,
   ): Promise<string> => {
+    await requireAiFeature();
     const apiKey = localStorage.getItem('ocs-anthropic-key') || '';
 
     // (1) Spanvision Infra-account
@@ -163,7 +167,7 @@ Overheads and markups: ${staartItems.map(s => `${s.description} ${s.staartPercen
 
   const handleSend = useCallback(async () => {
     const text = input.trim();
-    if (!text) return;
+    if (!aiAccess.available || !text) return;
 
     // Alles vastleggen op verzendmoment → correct bij tab-wissel én concurrency
     const docId = activeDocId;
@@ -203,7 +207,7 @@ Overheads and markups: ${staartItems.map(s => `${s.description} ${s.staartPercen
     } catch (err: any) {
       updateChatMessage(docId, pendingId, { content: describeAiError(err), status: 'error' });
     }
-  }, [input, activeDocId, buildContextBlock, computeAnswer, appendChatMessage, updateChatMessage]);
+  }, [input, activeDocId, buildContextBlock, computeAnswer, appendChatMessage, updateChatMessage, aiAccess.available]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -238,7 +242,8 @@ Overheads and markups: ${staartItems.map(s => `${s.description} ${s.staartPercen
         <button className="chat-close" onClick={toggleChatPanel}>✕</button>
       </div>
       <div className="chat-messages">
-        {messages.length === 0 && (
+        {!aiAccess.available && <div className="chat-message chat-assistant" role="status"><div className="chat-bubble">{aiAccess.message}</div></div>}
+        {aiAccess.available && messages.length === 0 && (
           <div className="chat-message chat-assistant">
             <div className="chat-bubble" dangerouslySetInnerHTML={{ __html: renderContent(t('chat.welcome')) }} />
           </div>
@@ -257,7 +262,7 @@ Overheads and markups: ${staartItems.map(s => `${s.description} ${s.staartPercen
         ))}
         <div ref={messagesEndRef} />
       </div>
-      {messages.length === 0 && (
+      {aiAccess.available && messages.length === 0 && (
         <div className="chat-chips">
           {[
             t('chat.chip1'),
@@ -274,6 +279,7 @@ Overheads and markups: ${staartItems.map(s => `${s.description} ${s.staartPercen
         <textarea
           ref={inputRef}
           className="chat-input"
+          disabled={!aiAccess.available}
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -283,7 +289,7 @@ Overheads and markups: ${staartItems.map(s => `${s.description} ${s.staartPercen
         <button
           className="chat-send"
           onClick={handleSend}
-          disabled={!input.trim()}
+          disabled={!aiAccess.available || !input.trim()}
         >
           ➤
         </button>
