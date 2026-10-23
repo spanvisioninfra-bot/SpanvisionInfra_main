@@ -16,7 +16,7 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
 const reports=[];
 try{
   for(const [mode,width] of [['dark',1440],['light',390]]){
-    for(const scenario of ['anonymous','daily_limit','daily_limit_second','expired','allowed','retry','account','pricing','catalog','catalog_guest','catalog_paid','catalog_admin','coming_soon_bim','coming_soon_stl','coming_soon_fem','backend_paid','backend_admin']){
+    for(const scenario of ['anonymous','daily_limit','daily_limit_second','expired','allowed','retry','account','pricing','faq','faq_guest','catalog','catalog_guest','catalog_paid','catalog_admin','coming_soon_bim','coming_soon_stl','coming_soon_fem','backend_paid','backend_admin']){
       const context=await browser.newContext({viewport:{width,height:950},reducedMotion:'reduce'});
       const page=await context.newPage(),errors=[],launches=[],handoffs=[],warmups=[];
       const isAdmin=['catalog_admin','backend_admin'].includes(scenario),isPaid=['catalog_paid','backend_paid'].includes(scenario);
@@ -30,9 +30,9 @@ try{
         if(url.origin!==origin)return route.abort();
         let data;
         if(url.pathname==='/__suite/status')data=manifest;
-        else if(url.pathname==='/api/account/config')data={authAvailable:true,authProvider:'neon',databaseAvailable:true,pricingApproved:true,trialPolicy,plans,regions,checkoutAvailable:{IN:true,US:true,GB:true}};
+        else if(url.pathname==='/api/account/config')data={authAvailable:true,authProvider:'neon',databaseAvailable:true,pricingApproved:scenario!=='faq_guest',trialPolicy,plans,regions,checkoutAvailable:{IN:true,US:true,GB:true}};
         else if(url.pathname.startsWith('/__suite/ready/')){warmups.push(url.pathname);data={status:'ok',app:'spanvision-stl-3d-map-workspace'};}
-        else if(url.pathname==='/api/account/session')data={user:['anonymous','catalog_guest'].includes(scenario)?null:{...user,role:isAdmin?'super_admin':'member'}};
+        else if(url.pathname==='/api/account/session')data={user:['anonymous','catalog_guest','faq_guest'].includes(scenario)?null:{...user,role:isAdmin?'super_admin':'member'}};
         else if(url.pathname==='/api/account/tool-launch'){
           launches.push(route.request().postDataJSON());
           if(scenario==='anonymous')return route.fulfill({status:401,contentType:'application/json',body:JSON.stringify({error:'Please sign in to continue.'})});
@@ -49,7 +49,7 @@ try{
       });
       try{
         const tool=scenario.startsWith('coming_soon_')?scenario.slice('coming_soon_'.length):scenario.startsWith('backend_')?'fem':'frame';
-        const start=scenario.startsWith('catalog')?'/?appearance='+mode+'#modules':scenario==='account'?'/?appearance='+mode+'#account':scenario==='pricing'?'/?appearance='+mode+'#pricing':'/launch.html?tool='+tool+'&appearance='+mode;
+        const start=scenario.startsWith('catalog')||scenario==='faq_guest'?'/?appearance='+mode+'#modules':scenario==='faq'?'/?appearance='+mode+'#faq':scenario==='account'?'/?appearance='+mode+'#account':scenario==='pricing'?'/?appearance='+mode+'#pricing':'/launch.html?tool='+tool+'&appearance='+mode;
         await page.goto(origin+start);
         if(scenario.startsWith('catalog')){
           await page.locator('.module-card').last().waitFor();
@@ -100,6 +100,25 @@ try{
           assert(!handoffs[0].url.includes('ticket'));
           assert.equal(new Set(launches.map(item=>item.requestId)).size,1,'retry keeps its idempotency key');
           if(scenario.startsWith('backend_'))assert.equal(warmups.length,1);
+        }else if(scenario.startsWith('faq')){
+          if(scenario==='faq_guest')await page.locator('header').getByRole('link',{name:'FAQ',exact:true}).click();
+          else await page.reload();
+          const faq=page.locator('.dedicated-faq');
+          await faq.getByRole('heading',{name:'Frequently asked questions.'}).waitFor();
+          assert.equal(await faq.locator('details').count(),5);
+          for(const item of await faq.locator('details').all()){
+            await item.locator('summary').click();await item.locator('p').waitFor({state:'visible'});
+          }
+          await faq.getByText(scenario==='faq_guest'?/Checkout is being configured/:/hosted checkout available for your billing region/).waitFor();
+          const email=page.locator('footer').getByRole('link',{name:'mandeep@spanvisioninfra.com',exact:true});
+          assert.equal(await email.getAttribute('href'),'mailto:mandeep@spanvisioninfra.com');
+          assert.equal(await email.locator('svg').count(),1);
+          // Prevent the OS mail client from opening during the controlled click check.
+          await email.evaluate(link=>link.addEventListener('click',event=>{event.preventDefault();window.__svTestEmailTarget=link.href;},{once:true}));
+          await email.locator('svg').click();
+          assert.equal(await page.evaluate(()=>window.__svTestEmailTarget),'mailto:mandeep@spanvisioninfra.com');
+          assert.equal(launches.length,0);assert.equal(warmups.length,0);
+          await faq.scrollIntoViewIfNeeded();
         }else if(scenario==='account'){
           await page.getByText('Trial day 1 of 2 · 1 launch remaining',{exact:true}).waitFor();
           assert(!(await page.locator('body').innerText()).includes('remain free to use'));
