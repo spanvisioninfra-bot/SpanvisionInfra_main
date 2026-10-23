@@ -19,6 +19,23 @@ import './admin.css';
 const organization=brand.hub.organization||brand.organization;
 function Arrow() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>; }
 function Mark(props) { return <a class="brand-lockup" href="#landing" aria-label={`${organization} home`}><img class="company-mark" src={props.mode==='light'?'/spanvision-mark-light.svg':'/spanvision-mark.svg'} width="44" height="44" alt="" aria-hidden="true"/><span>{organization}<small>Engineering tools</small></span></a>; }
+function TrialNotice() {
+  const [paused,setPaused]=createSignal(false);
+  const [reducedMotion,setReducedMotion]=createSignal(false);
+  const message=`Your two-day trial includes ${trialToolIds.length} tools, with 3 launches shared across them each day. BIM, STL-3D and FEM are coming soon for trial users. AI features are also coming soon; the regular features of trial tools remain available.`;
+  onMount(()=>{
+    const preference=window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update=()=>setReducedMotion(preference.matches);
+    update();preference.addEventListener('change',update);
+    onCleanup(()=>preference.removeEventListener('change',update));
+  });
+  return <aside class="trial-notice" classList={{'is-paused':paused()}} role="note" aria-label="Trial availability">
+    <span class="trial-notice-label"><span aria-hidden="true">✦</span> Trial update</span>
+    <p class="trial-notice-readable">{message}</p>
+    <div id="trial-notice-scroll" class="trial-notice-viewport" aria-hidden="true"><div class="trial-notice-track"><span>{message}</span><span>{message}</span></div></div>
+    <Show when={!reducedMotion()}><button class="trial-notice-control" type="button" aria-controls="trial-notice-scroll" aria-pressed={paused()} aria-label={paused()?'Resume announcement':'Pause announcement'} title={paused()?'Resume announcement':'Pause announcement'} onClick={()=>setPaused(value=>!value)}><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><Show when={paused()} fallback={<path d="M4 3h3v10H4zm5 0h3v10H9z"/>}><path d="m5 3 8 5-8 5z"/></Show></svg></button></Show>
+  </aside>;
+}
 function SocialIcon(props) {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <Show when={props.platform==='instagram'} fallback={<path fill="currentColor" d="M14 22v-8h3l.5-4H14V7.5c0-1 .3-1.5 1.5-1.5H18V2.3A22 22 0 0 0 14.7 2C11.4 2 10 4 10 7v3H7v4h3v8z"/>}>
@@ -208,7 +225,7 @@ function App() {
         <section class="company-tools-page">
           <section class="company-catalog" aria-labelledby="tools-title">
             <div class="catalog-heading" data-sv-reveal><div><span class="eyebrow">SPANVISION INFRA TOOLKIT</span><h1 id="tools-title">All tools <span>{brand.modules.length}</span></h1><p>Choose a tool for your project, wherever you work. Each workspace opens in a new tab.</p></div><button class="button button-outline" onClick={refreshStatus}>Check availability<Arrow/></button></div>
-            <p class="catalog-note">Your two-day trial includes {trialToolIds.length} tools, with 3 launches shared across them each day. BIM, STL-3D and FEM are coming soon for trial users. AI features are also coming soon; the regular features of trial tools remain available.</p>
+            <TrialNotice/>
             <Modules/>
             <p class="catalog-note">{localPreview?'Files and saved preferences stay with each workspace.':'Browser drafts stay with each workspace. BIM and map processing uses temporary cloud storage; download your results to keep them.'}</p>
           </section>
