@@ -91,6 +91,7 @@ html[data-sv-mode="light"] .auth-form-wrap input,html[data-sv-mode="light"] .acc
 .footer-social a:focus-visible{outline:2px solid var(--sv-focus);outline-offset:3px}
 .footer-social svg{flex-shrink:0}
 .preview-footer>span{color:var(--sv-muted)}
+.preview-footer>.footer-contact{display:grid;gap:4px;min-width:0;font-size:12px;line-height:1.6}.footer-contact>span{color:var(--sv-muted);font-size:10px}.preview-footer .footer-contact a{color:var(--sv-text);overflow-wrap:anywhere;text-underline-offset:3px}.preview-footer .footer-contact a:hover{text-decoration:underline}.footer-contact a:focus-visible{outline:2px solid var(--sv-focus);outline-offset:4px;border-radius:2px}
 @media(max-width:600px){.preview-footer>.footer-social{flex-basis:100%;justify-content:flex-start}}
 
 .company-intro{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
