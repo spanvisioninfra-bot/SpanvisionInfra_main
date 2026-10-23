@@ -1,7 +1,7 @@
 import {createHmac,timingSafeEqual} from 'node:crypto';
+import {toolIds} from './catalog.mjs';
 
-export const toolIds=Object.freeze(['cad','cad2d','bim','pdf','ifc','calc','planner','fem','frame','calculation','geo','speech','stl','field','pointcloud','pile']);
-export const trialPolicy=Object.freeze({days:2,hours:48,dailyLimit:3,scope:'all_tools',starts:'first_launch',reset:'every_24_hours_from_first_launch'});
+export {toolIds,trialPolicy} from './catalog.mjs';
 const validId=value=>typeof value==='string'&&/^[a-zA-Z0-9_-]{1,128}$/.test(value);
 const signature=(value,secret)=>createHmac('sha256',secret).update('spanvision-tool-access-v1\0'+value).digest();
 

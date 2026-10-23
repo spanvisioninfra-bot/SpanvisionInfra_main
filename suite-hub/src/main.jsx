@@ -4,7 +4,8 @@ import brand from './brand.json';
 import { readLocalProfile, saveLocalProfile } from './local-profile';
 import MarketingHome, {Pricing,FAQ} from './MarketingHome';
 import {AuthGateway,OnlineAccount} from './AccountGateway';
-import {createAccountState} from './account-client';
+import {createAccountState,accountRequest} from './account-client';
+import {trialComingSoonTools,trialComingSoonMessage,trialToolIds} from '../../commerce/catalog.mjs';
 import AdminPanel from './AdminPanel';
 import ToolIcon from './ToolIcon';
 import release from '../../branding/release.json';
@@ -47,6 +48,8 @@ function App() {
     if(favicon)favicon.href=mode()==='light'?'/spanvision-mark-light.svg':'/spanvision-mark.svg';
   });
   const [status,setStatus]=createSignal({});
+  const [toolPlan,setToolPlan]=createSignal(null);
+  let planRequest=0;
   const [name,setName]=createSignal(readLocalProfile().name);
   const [error,setError]=createSignal('');
   const [success,setSuccess]=createSignal('');
@@ -61,6 +64,19 @@ function App() {
   const validScreens=['landing','modules','pricing','faq','login','signup','forgot','verify','reset','account','profile','admin'];
   const localPreview=isLocalPreview(location.hostname);
   const openUrl=module=>toolLaunchUrl(module,status()[module.id],mode(),location);
+  const comingSoon=module=>!localPreview&&trialComingSoonTools.includes(module.id)&&account.user()?.role!=='super_admin'&&!['studio','team'].includes(toolPlan()?.plan);
+  async function refreshToolPlan(){
+    const request=++planRequest,user=account.user();
+    if(!user){setToolPlan(null);return;}
+    try{
+      const result=await accountRequest('account/tool-status');
+      if(request===planRequest&&account.user()?.id===user.id)setToolPlan(result.access);
+    }catch{if(request===planRequest)setToolPlan(null);}
+  }
+  createEffect(()=>{
+    account.user();screen();setToolPlan(null);
+    void refreshToolPlan();
+  });
   function clearScan() { scanController?.abort(); scanController=undefined; }
   function closeScan() { clearScan(); modal.close(); previousFocus?.focus(); }
   function openScan(event) { previousFocus=event.currentTarget;clearScan();setScanState('ready');setScanError('');setProgress(0);modal.showModal(); }
@@ -93,6 +109,7 @@ function App() {
     else if(!event.shiftKey&&(document.activeElement===last||!modal.contains(document.activeElement))){event.preventDefault();first.focus();}
   }
   async function refreshStatus() {
+    void refreshToolPlan();
     requestController?.abort();requestController=new AbortController();
     try {
       const response=await fetch('/__suite/status',{cache:'no-store',signal:requestController.signal});
@@ -164,15 +181,15 @@ function App() {
   }
   function ToolLink(props) {
     const state=()=>status()[props.module.id];
-    return <Show when={state()?.available} fallback={<button class={`button button-outline ${props.class||''}`} disabled title={state()?.message||'Checking preview availability'}>Unavailable <Arrow/></button>}>
+    return <Show when={!comingSoon(props.module)} fallback={<button class={`button button-outline ${props.class||''}`} disabled title={trialComingSoonMessage}>Coming soon</button>}><Show when={state()?.available} fallback={<button class={`button button-outline ${props.class||''}`} disabled title={state()?.message||'Checking preview availability'}>Unavailable <Arrow/></button>}>
       <a class={`button ${props.class||'button-light'}`} href={openUrl(props.module)} target="_blank" rel="noopener noreferrer" aria-label={`Open ${props.module.label} in a new tab`}>Open {props.label||({planner:'Planning',fem:'FEM',frame:'Frame design',calculation:'Calculations'})[props.module.id]||props.module.label}<Arrow/></a>
-    </Show>;
+    </Show></Show>;
   }
   function Modules() {
     return <div class="module-grid"><For each={brand.modules}>{module=><article class="module-card" data-module={module.id}>
       <div class="module-top"><span class="tool-glyph"><ToolIcon id={module.id}/></span><span class="module-release">v{release.version}</span></div>
       <h3>{module.label}</h3><p>{module.description}</p>
-      <div class="module-bottom"><ToolLink module={module}/><small>{status()[module.id]?.available?'Opens in a new tab':status()[module.id]?.message||'Checking the local preview…'}</small></div>
+      <div class="module-bottom"><ToolLink module={module}/><small>{comingSoon(module)?'Not included in the trial.':status()[module.id]?.available?'Opens in a new tab':status()[module.id]?.message||'Checking the local preview…'}</small></div>
     </article>}</For></div>;
   }
   return <>
@@ -189,6 +206,7 @@ function App() {
         <section class="company-tools-page">
           <section class="company-catalog" aria-labelledby="tools-title">
             <div class="catalog-heading" data-sv-reveal><div><span class="eyebrow">SPANVISION INFRA TOOLKIT</span><h1 id="tools-title">All tools <span>{brand.modules.length}</span></h1><p>Choose a tool for your project, wherever you work. Each workspace opens in a new tab.</p></div><button class="button button-outline" onClick={refreshStatus}>Check availability<Arrow/></button></div>
+            <p class="catalog-note">Your two-day trial includes {trialToolIds.length} tools, with 3 launches shared across them each day. BIM, STL-3D and FEM are coming soon for trial users.</p>
             <Modules/>
             <p class="catalog-note">{localPreview?'Files and saved preferences stay with each workspace.':'Browser drafts stay with each workspace. BIM and map processing uses temporary cloud storage; download your results to keep them.'}</p>
           </section>

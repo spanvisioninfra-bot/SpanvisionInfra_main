@@ -1,5 +1,5 @@
 import {createCipheriv,createDecipheriv,createHash,createHmac,randomBytes,timingSafeEqual} from 'node:crypto';
-import {plans,regions,selection} from './catalog.mjs';
+import {plans,regions,selection,trialComingSoonTools,trialComingSoonMessage} from './catalog.mjs';
 import {publicUser,planAccess,SUPER_ADMIN_EMAIL,signInDestination} from './access.mjs';
 import {neonAuthUrl,neonSelected,neonAuth,neonRequest} from './neon-auth.mjs';
 import {databaseConfigured,neonStore,bindNeonStore} from './neon-store.mjs';
@@ -165,6 +165,7 @@ async function verifyToolAccess(body,env,fetcher){
   const grant=rows[0];
   if(!grant||grant.tool_id!==ticket.tool||!(Date.parse(grant.expires_at)>Date.now()))fail(402,'Your tool session has ended. Open the tool again from your account.');
   if(grant.access_source==='trial'){
+    if(trialComingSoonTools.includes(ticket.tool))fail(402,trialComingSoonMessage);
     const trial=await db(env,'rpc/tool_trial_status',fetcher,{method:'POST',body:JSON.stringify({account_id:ticket.sub})});
     if(trial.status==='expired')fail(402,'Your two-day trial has ended. Choose Studio or Team to continue.');
   }else{
@@ -367,6 +368,7 @@ export function createHandler({env=process.env,fetcher=fetch,store}={}){
           if(current.session.recovery||!current.user.emailVerified)fail(403,'Verify your email and finish signing in before opening tools.');
           if(!toolIds.includes(body.tool)||!uuid(body.requestId))fail(400,'Choose a valid tool and launch request.');
           const access=await toolAccess(current.user,env,fetcher);
+          if(!['studio','team'].includes(access.plan)&&trialComingSoonTools.includes(body.tool))fail(403,trialComingSoonMessage);
           const grant=await db(env,'rpc/claim_tool_launch',fetcher,{method:'POST',body:JSON.stringify({account_id:current.user.id,selected_tool:body.tool,launch_request:body.requestId,
             access_source:['studio','team'].includes(access.plan)?access.source:'trial',access_expires:access.expiresAt})});
           result={...grant,policy:trialPolicy,...(grant.allowed?{ticket:issueToolTicket(grant,current.user,body.tool,env.SESSION_SECRET)}:{})};

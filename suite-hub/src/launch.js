@@ -1,6 +1,7 @@
 import brand from './brand.json';
 import { isLocalPreview, moduleUrl } from './module-url';
 import { waitForBackend } from '../../deployment/service-readiness.mjs';
+import {trialComingSoonTools,trialComingSoonMessage} from '../../commerce/catalog.mjs';
 import './launch.css';
 
 const id = new URL(location.href).searchParams.get('tool');
@@ -14,12 +15,21 @@ const accountLink=document.getElementById('splash-account');
 const plansLink=document.getElementById('splash-plans');
 accountLink.href='/?returnTool='+encodeURIComponent(id||'')+'#login';
 
+async function checkTrialAvailability(signal){
+  if(!trialComingSoonTools.includes(id))return;
+  const response=await fetch('/api/account/tool-status',{credentials:'same-origin',cache:'no-store',signal});
+  const usage=await response.json();
+  if(response.status===401)accountLink.hidden=false;
+  if(response.status===401||response.ok&&!['studio','team'].includes(usage.access?.plan))throw Object.assign(new Error(trialComingSoonMessage),{comingSoon:true});
+  if(!response.ok)throw new Error(usage.error||'Tool access could not be checked. Please try again.');
+}
+
 async function authorizeTool(signal){
   const response=await fetch('/api/account/tool-launch',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({tool:id,requestId:launchRequestId}),signal});
   const grant=await response.json();
   if(!response.ok){
     if(response.status===401)accountLink.hidden=false;
-    throw new Error(grant.error||'Tool access could not be checked. Please try again.');
+    throw Object.assign(new Error(grant.error||'Tool access could not be checked. Please try again.'),{comingSoon:response.status===403&&grant.error===trialComingSoonMessage});
   }
   if(!grant.allowed){
     plansLink.hidden=false;
@@ -88,6 +98,10 @@ async function openWorkspace() {
     if (!state?.available) throw new Error('This workspace is currently unavailable. Please try again shortly.');
     const url = moduleUrl(module, state, window.SpanvisionAppearance.getMode(), location.hostname);
     if (!url || (!isLocalPreview(location.hostname) && new URL(url).protocol !== 'https:')) throw new Error('This workspace has no valid deployment address.');
+    if(!isLocalPreview(location.hostname)&&trialComingSoonTools.includes(id)){
+      stage='access';clearTimeout(timeout);timeout=setTimeout(()=>request.abort(),30000);
+      await checkTrialAvailability(request.signal);
+    }
     if (!isLocalPreview(location.hostname) && ['bim', 'stl', 'fem'].includes(id)) {
       stage = 'startup';
       clearTimeout(timeout);
@@ -109,7 +123,7 @@ async function openWorkspace() {
     splash.setAttribute('aria-busy', 'false');
     status.textContent = request.signal.aborted ? (stage === 'startup' ? 'This workspace is taking longer to start. Please try again shortly.' : 'Tool availability took too long to respond. Please try again.') : error.message;
     actions.hidden = false;
-    document.getElementById('splash-retry').hidden = !module;
+    document.getElementById('splash-retry').hidden = !module||error.comingSoon===true;
   } finally {
     clearTimeout(timeout);
   }
