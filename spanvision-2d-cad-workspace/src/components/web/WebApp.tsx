@@ -13,9 +13,10 @@ import '../../styles/web.css';
 
 const mobile = isMobileViewer();
 const Editor = lazy(() => mobile ? import('../tablet/TabletApp') : import('../../App'));
+const isWorkspaceRoute = () => location.pathname.replace(/\/+$/, '') === '/workspace' || new URL(location.href).searchParams.get('launch') === 'workspace';
 
 export default function WebApp() {
-  const [directLaunch, setDirectLaunch] = useState(() => new URL(location.href).searchParams.get('launch') === 'workspace');
+  const [directLaunch, setDirectLaunch] = useState(isWorkspaceRoute);
   const [started, setStarted] = useState(false);
   const [drafts, setDrafts] = useState<BrowserDraft[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +24,16 @@ export default function WebApp() {
   const [status, setStatus] = useState('Drafts stay on this device');
   const [notice, setNotice] = useState<{ message: string; error: boolean } | null>(null);
   const { handleOpen, handleNew } = useFileOperations();
+
+  useEffect(() => {
+    const route = () => { const workspace = isWorkspaceRoute(); if (!workspace) setDirectLaunch(false); setStarted(workspace); };
+    window.addEventListener('popstate', route);
+    return () => window.removeEventListener('popstate', route);
+  }, []);
+  useEffect(() => {
+    if (!started) return;
+    if (!isWorkspaceRoute()) history.pushState(null, '', '/workspace' + location.search);
+  }, [started]);
 
   useEffect(() => {
     const onStart = async () => {
@@ -33,6 +44,7 @@ export default function WebApp() {
       } catch { notifyWeb('Could not save the recovery draft. Download your project to keep a copy.', true); }
       setDirectLaunch(false);
       setStarted(false);
+      if (location.pathname !== '/') history.pushState(null, '', '/' + location.search);
     };
     window.addEventListener('spanvision-start', onStart);
     return () => window.removeEventListener('spanvision-start', onStart);

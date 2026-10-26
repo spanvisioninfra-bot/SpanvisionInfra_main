@@ -15,12 +15,18 @@ export async function installWorkspaceUi(directory,{entries=['index.html'],optio
     let html;
     try{html=await fs.readFile(file,'utf8');}
     catch(error){if(error.code==='ENOENT'&&optionalEntries.includes(entry))continue;throw error;}
-    html=html.replace(/<!-- Spanvision workspace UI -->[\s\S]*?<!-- \/Spanvision workspace UI -->\r?\n?/g,'');
+    html=html.replace(/<!-- Spanvision workspace UI -->[\s\S]*?<!-- \/Spanvision workspace UI -->\r?\n?/g,'')
+      .replace(/\r?\n?<!-- Spanvision workspace routing -->[\s\S]*?<!-- \/Spanvision workspace routing -->\r?\n?/g,'');
     if(!/<\/head>/i.test(html))throw new Error('Browser entry has no head element.');
     const id=html.match(/\bdata-module=["']([^"']+)["']/)?.[1];
     const tool=brand.modules.find(module=>module.id===id);
     const identity=tool?JSON.stringify({id:tool.id,label:tool.label,version:release.version,icon:toolIcons[tool.id]}).replaceAll('<','\\u003c'):null;
     if(tool&&!toolIcons[tool.id])throw new Error(`Missing landing-page icon for ${tool.id}`);
+    if(tool){
+      const routeVersion=createHash('sha256').update(await fs.readFile(path.join(assets,'workspace-route.js'))).digest('hex').slice(0,12);
+      const base=tool.id==='cad'?'<base href="/app/">\n':'';
+      html=html.replace(/<head\b[^>]*>/i,head=>head+`\n<!-- Spanvision workspace routing -->\n${base}<script src="${prefix}workspace-route.js?v=${routeVersion}" data-tool="${tool.id}"></script>\n<!-- /Spanvision workspace routing -->\n`);
+    }
     const sessionVersion=createHash('sha256').update(await fs.readFile(path.join(assets,'tool-session.js'))).digest('hex').slice(0,12);
     const markup=`<!-- Spanvision workspace UI -->
 <link rel="preload" href="${prefix}Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>

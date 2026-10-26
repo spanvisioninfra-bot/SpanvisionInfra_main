@@ -1,7 +1,7 @@
 (() => {
   if (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) return;
   let checking=false,locked=false,expiryTimer;
-  function lock(message,href='https://www.spanvisioninfra.com/#account') {
+  function lock(message,href='https://www.spanvisioninfra.com/account') {
     if(locked)return;
     locked=true;
     const panel=document.createElement('div');

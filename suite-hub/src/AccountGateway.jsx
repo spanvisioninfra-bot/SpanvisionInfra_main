@@ -49,7 +49,7 @@ export function AuthGateway(props){
       const adminDestination=result?.redirectTo==='/admin'||result?.redirectTo==='#admin'||!result?.redirectTo&&props.account.user()?.role==='super_admin';
       const returnTool=new URL(location.href).searchParams.get('returnTool');
       if(!adminDestination&&brand.modules.some(tool=>tool.id===returnTool)){
-        const launch=new URL('/launch.html',location.origin);launch.searchParams.set('tool',returnTool);launch.searchParams.set('appearance',props.mode==='light'?'light':'dark');location.assign(launch.href);return;
+        const launch=new URL('/launch/'+returnTool,location.origin);location.assign(launch.href);return;
       }
       navigate(adminDestination?'admin':'account',{replace:true});
     }catch(error){setError(error.message);}finally{setBusy(false);}

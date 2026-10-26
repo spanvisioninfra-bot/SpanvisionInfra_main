@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 from http.cookies import SimpleCookie
 from urllib.error import HTTPError, URLError
-from urllib.parse import parse_qs, urlencode, urlsplit
+from urllib.parse import parse_qs, urlsplit
 from urllib.request import Request, HTTPRedirectHandler, build_opener
 
 from starlette.responses import JSONResponse, RedirectResponse, Response
@@ -61,8 +61,7 @@ class ToolAccess:
         if scope['method'] in ('GET', 'HEAD') and path in ('/health', '/api/ping'):
             return await self.app(scope, receive, send)
         headers = dict(scope.get('headers', []))
-        query = parse_qs(scope.get('query_string', b'').decode('utf-8', errors='replace'))
-        launch = self.origin + '/launch.html?' + urlencode({'tool': self.tool, 'appearance': 'light' if query.get('appearance') == ['light'] else 'dark'})
+        launch = self.origin + '/launch/' + self.tool
         if path == '/__spanvision/access':
             if scope['method'] != 'POST' or headers.get(b'origin', b'').decode() != self.origin or not headers.get(b'content-type', b'').startswith(b'application/x-www-form-urlencoded'):
                 return await JSONResponse({'error': 'Open this tool from your account.'}, 403, headers=self.headers)(scope, receive, send)
@@ -87,6 +86,9 @@ class ToolAccess:
             expiry = datetime.fromisoformat(access['expiresAt'].replace('Z', '+00:00')).timestamp()
             response = RedirectResponse(target, status_code=303, headers=self.headers)
             response.set_cookie(COOKIE, ticket, max_age=max(0, int(expiry-time.time())), path='/', secure=True, httponly=True, samesite='lax')
+            appearance = fields.get('appearance', [''])[0]
+            if appearance in ('light', 'dark'):
+                response.set_cookie('sv-appearance', appearance, max_age=31536000, path='/', secure=True, samesite='lax')
             return await response(scope, receive, send)
         cookie = SimpleCookie()
         try:

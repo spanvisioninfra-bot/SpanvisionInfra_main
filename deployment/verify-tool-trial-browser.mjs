@@ -47,7 +47,7 @@ try{
         else if(url.pathname==='/api/account/tool-status')data={policy:trialPolicy,access:{plan:isAdmin?'team':isPaid?'studio':'explorer'},trial:{status:'available',remaining:1,day:1,expiresAt:new Date(Date.now()+3600000).toISOString()}};
         else if(url.pathname.startsWith('/api/'))throw new Error('Unexpected test endpoint: '+url.pathname);
         if(data)return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)});
-        const pathname=url.pathname==='/'||!path.extname(url.pathname)?'/index.html':decodeURIComponent(url.pathname),file=path.resolve(dist,'.'+pathname);
+        const pathname=url.pathname.startsWith('/launch/')?'/launch.html':url.pathname==='/'||!path.extname(url.pathname)?'/index.html':decodeURIComponent(url.pathname),file=path.resolve(dist,'.'+pathname);
         if(!file.startsWith(dist+path.sep))return route.fulfill({status:403,body:''});
         try{return route.fulfill({status:200,contentType:mime[path.extname(file)]||'application/octet-stream',body:await fs.readFile(file)});}
         catch{return route.fulfill({status:404,body:'Not found'});}
@@ -101,7 +101,8 @@ try{
           await page.getByRole('heading',{name:'Tool launched'}).waitFor();
           assert.equal(handoffs.length,1);assert.equal(handoffs[0].method,'POST');
           assert.equal(handoffs[0].body.get('ticket'),'isolated-browser-ticket');
-          assert(handoffs[0].body.get('next').includes('appearance='+mode));
+          assert.equal(handoffs[0].body.get('next'),'/workspace');
+          assert.equal(handoffs[0].body.get('appearance'),mode);
           assert(!handoffs[0].url.includes('ticket'));
           assert.equal(new Set(launches.map(item=>item.requestId)).size,1,'retry keeps its idempotency key');
           if(scenario.startsWith('backend_'))assert.equal(warmups.length,1);

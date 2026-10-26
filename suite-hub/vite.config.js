@@ -9,6 +9,8 @@ import {installWorkspaceUi} from '../deployment/browser-ui.mjs';
 const require = createRequire(import.meta.url);
 const core = path.dirname(require.resolve('tesseract.js-core/package.json'));
 const files = fs.readdirSync(core).filter(name => /^tesseract-core.*-lstm\.wasm(?:\.js)?$/.test(name));
+const launchRoutes={name:'clean-tool-launch-routes',configureServer(server){server.middlewares.use(rewriteLaunch);},configurePreviewServer(server){server.middlewares.use(rewriteLaunch);}};
+function rewriteLaunch(request,response,next){if(/^\/launch\/[a-z0-9-]+\/?(?:\?|$)/.test(request.url||''))request.url='/launch.html'+(request.url.includes('?')?'?'+request.url.split('?').slice(1).join('?'):'');next();}
 const ocrAssets = {
   name: 'local-ocr-engine',
   configureServer(server) {
@@ -27,4 +29,4 @@ const ocrAssets = {
   },
 };
 const accounts={name:'spanvision-accounts',configureServer(server){const handler=createHandler({env:readLocalEnvironment()});server.middlewares.use((request,response,next)=>/^\/api\/(account|billing|admin)\//.test(request.url||'')?handler(request,response):next());},async closeBundle(){await installWorkspaceUi(path.resolve('dist'),{optionalEntries:['launch.html']});}};
-export default defineConfig({ plugins: [solid(), ocrAssets,accounts], build: { rollupOptions: { input: { main: path.resolve('index.html'), launch: path.resolve('launch.html') } } }, server: { host: '127.0.0.1', port: 4230, strictPort: true } });
+export default defineConfig({ plugins: [solid(), ocrAssets,accounts,launchRoutes], build: { rollupOptions: { input: { main: path.resolve('index.html'), launch: path.resolve('launch.html') } } }, server: { host: '127.0.0.1', port: 4230, strictPort: true } });

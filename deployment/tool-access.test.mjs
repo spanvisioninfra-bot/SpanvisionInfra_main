@@ -17,7 +17,7 @@ test('direct pages, JS/WASM assets and backend requests require access',async()=
     assert.equal(response.headers.get('x-middleware-next'),null);
   }
   const redirect=await guard(request('/app/',{headers:{Accept:'text/html'}}),{tool:'cad',env});
-  assert.equal(redirect.status,303);assert(redirect.headers.get('location').startsWith(origin+'/launch.html?tool=cad'));
+  assert.equal(redirect.status,303);assert.equal(redirect.headers.get('location'),origin+'/launch/cad');
 });
 
 test('form handoff sets an HttpOnly host cookie and only redirects within the tool',async()=>{
@@ -43,6 +43,18 @@ test('invalid, expired and unavailable grants fail closed; heartbeat is private'
   assert.equal(failure.status,503);
   const invalid=await verify('wrong-audience','pdf',origin,allowed);assert.equal(invalid.allowed,false);
   const expired=await verify('expired','cad',origin,async()=>Response.json({allowed:true,tool:'cad',expiresAt:'2000-01-01'}));assert.equal(expired.allowed,false);
+});
+
+test('clean workspace handoff transfers appearance separately without weakening authorization',async()=>{
+  for(const appearance of ['light','dark','injected; HttpOnly']){
+    const response=await guard(request('/__spanvision/access',{method:'POST',headers:{Origin:origin,'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({ticket:'appearance-test-'+appearance,next:'/workspace',appearance})}),{tool:'cad',env,fetcher:allowed});
+    assert.equal(response.status,303);assert.equal(response.headers.get('location'),'https://tool.example/workspace');
+    const cookies=response.headers.getSetCookie();
+    assert(cookies.some(cookie=>cookie.startsWith('__Host-sv-tool=')&&cookie.includes('HttpOnly')));
+    assert.equal(cookies.some(cookie=>cookie.startsWith('sv-appearance=')),appearance==='light'||appearance==='dark');
+  }
+  const denied=await guard(request('/workspace',{headers:{Accept:'text/html'}}),{tool:'cad',env});
+  assert.equal(denied.status,303);assert.equal(denied.headers.get('location'),origin+'/launch/cad');
 });
 
 test('session heartbeat preserves centrally verified AI policy independently of tool access',async()=>{

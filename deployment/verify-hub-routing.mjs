@@ -71,7 +71,7 @@ try{
         data={allowed:true,ticket:'isolated-routing-ticket',expiresAt:new Date(Date.now()+60000).toISOString()};
       }else if(url.pathname.startsWith('/api/'))throw new Error('Unexpected test API: '+url.pathname);
       if(data)return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)});
-      const pathname=url.pathname==='/'||!path.extname(url.pathname)?'/index.html':decodeURIComponent(url.pathname);
+      const pathname=url.pathname.startsWith('/launch/')?'/launch.html':url.pathname==='/'||!path.extname(url.pathname)?'/index.html':decodeURIComponent(url.pathname);
       const file=path.resolve(dist,'.'+pathname);
       if(!file.startsWith(dist+path.sep))return route.fulfill({status:403,body:''});
       try{return route.fulfill({status:200,contentType:mime[path.extname(file)]||'application/octet-stream',body:await fs.readFile(file)});}

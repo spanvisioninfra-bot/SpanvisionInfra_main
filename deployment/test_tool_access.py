@@ -39,7 +39,7 @@ class ToolAccessTests(unittest.TestCase):
                 self.assertEqual(client.get('/health').status_code, 200)
                 redirect = client.get('/', headers={'Accept': 'text/html'}, follow_redirects=False)
                 self.assertEqual(redirect.status_code, 303)
-                self.assertIn('tool='+tool, redirect.headers['location'])
+                self.assertEqual('https://www.spanvisioninfra.com/launch/'+tool, redirect.headers['location'])
 
     def test_verified_form_handoff_session_and_identity(self):
         with TestClient(gateway(), base_url='https://tool.example') as client:
@@ -70,6 +70,17 @@ class ToolAccessTests(unittest.TestCase):
             self.assertEqual(client.post('/api/data').json(), {'private': 'account-a'})
             client.cookies.set('__Host-sv-tool', 'account-b')
             self.assertEqual(client.get('/api/data').json(), {})
+
+    def test_clean_workspace_handoff_keeps_access_private_and_appearance_separate(self):
+        for tool in ('bim', 'stl'):
+            with TestClient(gateway(tool), base_url='https://tool.example') as client:
+                denied = client.get('/workspace', headers={'Accept': 'text/html'}, follow_redirects=False)
+                self.assertEqual(denied.headers['location'], 'https://www.spanvisioninfra.com/launch/'+tool)
+                response = client.post('/__spanvision/access', data={'ticket': 'account-a', 'next': '/workspace', 'appearance': 'light'}, headers={'Origin': 'https://www.spanvisioninfra.com'}, follow_redirects=False)
+                self.assertEqual(response.status_code, 303)
+                self.assertEqual(response.headers['location'], '/workspace')
+                self.assertEqual(client.cookies.get('sv-appearance'), 'light')
+                self.assertTrue(any('__Host-sv-tool=' in cookie and 'HttpOnly' in cookie for cookie in response.headers.get_list('set-cookie')))
 
 
 if __name__ == '__main__':

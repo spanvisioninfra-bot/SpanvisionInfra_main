@@ -27,8 +27,7 @@ export function safeNext(value){
 }
 export async function guard(request,{tool=toolId,env=process.env,fetcher=fetch}={}){
   const url=new URL(request.url),origin=accountOrigin(env);
-  const launch=new URL('/launch.html',origin);launch.searchParams.set('tool',tool);
-  launch.searchParams.set('appearance',url.searchParams.get('appearance')==='light'?'light':'dark');
+  const launch=new URL('/launch/'+encodeURIComponent(tool),origin);
   try{
     if(url.pathname==='/__spanvision/access'){
       if(request.method!=='POST'||request.headers.get('origin')!==origin||!request.headers.get('content-type')?.startsWith('application/x-www-form-urlencoded'))return Response.json({error:'Open this tool from your account.'},{status:403,headers});
@@ -38,7 +37,9 @@ export async function guard(request,{tool=toolId,env=process.env,fetcher=fetch}=
       const access=await verify(ticket,tool,origin,fetcher);
       if(!access.allowed)return Response.json({error:'Your tool session could not be opened. Return to your account.',launchUrl:launch.href},{status:access.status,headers});
       const maxAge=Math.max(0,Math.floor((Date.parse(access.expiresAt)-Date.now())/1000));
-      return new Response(null,{status:303,headers:{...headers,Location:new URL(safeNext(body.get('next')),url.origin).href,'Set-Cookie':`${cookieName}=${ticket}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`}});
+      const response=new Response(null,{status:303,headers:{...headers,Location:new URL(safeNext(body.get('next')),url.origin).href,'Set-Cookie':`${cookieName}=${ticket}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`}});
+      if(['light','dark'].includes(body.get('appearance')))response.headers.append('Set-Cookie',`sv-appearance=${body.get('appearance')}; Path=/; Secure; SameSite=Lax; Max-Age=31536000`);
+      return response;
     }
     const ticket=(request.headers.get('cookie')||'').split(';').map(part=>part.trim()).find(part=>part.startsWith(cookieName+'='))?.slice(cookieName.length+1);
     const access=await verify(ticket,tool,origin,fetcher);

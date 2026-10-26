@@ -17,7 +17,7 @@ export default function Sidebar(props: SidebarProps) {
   const { t } = useI18n();
   return (
     <aside class="sidebar" id="speech-sidebar" aria-label="Workspace navigation">
-      <nav class="sidebar-nav"><a class="sidebar-brand" href="#landing"><img src="/sw-mark.svg" alt={brand.mark}/><span>{brand.product}<small>{brand.organization}</small></span></a><a class="sidebar-item" href="#suggestions" aria-label="Speech suggestions"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/></svg><span>Suggestions</span></a>
+      <nav class="sidebar-nav"><a class="sidebar-brand" href="/"><img src="/sw-mark.svg" alt={brand.mark}/><span>{brand.product}<small>{brand.organization}</small></span></a><a class="sidebar-item" href="/suggestions" aria-label="Speech suggestions"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/></svg><span>Suggestions</span></a>
         <button
           class={`sidebar-item ${props.currentView === "home" ? "active" : ""}`} aria-label={t("sidebar.speech")}
           onClick={() => props.onViewChange("home")}

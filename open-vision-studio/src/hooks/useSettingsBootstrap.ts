@@ -59,7 +59,7 @@ export function useSettingsBootstrap(recoveryResolved: boolean, recovery: Recove
     if (recovery !== null) return; // RecoveryDialog is zichtbaar — welkomstdialoog wacht
     welcomeChecked.current = true;
     // Vanuit de suite direct naar de werkruimte; herstel blijft beschikbaar.
-    if (new URL(window.location.href).searchParams.get('launch') === 'workspace') return;
+    if (window.location.pathname.replace(/\/+$/, '') === '/workspace' || new URL(window.location.href).searchParams.get('launch') === 'workspace') return;
 
     void loadWelcomeSeen().then(seen => {
       if (!seen) setUI({ showWelcomeDialog: true });

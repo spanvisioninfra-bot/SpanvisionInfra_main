@@ -1,6 +1,6 @@
 // Open suite launches through CAD's shared GUI/web control API.
 window.SpanvisionCADLaunch = async function () {
-  if (new URL(location.href).searchParams.get('launch') !== 'workspace') return;
+  if (location.pathname.replace(/\/+$/, '') !== '/workspace' && new URL(location.href).searchParams.get('launch') !== 'workspace') return;
   const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
   const deadline = Date.now() + 20000;
   while (!window.wasmBindings && Date.now() < deadline) await sleep(50);

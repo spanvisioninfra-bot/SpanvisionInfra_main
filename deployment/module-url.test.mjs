@@ -5,8 +5,8 @@ const tool = { port: 4220, path: '/' };
 test('local preview continues to open the local tool in the chosen theme', () => {
   assert.equal(moduleUrl(tool, {}, 'light', '127.0.0.1'), 'http://127.0.0.1:4220/?appearance=light');
 });
-test('production uses its deployment URL and preserves other query parameters', () => {
-  assert.equal(moduleUrl(tool, { url: 'https://tool.vercel.app/draw?project=one' }, 'dark', 'spanvision-infra.vercel.app'), 'https://tool.vercel.app/draw?project=one&appearance=dark');
+test('production preserves document links without adding technical launch parameters', () => {
+  assert.equal(moduleUrl(tool, { url: 'https://tool.vercel.app/draw?project=one' }, 'dark', 'spanvision-infra.vercel.app'), 'https://tool.vercel.app/draw?project=one');
 });
 test('production never opens a visitors localhost or insecure/missing deployments', () => {
   for (const url of [undefined, 'not a URL', 'http://tool.example/', 'https://127.0.0.1:4220/']) {
@@ -16,22 +16,20 @@ test('production never opens a visitors localhost or insecure/missing deployment
 
 test('suite launch enters BIM and Speech workspaces instead of their landing pages', () => {
   const bim = new URL(moduleUrl({id:'bim'}, {url:'https://spanvision-bim.onrender.com/home'}, 'light', 'spanvision-infra.vercel.app'));
-  assert.equal(bim.pathname, '/viewer');
-  assert.equal(bim.searchParams.get('launch'), 'workspace');
-  assert.equal(bim.searchParams.get('appearance'), 'light');
+  assert.equal(bim.pathname, '/workspace');
+  assert.equal(bim.search, '');
   const speech = new URL(moduleUrl({id:'speech'}, {url:'https://spanvision-speech.vercel.app/'}, 'dark', 'spanvision-infra.vercel.app'));
-  assert.equal(speech.hash, '#workspace');
+  assert.equal(speech.pathname, '/workspace');assert.equal(speech.hash, '');
   const deepLink = new URL(moduleUrl({id:'speech'}, {url:'https://spanvision-speech.vercel.app/#transcribe'}, 'light', 'spanvision-infra.vercel.app'));
-  assert.equal(deepLink.hash, '#transcribe');
+  assert.equal(deepLink.pathname, '/transcribe');assert.equal(deepLink.hash, '');
 });
 
 test('tool cards open the splash on the hub origin, without accepting a redirect URL', () => {
   const location = {origin:'https://spanvision-infra.vercel.app',hostname:'spanvision-infra.vercel.app'};
   const url = new URL(toolLaunchUrl({id:'cad2d'}, {url:'https://spanvision-cad2d.vercel.app/'}, 'dark', location));
   assert.equal(url.origin, location.origin);
-  assert.equal(url.pathname, '/launch.html');
-  assert.equal(url.searchParams.get('tool'), 'cad2d');
-  assert.equal(url.searchParams.get('appearance'), 'dark');
+  assert.equal(url.pathname, '/launch/cad2d');
+  assert.equal(url.search, '');
   assert.equal(url.searchParams.has('url'), false);
   assert.equal(toolLaunchUrl({id:'cad2d'}, {}, 'light', location), null);
 });

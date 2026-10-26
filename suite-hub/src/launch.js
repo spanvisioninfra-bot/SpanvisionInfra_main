@@ -4,8 +4,14 @@ import { waitForBackend } from '../../deployment/service-readiness.mjs';
 import {trialComingSoonTools,trialComingSoonMessage} from '../../commerce/catalog.mjs';
 import './launch.css';
 
-const id = new URL(location.href).searchParams.get('tool');
+const launchUrl=new URL(location.href);
+const id = launchUrl.pathname.match(/^\/launch\/([a-z0-9-]+)\/?$/)?.[1]||launchUrl.searchParams.get('tool');
 const module = brand.modules.find(tool => tool.id === id);
+if(module){
+  launchUrl.pathname='/launch/'+module.id;
+  launchUrl.searchParams.delete('tool');launchUrl.searchParams.delete('appearance');launchUrl.searchParams.delete('launch');
+  history.replaceState(history.state,'',launchUrl.pathname+launchUrl.search);
+}
 const splash = document.querySelector('.tool-splash');
 const status = document.getElementById('splash-status');
 const actions = document.getElementById('splash-actions');
@@ -42,7 +48,7 @@ async function authorizeTool(signal){
 function enterAuthorizedTool(url,ticket){
   const destination=new URL(url),form=document.createElement('form');
   form.method='POST';form.action=destination.origin+'/__spanvision/access';
-  for(const [name,value] of Object.entries({ticket,next:destination.pathname+destination.search+destination.hash})){
+  for(const [name,value] of Object.entries({ticket,next:destination.pathname+destination.search+destination.hash,appearance:window.SpanvisionAppearance.getMode()})){
     const input=document.createElement('input');input.type='hidden';input.name=name;input.value=value;form.append(input);
   }
   document.body.append(form);form.submit();

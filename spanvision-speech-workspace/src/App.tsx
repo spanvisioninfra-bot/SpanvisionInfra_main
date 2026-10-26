@@ -3,6 +3,7 @@ import { api, type Settings, type TranscriptionResult } from "./lib/api";
 import { useI18n, type Locale } from "./lib/i18n";
 import brand from "./brand.json";
 import {runtime} from "./lib/runtime";
+import {speechPath,speechRoute} from "./lib/routes";
 import BrandPages, {PreviewWorkspace, AudioImport} from "./components/BrandPages";
 import Sidebar from "./components/Sidebar";
 import TranscriptionView from "./components/TranscriptionView";
@@ -187,8 +188,11 @@ function getEstimatedSeconds(model: string, recordingMs: number): number {
 
 export default function App() {
   const { t, setLocale } = useI18n();
-  const views: View[]=["landing", "suggestions", "login", "signup", "account", "home", "settings", "dictionary", "models", "mic-test", "meeting", "transcribe", "tts"];
-  const route=():View=>{if(location.hash==="#about"){history.replaceState(history.state,"",location.pathname+location.search+"#workspace");return "home";}if(["login","signup"].includes(location.hash.slice(1))){history.replaceState(history.state,"",location.pathname+location.search+"#account");return "account";}const value=location.hash.slice(1)==="workspace"?"home":location.hash.slice(1);return views.includes(value as View)?value as View:runtime.native?"home":"landing";};
+  const route=():View=>{
+    const current=speechRoute(location.href,runtime.native);
+    if(!runtime.native&&current.path!==location.pathname+location.search+location.hash)history.replaceState(history.state,'',current.path);
+    return current.view;
+  };
   const [view, setViewInternal] = createSignal<View>(route());
   const [navigationOpen,setNavigationOpen]=createSignal(false);
   const closeNavigation=()=>{setNavigationOpen(false);document.querySelector<HTMLButtonElement>(".mobile-menu")?.focus();};
@@ -201,9 +205,25 @@ export default function App() {
     if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
     else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
   }
-  const setView=(value:View)=>{location.hash=value==="home"?"workspace":value;setViewInternal(value);setNavigationOpen(false);};
+  const setView=(value:View)=>{
+    if(runtime.native)location.hash=value==='home'?'workspace':value;
+    else if(location.pathname!==speechPath(value))history.pushState(null,'',speechPath(value)+location.search);
+    setViewInternal(value);setNavigationOpen(false);
+  };
   const [sampleText,setSampleText]=createSignal("");
-  onMount(()=>{const change=()=>{setViewInternal(route());setNavigationOpen(false);};window.addEventListener("hashchange",change);onCleanup(()=>window.removeEventListener("hashchange",change));});
+  onMount(()=>{
+    const change=()=>{setViewInternal(route());setNavigationOpen(false);};
+    const click=(event:MouseEvent)=>{
+      if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+      const link=(event.target as Element)?.closest<HTMLAnchorElement>('a[href]');
+      if(!link||link.target||link.hasAttribute('download'))return;
+      const url=new URL(link.href);if(url.origin!==location.origin)return;
+      if(!['/','/workspace','/transcribe','/meeting','/mic-test','/models','/dictionary','/settings','/tts','/suggestions','/account'].includes(url.pathname))return;
+      event.preventDefault();setView(speechRoute(url.href,runtime.native).view);
+    };
+    window.addEventListener('hashchange',change);window.addEventListener('popstate',change);document.addEventListener('click',click);
+    onCleanup(()=>{window.removeEventListener('hashchange',change);window.removeEventListener('popstate',change);document.removeEventListener('click',click);});
+  });
   const [settings, setSettings] = createSignal<Settings | null>(null);
   createEffect(()=>{document.documentElement.dataset.theme=["spanvision-mono","light","dark"].includes(settings()?.theme||"")?settings()!.theme:document.documentElement.dataset.svMode==='light'?'light':brand.theme;});
   onMount(()=>{

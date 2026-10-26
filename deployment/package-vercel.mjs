@@ -25,15 +25,17 @@ await fs.access(path.join(source, module.path === '/app/' ? 'app/index.html' : '
 await fs.cp(source, staticDir, { recursive: true, filter: sourcePath => !sourcePath.endsWith('.map') && path.basename(sourcePath) !== 'suite-build.json' });
 if(id !== 'hub') await installBrowserIdentity(staticDir,{entries:[id === 'cad' ? 'app/index.html' : 'index.html']});
 else await installWorkspaceUi(staticDir,{optionalEntries:['launch.html']});
+if(id==='cad')await fs.copyFile(path.join(root,'SpanvisionCAD/web/workspace-launch.js'),path.join(staticDir,'app/workspace-launch.js'));
 const routes = [
   { src: '/.*', headers: { 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'strict-origin-when-cross-origin' }, continue: true },
   { handle: 'filesystem' },
 ];
 if(id!=='hub')routes.unshift(await packageToolAccess(vercelOutput,id));
 routes.splice(1, 0, ...backendRoutes(id));
-if (id === 'cad') routes.push({ src: '/app(?:/.*)?', dest: '/app/index.html' });
+if (id === 'cad') routes.push({src:'/workspace/?',dest:'/app/index.html'},{ src: '/app(?:/.*)?', dest: '/app/index.html' });
 else routes.push({ src: '/(.*)', dest: '/index.html' });
 if (id === 'hub') {
+  routes.splice(routes.findIndex(route=>route.handle==='filesystem'),0,{src:'/launch/[a-z0-9-]+/?',dest:'/launch.html'});
   await packageCommerce(path.join(output,'.vercel/output'));
   const locationFunction = path.join(vercelOutput, 'functions/api/location.func');
   await fs.mkdir(locationFunction, { recursive: true });

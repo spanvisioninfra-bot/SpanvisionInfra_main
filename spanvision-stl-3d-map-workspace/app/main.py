@@ -371,6 +371,8 @@ def api_project_load(project_id: str) -> dict:
 # static
 # --------------------------------------------------------------------------- #
 @app.get("/", response_class=HTMLResponse)
+@app.get("/workspace", response_class=HTMLResponse)
+@app.get("/workspace/", response_class=HTMLResponse)
 def index() -> HTMLResponse:
     return HTMLResponse((WEB_DIR / "index.html").read_text(encoding="utf-8"))
 
