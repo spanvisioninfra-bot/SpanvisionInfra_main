@@ -42,15 +42,15 @@ try {
     assert.deepEqual(await page.locator('.landing-cover-image').evaluate(i=>[i.naturalWidth,i.naturalHeight]),[expectedSource.readUInt32BE(16),expectedSource.readUInt32BE(20)]);
     const layout=await page.evaluate(()=>{
       const box=s=>document.querySelector(s).getBoundingClientRect();
-      const hero=box('.company-intro'),account=box('.home-account-access'),summary=box('.intro-summary');
+      const hero=box('.company-intro'),pricing=box('.pricing-section'),actions=box('.intro-actions'),summary=box('.intro-summary');
       const image=document.querySelector('.landing-cover-image');
       const bounds=image.getBoundingClientRect(),style=getComputedStyle(image);
       const x=bounds.width/image.naturalWidth,y=bounds.height/image.naturalHeight;
       const scale=style.objectFit==='cover'?Math.max(x,y):style.objectFit==='none'?1:style.objectFit==='scale-down'?Math.min(1,x,y):Math.min(x,y);
       const fullImageVisible=scale*image.naturalWidth<=bounds.width+.5&&scale*image.naturalHeight<=bounds.height+.5&&bounds.left>=hero.left-.5&&bounds.right<=hero.right+.5&&bounds.top>=hero.top-.5&&bounds.bottom<=hero.bottom+.5;
-      return {gap:account.top-hero.bottom,overflow:document.documentElement.scrollWidth>innerWidth+1,summaryInside:summary.bottom<hero.bottom,fullImageVisible,artworkWidth:scale*image.naturalWidth,heroWidth:hero.width,source:image.currentSrc,filter:style.filter,mode:document.documentElement.dataset.svMode,webgl:window.coverWebglCalls,canvases:document.querySelectorAll('.company-intro canvas').length};
+      return {gap:pricing.top-hero.bottom,overflow:document.documentElement.scrollWidth>innerWidth+1,actionsInside:actions.bottom<hero.bottom,summaryInside:summary.bottom<hero.bottom,removedBlocks:document.querySelectorAll('.home-account-access,.payment-strip,.pricing-footnote').length,fullImageVisible,artworkWidth:scale*image.naturalWidth,heroWidth:hero.width,source:image.currentSrc,filter:style.filter,mode:document.documentElement.dataset.svMode,webgl:window.coverWebglCalls,canvases:document.querySelectorAll('.company-intro canvas').length};
     });
-    assert.equal(layout.gap,0);assert.equal(layout.overflow,false);assert.equal(layout.summaryInside,true);
+    assert.equal(layout.gap,0);assert.equal(layout.overflow,false);assert.equal(layout.actionsInside,true);assert.equal(layout.summaryInside,true);assert.equal(layout.removedBlocks,0);
     assert.equal(layout.fullImageVisible,true,'The entire artwork must fit inside the hero without clipping');
     if(width>=768)assert.ok(Math.abs(layout.artworkWidth-layout.heroWidth)<2,'The landscape artwork must fill the desktop hero width');
     assert.equal(layout.mode,theme);assert.equal(layout.webgl,0);assert.equal(layout.canvases,0);
