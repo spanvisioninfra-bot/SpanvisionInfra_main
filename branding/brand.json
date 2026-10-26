@@ -34,8 +34,8 @@
   "modules": [
     {
       "id": "cad",
-      "label": "Vision CAD Studio",
-      "productName": "CAD",
+      "label": "3D CAD",
+      "productName": "3D CAD",
       "organization": "Spanvision Infra",
       "mark": "CAD",
       "logo": "branding/cad-mark.svg",
@@ -72,7 +72,8 @@
     },
     {
       "id": "pdf",
-      "label": "Vision Portable Document Studio",
+      "label": "Vision PDF Workspace",
+      "productName": "Vision PDF Workspace",
       "directory": "spanvision-pdf-workspace/open-pdf-studio",
       "dist": "dist",
       "port": 3084,

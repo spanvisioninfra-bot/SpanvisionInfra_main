@@ -3,7 +3,7 @@
   "modules": [
     {
       "id": "cad",
-      "label": "Vision CAD Studio",
+      "label": "3D CAD",
       "url": "https://cad.spanvisioninfra.com/app/",
       "available": true,
       "platform": "vercel"
@@ -11,7 +11,7 @@
     {
       "id": "cad2d",
       "label": "2D Vision Studio",
-      "url": "https://spanvision-cad2d.vercel.app/",
+      "url": "https://cad2d.spanvisioninfra.com/",
       "available": true,
       "platform": "vercel"
     },
@@ -24,8 +24,8 @@
     },
     {
       "id": "pdf",
-      "label": "Vision Portable Document Studio",
-      "url": "https://spanvision-pdf.vercel.app/",
+      "label": "Vision PDF Workspace",
+      "url": "https://visionpdfworkspace.spanvisioninfra.com/",
       "available": true,
       "platform": "vercel"
     },
@@ -81,7 +81,7 @@
     {
       "id": "speech",
       "label": "Speech Vision Studio",
-      "url": "https://spanvision-speech.vercel.app/",
+      "url": "https://speechvision.spanvisioninfra.com/",
       "available": true,
       "platform": "vercel"
     },

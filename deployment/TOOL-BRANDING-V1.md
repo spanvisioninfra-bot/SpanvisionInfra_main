@@ -6,10 +6,10 @@ The screenshot follow-up also applies the CAD2D icon and v1.0 badge to its welco
 
 | Tool | Product release |
 | --- | --- |
-| Vision CAD Studio | v1.0 |
+| 3D CAD | v1.0 |
 | 2D Vision Studio | v1.0 |
 | Vision BIM Validator | v1.0 |
-| Vision Portable Document Studio | v1.0 |
+| Vision PDF Workspace | v1.0 |
 | Vision IFC Studio | v1.0 |
 | Calc Vision Studio | v1.0 |
 | Open Vision Studio | v1.0 |

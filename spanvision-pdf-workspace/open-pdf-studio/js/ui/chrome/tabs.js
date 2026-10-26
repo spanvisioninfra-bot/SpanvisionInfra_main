@@ -1,5 +1,6 @@
 import { state, createDocument, getActiveDocument, findDocumentByPath, clearSelection } from '../../core/state.js';
 import { appVersion } from '../../core/app-version.js';
+import { BRAND } from '../../core/brand.js';
 import { renderPage, renderContinuous, clearPdfView } from '../../pdf/renderer.js';
 import { hideFormFieldsBar } from '../../pdf/form-layer.js';
 import { redrawAnnotations, redrawContinuous, updateQuickAccessButtons } from '../../annotations/rendering.js';
@@ -497,7 +498,7 @@ export function updateTabBar() {
  */
 export function updateWindowTitle() {
   const doc = getActiveDocument();
-  const baseTitle = `Spanvision Infra · PDF v${appVersion()}`;
+  const baseTitle = `${BRAND.product} v${appVersion()}`;
 
   // Update document.title (browser/OS window title)
   if (doc) {

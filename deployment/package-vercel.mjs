@@ -25,7 +25,7 @@ await fs.access(path.join(source, module.path === '/app/' ? 'app/index.html' : '
 await fs.cp(source, staticDir, { recursive: true, filter: sourcePath => !sourcePath.endsWith('.map') && path.basename(sourcePath) !== 'suite-build.json' });
 if(id !== 'hub') await installBrowserIdentity(staticDir,{entries:[id === 'cad' ? 'app/index.html' : 'index.html']});
 else await installWorkspaceUi(staticDir,{optionalEntries:['launch.html']});
-if(id==='cad')await fs.copyFile(path.join(root,'SpanvisionCAD/web/workspace-launch.js'),path.join(staticDir,'app/workspace-launch.js'));
+if(id==='cad')for(const name of ['workspace-launch.js','locale-labels.json'])await fs.copyFile(path.join(root,'SpanvisionCAD/web',name),path.join(staticDir,'app',name));
 const routes = [
   { src: '/.*', headers: { 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'strict-origin-when-cross-origin' }, continue: true },
   { handle: 'filesystem' },

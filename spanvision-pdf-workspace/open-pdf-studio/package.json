@@ -1,7 +1,7 @@
 {
   "name": "spanvision-pdf-workspace",
   "version": "2026.39.0",
-  "description": "Spanvision Infra · PDF by Spanvision Infra",
+  "description": "Vision PDF Workspace by Spanvision Infra",
   "scripts": {
     "prepare:native-runtime": "node scripts/native-runtime.mjs",
     "prepare:ocr-runtime": "node scripts/ocr-runtime.mjs",

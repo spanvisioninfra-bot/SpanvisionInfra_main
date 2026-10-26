@@ -1,7 +1,7 @@
 {
   "organization": "Spanvision Infra",
-  "product": "CAD",
-  "display_name": "CAD — Spanvision Infra",
+  "product": "3D CAD",
+  "display_name": "3D CAD — Spanvision Infra",
   "executable": "SpanvisionCAD",
   "app_id": "com.spanvisioninfra.cad",
   "website_url": null,

@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Spanvision Infra · PDF",
+  "productName": "Vision PDF Workspace",
   "version": "2026.39.0",
   "identifier": "com.spanvisioninfra.pdfworkspace",
   "build": {
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "Spanvision Infra · PDF — Spanvision Infra",
+        "title": "Vision PDF Workspace — Spanvision Infra",
         "width": 1200,
         "height": 800,
         "minWidth": 800,
