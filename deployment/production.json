@@ -32,7 +32,7 @@
     {
       "id": "ifc",
       "label": "Vision IFC Studio",
-      "url": "https://spanvision-ifc.vercel.app/",
+      "url": "https://ifc.spanvisioninfra.com/",
       "available": true,
       "platform": "vercel"
     },
