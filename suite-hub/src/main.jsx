@@ -10,6 +10,7 @@ import AdminPanel from './AdminPanel';
 import ToolIcon from './ToolIcon';
 import release from '../../branding/release.json';
 import { isLocalPreview, moduleUrl, toolLaunchUrl } from './module-url';
+import {currentScreen,installNavigation,routeHref} from './router.mjs';
 import './preview.css';
 import './palette.css';
 import './hub.css';
@@ -18,7 +19,7 @@ import './admin.css';
 
 const organization=brand.hub.organization||brand.organization;
 function Arrow() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>; }
-function Mark(props) { return <a class="brand-lockup" href="#landing" aria-label={`${organization} home`}><img class="company-mark" src={props.mode==='light'?'/spanvision-mark-light.svg':'/spanvision-mark.svg'} width="44" height="44" alt="" aria-hidden="true"/><span>{organization}<small>Engineering tools</small></span></a>; }
+function Mark(props) { return <a class="brand-lockup" href="/" aria-label={`${organization} home`}><img class="company-mark" src={props.mode==='light'?'/spanvision-mark-light.svg':'/spanvision-mark.svg'} width="44" height="44" alt="" aria-hidden="true"/><span>{organization}<small>Engineering tools</small></span></a>; }
 function TrialNotice() {
   const message=`Your two-day trial includes ${trialToolIds.length} tools, with 3 launches shared across them each day. BIM, STL-3D and FEM are coming soon for trial users. AI features are also coming soon; the regular features of trial tools remain available.`;
   return <aside class="trial-notice" tabindex="0" role="note" aria-label="Trial availability">
@@ -46,14 +47,6 @@ function ContactLinks() {
   </div>;
 }
 
-function currentScreen() {
-  const requested=location.hash.slice(1)==='main-content'?'landing':location.hash.slice(1)||'landing';
-  if(requested==='suggestions') {
-    history.replaceState(history.state,'',location.pathname+location.search+'#modules');
-    return 'modules';
-  }
-  return requested;
-}
 function App() {
   const account=createAccountState();
   const [screen,setScreen]=createSignal(currentScreen());
@@ -167,11 +160,12 @@ function App() {
       setStatus(Object.fromEntries(brand.modules.map(module=>[module.id,{available:false,message:localPreview?'Start the suite preview to open this module.':'Tool availability could not be loaded. Try checking again.'}])));
     }
   }
-  function changeScreen() {
+  function changeScreen({scroll=true}={}) {
     setScreen(currentScreen());setError('');setSuccess('');
     recoverAccountConnection();
-    window.scrollTo({top:0,behavior:'instant'});
+    if(scroll)window.scrollTo({top:0,behavior:'instant'});
     if(modal?.open)closeScan();
+    document.getElementById('main-content')?.focus({preventScroll:true});
   }
   function recoverAccountConnection(){
     if(!account.loading()&&(account.error()||account.config()?.authAvailable===false))void account.refresh();
@@ -182,11 +176,11 @@ function App() {
     window.addEventListener('spanvision:mode-change',syncMode);
     window.addEventListener('spanvision:mode-observed',syncMode);
     onCleanup(()=>{window.removeEventListener('spanvision:mode-change',syncMode);window.removeEventListener('spanvision:mode-observed',syncMode);});
-    window.addEventListener('hashchange',changeScreen);
+    const stopNavigation=installNavigation(changeScreen);
     refreshStatus();
     const onFocus=()=>{refreshStatus();recoverAccountConnection();};window.addEventListener('focus',onFocus);
     window.addEventListener('online',recoverAccountConnection);
-    onCleanup(()=>{window.removeEventListener('hashchange',changeScreen);window.removeEventListener('focus',onFocus);window.removeEventListener('online',recoverAccountConnection);requestController?.abort();clearScan();});
+    onCleanup(()=>{stopNavigation();window.removeEventListener('focus',onFocus);window.removeEventListener('online',recoverAccountConnection);requestController?.abort();clearScan();});
   });
   function submitProfile(event) {
     event.preventDefault();setError('');setSuccess('');
@@ -211,7 +205,7 @@ function App() {
   }
   return <>
     <a class="skip-link" href="#main-content" onClick={event=>{event.preventDefault();document.getElementById('main-content')?.focus();}}>Skip to content</a>
-    <header class="preview-header marketing-header" data-sv-reveal><Mark mode={mode()}/><nav aria-label="Main navigation"><For each={['landing','modules','pricing','faq']}>{route=><a href={`#${route}`} classList={{current:screen()===route}} aria-current={screen()===route?'page':undefined}>{({landing:'Home',modules:'Tools',pricing:'Pricing',faq:'FAQ'})[route]}</a>}</For><Show when={account.user()?.role==='super_admin'}><a href="#admin" classList={{current:screen()==='admin'}} aria-current={screen()==='admin'?'page':undefined}>Admin</a></Show></nav><Show when={account.user()} fallback={<a class="header-sign-in" href="#login" aria-current={screen()==='login'?'page':undefined}>Sign in</a>}><a class="header-sign-in" href="#account">My account</a></Show><a href={account.user()?'#modules':'#signup'} class="button button-light header-action">{account.user()?'Open workspace':'Create account'}<Arrow/></a></header>
+    <header class="preview-header marketing-header" data-sv-reveal><Mark mode={mode()}/><nav aria-label="Main navigation"><For each={['landing','modules','pricing','faq']}>{route=><a href={routeHref(route)} classList={{current:screen()===route}} aria-current={screen()===route?'page':undefined}>{({landing:'Home',modules:'Tools',pricing:'Pricing',faq:'FAQ'})[route]}</a>}</For><Show when={account.user()?.role==='super_admin'}><a href="/admin" classList={{current:screen()==='admin'}} aria-current={screen()==='admin'?'page':undefined}>Admin</a></Show></nav><Show when={account.user()} fallback={<a class="header-sign-in" href="/login" aria-current={screen()==='login'?'page':undefined}>Sign in</a>}><a class="header-sign-in" href="/account">My account</a></Show><a href={account.user()?'/tools':'/signup'} class="button button-light header-action">{account.user()?'Open workspace':'Create account'}<Arrow/></a></header>
     <main id="main-content" tabindex="-1">
       <Show when={screen()==='landing'}><MarketingHome mode={mode()} account={account} openScan={openScan} organization={organization} toolCount={brand.modules.length}/></Show>
       <Show when={screen()==='pricing'}><div class="dedicated-pricing"><Pricing account={account}/></div></Show>
@@ -229,8 +223,8 @@ function App() {
           </section>
         </section>
       </Show>
-      <Show when={screen()==='profile'}><section class="account-page"><span class="preview-badge">LOCAL PROFILE</span><div class="account-heading"><div><span class="eyebrow">YOUR WORKSPACE</span><h1>Your local profile.</h1><p>Set a display name and choose your preferred appearance.</p></div><a href="#modules" class="button button-light">Open workspace<Arrow/></a></div><div class="account-grid"><aside class="account-nav"><span class="selected" aria-current="page">Profile</span><a href="#modules">All tools<Arrow/></a></aside><div class="account-card"><div class="profile-header"><span class="avatar">{name().split(' ').filter(Boolean).map(s=>s[0]).join('').slice(0,2)||'SI'}</span><div><h2>{name()||'Your workspace'}</h2><p>Local profile · {organization}</p></div></div><form novalidate onSubmit={submitProfile}><label>Display name<input name="name" value={name()} maxlength="80" autocomplete="name" placeholder="Your name"/></label><label>Organization<input value={organization} readonly/></label><label>Interface theme<select aria-label="Interface theme" value={mode()} onChange={event=>window.SpanvisionAppearance.setMode(event.currentTarget.value)}><option value="light">Light</option><option value="dark">Dark</option></select></label><Show when={error()}><p role="alert" class="form-error">{error()}</p></Show><Show when={success()}><p role="status" class="form-success">{success()}</p></Show><button class="button button-light">Save profile<Arrow/></button></form></div><div class="account-details"><article><span class="eyebrow">LOCAL BY DESIGN</span><h3>Your files. Your control.</h3><p>Your profile saves in this browser. Tool access uses your verified online account, and each workspace keeps its own drafts. Download project files to back them up or move them to another device.</p></article><article><span class="eyebrow">APPEARANCE</span><div class="palette"><i/><i/><i/><i/></div><p>{mode()==='light'?'Light':'Dark'} mode<br/>A clear space for detailed work.</p></article></div></div></section></Show>
-      <Show when={!validScreens.includes(screen())}><section class="suggestions-page"><h1>Page not found.</h1><a href="#landing" class="button button-light">Back to overview<Arrow/></a></section></Show>
+      <Show when={screen()==='profile'}><section class="account-page"><span class="preview-badge">LOCAL PROFILE</span><div class="account-heading"><div><span class="eyebrow">YOUR WORKSPACE</span><h1>Your local profile.</h1><p>Set a display name and choose your preferred appearance.</p></div><a href="/tools" class="button button-light">Open workspace<Arrow/></a></div><div class="account-grid"><aside class="account-nav"><span class="selected" aria-current="page">Profile</span><a href="/tools">All tools<Arrow/></a></aside><div class="account-card"><div class="profile-header"><span class="avatar">{name().split(' ').filter(Boolean).map(s=>s[0]).join('').slice(0,2)||'SI'}</span><div><h2>{name()||'Your workspace'}</h2><p>Local profile · {organization}</p></div></div><form novalidate onSubmit={submitProfile}><label>Display name<input name="name" value={name()} maxlength="80" autocomplete="name" placeholder="Your name"/></label><label>Organization<input value={organization} readonly/></label><label>Interface theme<select aria-label="Interface theme" value={mode()} onChange={event=>window.SpanvisionAppearance.setMode(event.currentTarget.value)}><option value="light">Light</option><option value="dark">Dark</option></select></label><Show when={error()}><p role="alert" class="form-error">{error()}</p></Show><Show when={success()}><p role="status" class="form-success">{success()}</p></Show><button class="button button-light">Save profile<Arrow/></button></form></div><div class="account-details"><article><span class="eyebrow">LOCAL BY DESIGN</span><h3>Your files. Your control.</h3><p>Your profile saves in this browser. Tool access uses your verified online account, and each workspace keeps its own drafts. Download project files to back them up or move them to another device.</p></article><article><span class="eyebrow">APPEARANCE</span><div class="palette"><i/><i/><i/><i/></div><p>{mode()==='light'?'Light':'Dark'} mode<br/>A clear space for detailed work.</p></article></div></div></section></Show>
+      <Show when={!validScreens.includes(screen())}><section class="suggestions-page"><h1>Page not found.</h1><a href="/" class="button button-light">Back to overview<Arrow/></a></section></Show>
     </main>
     <footer class="preview-footer"><div class="footer-main"><Mark mode={mode()}/><span class="footer-copyright">© 2026 {organization}</span><ContactLinks/><SocialLinks/></div></footer>
     <dialog ref={modal} class="scan-dialog" aria-labelledby="scan-title" onKeyDown={trapScanFocus} onCancel={event=>{event.preventDefault();closeScan();}}>

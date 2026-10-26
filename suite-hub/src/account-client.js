@@ -1,4 +1,5 @@
 import {createSignal} from 'solid-js';
+import {navigate} from './router.mjs';
 export async function accountRequest(path,body){
   // Only retry reads. Repeating a sign-up or billing request could perform it twice.
   const attempts=body===undefined?2:1;
@@ -30,6 +31,6 @@ export function createAccountState(){
     })();
     return pending;
   }
-  async function signOut(){await accountRequest('account/sign-out',{});setUser(null);location.hash='login';}
+  async function signOut(){await accountRequest('account/sign-out',{});setUser(null);navigate('login',{replace:true});}
   return {config,user,loading,error,refresh,signOut};
 }

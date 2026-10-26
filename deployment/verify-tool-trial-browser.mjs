@@ -47,14 +47,14 @@ try{
         else if(url.pathname==='/api/account/tool-status')data={policy:trialPolicy,access:{plan:isAdmin?'team':isPaid?'studio':'explorer'},trial:{status:'available',remaining:1,day:1,expiresAt:new Date(Date.now()+3600000).toISOString()}};
         else if(url.pathname.startsWith('/api/'))throw new Error('Unexpected test endpoint: '+url.pathname);
         if(data)return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)});
-        const pathname=url.pathname==='/'?'/index.html':decodeURIComponent(url.pathname),file=path.resolve(dist,'.'+pathname);
+        const pathname=url.pathname==='/'||!path.extname(url.pathname)?'/index.html':decodeURIComponent(url.pathname),file=path.resolve(dist,'.'+pathname);
         if(!file.startsWith(dist+path.sep))return route.fulfill({status:403,body:''});
         try{return route.fulfill({status:200,contentType:mime[path.extname(file)]||'application/octet-stream',body:await fs.readFile(file)});}
         catch{return route.fulfill({status:404,body:'Not found'});}
       });
       try{
         const tool=scenario.startsWith('coming_soon_')?scenario.slice('coming_soon_'.length):scenario.startsWith('backend_')?'fem':'frame';
-        const start=scenario.startsWith('catalog')||scenario==='faq_guest'?'/?appearance='+mode+'#modules':scenario==='faq'?'/?appearance='+mode+'#faq':scenario==='account'?'/?appearance='+mode+'#account':scenario==='pricing'?'/?appearance='+mode+'#pricing':'/launch.html?tool='+tool+'&appearance='+mode;
+        const start=scenario.startsWith('catalog')||scenario==='faq_guest'?'/tools?appearance='+mode:scenario==='faq'?'/faq?appearance='+mode:scenario==='account'?'/account?appearance='+mode:scenario==='pricing'?'/pricing?appearance='+mode:'/launch.html?tool='+tool+'&appearance='+mode;
         await page.goto(origin+start);
         if(scenario.startsWith('catalog')){
           await page.locator('.module-card').last().waitFor();

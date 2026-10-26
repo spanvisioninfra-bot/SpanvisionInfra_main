@@ -94,12 +94,33 @@ test('approved Stripe checkout validates server price and ignores a forged brows
     if(url.endsWith('/checkout/sessions'))return Response.json({url:'https://checkout.stripe.com/c/pay/test'});
     return Response.json([]);
   };
-  const {post}=await fixture(t,{env,fetcher});
+  const {post,origin}=await fixture(t,{env,fetcher});
   const login=await post('/api/account/sign-in',{email:user.email,password:'test-password'});
   const response=await post('/api/billing/checkout',{plan:'studio',region:'US',interval:'monthly',amount:1},{Cookie:login.headers.get('set-cookie').split(';')[0]});
   assert.equal(response.status,200);assert.equal((await response.json()).provider,'stripe');
   const checkout=calls.find(call=>call.url.endsWith('/checkout/sessions'));
   const payload=new URLSearchParams(checkout.body);assert.equal(payload.get('line_items[0][price]'),'price_test');assert.equal(payload.get('amount'),null);
+  assert.equal(payload.get('success_url'),origin+'/account?checkout=returned');
+  assert.equal(payload.get('cancel_url'),origin+'/pricing?checkout=cancelled');
+});
+test('Stripe billing portal returns to the clean account route',async t=>{
+  let payload;
+  const env={...secrets,STRIPE_SECRET_KEY:'stripe-private'};
+  const fetcher=async(url,options)=>{
+    if(url.endsWith('/user'))return Response.json(user);
+    if(url.includes('grant_type=password'))return Response.json({access_token:'access',refresh_token:'refresh'});
+    if(url.includes('/billing_customers?'))return Response.json([{provider_customer_id:'cus_test'}]);
+    if(url.endsWith('/billing_portal/sessions')){
+      payload=new URLSearchParams(options.body);
+      return Response.json({url:'https://billing.stripe.com/p/session/test'});
+    }
+    return Response.json([]);
+  };
+  const {post,origin}=await fixture(t,{env,fetcher});
+  const login=await post('/api/account/sign-in',{email:user.email,password:'test-password'});
+  const response=await post('/api/billing/portal',{},{Cookie:login.headers.get('set-cookie').split(';')[0]});
+  assert.equal(response.status,200);
+  assert.equal(payload.get('return_url'),origin+'/account');
 });
 test('approved Razorpay checkout validates plan and records ownership before returning a link',async t=>{
   const calls=[];const env={...secrets,PRICING_APPROVED:'true',RAZORPAY_KEY_ID:'rzp_test',RAZORPAY_KEY_SECRET:'private',RAZORPAY_WEBHOOK_SECRET:'hook',RAZORPAY_PLAN_STUDIO_MONTHLY_INR:'plan_test'};

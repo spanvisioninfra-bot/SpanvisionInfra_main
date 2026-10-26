@@ -3,8 +3,8 @@ const levels=['explorer','studio','team'];
 const text=value=>typeof value==='string'?value:'';
 
 export function signInDestination(user,recovery=false){
-  if(recovery)return '#reset';
-  return user?.role==='super_admin'?'#admin':'#account';
+  if(recovery)return '/reset-password';
+  return user?.role==='super_admin'?'/admin':'/account';
 }
 
 // Authorization uses the verified provider identity, never signup metadata or request fields.

@@ -57,15 +57,15 @@ test('invalid Neon selection cannot fall back to legacy credentials',async t=>{
 
 test('backend chooses the admin destination only for the exact verified pinned identity',async t=>{
   for(const [providerUser,env,destination] of [
-    [administrator,{},'#admin'],[member,{},'#account'],
-    [{...member,role:'super_admin'}, {}, '#account'],
-    [administrator,{SUPER_ADMIN_USER_ID:''},'#account'],
-    [administrator,{SUPER_ADMIN_USER_ID:'different-user'},'#account'],
+    [administrator,{},'/admin'],[member,{},'/account'],
+    [{...member,role:'super_admin'}, {}, '/account'],
+    [administrator,{SUPER_ADMIN_USER_ID:''},'/account'],
+    [administrator,{SUPER_ADMIN_USER_ID:'different-user'},'/account'],
   ]){
     const f=await fixture(t,{providerUser,env});
     const response=await f.post('/api/account/sign-in',{email:providerUser.email,password:'test-private-password',redirectTo:'#admin',role:'super_admin'});
     assert.equal(response.status,200);const body=await response.json();assert.equal(body.redirectTo,destination);
-    assert.equal(body.user.role,destination==='#admin'?'super_admin':'member');
+    assert.equal(body.user.role,destination==='/admin'?'super_admin':'member');
     assert(!JSON.stringify(body).includes('private-provider-token'));
   }
 });

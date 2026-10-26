@@ -46,8 +46,8 @@ export default function AdminPanel(props){
       setDetail(result);setNotice('Plan access saved. Payment-provider billing was not changed.');await loadPage(page());
     }catch(error){if(allowed())setError(error.message);}finally{setSaving(false);}
   }
-  return <section class="admin-page marketing-section"><Show when={allowed()} fallback={<div class="signed-out-card"><span class="eyebrow">ADMINISTRATION</span><h1>Super-admin access required.</h1><p>This area is available to the designated, verified administrator.</p><a class="button button-light" href={props.account.user()?'#account':'#login'}>{props.account.user()?'Back to my account':'Sign in'} →</a></div>}>
-    <div class="admin-heading"><div><span class="eyebrow">SUPER ADMIN</span><h1>Users & plan access.</h1><p>Manage access across your workspace. Your account includes Explorer, Studio and Team.</p></div><a href="#account" class="button button-outline">My account →</a></div>
+  return <section class="admin-page marketing-section"><Show when={allowed()} fallback={<div class="signed-out-card"><span class="eyebrow">ADMINISTRATION</span><h1>Super-admin access required.</h1><p>This area is available to the designated, verified administrator.</p><a class="button button-light" href={props.account.user()?'/account':'/login'}>{props.account.user()?'Back to my account':'Sign in'} →</a></div>}>
+    <div class="admin-heading"><div><span class="eyebrow">SUPER ADMIN</span><h1>Users & plan access.</h1><p>Manage access across your workspace. Your account includes Explorer, Studio and Team.</p></div><a href="/account" class="button button-outline">My account →</a></div>
     <p class="admin-disclosure">Plan grants control account access. Subscription charges and cancellation remain with the payment provider. Each saved change records who changed it and why.</p>
     <Show when={!databaseReady()}><p class="account-setup-note" role="status">Your administrator sign-in is active. User and plan management will become available after the account database is connected.</p></Show>
     <Show when={databaseReady()}>

@@ -300,7 +300,7 @@ async function createCheckout(user,choice,env,fetcher){
       customer=created.id;
       await db(env,'billing_customers?on_conflict=user_id,provider',fetcher,{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify({user_id:user.id,provider:'stripe',provider_customer_id:customer})});
     }
-    const session=await stripe(env,'checkout/sessions',{mode:'subscription',customer,expires_at:String(Math.floor(Date.now()/1000)+3600),'line_items[0][price]':priceId,'line_items[0][quantity]':'1','subscription_data[metadata][plan_key]':choice.key,success_url:`${origin}/?checkout=returned#account`,cancel_url:`${origin}/?checkout=cancelled#pricing`},fetcher);
+    const session=await stripe(env,'checkout/sessions',{mode:'subscription',customer,expires_at:String(Math.floor(Date.now()/1000)+3600),'line_items[0][price]':priceId,'line_items[0][quantity]':'1','subscription_data[metadata][plan_key]':choice.key,success_url:`${origin}/account?checkout=returned`,cancel_url:`${origin}/pricing?checkout=cancelled`},fetcher);
     const url=new URL(session.url);if(url.protocol!=='https:'||url.hostname!=='checkout.stripe.com')fail(502,'Checkout link could not be verified.');
     return {url:url.href,provider};
   }
@@ -451,7 +451,7 @@ export function createHandler({env=process.env,fetcher=fetch,store}={}){
           const current=await identity(req,res,env,fetcher);if(current.session.recovery)fail(403,'Set your new password before opening billing.');
           const customers=await db(env,`billing_customers?user_id=eq.${current.user.id}&provider=eq.stripe&select=provider_customer_id`,fetcher);
           if(!customers[0])fail(409,'There is no Stripe billing account to manage yet.');
-          const portal=await stripe(env,'billing_portal/sessions',{customer:customers[0].provider_customer_id,return_url:`${site(env)}/#account`},fetcher);
+          const portal=await stripe(env,'billing_portal/sessions',{customer:customers[0].provider_customer_id,return_url:`${site(env)}/account`},fetcher);
           const url=new URL(portal.url);if(url.protocol!=='https:'||url.hostname!=='billing.stripe.com')fail(502,'Billing link could not be verified.');
           result={url:url.href};
         }else fail(404,'Endpoint not found.');

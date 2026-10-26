@@ -13,7 +13,7 @@ let controller;
 const launchRequestId=crypto.randomUUID();
 const accountLink=document.getElementById('splash-account');
 const plansLink=document.getElementById('splash-plans');
-accountLink.href='/?returnTool='+encodeURIComponent(id||'')+'#login';
+accountLink.href='/login?returnTool='+encodeURIComponent(id||'');
 
 async function checkTrialAvailability(signal){
   if(!trialComingSoonTools.includes(id))return;
