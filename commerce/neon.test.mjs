@@ -207,6 +207,10 @@ test('SQL adapter parameterizes values and rejects uncontrolled table/column/fun
   await assert.rejects(store.request('billing_subscriptions?select=password'),/Unsupported/);
   await assert.rejects(store.request('rpc/arbitrary',{method:'POST',body:'{}'}),/Unsupported/);
   await assert.rejects(store.request('billing_events?provider=eq.stripe',{method:'DELETE'}),/Invalid|Unsupported/);
+  await assert.rejects(store.request('billing_checkout_locks?user_id=eq.member',{method:'DELETE'}),/Invalid|Unsupported/);
+  await store.request('billing_checkout_locks?user_id=eq.member&plan_key=eq.STUDIO_MONTHLY_INR&expires_at=eq.2026-10-31T10%3A00%3A00Z',{method:'DELETE'});
+  assert.match(last.sql,/delete from spanvision_commerce.billing_checkout_locks/);
+  assert.deepEqual(last.params,['member','STUDIO_MONTHLY_INR','2026-10-31T10:00:00Z']);
 });
 
 test('resending verification uses the correct OTP purpose and honors provider throttling',async t=>{

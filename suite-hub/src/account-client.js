@@ -12,7 +12,7 @@ export async function accountRequest(path,body){
     }
     if([502,503,504].includes(response.status)&&attempt+1<attempts){await new Promise(resolve=>setTimeout(resolve,500));continue;}
     let data;try{data=await response.json();}catch{throw new Error('The account service returned an unexpected response. Please try again.');}
-    if(!response.ok)throw new Error(data.error||'The request could not be completed.');return data;
+    if(!response.ok){const error=new Error(data.error||'The request could not be completed.');error.pendingCheckout=data.pendingCheckout||null;throw error;}return data;
   }
 }
 export function createAccountState(){

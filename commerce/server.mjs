@@ -1,5 +1,5 @@
 import {createCipheriv,createDecipheriv,createHash,createHmac,randomBytes,timingSafeEqual} from 'node:crypto';
-import {plans,regions,selection,trialComingSoonTools,trialComingSoonMessage,toolFeatures} from './catalog.mjs';
+import {plans,regions,selection,formatPrice,trialComingSoonTools,trialComingSoonMessage,toolFeatures} from './catalog.mjs';
 import {publicUser,planAccess,SUPER_ADMIN_EMAIL,signInDestination} from './access.mjs';
 import {neonAuthUrl,neonSelected,neonAuth,neonRequest} from './neon-auth.mjs';
 import {databaseConfigured,neonStore,bindNeonStore} from './neon-store.mjs';
@@ -8,8 +8,8 @@ import {toolIds,trialPolicy,issueToolTicket,readToolTicket} from './tool-trial.m
 import {paymentTestRoute,PaymentTestError} from './payment-test.mjs';
 
 const cookieName='sv_account';
-class RequestError extends Error {constructor(status,message){super(message);this.status=status;}}
-const fail=(status,message)=>{throw new RequestError(status,message);};
+class RequestError extends Error {constructor(status,message,details={}){super(message);this.status=status;this.details=details;}}
+const fail=(status,message,details)=>{throw new RequestError(status,message,details);};
 const uuid=value=>typeof value==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 const providerId=value=>typeof value==='string'&&/^[a-zA-Z0-9_-]{1,180}$/.test(value);
 const scalar=value=>typeof value==='string'?value:'';
@@ -289,18 +289,81 @@ async function applyWebhook(provider,raw,req,env,fetcher){
   await db(env,'billing_events?on_conflict=provider,event_id',fetcher,{method:'POST',headers:{Prefer:'resolution=ignore-duplicates,return=representation'},body:JSON.stringify({provider,event_id:id})});
   return {received:true};
 }
-async function createCheckout(user,choice,env,fetcher){
-  if(env.PRICING_APPROVED!=='true')fail(409,'These are draft prices. Payments are not open yet.');
-  if(choice.plan.id==='explorer')fail(400,'The Explorer trial does not need checkout. Choose Studio or Team for paid access.');
-  if(!billingReady(env,choice))fail(503,'Payments for this region are not available yet.');
+function checkoutUrl(value,provider){
+  let url;try{url=new URL(value);}catch{fail(502,'Checkout link could not be verified.');}
+  const hosts=provider==='stripe'?['checkout.stripe.com']:['rzp.io','razorpay.com'];
+  if(url.protocol!=='https:'||url.username||url.password||!hosts.includes(url.hostname))fail(502,'Checkout link could not be verified.');
+  return url.href;
+}
+async function checkoutLock(user,env,fetcher){
+  const rows=await db(env,`billing_checkout_locks?user_id=eq.${user.id}&select=plan_key,expires_at,checkout_url`,fetcher);
+  return rows[0]||null;
+}
+async function releaseCheckoutLock(user,lock,env,fetcher){
+  if(!lock?.expires_at||!lock.plan_key)return;
+  // Compare the lease generation so an older request cannot clear a newer checkout.
+  await db(env,`billing_checkout_locks?user_id=eq.${user.id}&plan_key=eq.${lock.plan_key}&expires_at=eq.${encodeURIComponent(lock.expires_at)}`,fetcher,{method:'DELETE'});
+}
+function subscriptionChoice(record){
+  const match=/^(STUDIO|TEAM)_(MONTHLY|ANNUAL)_(INR|USD|GBP)$/.exec(record.plan_key||'');
+  if(!match)fail(502,'The existing subscription needs review.');
+  return selection(match[1].toLowerCase(),regions.find(region=>region.currency===match[3]).id,match[2].toLowerCase());
+}
+function validateOwnedSubscription(subscription,record,env){
+  if(subscription.id!==record.provider_subscription_id||subscription.plan_id!==env[`RAZORPAY_PLAN_${record.plan_key}`]||subscription.quantity!==1||subscription.notes?.user_id&&subscription.notes.user_id!==record.user_id)fail(409,'The subscription does not match its recorded plan.');
+}
+async function saveSubscriptionState(subscription,record,env,fetcher,observedAt){
+  await db(env,'rpc/apply_billing_subscription',fetcher,{method:'POST',body:JSON.stringify({record:{...record,status:subscription.status,current_period_end:subscription.current_end?new Date(subscription.current_end*1000).toISOString():null,observed_at:observedAt}})});
+}
+async function releaseSubscriptionCheckout(user,subscription,record,env,fetcher){
+  const lock=await checkoutLock(user,env,fetcher);
+  if(lock?.plan_key===record.plan_key&&lock.checkout_url===subscription.short_url)await releaseCheckoutLock(user,lock,env,fetcher);
+}
+async function existingCheckout(user,choice,env,fetcher){
   const active=await db(env,`billing_subscriptions?user_id=eq.${user.id}&status=in.(active,trialing,authenticated,pending,created,past_due,halted)&select=provider,provider_subscription_id,plan_key,status`,fetcher);
+  // An authenticated or paid subscription is never replaced by the pricing dialog.
+  if(active.some(record=>record.provider!=='razorpay'||record.status!=='created'||!providerId(record.provider_subscription_id)))fail(409,'You already have a subscription or payment in progress. Open My account to manage billing.');
+  const pending=[];
   for(const record of active){
-    if(record.provider!=='razorpay'||record.status!=='created'||!providerId(record.provider_subscription_id))fail(409,'You already have a subscription or checkout in progress. Open billing before starting another.');
+    record.user_id=user.id;
+    const observedAt=new Date().toISOString();
     const previous=await razorpay(env,'subscriptions/'+record.provider_subscription_id,undefined,fetcher);
-    if(previous.id!==record.provider_subscription_id||!['expired','cancelled','completed'].includes(previous.status))fail(409,'You already have a subscription or checkout in progress. Open billing before starting another.');
-    // Expired, unpaid hosted links must not permanently block a new checkout.
-    await db(env,'rpc/apply_billing_subscription',fetcher,{method:'POST',body:JSON.stringify({record:{provider:'razorpay',provider_subscription_id:record.provider_subscription_id,user_id:user.id,plan_key:record.plan_key,status:previous.status,current_period_end:null,observed_at:new Date().toISOString()}})});
+    validateOwnedSubscription(previous,record,env);
+    if(['expired','cancelled','completed'].includes(previous.status)){
+      await saveSubscriptionState(previous,record,env,fetcher,observedAt);
+      await releaseSubscriptionCheckout(user,previous,record,env,fetcher);
+    }else pending.push({record,subscription:previous});
   }
+  if(!pending.length)return null;
+  if(pending.length!==1||pending[0].subscription.status!=='created'||pending[0].subscription.paid_count!==0)fail(409,'You already have a subscription or payment in progress. Open My account to manage billing.');
+  const {record,subscription}=pending[0],previousChoice=subscriptionChoice(record);
+  const url=checkoutUrl(subscription.short_url,'razorpay');
+  const expired=Number.isSafeInteger(subscription.expire_by)&&subscription.expire_by<=Date.now()/1000;
+  if(choice.key===record.plan_key&&!expired)return {url,provider:'razorpay',reused:true};
+  const canReplace=subscription.auth_attempts===0;
+  const price=`${formatPrice(previousChoice.amount,previousChoice.region.id)} / ${previousChoice.interval==='annual'?'year':'month'}`;
+  fail(409,canReplace?(expired?'The previous unpaid checkout has expired. Replace it to continue.':`An unpaid ${previousChoice.plan.name} checkout at ${price} is already open. Resume it or replace it with the selected plan.`):'A previous payment is being processed. Resume that checkout or open My account before changing plans.',{pendingCheckout:{subscriptionId:subscription.id,planKey:record.plan_key,price,url,canReplace,expired}});
+}
+async function cancelUnpaidCheckout(user,subscriptionId,env,fetcher){
+  if(!/^sub_[A-Za-z0-9]+$/.test(subscriptionId||''))fail(400,'Choose a valid unpaid checkout.');
+  const rows=await db(env,`billing_subscriptions?user_id=eq.${user.id}&provider=eq.razorpay&provider_subscription_id=eq.${subscriptionId}&select=provider,provider_subscription_id,user_id,plan_key,status`,fetcher);
+  const record=rows[0];if(!record)fail(404,'The checkout was not found for your account.');
+  let subscription=await razorpay(env,'subscriptions/'+subscriptionId,undefined,fetcher);
+  validateOwnedSubscription(subscription,record,env);
+  const previous=subscription;
+  if(subscription.paid_count!==0||!['created','cancelled','expired'].includes(subscription.status)||subscription.status==='created'&&subscription.auth_attempts!==0)fail(409,'This checkout has payment activity and cannot be replaced here. Open My account to manage billing.');
+  if(subscription.status==='created'){
+    subscription=await razorpay(env,'subscriptions/'+subscriptionId+'/cancel',{cancel_at_cycle_end:0},fetcher);
+    validateOwnedSubscription(subscription,record,env);
+    if(subscription.status!=='cancelled'||subscription.paid_count!==0)fail(409,'Cancellation has not been confirmed. Resume the existing checkout before trying again.');
+  }
+  await saveSubscriptionState(subscription,record,env,fetcher,new Date().toISOString());
+  await releaseSubscriptionCheckout(user,previous,record,env,fetcher);
+  return {cancelled:true};
+}
+async function createCheckout(user,choice,env,fetcher,providerWrite){
+  // Recheck under the lease before making a provider write.
+  const previous=await existingCheckout(user,choice,env,fetcher);if(previous)return previous;
   const provider=providerFor(env,choice.region.id),origin=site(env);
   if(provider==='stripe'){
     const priceId=env[`STRIPE_PRICE_${choice.key}`];
@@ -310,10 +373,12 @@ async function createCheckout(user,choice,env,fetcher){
     const existing=await db(env,`billing_customers?user_id=eq.${user.id}&provider=eq.stripe&select=provider_customer_id`,fetcher);
     let customer=existing[0]?.provider_customer_id;
     if(!customer){
+      providerWrite();
       const created=await stripe(env,'customers',{email:user.email,'metadata[user_id]':user.id},fetcher,`spanvision-customer-${user.id}`);
       customer=created.id;
       await db(env,'billing_customers?on_conflict=user_id,provider',fetcher,{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify({user_id:user.id,provider:'stripe',provider_customer_id:customer})});
     }
+    providerWrite();
     const session=await stripe(env,'checkout/sessions',{mode:'subscription',customer,expires_at:String(Math.floor(Date.now()/1000)+3600),'line_items[0][price]':priceId,'line_items[0][quantity]':'1','subscription_data[metadata][plan_key]':choice.key,success_url:`${origin}/account?checkout=returned`,cancel_url:`${origin}/pricing?checkout=cancelled`},fetcher);
     const url=new URL(session.url);if(url.protocol!=='https:'||url.hostname!=='checkout.stripe.com')fail(502,'Checkout link could not be verified.');
     return {url:url.href,provider};
@@ -321,6 +386,7 @@ async function createCheckout(user,choice,env,fetcher){
   const planId=env[`RAZORPAY_PLAN_${choice.key}`];if(!providerId(planId))fail(503,'This plan is not ready for checkout.');
   const plan=await razorpay(env,`plans/${planId}`,undefined,fetcher);
   if(plan.id!==planId||plan.item?.amount!==choice.amount||plan.item?.currency!==choice.region.currency||plan.period!==(choice.interval==='annual'?'yearly':'monthly')||plan.interval!==1)fail(503,'The checkout price needs review.');
+  providerWrite();
   const subscription=await razorpay(env,'subscriptions',{plan_id:planId,total_count:choice.interval==='annual'?10:120,quantity:1,customer_notify:1,expire_by:Math.floor(Date.now()/1000)+3600,notes:{user_id:user.id,plan_key:choice.key}},fetcher);
   if(!/^sub_[a-zA-Z0-9]+$/.test(subscription.id||'')||subscription.plan_id!==planId||subscription.quantity!==1||subscription.status!=='created')fail(502,'The subscription checkout could not be verified.');
   await db(env,'billing_subscriptions?on_conflict=provider,provider_subscription_id',fetcher,{method:'POST',headers:{Prefer:'resolution=ignore-duplicates,return=representation'},body:JSON.stringify({provider,provider_subscription_id:subscription.id,user_id:user.id,plan_key:choice.key,status:subscription.status,observed_at:new Date().toISOString()})});
@@ -331,20 +397,22 @@ async function checkout(user,choice,env,fetcher){
   if(env.PRICING_APPROVED!=='true')fail(409,'These are draft prices. Payments are not open yet.');
   if(choice.plan.id==='explorer')fail(400,'The Explorer workspace is free.');
   if(!billingReady(env,choice))fail(503,'Payments for this region are not available yet.');
+  const previous=await existingCheckout(user,choice,env,fetcher);if(previous)return previous;
   const lock=await db(env,'rpc/claim_billing_checkout',fetcher,{method:'POST',body:JSON.stringify({account_id:user.id,selected_plan:choice.key})});
   if(!lock.claimed){
     if(lock.checkout_url&&lock.plan_key===choice.key){
-      const url=new URL(lock.checkout_url);if(url.protocol!=='https:'||!['checkout.stripe.com','rzp.io','razorpay.com'].includes(url.hostname))fail(502,'Checkout link could not be verified.');
-      return {url:url.href,provider:providerFor(env,choice.region.id)};
+      const provider=providerFor(env,choice.region.id);return {url:checkoutUrl(lock.checkout_url,provider),provider};
     }
     fail(409,'A checkout is already in progress. Please wait before opening another plan.');
   }
+  const lease=await checkoutLock(user,env,fetcher);let providerStarted=false;
   try{
-    const result=await createCheckout(user,choice,env,fetcher);
+    const result=await createCheckout(user,choice,env,fetcher,()=>{providerStarted=true;});
     await db(env,'billing_checkout_locks?user_id=eq.'+user.id,fetcher,{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({checkout_url:result.url})});
     return result;
   }catch(error){
-    // Retain the short lease after an ambiguous provider failure to avoid a duplicate subscription.
+    // Validation failures may retry immediately; ambiguous provider writes retain their lease.
+    if(!providerStarted)await releaseCheckoutLock(user,lease,env,fetcher);
     throw error;
   }
 }
@@ -465,6 +533,9 @@ export function createHandler({env=process.env,fetcher=fetch,store}={}){
           if(current.user.role==='super_admin')fail(409,'Your super-admin account already has access to every plan.');
           const choice=selection(body.plan,body.region,body.interval);if(!choice)fail(400,'Choose a valid plan, region and billing cycle.');
           result=await checkout(current.user,choice,env,fetcher);
+        }else if(route==='/api/billing/checkout/cancel'&&method==='POST'){
+          const current=await identity(req,res,env,fetcher);if(current.session.recovery)fail(403,'Set your new password before changing checkout.');
+          result=await cancelUnpaidCheckout(current.user,body.subscriptionId,env,fetcher);
         }else if(route==='/api/billing/portal'&&method==='POST'){
           const current=await identity(req,res,env,fetcher);if(current.session.recovery)fail(403,'Set your new password before opening billing.');
           const customers=await db(env,`billing_customers?user_id=eq.${current.user.id}&provider=eq.stripe&select=provider_customer_id`,fetcher);
@@ -475,7 +546,7 @@ export function createHandler({env=process.env,fetcher=fetch,store}={}){
         }else fail(404,'Endpoint not found.');
       }
       res.statusCode=200;res.end(JSON.stringify(result));
-    }catch(error){const known=error instanceof RequestError||error instanceof PaymentTestError;res.statusCode=known?error.status:500;res.end(JSON.stringify({error:known?error.message:'The request could not be completed. Please try again.'}));}
+    }catch(error){const known=error instanceof RequestError||error instanceof PaymentTestError;res.statusCode=known?error.status:500;res.end(JSON.stringify({error:known?error.message:'The request could not be completed. Please try again.',...(error instanceof RequestError?error.details:{})}));}
   };
 }
 export default createHandler();

@@ -94,7 +94,11 @@ export function createNeonStore(query, env = {}) {
       }
       const where = filters.length ? ` where ${filters.join(' and ')}` : '';
       if (method === 'GET') {
-        const selected = (url.searchParams.get('select') || columns.join(',')).split(',').map(column => identifier(column, columns)).join(',');
+        const selected = (url.searchParams.get('select') || columns.join(',')).split(',').map(column => {
+          const name=identifier(column,columns);
+          // Keep PostgreSQL's microseconds for exact lease comparisons across requests.
+          return table==='billing_checkout_locks'&&column==='expires_at'?`${name}::text as ${name}`:name;
+        }).join(',');
         let suffix = '';
         if (url.searchParams.has('order')) {
           const [column, direction, extra] = url.searchParams.get('order').split('.');
@@ -107,6 +111,10 @@ export function createNeonStore(query, env = {}) {
           suffix += ` limit ${bind(limit)}`;
         }
         return rows(`select ${selected} from ${schema}.${table}${where}${suffix}`, params);
+      }
+      if (method === 'DELETE' && table === 'billing_checkout_locks' && filters.length === 3
+        && ['user_id','plan_key','expires_at'].every(column => url.searchParams.get(column)?.startsWith('eq.'))) {
+        return rows(`delete from ${schema}.${table}${where} returning user_id`, params);
       }
       if (!body || typeof body !== 'object' || Array.isArray(body)) throw new Error('Invalid database write.');
       const names = Object.keys(body); names.forEach(name => identifier(name, columns));

@@ -7,19 +7,23 @@ const PaymentTest=lazy(()=>import('./PaymentTest'));
 function Arrow(){return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>;}
 function Check(){return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m5 12 4 4 10-10"/></svg>;}
 export function Pricing(props){
-  const [region,setRegion]=createSignal('IN'),[interval,setInterval]=createSignal('monthly'),[chosen,setChosen]=createSignal(null),[busy,setBusy]=createSignal(false),[error,setError]=createSignal('');
+  const [region,setRegion]=createSignal('IN'),[interval,setInterval]=createSignal('monthly'),[chosen,setChosen]=createSignal(null),[busy,setBusy]=createSignal(false),[error,setError]=createSignal(''),[pendingCheckout,setPendingCheckout]=createSignal(null);
   let dialog,previousFocus;
   const approved=()=>props.account.config()?.pricingApproved===true;
   const displayedPlans=()=>props.account.config()?.plans||plans;
   const checkoutAvailable=choice=>props.account.config()?.checkoutAvailability?.[choice.key]??props.account.config()?.checkoutAvailable?.[choice.region.id]===true;
-  function review(event,plan){previousFocus=event.currentTarget;setError('');setChosen(selection(plan.id,region(),interval()));dialog.showModal();}
+  function review(event,plan){previousFocus=event.currentTarget;setError('');setPendingCheckout(null);setChosen(selection(plan.id,region(),interval()));dialog.showModal();}
   function close(){dialog.close();previousFocus?.focus();}
   async function checkout(){
+    if(busy())return;
     if(!chosen()||!checkoutAvailable(chosen()))return;
     if(!props.account.user()){close();navigate('signup');return;}
     setBusy(true);setError('');
-    try{const choice=chosen();const result=await accountRequest('billing/checkout',{plan:choice.plan.id,region:choice.region.id,interval:choice.interval});location.assign(result.url);}
-    catch(error){setError(error.message);}finally{setBusy(false);}
+    try{
+      const choice=chosen(),pending=pendingCheckout();
+      if(pending?.canReplace){await accountRequest('billing/checkout/cancel',{subscriptionId:pending.subscriptionId});setPendingCheckout(null);}
+      const result=await accountRequest('billing/checkout',{plan:choice.plan.id,region:choice.region.id,interval:choice.interval});location.assign(result.url);
+    }catch(error){setError(error.message);setPendingCheckout(error.pendingCheckout||null);}finally{setBusy(false);}
   }
   return <section class="pricing-section marketing-section" id="pricing-section" aria-labelledby="pricing-heading">
     <div class="marketing-section-heading"><h2 id="pricing-heading">Pricing</h2></div>
@@ -41,7 +45,8 @@ export function Pricing(props){
         <Show when={approved()&&checkoutAvailable(choice())}><p class="checkout-note">Recurring {choice().interval==='annual'?'annual':'monthly'} billing. Authorize payments in secure checkout. Your plan activates after payment confirmation; use your provider's subscription link to manage or cancel renewals.</p></Show>
         <Show when={approved()&&!checkoutAvailable(choice())}><p class="checkout-note" role="status">Payments in {choice().region.currency} are not available for this plan and billing cycle yet.</p></Show>
         <Show when={error()}><p class="form-error" role="alert">{error()}</p></Show>
-        <Show when={approved()} fallback={<><a href="/signup" class="button button-light" onClick={close}>Create your account<Arrow/></a><button class="text-button" onClick={close}>Keep exploring</button></>}><button class="button button-light" disabled={busy()||!checkoutAvailable(choice())} onClick={checkout}>{busy()?'Opening checkout…':!checkoutAvailable(choice())?'Checkout unavailable':props.account.user()?'Continue to secure checkout':'Create an account to continue'}<Arrow/></button></Show>
+        <Show when={pendingCheckout()&&!pendingCheckout().expired}><a class="button button-outline" href={pendingCheckout()?.url}><span>Resume {pendingCheckout()?.price} checkout</span><Arrow/></a></Show>
+        <Show when={approved()} fallback={<><a href="/signup" class="button button-light" onClick={close}>Create your account<Arrow/></a><button class="text-button" onClick={close}>Keep exploring</button></>}><button class="button button-light" disabled={busy()||!checkoutAvailable(choice())||pendingCheckout()&&!pendingCheckout().canReplace} onClick={checkout}>{busy()?'Opening checkout…':pendingCheckout()?.canReplace?'Replace unpaid checkout':pendingCheckout()?'Payment in progress':!checkoutAvailable(choice())?'Checkout unavailable':props.account.user()?'Continue to secure checkout':'Create an account to continue'}<Arrow/></button></Show>
       </>}</Show>
     </dialog>
   </section>;

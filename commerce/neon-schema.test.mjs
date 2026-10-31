@@ -56,6 +56,13 @@ test('Neon migration, least-privilege access, checkout leases, subscription orde
     assert.deepEqual(await lease(),{claimed:true});assert.equal((await lease()).claimed,false);
     await store.request('billing_checkout_locks?user_id=eq.'+member.id,{method:'PATCH',body:JSON.stringify({checkout_url:'https://checkout.stripe.com/test'})});
     assert.equal((await lease()).checkout_url,'https://checkout.stripe.com/test');
+    const currentLock=(await store.request(`billing_checkout_locks?user_id=eq.${member.id}&select=expires_at`))[0];
+    const release=expires=>store.request(`billing_checkout_locks?user_id=eq.${member.id}&plan_key=eq.STUDIO_MONTHLY_USD&expires_at=eq.${encodeURIComponent(expires)}`,{method:'DELETE'});
+    await query(`update spanvision_commerce.billing_checkout_locks set expires_at=expires_at+interval '1 minute' where user_id=$1`,[member.id]);
+    assert.deepEqual(await release(currentLock.expires_at),[],'an older request cannot remove a newer lease');
+    assert.equal((await lease()).claimed,false);
+    const newerLock=(await store.request(`billing_checkout_locks?user_id=eq.${member.id}&select=expires_at`))[0];
+    assert.equal((await release(newerLock.expires_at)).length,1);assert.equal((await lease()).claimed,true);
     const subscription={provider:'stripe',provider_subscription_id:'sub_test',user_id:member.id,plan_key:'STUDIO_MONTHLY_USD',status:'active',
       current_period_end:'2026-12-01T00:00:00Z',observed_at:'2026-10-14T10:00:00Z'};
     const apply=record=>store.request('rpc/apply_billing_subscription',{method:'POST',body:JSON.stringify({record})});

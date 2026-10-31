@@ -10,9 +10,11 @@ await fs.mkdir(path.join(output,'temp'),{recursive:true});
 const browser=await chromium.launch({channel:'msedge',headless:true,env:{...process.env,TEMP:path.join(output,'temp'),TMP:path.join(output,'temp')}}),reports=[];
 try{
   const internationalScenarios=['us','gb'].flatMap(region=>['studio','team'].flatMap(plan=>['monthly','annual'].map(interval=>`${plan}-${interval}-${region}`)));
-  for(const [theme,width] of [['dark',1440],['light',320]])for(const scenario of ['studio-monthly','team-monthly','studio-annual','team-annual','unsupported-us','unsupported-gb','missing-annual','guest',...internationalScenarios]){
-    const context=await browser.newContext({viewport:{width,height:1000},reducedMotion:'reduce'}),page=await context.newPage(),bodies=[],errors=[];
-    const internationalReady=internationalScenarios.includes(scenario);
+  const recoveryScenarios=['pending-resume-us','pending-replace-us','pending-payment-us'];
+  const scenarios=process.argv.includes('--recovery-only')?recoveryScenarios:['studio-monthly','team-monthly','studio-annual','team-annual','unsupported-us','unsupported-gb','missing-annual','guest',...internationalScenarios,...recoveryScenarios];
+  for(const [theme,width] of [['dark',1440],['light',320]])for(const scenario of scenarios){
+    const context=await browser.newContext({viewport:{width,height:width===320&&scenario.startsWith('pending-')?700:1000},reducedMotion:'reduce'}),page=await context.newPage(),bodies=[],errors=[],cancellations=[],requests=[];
+    const internationalReady=internationalScenarios.includes(scenario)||scenario.startsWith('pending-');
     const checkoutAvailability=Object.fromEntries(plans.filter(plan=>plan.id!=='explorer').flatMap(plan=>regions.flatMap(region=>['monthly','annual'].map(interval=>{const choice=selection(plan.id,region.id,interval);return [choice.key,(region.id==='IN'||internationalReady)&&!(scenario==='missing-annual'&&choice.key==='TEAM_ANNUAL_INR')];}))));
     page.on('pageerror',error=>errors.push(error.message));
     await context.route('**/*',async route=>{
@@ -24,8 +26,11 @@ try{
       if(url.pathname==='/api/billing/payment-test/config')return route.fulfill({json:{enabled:false}});
       if(url.pathname==='/api/account/tool-status')return route.fulfill({json:{trial:{status:'not_started'}}});
       if(url.pathname==='/api/billing/checkout'){
-        bodies.push(route.request().postDataJSON());return route.fulfill({json:{provider:'razorpay',url:'https://rzp.io/rzp/verifiedfixture'}});
+        bodies.push(route.request().postDataJSON());requests.push('checkout');
+        if(scenario.startsWith('pending-')&&bodies.length===1)return route.fulfill({status:409,json:{error:'An unpaid Studio checkout at ₹999 / month is already open. Resume it or replace it with the selected plan.',pendingCheckout:{subscriptionId:'sub_previous',planKey:'STUDIO_MONTHLY_INR',price:'₹999 / month',url:'https://rzp.io/rzp/previousfixture',canReplace:scenario!=='pending-payment-us'}}});
+        return route.fulfill({json:{provider:'razorpay',url:'https://rzp.io/rzp/verifiedfixture'}});
       }
+      if(url.pathname==='/api/billing/checkout/cancel'){cancellations.push(route.request().postDataJSON());requests.push('cancel');return route.fulfill({json:{cancelled:true}});}
       if(url.pathname.startsWith('/api/'))return route.fulfill({status:503,json:{error:'Isolated browser check'}});
       const file=path.resolve(build,'.'+(['/', '/pricing','/signup'].includes(url.pathname)?'/index.html':url.pathname));assert(file.startsWith(build+path.sep));
       try{return route.fulfill({contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2'})[path.extname(file)]||'application/octet-stream',body:await fs.readFile(file)});}
@@ -50,10 +55,25 @@ try{
         await dialog.getByRole('button',{name:'Create an account to continue'}).click();await page.waitForURL('**/signup');assert.equal(bodies.length,0);
       }else{
         if(scenario==='studio-monthly')await page.screenshot({path:path.join(output,theme+'-plan-summary.png')});
-        await dialog.getByRole('button',{name:'Continue to secure checkout'}).click();await page.waitForURL('https://rzp.io/rzp/verifiedfixture');
-        assert.deepEqual(bodies,[{plan,region,interval}]);
+        await dialog.getByRole('button',{name:'Continue to secure checkout'}).click();
+        if(scenario.startsWith('pending-')){
+          await dialog.getByRole('alert').waitFor();assert.equal(cancellations.length,0);
+          const resume=dialog.getByRole('link',{name:'Resume ₹999 / month checkout'});await resume.waitFor();
+          assert.equal(await dialog.evaluate(element=>element.scrollWidth<=element.clientWidth),true);
+          assert.equal(await resume.evaluate(element=>element.scrollWidth<=element.clientWidth),true,'Resume text and icon fit inside the action');
+          if(scenario==='pending-payment-us')assert.equal(await dialog.getByRole('button',{name:'Payment in progress'}).isDisabled(),true);
+          else if(scenario==='pending-resume-us'){await resume.click();await page.waitForURL('https://rzp.io/rzp/previousfixture');assert.equal(cancellations.length,0);}
+          else{
+            await page.screenshot({path:path.join(output,theme+'-checkout-recovery.png')});
+            await dialog.getByRole('button',{name:'Replace unpaid checkout'}).click();await page.waitForURL('https://rzp.io/rzp/verifiedfixture');
+            assert.deepEqual(cancellations,[{subscriptionId:'sub_previous'}]);assert.deepEqual(requests,['checkout','cancel','checkout']);
+          }
+          assert.deepEqual(bodies,Array.from({length:scenario==='pending-replace-us'?2:1},()=>({plan,region,interval})));
+        }else{
+          await page.waitForURL('https://rzp.io/rzp/verifiedfixture');assert.deepEqual(bodies,[{plan,region,interval}]);
+        }
       }
     }
     assert.deepEqual(errors,[]);reports.push({theme,width,scenario,passed:true});console.log(theme+'/'+scenario+': passed');await context.close();
   }
-}finally{await browser.close();await fs.writeFile(path.join(output,'results.json'),JSON.stringify(reports,null,2));}
+}finally{await browser.close();await fs.writeFile(path.join(output,process.argv.includes('--recovery-only')?'recovery-results.json':'results.json'),JSON.stringify(reports,null,2));}

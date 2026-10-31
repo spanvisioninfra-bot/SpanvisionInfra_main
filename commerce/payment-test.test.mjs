@@ -71,7 +71,9 @@ test('fixed amount, same-origin, session and signature checks reject forged chec
   assert.equal((await f.post('order',{amount:1,plan:'studio'},cookie)).status,400);
   assert.equal((await f.post('order',{},cookie,{Origin:'https://evil.example'})).status,403);
   assert.equal((await f.post('order',{},cookie,{'Sec-Fetch-Site':'cross-site'})).status,403);
-  assert.equal((await f.post('order',{},cookie.slice(0,-1)+'x')).status,403);assert.equal(f.count(),0);
+  // Mutate the first signature character; the final character can be unchanged or alias padding bits.
+  const proofAt=cookie.lastIndexOf('.')+1,forged=cookie.slice(0,proofAt)+(cookie[proofAt]==='A'?'B':'A')+cookie.slice(proofAt+1);
+  assert.equal((await f.post('order',{},forged)).status,403);assert.equal(f.count(),0);
   const order=await f.post('order',{},cookie);assert.equal(order.status,200);assert.equal((await order.json()).status,'unpaid');
   f.setPayment('captured');const invalid=await f.post('verify',{...f.confirmation(),razorpay_signature:'0'.repeat(64)},cookie);assert.equal(invalid.status,400);
   assert.equal(f.calls.filter(call=>call.url.includes('/payments/pay_')).length,0);
