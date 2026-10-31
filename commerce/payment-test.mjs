@@ -1,4 +1,4 @@
-// Public one-time checkout. Never creates subscriptions or tool access grants.
+// Administrator-only one-time checkout. Never creates subscriptions or tool access grants.
 import {createHmac,randomUUID,timingSafeEqual} from 'node:crypto';
 const cookieName='sv_payment_test',amount=100,currency='INR',ttl=86400000;
 const validId=(value,type)=>typeof value==='string'&&new RegExp('^'+type+'_[A-Za-z0-9]{1,80}$').test(value);
@@ -6,7 +6,7 @@ export class PaymentTestError extends Error{constructor(status,message){super(me
 const fail=(status,message)=>{throw new PaymentTestError(status,message);};
 export function paymentTestReady(env){return env.PAYMENT_TEST_ENABLED==='true'&&/^rzp_(live|test)_[A-Za-z0-9]+$/.test(env.RAZORPAY_KEY_ID||'')&&!!env.RAZORPAY_KEY_SECRET&&env.SESSION_SECRET?.length>=32;}
 const signature=(value,env)=>createHmac('sha256',env.SESSION_SECRET).update('spanvision-payment-test-v1\0'+env.SITE_URL+'\0'+value).digest();
-function readSession(req,env){
+function readSession(req,env,userId){
   try{
     const cookie=(req.headers.cookie||'').split(';').map(value=>value.trim()).find(value=>value.startsWith(cookieName+'='))?.slice(cookieName.length+1);
     if(!cookie||cookie.length>600)return null;
@@ -14,25 +14,26 @@ function readSession(req,env){
     const expected=signature(value,env),actual=Buffer.from(proof,'base64url');
     if(actual.length!==expected.length||!timingSafeEqual(actual,expected))return null;
     const session=JSON.parse(Buffer.from(value,'base64url'));
-    return /^[0-9a-f-]{36}$/.test(session.id||'')&&session.expires>Date.now()?session:null;
+    return session.userId===userId&&/^[0-9a-f-]{36}$/.test(session.id||'')&&session.expires>Date.now()?session:null;
   }catch{return null;}
 }
-function createSession(res,env){
-  const session={id:randomUUID(),expires:Date.now()+ttl},value=Buffer.from(JSON.stringify(session)).toString('base64url');
+function createSession(res,env,userId){
+  const session={id:randomUUID(),userId,expires:Date.now()+ttl},value=Buffer.from(JSON.stringify(session)).toString('base64url');
   const cookie=cookieName+'='+value+'.'+signature(value,env).toString('base64url')+'; Path=/api/billing/payment-test; HttpOnly; SameSite=Lax; Max-Age=86400'+(new URL(env.SITE_URL).protocol==='https:'?'; Secure':'');
   const existing=res.getHeader('Set-Cookie');res.setHeader('Set-Cookie',existing?[...(Array.isArray(existing)?existing:[existing]),cookie]:cookie);
   return session;
 }
-export async function paymentTestRoute(route,method,input,req,res,{env,fetcher,store,storageReady}){
+export async function paymentTestRoute(route,method,input,req,res,{env,fetcher,user,store,storageReady}){
+  if(user?.role!=='super_admin'||!user.id)fail(403,'Administrator access is required for the ₹1 payment test.');
   const action=route.slice('/api/billing/payment-test/'.length),enabled=paymentTestReady(env)&&storageReady;
   if(action==='config'&&method==='GET'){
     if(!enabled)return {enabled:false};
-    if(!readSession(req,env))createSession(res,env);
+    if(!readSession(req,env,user.id))createSession(res,env,user.id);
     return {enabled:true,amount,currency,live:env.RAZORPAY_KEY_ID.startsWith('rzp_live_')};
   }
   if(!enabled)fail(404,'The ₹1 payment test is unavailable.');
   if(method!=='POST'||!['order','verify','status'].includes(action))fail(404,'Endpoint not found.');
-  const session=readSession(req,env);if(!session)fail(403,'Reload the pricing page before opening the ₹1 checkout.');
+  const session=readSession(req,env,user.id);if(!session)fail(403,'Reload the pricing page before opening the ₹1 checkout.');
   if(req.headers['sec-fetch-site']==='cross-site')fail(403,'Open the payment test on this website.');
   const rpc=(name,data)=>store('rpc/'+name,{method:'POST',body:JSON.stringify({test_session:session.id,...data})});
   async function razorpay(endpoint,body){

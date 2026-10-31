@@ -442,7 +442,12 @@ export function createHandler({env=process.env,fetcher=fetch,store}={}){
         if(method==='POST'&&!scalar(req.headers['content-type']).startsWith('application/json'))fail(415,'Send a JSON request.');
         const body=method==='POST'?jsonBody(await rawBody(req,16384)):{};
         if(route.startsWith('/api/billing/payment-test/')){
-          result=await paymentTestRoute(route,method,body,req,res,{env,fetcher,storageReady:storageReady(env),store:(resource,options)=>db(env,resource,fetcher,options)});
+          const current=await identity(req,res,env,fetcher,true);
+          const administrator=current?.user.role==='super_admin'&&!current.session.recovery;
+          if(!administrator){
+            if(route==='/api/billing/payment-test/config'&&method==='GET')result={enabled:false};
+            else fail(current?403:401,'Administrator access is required for the ₹1 payment test.');
+          }else result=await paymentTestRoute(route,method,body,req,res,{env,fetcher,user:current.user,storageReady:storageReady(env),store:(resource,options)=>db(env,resource,fetcher,options)});
         }else if(route==='/api/account/session'&&method==='GET'){
           result={user:configured(env)?(await identity(req,res,env,fetcher,true))?.user||null:null};
         }else if(route==='/api/account/tool-status'&&method==='GET'){

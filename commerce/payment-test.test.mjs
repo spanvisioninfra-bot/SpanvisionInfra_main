@@ -2,13 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import {createHmac} from 'node:crypto';
-import {createHandler} from './server.mjs';
+import {createHandler,sealSession} from './server.mjs';
 
-const environment={SITE_URL:'https://www.spanvisioninfra.com',SESSION_SECRET:'isolated-public-payment-signing-secret-32',SUPABASE_URL:'https://database.example',SUPABASE_PUBLISHABLE_KEY:'isolated-public-key',SUPABASE_SERVICE_ROLE_KEY:'isolated-server-role',PAYMENT_TEST_ENABLED:'true',RAZORPAY_KEY_ID:'rzp_live_fixture',RAZORPAY_KEY_SECRET:'isolated-payment-secret'};
+const administrator={id:'12345678-1234-4234-8234-123456789abc',email:'spanvisioninfra.admin@gmail.com',email_confirmed_at:'2026-01-01T00:00:00Z',user_metadata:{full_name:'Administrator'}};
+const environment={SITE_URL:'https://www.spanvisioninfra.com',SESSION_SECRET:'isolated-public-payment-signing-secret-32',SUPABASE_URL:'https://database.example',SUPABASE_PUBLISHABLE_KEY:'isolated-public-key',SUPABASE_SERVICE_ROLE_KEY:'isolated-server-role',SUPER_ADMIN_USER_ID:administrator.id,PAYMENT_TEST_ENABLED:'true',RAZORPAY_KEY_ID:'rzp_live_fixture',RAZORPAY_KEY_SECRET:'isolated-payment-secret'};
 async function fixture(t,options={}){
   const env={...environment,...options.env},rows=new Map(),orders=new Map(),calls=[];
+  let providerUser=options.user||administrator;
+  const accountCookie=options.guest?'':'sv_account='+sealSession({access:'fixture-access',refresh:'fixture-refresh',provider:'supabase',recovery:options.recovery===true,validUntil:Date.now()+3600000},env.SESSION_SECRET);
   let attempts=0,payment=null,ambiguous=options.ambiguous===true,rateLimited=false;
   const fetcher=async(url,request={})=>{
+    if(url==='https://database.example/auth/v1/user')return Response.json(providerUser||{error:'Revoked'},{status:providerUser?200:401});
+    if(url.startsWith('https://database.example/auth/v1/token'))return Response.json({error:'Revoked'},{status:401});
     calls.push({url,request});
     if(url.startsWith('https://database.example/rest/v1/rpc/')){
       const name=url.split('/').at(-1),body=JSON.parse(request.body),id=body.test_session,row=rows.get(id);
@@ -43,23 +48,52 @@ async function fixture(t,options={}){
     const server=http.createServer(createHandler({env,fetcher}));await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));t.after(()=>new Promise(resolve=>server.close(resolve)));
     const base='http://127.0.0.1:'+server.address().port;
     return {
-      get:async(cookie='',rewritten=false)=>fetch(base+(rewritten?'/api/commerce?__route=billing/payment-test/config':'/api/billing/payment-test/config'),{headers:{Cookie:cookie}}),
-      post:(action,body={},cookie='',headers={})=>fetch(base+'/api/billing/payment-test/'+action,{method:'POST',headers:{Origin:env.SITE_URL,'Content-Type':'application/json',Cookie:cookie,...headers},body:JSON.stringify(body)}),
+      get:async(cookie='',rewritten=false)=>fetch(base+(rewritten?'/api/commerce?__route=billing/payment-test/config':'/api/billing/payment-test/config'),{headers:{Cookie:[accountCookie,cookie].filter(Boolean).join('; ')}}),
+      post:(action,body={},cookie='',headers={})=>fetch(base+'/api/billing/payment-test/'+action,{method:'POST',headers:{Origin:env.SITE_URL,'Content-Type':'application/json',Cookie:[accountCookie,cookie].filter(Boolean).join('; '),...headers},body:JSON.stringify(body)}),
     };
   }
   const first=await client();
   const config=async target=>{const response=await (target||first).get();return {response,cookie:response.headers.get('set-cookie')?.split(';')[0]||''};};
-  return {...first,client,config,calls,rows,orders,setRateLimited:value=>{rateLimited=value;},
+  return {...first,client,config,calls,rows,orders,env,setUser:value=>{providerUser=value;},setRateLimited:value=>{rateLimited=value;},
     count:()=>attempts,setPayment:(status,orderId='order_fixture1',changes={})=>{payment={id:'pay_fixture',order_id:orderId,amount:100,currency:'INR',status,captured:status==='captured',amount_refunded:0,refund_status:null,...changes};},
     confirmation:()=>({razorpay_order_id:'order_fixture1',razorpay_payment_id:'pay_fixture',razorpay_signature:createHmac('sha256',env.RAZORPAY_KEY_SECRET).update('order_fixture1|pay_fixture').digest('hex')}),
   };
 }
 
-test('everyone can discover enabled checkout without login, secrets or provider writes',async t=>{
+test('the verified administrator can discover enabled checkout without secrets or payment writes',async t=>{
   const f=await fixture(t),{response,cookie}=await f.config();assert.equal(response.status,200);
   assert.deepEqual(await response.json(),{enabled:true,amount:100,currency:'INR',live:true});assert.match(response.headers.get('set-cookie'),/HttpOnly; SameSite=Lax; Max-Age=86400; Secure/);
   assert.equal(f.calls.length,0);assert(!cookie.includes(environment.RAZORPAY_KEY_SECRET));
   assert.equal((await f.get(cookie,true)).status,200);
+});
+
+test('guests, members, forged admins, unverified identities and recovery sessions cannot access the payment test',async t=>{
+  const admin=await fixture(t),{cookie}=await admin.config();
+  for(const options of [
+    {guest:true},
+    {user:{...administrator,id:'22345678-1234-4234-8234-123456789abc',email:'member@example.test',user_metadata:{role:'super_admin'}}},
+    {user:{...administrator,id:'22345678-1234-4234-8234-123456789abc'}},
+    {user:{...administrator,email_confirmed_at:null}},
+    {user:{...administrator,email:'member@example.test'}},
+    {recovery:true},
+  ]){
+    const f=await fixture(t,options);
+    for(const rewritten of [false,true]){
+      const response=await f.get(cookie,rewritten);assert.deepEqual(await response.json(),{enabled:false});assert.equal(response.headers.get('set-cookie'),null);
+    }
+    for(const action of ['order','verify','status'])assert.equal((await f.post(action,{},cookie)).status,options.guest?401:403);
+    assert.equal(f.calls.length,0);assert.equal(f.count(),0);
+  }
+});
+
+test('role revocation and a different administrator cannot reuse a saved payment-test cookie',async t=>{
+  const f=await fixture(t),{cookie}=await f.config();await f.post('order',{},cookie);const calls=f.calls.length;
+  f.setUser({...administrator,email:'member@example.test'});
+  assert.equal((await f.post('status',{},cookie)).status,403);assert.equal(f.calls.length,calls);
+  f.setUser(null);assert.equal((await f.post('verify',{},cookie)).status,401);assert.equal(f.calls.length,calls);
+  const next={...administrator,id:'22345678-1234-4234-8234-123456789abc'};f.env.SUPER_ADMIN_USER_ID=next.id;f.setUser(next);
+  assert.equal((await f.post('status',{},cookie)).status,403);assert.equal(f.calls.length,calls);
+  assert.notEqual((await f.config()).cookie,cookie);
 });
 test('production switch defaults off and missing storage or keys cannot create orders',async t=>{
   for(const env of [{PAYMENT_TEST_ENABLED:'false'},{RAZORPAY_KEY_SECRET:''},{SUPABASE_SERVICE_ROLE_KEY:''}]){

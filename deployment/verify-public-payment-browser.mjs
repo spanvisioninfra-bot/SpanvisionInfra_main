@@ -26,10 +26,11 @@ const browser=await chromium.launch({channel:'msedge',headless:true,env:{...proc
 const reports=[];
 try{
   for(const [mode,width] of [['dark',1440],['light',320]]){
-    for(const scenario of ['disabled','success','cancel','pending','refunded','verify-error','order-error','script-error','recover','existing-paid','existing-pending','amount-mismatch']){
+    for(const scenario of ['guest','member','forged-admin','disabled','success','cancel','pending','refunded','verify-error','order-error','script-error','recover','existing-paid','existing-pending','amount-mismatch']){
       const context=await browser.newContext({viewport:{width,height:1000},reducedMotion:'reduce'});
       const page=await context.newPage(),orders=[],verifies=[],statuses=[],errors=[],prohibited=[];
-      let sdkLoads=0;
+      let sdkLoads=0,configs=0;
+      const hidden=['guest','member','forged-admin'].includes(scenario);
       page.on('pageerror',error=>errors.push(error.message));
       await context.route('**/*',async route=>{
         const url=new URL(route.request().url());
@@ -39,7 +40,7 @@ try{
         }
         if(url.origin!==origin){if(url.hostname.endsWith('razorpay.com'))prohibited.push(url.hostname);return route.abort();}
         const data={verified:true,status:'captured',paymentId:'pay_browser',orderId:'order_browser',amount:100,currency:'INR'};
-        if(url.pathname===api+'config')return route.fulfill({json:{enabled:scenario!=='disabled',amount:100,currency:'INR',live:true}});
+        if(url.pathname===api+'config'){configs++;return route.fulfill({json:{enabled:scenario!=='disabled',amount:100,currency:'INR',live:true}});}
         if(url.pathname===api+'order'){
           orders.push(route.request().postDataJSON());
           if(scenario==='order-error')return route.fulfill({status:429,json:{error:'The payment test is busy. Please try again later.'}});
@@ -55,8 +56,8 @@ try{
           return route.fulfill({json:data});
         }
         if(url.pathname.startsWith('/api/local-payment/')){prohibited.push(url.pathname);return route.abort();}
-        if(url.pathname==='/api/account/config')return route.fulfill({json:{authAvailable:false,databaseAvailable:false,pricingApproved:true,plans,regions,trialPolicy,checkoutAvailable:{IN:false,US:false,GB:false}}});
-        if(url.pathname==='/api/account/session')return route.fulfill({json:{user:null}});
+        if(url.pathname==='/api/account/config')return route.fulfill({json:{authAvailable:true,databaseAvailable:true,pricingApproved:true,plans,regions,trialPolicy,checkoutAvailable:{IN:false,US:false,GB:false}}});
+        if(url.pathname==='/api/account/session')return route.fulfill({json:{user:scenario==='guest'?null:{id:'fixture-user',email:'fixture@example.test',role:hidden?'member':'super_admin',emailVerified:true,user_metadata:{role:scenario==='forged-admin'?'super_admin':'member'}}}});
         if(url.pathname==='/api/account/tool-status')return route.fulfill({json:{trial:{status:'not_started'}}});
         if(url.pathname.startsWith('/api/'))return route.fulfill({status:503,json:{error:'Isolated browser check'}});
         const pathname=url.pathname==='/pricing'?'/index.html':url.pathname;
@@ -64,8 +65,9 @@ try{
         try{return route.fulfill({contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2'})[path.extname(file)]||'application/octet-stream',body:await fs.readFile(file)});}
         catch{return route.fulfill({status:404,body:'Not found'});}
       });
-      const configured=page.waitForResponse(response=>response.url()===origin+api+'config');
-      await page.goto(origin+'/pricing?appearance='+mode);await configured;
+      const configured=hidden?null:page.waitForResponse(response=>response.url()===origin+api+'config');
+      const session=page.waitForResponse(response=>response.url()===origin+'/api/account/session');
+      await page.goto(origin+'/pricing?appearance='+mode);await session;if(configured)await configured;
       await page.locator('.price-card').last().waitFor();
       assert.equal(await page.locator('.price-card').count(),3);
       assert.match(await page.locator('.price-card').nth(0).innerText(),/Explorer trial/);
@@ -73,7 +75,8 @@ try{
       assert.match(await page.locator('.price-card').nth(2).innerText(),/Team/);
       assert.equal(orders.length,0);assert.equal(sdkLoads,0);
       const panel=page.locator('.local-payment-test');
-      if(scenario==='disabled')assert.equal(await panel.count(),0);
+      if(hidden){await page.waitForLoadState('networkidle');assert.equal(await panel.count(),0);assert.equal(configs,0);assert.equal(sdkLoads,0);}
+      else if(scenario==='disabled')assert.equal(await panel.count(),0);
       else{
         await panel.getByRole('heading',{name:'Try a ₹1 payment'}).waitFor();
         assert.match(await panel.innerText(),/real ₹1/);assert.match(await panel.innerText(),/does not start a subscription/);

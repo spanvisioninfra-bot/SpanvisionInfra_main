@@ -35,7 +35,7 @@ export function Pricing(props){
       <Show when={plan.id!=='explorer'} fallback={<a class="button button-outline" href="/signup">Start your trial<Arrow/></a>}><button class={`button ${plan.id==='studio'?'button-light':'button-outline'}`} onClick={event=>review(event,plan)}>{approved()?'Choose this plan':'Preview this plan'}<Arrow/></button></Show>
       <ul class="plan-features"><For each={plan.features}>{feature=><li><Check/><span>{feature}</span></li>}</For></ul>
     </article>}</For></div>
-    <Suspense><PaymentTest/></Suspense>
+    <Show when={!props.account.loading()&&props.account.user()?.role==='super_admin'}><Suspense><PaymentTest/></Suspense></Show>
     <dialog ref={dialog} class="checkout-dialog" aria-labelledby="checkout-title" onCancel={()=>previousFocus?.focus()}>
       <Show when={chosen()}>{choice=><>
         <div class="checkout-title-row"><span class="eyebrow">{approved()?'YOUR SUBSCRIPTION':'PLAN PREVIEW'}</span><button type="button" class="close-icon" aria-label="Close plan preview" onClick={close}>×</button></div>

@@ -14,7 +14,7 @@ const sdk=`window.Razorpay=class {constructor(options){this.options=options;wind
 async function mockAccount(route){
   const url=new URL(route.request().url());
   if(url.pathname==='/api/account/config')return route.fulfill({json:{authAvailable:false,databaseAvailable:false,pricingApproved:true,plans,regions,trialPolicy,checkoutAvailable:{IN:false,US:false,GB:false}}});
-  if(url.pathname==='/api/account/session')return route.fulfill({json:{user:null}});
+  if(url.pathname==='/api/account/session')return route.fulfill({json:{user:{id:'fixture-administrator',role:'super_admin',emailVerified:true}}});
   if(url.pathname==='/api/account/tool-status')return route.fulfill({json:{trial:{status:'not_started'}}});
   if(url.pathname.startsWith('/api/'))return route.fulfill({status:503,json:{error:'Isolated browser check'}});
   return route.continue();
