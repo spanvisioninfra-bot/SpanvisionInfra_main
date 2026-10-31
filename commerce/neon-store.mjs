@@ -66,6 +66,11 @@ export function createNeonStore(query, env = {}) {
         } else if (table === 'rpc/claim_tool_launch') {
           sql = `select ${schema}.claim_tool_launch($1,$2,$3,$4,$5) as result`;
           params = [body.account_id, body.selected_tool, body.launch_request, body.access_source, body.access_expires];
+        } else if (['rpc/claim_payment_test_order','rpc/payment_test_order_status'].includes(table)) {
+          const name=table.slice(4);
+          sql = `select ${schema}.${name}($1::uuid) as result`; params = [body.test_session];
+        } else if (table === 'rpc/save_payment_test_order') {
+          sql = `select ${schema}.save_payment_test_order($1::uuid,$2,$3) as result`; params = [body.test_session,body.selected_order,body.verified_payment];
         } else if (table === 'rpc/claim_billing_checkout') {
           sql = `select ${schema}.claim_billing_checkout($1,$2) as result`; params = [body.account_id, body.selected_plan];
         } else if (table === 'rpc/apply_billing_subscription') {

@@ -129,8 +129,8 @@ test('approved Razorpay checkout validates plan and records ownership before ret
     if(url.endsWith('/user'))return Response.json(user);
     if(url.includes('grant_type=password'))return Response.json({access_token:'access',refresh_token:'refresh'});
     if(url.includes('claim_billing_checkout'))return Response.json({claimed:true});
-    if(url.includes('/plans/'))return Response.json({item:{amount:99900,currency:'INR'},period:'monthly',interval:1});
-    if(url.endsWith('/subscriptions'))return Response.json({id:'sub_test',status:'created',short_url:'https://rzp.io/rzp/test'});
+    if(url.includes('/plans/'))return Response.json({id:'plan_test',item:{amount:99900,currency:'INR'},period:'monthly',interval:1});
+    if(url.endsWith('/subscriptions'))return Response.json({id:'sub_test',plan_id:'plan_test',quantity:1,status:'created',short_url:'https://rzp.io/rzp/test'});
     return Response.json([]);
   };
   const {post}=await fixture(t,{env,fetcher});const login=await post('/api/account/sign-in',{email:user.email,password:'test-password'});

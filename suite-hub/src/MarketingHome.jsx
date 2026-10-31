@@ -1,7 +1,8 @@
-import {For,Show,createSignal} from 'solid-js';
+import {For,Show,Suspense,createSignal,lazy} from 'solid-js';
 import {plans,regions,selection,formatPrice} from '../../commerce/catalog.mjs';
 import {accountRequest} from './account-client';
 import {navigate} from './router.mjs';
+const PaymentTest=lazy(()=>import('./PaymentTest'));
 
 function Arrow(){return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>;}
 function Check(){return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m5 12 4 4 10-10"/></svg>;}
@@ -10,9 +11,11 @@ export function Pricing(props){
   let dialog,previousFocus;
   const approved=()=>props.account.config()?.pricingApproved===true;
   const displayedPlans=()=>props.account.config()?.plans||plans;
+  const checkoutAvailable=choice=>props.account.config()?.checkoutAvailability?.[choice.key]??props.account.config()?.checkoutAvailable?.[choice.region.id]===true;
   function review(event,plan){previousFocus=event.currentTarget;setError('');setChosen(selection(plan.id,region(),interval()));dialog.showModal();}
   function close(){dialog.close();previousFocus?.focus();}
   async function checkout(){
+    if(!chosen()||!checkoutAvailable(chosen()))return;
     if(!props.account.user()){close();navigate('signup');return;}
     setBusy(true);setError('');
     try{const choice=chosen();const result=await accountRequest('billing/checkout',{plan:choice.plan.id,region:choice.region.id,interval:choice.interval});location.assign(result.url);}
@@ -28,8 +31,18 @@ export function Pricing(props){
       <Show when={plan.id!=='explorer'} fallback={<a class="button button-outline" href="/signup">Start your trial<Arrow/></a>}><button class={`button ${plan.id==='studio'?'button-light':'button-outline'}`} onClick={event=>review(event,plan)}>{approved()?'Choose this plan':'Preview this plan'}<Arrow/></button></Show>
       <ul class="plan-features"><For each={plan.features}>{feature=><li><Check/><span>{feature}</span></li>}</For></ul>
     </article>}</For></div>
+    <Suspense><PaymentTest/></Suspense>
     <dialog ref={dialog} class="checkout-dialog" aria-labelledby="checkout-title" onCancel={()=>previousFocus?.focus()}>
-      <Show when={chosen()}>{choice=><><div class="checkout-title-row"><span class="eyebrow">{approved()?'YOUR SUBSCRIPTION':'PLAN PREVIEW'}</span><button type="button" class="close-icon" aria-label="Close plan preview" onClick={close}>×</button></div><h2 id="checkout-title">{choice().plan.name}, your way.</h2><dl class="checkout-summary"><div><dt>Billing region</dt><dd>{choice().region.label}</dd></div><div><dt>Billing cycle</dt><dd>{choice().interval==='annual'?'Annual':'Monthly'}</dd></div><div><dt>{approved()?'Plan price':'Draft price'}</dt><dd>{formatPrice(choice().amount,choice().region.id)} / {choice().interval==='annual'?'year':'month'}</dd></div></dl><Show when={!approved()}><p class="checkout-note">This is a preview. No payment will be taken. Final prices and plan features will be confirmed before subscriptions open.</p></Show><Show when={error()}><p class="form-error" role="alert">{error()}</p></Show><Show when={approved()} fallback={<><a href="/signup" class="button button-light" onClick={close}>Create your account<Arrow/></a><button class="text-button" onClick={close}>Keep exploring</button></>}><button class="button button-light" disabled={busy()} onClick={checkout}>{busy()?'Opening checkout…':props.account.user()?'Continue to secure checkout':'Create an account to continue'}<Arrow/></button></Show></>}</Show>
+      <Show when={chosen()}>{choice=><>
+        <div class="checkout-title-row"><span class="eyebrow">{approved()?'YOUR SUBSCRIPTION':'PLAN PREVIEW'}</span><button type="button" class="close-icon" aria-label="Close plan preview" onClick={close}>×</button></div>
+        <h2 id="checkout-title">{choice().plan.name}, your way.</h2>
+        <dl class="checkout-summary"><div><dt>Billing region</dt><dd>{choice().region.label}</dd></div><div><dt>Billing cycle</dt><dd>{choice().interval==='annual'?'Annual':'Monthly'}</dd></div><div><dt>{approved()?'Plan price':'Draft price'}</dt><dd>{formatPrice(choice().amount,choice().region.id)} / {choice().interval==='annual'?'year':'month'}</dd></div></dl>
+        <Show when={!approved()}><p class="checkout-note">This is a preview. No payment will be taken. Final prices and plan features will be confirmed before subscriptions open.</p></Show>
+        <Show when={approved()&&checkoutAvailable(choice())}><p class="checkout-note">Recurring {choice().interval==='annual'?'annual':'monthly'} billing. Authorize payments in secure checkout. Your plan activates after payment confirmation; use your provider's subscription link to manage or cancel renewals.</p></Show>
+        <Show when={approved()&&!checkoutAvailable(choice())}><p class="checkout-note" role="status">Payments in {choice().region.currency} are not available for this plan and billing cycle yet.</p></Show>
+        <Show when={error()}><p class="form-error" role="alert">{error()}</p></Show>
+        <Show when={approved()} fallback={<><a href="/signup" class="button button-light" onClick={close}>Create your account<Arrow/></a><button class="text-button" onClick={close}>Keep exploring</button></>}><button class="button button-light" disabled={busy()||!checkoutAvailable(choice())} onClick={checkout}>{busy()?'Opening checkout…':!checkoutAvailable(choice())?'Checkout unavailable':props.account.user()?'Continue to secure checkout':'Create an account to continue'}<Arrow/></button></Show>
+      </>}</Show>
     </dialog>
   </section>;
 }

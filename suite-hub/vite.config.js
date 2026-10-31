@@ -6,9 +6,12 @@ import { createRequire } from 'node:module';
 import {createHandler} from '../commerce/server.mjs';
 import {readLocalEnvironment} from '../commerce/local-env.mjs';
 import {installWorkspaceUi} from '../deployment/browser-ui.mjs';
+import {fileURLToPath} from 'node:url';
+import {createLocalPaymentHandler} from '../commerce/local-payment.mjs';
 const require = createRequire(import.meta.url);
 const core = path.dirname(require.resolve('tesseract.js-core/package.json'));
 const files = fs.readdirSync(core).filter(name => /^tesseract-core.*-lstm\.wasm(?:\.js)?$/.test(name));
+const localPayment={name:'local-one-rupee-payment',apply:'serve',configureServer(server){const env=readLocalEnvironment({file:fileURLToPath(new URL('../commerce/.env.local-payment',import.meta.url))});server.middlewares.use(createLocalPaymentHandler({env}));}};
 const launchRoutes={name:'clean-tool-launch-routes',configureServer(server){server.middlewares.use(rewriteLaunch);},configurePreviewServer(server){server.middlewares.use(rewriteLaunch);}};
 function rewriteLaunch(request,response,next){if(/^\/launch\/[a-z0-9-]+\/?(?:\?|$)/.test(request.url||''))request.url='/launch.html'+(request.url.includes('?')?'?'+request.url.split('?').slice(1).join('?'):'');next();}
 const ocrAssets = {
@@ -29,4 +32,4 @@ const ocrAssets = {
   },
 };
 const accounts={name:'spanvision-accounts',configureServer(server){const handler=createHandler({env:readLocalEnvironment()});server.middlewares.use((request,response,next)=>/^\/api\/(account|billing|admin)\//.test(request.url||'')?handler(request,response):next());},async closeBundle(){await installWorkspaceUi(path.resolve('dist'),{optionalEntries:['launch.html']});}};
-export default defineConfig({ plugins: [solid(), ocrAssets,accounts,launchRoutes], build: { rollupOptions: { input: { main: path.resolve('index.html'), launch: path.resolve('launch.html') } } }, server: { host: '127.0.0.1', port: 4230, strictPort: true } });
+export default defineConfig({ plugins: [solid(), ocrAssets,accounts,launchRoutes,localPayment], build: { rollupOptions: { input: { main: path.resolve('index.html'), launch: path.resolve('launch.html') } } }, server: { host: '127.0.0.1', port: 4230, strictPort: true } });

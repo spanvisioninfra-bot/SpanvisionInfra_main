@@ -1,0 +1,11 @@
+.local-payment-test{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:center;padding:28px;margin-top:28px;border:1px solid var(--theme-border);border-radius:14px;background:var(--theme-surface,var(--theme-bg));color:var(--theme-text)}
+.local-payment-test .local-payment-badge{display:inline-block;border:1px solid var(--theme-border);border-radius:5px;padding:4px 8px;font-size:10px;letter-spacing:.1em;color:var(--theme-text-secondary)}
+.local-payment-test h3{font-size:24px;line-height:1.2;margin:14px 0 10px}
+.local-payment-test p{margin:8px 0 0;line-height:1.6;max-width:650px;font-size:14px;overflow-wrap:anywhere}
+.local-payment-test .local-payment-note{font-size:12px;color:var(--theme-text-secondary)}
+.local-payment-action{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.local-payment-amount{font-size:40px;font-weight:600;line-height:1.1}
+.local-payment-amount span{display:block;font-size:11px;font-weight:400;color:var(--theme-text-secondary);margin-top:8px}
+.local-payment-test .local-payment-message,.local-payment-test .local-payment-error{grid-column:1/-1;margin:0}
+.local-payment-test .local-payment-error{color:var(--theme-text);border-inline-start:3px solid currentColor;padding-inline-start:12px}
+@media(max-width:700px){.local-payment-test{grid-template-columns:minmax(0,1fr);padding:20px;gap:20px}.local-payment-action{justify-content:space-between;gap:18px}.local-payment-action .button{flex:1;min-width:160px}}

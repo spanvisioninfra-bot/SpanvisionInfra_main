@@ -5,6 +5,7 @@ import {neonAuthUrl,neonSelected,neonAuth,neonRequest} from './neon-auth.mjs';
 import {databaseConfigured,neonStore,bindNeonStore} from './neon-store.mjs';
 import {passwordPolicy} from './password-policy.mjs';
 import {toolIds,trialPolicy,issueToolTicket,readToolTicket} from './tool-trial.mjs';
+import {paymentTestRoute,PaymentTestError} from './payment-test.mjs';
 
 const cookieName='sv_account';
 class RequestError extends Error {constructor(status,message){super(message);this.status=status;}}
@@ -275,7 +276,14 @@ async function applyWebhook(provider,raw,req,env,fetcher){
     }
     if(!owner||!accountId(owner.user_id,env))fail(409,'Subscription ownership has not been recorded yet.');
     const epoch=provider==='stripe'?(subscription.items?.data?.[0]?.current_period_end||subscription.current_period_end):subscription.current_end;
-    const record={provider,provider_subscription_id:subscriptionId,user_id:owner.user_id,plan_key:owner.plan_key,status:subscription.status,current_period_end:epoch?new Date(epoch*1000).toISOString():null,observed_at:observedAt};
+    let status=subscription.status;
+    if(provider==='razorpay'){
+      const match=/^(STUDIO|TEAM)_(MONTHLY|ANNUAL)_(INR|USD|GBP)$/.exec(owner.plan_key||'');
+      if(!match||subscription.id!==subscriptionId||subscription.plan_id!==env[`RAZORPAY_PLAN_${owner.plan_key}`]||subscription.quantity!==1)fail(409,'The subscription does not match its recorded plan.');
+      // Mandate authentication and an unpaid first invoice do not grant tool access.
+      if(status==='active'&&(!Number.isSafeInteger(subscription.paid_count)||subscription.paid_count<1||!Number.isSafeInteger(epoch)||epoch<=0))status='pending';
+    }
+    const record={provider,provider_subscription_id:subscriptionId,user_id:owner.user_id,plan_key:owner.plan_key,status,current_period_end:epoch?new Date(epoch*1000).toISOString():null,observed_at:observedAt};
     await db(env,'rpc/apply_billing_subscription',fetcher,{method:'POST',body:JSON.stringify({record})});
   }
   await db(env,'billing_events?on_conflict=provider,event_id',fetcher,{method:'POST',headers:{Prefer:'resolution=ignore-duplicates,return=representation'},body:JSON.stringify({provider,event_id:id})});
@@ -285,8 +293,14 @@ async function createCheckout(user,choice,env,fetcher){
   if(env.PRICING_APPROVED!=='true')fail(409,'These are draft prices. Payments are not open yet.');
   if(choice.plan.id==='explorer')fail(400,'The Explorer trial does not need checkout. Choose Studio or Team for paid access.');
   if(!billingReady(env,choice))fail(503,'Payments for this region are not available yet.');
-  const active=await db(env,`billing_subscriptions?user_id=eq.${user.id}&status=in.(active,trialing,authenticated,pending,created,past_due,halted)&select=provider_subscription_id&limit=1`,fetcher);
-  if(active.length)fail(409,'You already have a subscription or checkout in progress. Open billing before starting another.');
+  const active=await db(env,`billing_subscriptions?user_id=eq.${user.id}&status=in.(active,trialing,authenticated,pending,created,past_due,halted)&select=provider,provider_subscription_id,plan_key,status`,fetcher);
+  for(const record of active){
+    if(record.provider!=='razorpay'||record.status!=='created'||!providerId(record.provider_subscription_id))fail(409,'You already have a subscription or checkout in progress. Open billing before starting another.');
+    const previous=await razorpay(env,'subscriptions/'+record.provider_subscription_id,undefined,fetcher);
+    if(previous.id!==record.provider_subscription_id||!['expired','cancelled','completed'].includes(previous.status))fail(409,'You already have a subscription or checkout in progress. Open billing before starting another.');
+    // Expired, unpaid hosted links must not permanently block a new checkout.
+    await db(env,'rpc/apply_billing_subscription',fetcher,{method:'POST',body:JSON.stringify({record:{provider:'razorpay',provider_subscription_id:record.provider_subscription_id,user_id:user.id,plan_key:record.plan_key,status:previous.status,current_period_end:null,observed_at:new Date().toISOString()}})});
+  }
   const provider=providerFor(env,choice.region.id),origin=site(env);
   if(provider==='stripe'){
     const priceId=env[`STRIPE_PRICE_${choice.key}`];
@@ -306,8 +320,9 @@ async function createCheckout(user,choice,env,fetcher){
   }
   const planId=env[`RAZORPAY_PLAN_${choice.key}`];if(!providerId(planId))fail(503,'This plan is not ready for checkout.');
   const plan=await razorpay(env,`plans/${planId}`,undefined,fetcher);
-  if(plan.item?.amount!==choice.amount||plan.item?.currency!==choice.region.currency||plan.period!==(choice.interval==='annual'?'yearly':'monthly')||plan.interval!==1)fail(503,'The checkout price needs review.');
+  if(plan.id!==planId||plan.item?.amount!==choice.amount||plan.item?.currency!==choice.region.currency||plan.period!==(choice.interval==='annual'?'yearly':'monthly')||plan.interval!==1)fail(503,'The checkout price needs review.');
   const subscription=await razorpay(env,'subscriptions',{plan_id:planId,total_count:choice.interval==='annual'?10:120,quantity:1,customer_notify:1,expire_by:Math.floor(Date.now()/1000)+3600,notes:{user_id:user.id,plan_key:choice.key}},fetcher);
+  if(!/^sub_[a-zA-Z0-9]+$/.test(subscription.id||'')||subscription.plan_id!==planId||subscription.quantity!==1||subscription.status!=='created')fail(502,'The subscription checkout could not be verified.');
   await db(env,'billing_subscriptions?on_conflict=provider,provider_subscription_id',fetcher,{method:'POST',headers:{Prefer:'resolution=ignore-duplicates,return=representation'},body:JSON.stringify({provider,provider_subscription_id:subscription.id,user_id:user.id,plan_key:choice.key,status:subscription.status,observed_at:new Date().toISOString()})});
   const url=new URL(subscription.short_url);if(url.protocol!=='https:'||!['rzp.io','razorpay.com'].includes(url.hostname))fail(502,'Checkout link could not be verified.');
   return {url:url.href,provider};
@@ -344,7 +359,8 @@ export function createHandler({env=process.env,fetcher=fetch,store}={}){
       let result;
       if(route==='/api/account/config'&&method==='GET'){
         const ready=configured(env);
-        result={authAvailable:ready,authProvider:neonSelected(env)?'neon':'supabase',databaseAvailable:storageReady(env),passwordPolicy,trialPolicy,pricingApproved:env.PRICING_APPROVED==='true',plans,regions,checkoutAvailable:Object.fromEntries(regions.map(region=>[region.id,env.PRICING_APPROVED==='true'&&billingReady(env,selection('studio',region.id,'monthly'))]))};
+        const checkoutAvailability=Object.fromEntries(plans.filter(plan=>plan.id!=='explorer').flatMap(plan=>regions.flatMap(region=>['monthly','annual'].map(interval=>{const choice=selection(plan.id,region.id,interval);return [choice.key,env.PRICING_APPROVED==='true'&&billingReady(env,choice)];}))));
+        result={authAvailable:ready,authProvider:neonSelected(env)?'neon':'supabase',databaseAvailable:storageReady(env),passwordPolicy,trialPolicy,pricingApproved:env.PRICING_APPROVED==='true',plans,regions,checkoutAvailability,checkoutAvailable:Object.fromEntries(regions.map(region=>[region.id,checkoutAvailability[selection('studio',region.id,'monthly').key]]))};
       }else if(route==='/api/account/tool-verify'&&method==='POST'){
         // Server-to-server validation uses a signed, tool-bound ticket rather than browser cookies.
         const body=jsonBody(await rawBody(req,4096));
@@ -357,7 +373,9 @@ export function createHandler({env=process.env,fetcher=fetch,store}={}){
         if(method==='POST'&&req.headers.origin!==site(env))fail(403,'Open this page on the Spanvision Infra website and try again.');
         if(method==='POST'&&!scalar(req.headers['content-type']).startsWith('application/json'))fail(415,'Send a JSON request.');
         const body=method==='POST'?jsonBody(await rawBody(req,16384)):{};
-        if(route==='/api/account/session'&&method==='GET'){
+        if(route.startsWith('/api/billing/payment-test/')){
+          result=await paymentTestRoute(route,method,body,req,res,{env,fetcher,storageReady:storageReady(env),store:(resource,options)=>db(env,resource,fetcher,options)});
+        }else if(route==='/api/account/session'&&method==='GET'){
           result={user:configured(env)?(await identity(req,res,env,fetcher,true))?.user||null:null};
         }else if(route==='/api/account/tool-status'&&method==='GET'){
           const current=await identity(req,res,env,fetcher);
@@ -457,7 +475,7 @@ export function createHandler({env=process.env,fetcher=fetch,store}={}){
         }else fail(404,'Endpoint not found.');
       }
       res.statusCode=200;res.end(JSON.stringify(result));
-    }catch(error){res.statusCode=error instanceof RequestError?error.status:500;res.end(JSON.stringify({error:error instanceof RequestError?error.message:'The request could not be completed. Please try again.'}));}
+    }catch(error){const known=error instanceof RequestError||error instanceof PaymentTestError;res.statusCode=known?error.status:500;res.end(JSON.stringify({error:known?error.message:'The request could not be completed. Please try again.'}));}
   };
 }
 export default createHandler();
