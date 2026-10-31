@@ -5,7 +5,7 @@ import { readLocalProfile, saveLocalProfile } from './local-profile';
 import MarketingHome, {Pricing,FAQ} from './MarketingHome';
 import {AuthGateway,OnlineAccount} from './AccountGateway';
 import {createAccountState,accountRequest} from './account-client';
-import {trialComingSoonTools,trialComingSoonMessage,trialToolIds,aiFeatures} from '../../commerce/catalog.mjs';
+import {trialComingSoonTools,trialToolIds,aiFeatures} from '../../commerce/catalog.mjs';
 import AdminPanel from './AdminPanel';
 import ToolIcon from './ToolIcon';
 import release from '../../branding/release.json';
@@ -191,7 +191,7 @@ function App() {
   }
   function ToolLink(props) {
     const state=()=>status()[props.module.id];
-    return <Show when={!comingSoon(props.module)} fallback={<button class={`button button-outline ${props.class||''}`} disabled title={trialComingSoonMessage}>Coming soon</button>}><Show when={state()?.available} fallback={<button class={`button button-outline ${props.class||''}`} disabled title={state()?.message||'Checking preview availability'}>Unavailable <Arrow/></button>}>
+    return <Show when={!comingSoon(props.module)} fallback={<button class={`button button-outline ${props.class||''}`} disabled title="Coming soon">Coming soon</button>}><Show when={state()?.available} fallback={<button class={`button button-outline ${props.class||''}`} disabled title={state()?.message||'Checking preview availability'}>Unavailable <Arrow/></button>}>
       <a class={`button ${props.class||'button-light'}`} href={openUrl(props.module)} target="_blank" rel="noopener noreferrer" aria-label={`Open ${props.module.label} in a new tab`}>Open {props.label||({planner:'Planning',fem:'FEM',frame:'Frame design',calculation:'Calculations'})[props.module.id]||props.module.label}<Arrow/></a>
     </Show></Show>;
   }
@@ -199,8 +199,8 @@ function App() {
     return <div class="module-grid"><For each={brand.modules}>{module=><article class="module-card" data-module={module.id}>
       <div class="module-top"><span class="tool-glyph"><ToolIcon id={module.id}/></span><span class="module-release">v{release.version}</span></div>
       <h3>{module.label}</h3><p>{module.description}</p>
-      <Show when={aiComingSoon(module)}><div class="module-ai-status" data-ai-status="coming-soon"><strong>{aiFeatures[module.id]} — Coming soon</strong><span>AI is not included in the trial.</span></div></Show>
-      <div class="module-bottom"><ToolLink module={module}/><small>{comingSoon(module)?'Not included in the trial.':status()[module.id]?.available?'Opens in a new tab':status()[module.id]?.message||'Checking the local preview…'}</small></div>
+      <Show when={aiComingSoon(module)&&!comingSoon(module)}><div class="module-ai-status" data-ai-status="coming-soon"><strong>{aiFeatures[module.id]} — Coming soon</strong><span>AI is not included in the trial.</span></div></Show>
+      <div class="module-bottom"><ToolLink module={module}/><Show when={!comingSoon(module)}><small>{status()[module.id]?.available?'Opens in a new tab':status()[module.id]?.message||'Checking the local preview…'}</small></Show></div>
     </article>}</For></div>;
   }
   return <>

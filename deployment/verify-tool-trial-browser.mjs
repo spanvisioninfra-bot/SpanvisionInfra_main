@@ -16,8 +16,10 @@ const user={id:'browser_trial_member',email:'member@example.test',name:'Member',
 const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.woff2':'font/woff2'};
 const reports=[];
 try{
+  const allScenarios=['anonymous','daily_limit','daily_limit_second','expired','allowed','retry','account','pricing','faq','faq_guest','catalog','catalog_guest','catalog_paid','catalog_admin','coming_soon_bim','coming_soon_stl','coming_soon_fem','backend_paid','backend_admin'];
+  const scenarios=process.argv.includes('--catalog-only')?allScenarios.filter(scenario=>scenario.startsWith('catalog')):allScenarios;
   for(const [mode,width] of [['dark',1440],['light',390]]){
-    for(const scenario of ['anonymous','daily_limit','daily_limit_second','expired','allowed','retry','account','pricing','faq','faq_guest','catalog','catalog_guest','catalog_paid','catalog_admin','coming_soon_bim','coming_soon_stl','coming_soon_fem','backend_paid','backend_admin']){
+    for(const scenario of scenarios){
       const context=await browser.newContext({viewport:{width,height:950},reducedMotion:'reduce'});
       const page=await context.newPage(),errors=[],launches=[],handoffs=[],warmups=[],externalTargets=[];
       const isAdmin=['catalog_admin','backend_admin'].includes(scenario),isPaid=['catalog_paid','backend_paid'].includes(scenario);
@@ -72,10 +74,12 @@ try{
               const card=page.locator(`[data-module="${id}"]`);
               assert(await card.getByRole('button',{name:'Coming soon',exact:true}).isDisabled());
               assert.equal(await card.locator('a').count(),0);
-              assert.match(await card.innerText(),/Not included in the trial/);
+              assert.doesNotMatch(await card.innerText(),/Not included in the trial|AI is not included|External AI/);
+              assert.equal(await card.locator('[data-ai-status],.module-bottom small').count(),0);
+              assert.equal(await card.getByRole('button',{name:'Coming soon',exact:true}).getAttribute('title'),'Coming soon');
             }
             assert.equal(await cards.locator('a').count(),13);
-            assert.equal(await cards.locator('[data-ai-status="coming-soon"]').count(),Object.keys(aiFeatures).length);
+            assert.equal(await cards.locator('[data-ai-status="coming-soon"]').count(),Object.keys(aiFeatures).filter(id=>!trialComingSoonTools.includes(id)).length);
           }
           assert.match(await page.locator('.company-catalog').innerText(),/trial includes 13 tools/);
           assert.equal(launches.length,0);
@@ -156,5 +160,5 @@ try{
     }
   }
 }finally{
-  await browser.close();await fs.writeFile(path.join(output,'browser-results.json'),JSON.stringify(reports,null,2)+'\n');
+  await browser.close();await fs.writeFile(path.join(output,process.argv.includes('--catalog-only')?'catalog-results.json':'browser-results.json'),JSON.stringify(reports,null,2)+'\n');
 }
