@@ -16,16 +16,16 @@ import './palette.css';
 import './hub.css';
 import './marketing.css';
 import './admin.css';
+import './landing-ui.css';
+import './tools-ui.css';
 
 const organization=brand.hub.organization||brand.organization;
 function Arrow() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>; }
 function Mark(props) { return <a class="brand-lockup" href="/" aria-label={`${organization} home`}><img class="company-mark" src={props.mode==='light'?'/spanvision-mark-light.svg':'/spanvision-mark.svg'} width="44" height="44" alt="" aria-hidden="true"/><span>{organization}<small>Engineering tools</small></span></a>; }
 function TrialNotice() {
-  const message=`Your two-day trial includes ${trialToolIds.length} tools, with 3 launches shared across them each day. BIM, STL-3D and FEM are coming soon for trial users. AI features are also coming soon; the regular features of trial tools remain available.`;
-  return <aside class="trial-notice" tabindex="0" role="note" aria-label="Trial availability">
+  return <aside class="trial-notice" role="note" aria-label="Trial availability">
     <span class="trial-notice-label"><span aria-hidden="true">✦</span> Trial update</span>
-    <p class="trial-notice-readable">{message}</p>
-    <div id="trial-notice-scroll" class="trial-notice-viewport" aria-hidden="true"><div class="trial-notice-track"><span>{message}</span><span>{message}</span></div></div>
+    <ul class="trial-notice-details"><li>Your two-day trial includes {trialToolIds.length} tools, with 3 launches shared across them each day.</li><li>BIM, STL-3D and FEM trials are coming soon.</li><li>AI features are coming soon. Regular features remain available in trial tools.</li></ul>
   </aside>;
 }
 function SocialIcon(props) {
@@ -192,31 +192,31 @@ function App() {
   function ToolLink(props) {
     const state=()=>status()[props.module.id];
     return <Show when={!comingSoon(props.module)} fallback={<button class={`button button-outline ${props.class||''}`} disabled title="Coming soon">Coming soon</button>}><Show when={state()?.available} fallback={<button class={`button button-outline ${props.class||''}`} disabled title={state()?.message||'Checking preview availability'}>Unavailable <Arrow/></button>}>
-      <a class={`button ${props.class||'button-light'}`} href={openUrl(props.module)} target="_blank" rel="noopener noreferrer" aria-label={`Open ${props.module.label} in a new tab`}>Open {props.label||({planner:'Planning',fem:'FEM',frame:'Frame design',calculation:'Calculations'})[props.module.id]||props.module.label}<Arrow/></a>
+      <a class={`button ${props.class||'button-outline'}`} href={openUrl(props.module)} target="_blank" rel="noopener noreferrer" aria-label={`Open ${props.module.label} in a new tab`}>Open {props.module.label}<Arrow/></a>
     </Show></Show>;
   }
   function Modules() {
     return <div class="module-grid"><For each={brand.modules}>{module=><article class="module-card" data-module={module.id}>
       <div class="module-top"><span class="tool-glyph"><ToolIcon id={module.id}/></span><span class="module-release">v{release.version}</span></div>
-      <h3>{module.label}</h3><p>{module.description}</p>
+      <h2>{module.label}</h2><p>{module.description}</p>
       <Show when={aiComingSoon(module)&&!comingSoon(module)}><div class="module-ai-status" data-ai-status="coming-soon"><strong>{aiFeatures[module.id]} — Coming soon</strong><span>AI is not included in the trial.</span></div></Show>
       <div class="module-bottom"><ToolLink module={module}/><Show when={!comingSoon(module)}><small>{status()[module.id]?.available?'Opens in a new tab':status()[module.id]?.message||'Checking the local preview…'}</small></Show></div>
     </article>}</For></div>;
   }
   return <>
     <a class="skip-link" href="#main-content" onClick={event=>{event.preventDefault();document.getElementById('main-content')?.focus();}}>Skip to content</a>
-    <header class="preview-header marketing-header" data-sv-reveal><Mark mode={mode()}/><nav aria-label="Main navigation"><For each={['landing','modules','pricing','faq']}>{route=><a href={routeHref(route)} classList={{current:screen()===route}} aria-current={screen()===route?'page':undefined}>{({landing:'Home',modules:'Tools',pricing:'Pricing',faq:'FAQ'})[route]}</a>}</For><Show when={account.user()?.role==='super_admin'}><a href="/admin" classList={{current:screen()==='admin'}} aria-current={screen()==='admin'?'page':undefined}>Admin</a></Show></nav><Show when={account.user()} fallback={<a class="header-sign-in" href="/login" aria-current={screen()==='login'?'page':undefined}>Sign in</a>}><a class="header-sign-in" href="/account">My account</a></Show><a href={account.user()?'/tools':'/signup'} class="button button-light header-action">{account.user()?'Open workspace':'Create account'}<Arrow/></a></header>
+    <header class="preview-header marketing-header" data-sv-reveal><Mark mode={mode()}/><nav aria-label="Main navigation"><For each={['landing','modules','pricing','faq']}>{route=><a href={routeHref(route)} classList={{current:screen()===route}} aria-current={screen()===route?'page':undefined}>{({landing:'Home',modules:'Tools',pricing:'Pricing',faq:'FAQ'})[route]}</a>}</For><Show when={account.user()?.role==='super_admin'}><a href="/admin" classList={{current:screen()==='admin'}} aria-current={screen()==='admin'?'page':undefined}>Admin</a></Show></nav><Show when={account.user()} fallback={<a class="header-sign-in" href="/login" aria-current={screen()==='login'?'page':undefined}>Sign in</a>}><a class="header-sign-in" href="/account" aria-current={screen()==='account'?'page':undefined}>My account</a></Show><a href={account.user()?'/tools':'/signup'} class={`button ${['pricing','faq','account'].includes(screen())?'button-outline':'button-light'} header-action`}>{account.user()?'Open workspace':'Create account'}<Arrow/></a></header>
     <main id="main-content" tabindex="-1">
       <Show when={screen()==='landing'}><MarketingHome mode={mode()} account={account} openScan={openScan} organization={organization} toolCount={brand.modules.length}/></Show>
-      <Show when={screen()==='pricing'}><div class="dedicated-pricing"><Pricing account={account}/></div></Show>
-      <Show when={screen()==='faq'}><div class="dedicated-faq"><FAQ account={account}/></div></Show>
+      <Show when={screen()==='pricing'}><div class="dedicated-pricing"><Pricing account={account} standalone/></div></Show>
+      <Show when={screen()==='faq'}><div class="dedicated-faq"><FAQ account={account} standalone/></div></Show>
       <Show when={['login','signup','forgot','verify','reset'].includes(screen())}><AuthGateway screen={screen()} account={account} mode={mode()}/></Show>
       <Show when={screen()==='account'}><OnlineAccount account={account}/></Show>
       <Show when={screen()==='admin'}><AdminPanel account={account}/></Show>
       <Show when={screen()==='modules'}>
         <section class="company-tools-page">
           <section class="company-catalog" aria-labelledby="tools-title">
-            <div class="catalog-heading" data-sv-reveal><div><span class="eyebrow">SPANVISION INFRA TOOLKIT</span><h1 id="tools-title">All tools <span>{brand.modules.length}</span></h1><p>Choose a tool for your project, wherever you work. Each workspace opens in a new tab.</p></div><button class="button button-outline" onClick={refreshStatus}>Check availability<Arrow/></button></div>
+            <div class="catalog-heading" data-sv-reveal><span class="eyebrow">SPANVISION INFRA TOOLKIT</span><h1 id="tools-title">All tools <span>{brand.modules.length}</span></h1><p>Choose a tool for your project, wherever you work. Each workspace opens in a new tab.</p><button class="button button-outline" onClick={refreshStatus}>Check availability<Arrow/></button></div>
             <TrialNotice/>
             <Modules/>
             <p class="catalog-note">{localPreview?'Files and saved preferences stay with each workspace.':'Browser drafts stay with each workspace. BIM and map processing uses temporary cloud storage; download your results to keep them.'}</p>
