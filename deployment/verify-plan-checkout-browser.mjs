@@ -50,7 +50,7 @@ try{
     if(scenario.startsWith('unsupported')||scenario==='missing-annual'){
       await dialog.getByText(/not available for this plan/).waitFor();assert(await dialog.getByRole('button',{name:'Checkout unavailable'}).isDisabled());assert.equal(bodies.length,0);
     }else{
-      assert.match(await dialog.innerText(),/Recurring (monthly|annual) billing/);
+      assert.equal(await dialog.locator('.checkout-note').innerText(),'Authorize payments in secure checkout. Your plan activates after payment confirmation.');
       if(scenario==='guest'){
         await dialog.getByRole('button',{name:'Create an account to continue'}).click();await page.waitForURL('**/signup');assert.equal(bodies.length,0);
       }else{

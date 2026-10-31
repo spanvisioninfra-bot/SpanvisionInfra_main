@@ -42,7 +42,7 @@ export function Pricing(props){
         <h2 id="checkout-title">{choice().plan.name}, your way.</h2>
         <dl class="checkout-summary"><div><dt>Billing region</dt><dd>{choice().region.label}</dd></div><div><dt>Billing cycle</dt><dd>{choice().interval==='annual'?'Annual':'Monthly'}</dd></div><div><dt>{approved()?'Plan price':'Draft price'}</dt><dd>{formatPrice(choice().amount,choice().region.id)} / {choice().interval==='annual'?'year':'month'}</dd></div></dl>
         <Show when={!approved()}><p class="checkout-note">This is a preview. No payment will be taken. Final prices and plan features will be confirmed before subscriptions open.</p></Show>
-        <Show when={approved()&&checkoutAvailable(choice())}><p class="checkout-note">Recurring {choice().interval==='annual'?'annual':'monthly'} billing. Authorize payments in secure checkout. Your plan activates after payment confirmation; use your provider's subscription link to manage or cancel renewals.</p></Show>
+        <Show when={approved()&&checkoutAvailable(choice())}><p class="checkout-note">Authorize payments in secure checkout. Your plan activates after payment confirmation.</p></Show>
         <Show when={approved()&&!checkoutAvailable(choice())}><p class="checkout-note" role="status">Payments in {choice().region.currency} are not available for this plan and billing cycle yet.</p></Show>
         <Show when={error()}><p class="form-error" role="alert">{error()}</p></Show>
         <Show when={pendingCheckout()&&!pendingCheckout().expired}><a class="button button-outline" href={pendingCheckout()?.url}><span>Resume {pendingCheckout()?.price} checkout</span><Arrow/></a></Show>
