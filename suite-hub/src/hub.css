@@ -136,20 +136,20 @@ html[data-sv-mode="light"] .auth-form-wrap input,html[data-sv-mode="light"] .acc
 @media(max-width:600px){.brand-lockup .company-mark{width:38px;height:38px}}
 
 .preview-footer{display:block;width:100%;padding:40px 36px;border-top:1px solid var(--sv-border)}
-.preview-footer>.footer-main{display:grid;grid-template-columns:minmax(180px,1fr) auto auto;grid-template-areas:"brand contact social" "copyright . .";align-items:center;gap:8px 24px;width:100%;font-size:13px;color:var(--sv-text)}
-.footer-main>.brand-lockup{grid-area:brand;min-width:0;font-size:14px;color:var(--sv-text)}
+.preview-footer>.footer-main{display:grid;grid-template-columns:minmax(180px,1fr) auto auto;grid-template-areas:"brand contact social" "copyright . .";align-items:end;gap:8px 16px;width:100%;font-size:13px;color:var(--sv-text)}
+.footer-main>.brand-lockup{grid-area:brand;justify-self:start;width:fit-content;min-width:0;min-height:44px;font-size:14px;color:var(--sv-text)}
 .preview-footer .brand-lockup:hover{color:var(--sv-text)}
 .footer-copyright{grid-area:copyright;color:var(--sv-muted);font-size:11px;line-height:1.6}
 .footer-section-label{display:block;color:var(--sv-muted);font-size:11px;line-height:16px}
 .footer-contact{grid-area:contact;display:grid;gap:2px;min-width:0}
-.preview-footer .footer-email{display:flex;align-items:center;min-height:32px;min-width:0;padding:4px 0;font-size:13px;line-height:1.6;color:var(--sv-text);overflow-wrap:anywhere;text-underline-offset:4px}
+.preview-footer .footer-email{display:flex;align-items:center;min-height:44px;min-width:0;padding:4px 0;font-size:13px;font-weight:600;line-height:1.6;color:var(--sv-text);overflow-wrap:anywhere;text-decoration:underline;text-underline-offset:4px}
 .preview-footer .footer-email:hover{color:var(--sv-text);text-decoration:underline}
 .footer-main>.footer-social{grid-area:social;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-width:0}
 .preview-footer .footer-social-link{display:inline-flex;justify-content:center;align-items:center;gap:10px;min-width:0;min-height:44px;padding:10px 14px;border:1px solid var(--sv-border);border-radius:12px;background:transparent;color:var(--sv-text);font-size:13px;line-height:1.5;white-space:nowrap;transition:background 180ms ease,border-color 180ms ease}
 .footer-social-icon{display:grid;place-items:center;width:18px;height:18px;flex-shrink:0}.footer-social-icon svg{width:18px;height:18px}
 .preview-footer .footer-social-link:hover{background:var(--sv-raised);border-color:var(--sv-focus);color:var(--sv-text)}
 .footer-main a:focus-visible{outline:2px solid var(--sv-focus);outline-offset:4px}
-@media(max-width:1023px){.preview-footer>.footer-main{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand contact" "copyright social";gap:24px}}
+@media(max-width:1023px){.preview-footer>.footer-main{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand brand" "copyright copyright" "contact social";gap:8px 16px}}
 @media(max-width:599px){.preview-footer{padding:30px 20px}.preview-footer>.footer-main{grid-template-columns:minmax(0,1fr);grid-template-areas:"brand" "copyright" "contact" "social";gap:16px}.footer-main>.footer-social{width:100%}}
 
 .company-intro{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}

@@ -89,8 +89,9 @@ export function OnlineAccount(props){
   return <section class="online-account marketing-section">
     <Show when={props.account.user()} fallback={<div class="signed-out-card"><span class="eyebrow">YOUR ACCOUNT</span><h1>A place for your practice.</h1><p>Sign in to view your account and billing. Your account tracks your trial and paid access.</p><a href="/login" class="button button-light">Sign in →</a><a href="/tools" class="text-button">Continue to tools</a></div>}>{user=><>
       <div class="online-account-heading">
-        <div><span class="eyebrow">YOUR ACCOUNT</span><h1>Hello, {user().name||'there'}.</h1><p>{user().email}</p></div>
-        <button class="text-button account-sign-out" disabled={busy()} onClick={()=>action(props.account.signOut)}>Sign out</button>
+        <span class="eyebrow">YOUR ACCOUNT</span>
+        <div class="account-title-row"><h1>Hello, {user().name||'there'}.</h1><button class="text-button account-sign-out" disabled={busy()} onClick={()=>action(props.account.signOut)}>Sign out</button></div>
+        <p>{user().email}</p>
       </div>
       <div class="online-account-grid">
         <article>

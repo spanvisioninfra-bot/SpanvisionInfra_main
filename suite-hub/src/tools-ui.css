@@ -15,6 +15,16 @@
   margin:24px 0 0;color:var(--sv-text);
 }
 .company-catalog .module-card p {font-size:var(--landing-body)}
+.company-catalog .module-grid {align-items:stretch}
+.company-catalog .module-bottom small {margin:0 0 8px}
+.company-catalog .module-bottom .button:disabled {
+  background:var(--sv-raised);color:var(--sv-muted);border-color:var(--sv-border);
+  opacity:1;cursor:not-allowed;box-shadow:none;
+}
+.company-catalog .module-ai-status {
+  background:var(--sv-raised);border:0;border-inline-start:2px solid var(--sv-focus);
+  padding:8px 12px;
+}
 .company-catalog :is(.module-release,.module-bottom small,.catalog-note,.module-ai-status span) {font-size:var(--landing-small)}
 .company-catalog :is(.module-card,.trial-notice) {border-radius:var(--landing-panel-radius)}
 .company-catalog :is(.tool-glyph,.module-release,.module-ai-status,.button) {border-radius:var(--landing-radius)}

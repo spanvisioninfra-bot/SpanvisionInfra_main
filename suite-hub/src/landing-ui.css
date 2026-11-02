@@ -26,6 +26,7 @@
   flex-direction: row;
   align-items: center;
   gap: 12px;
+  margin: 0;
   color: var(--sv-muted);
 }
 .pricing-section .billing-cycle-control {
@@ -41,12 +42,20 @@
 .pricing-section .region-selector>span { white-space: nowrap; }
 .pricing-section .region-selector select {
   width: auto;
+  field-sizing: content;
   max-width: none;
-  flex: 1;
+  flex: 0 0 auto;
   min-width: 0;
   height: 44px;
-  padding: 8px 12px;
+  margin: 0;
+  padding: 8px 10px;
   border-radius: var(--landing-radius);
+}
+.pricing-section .billing-incentive {
+  margin: -10px 0 24px;
+  font-size: var(--landing-small);
+  line-height: 1.6;
+  color: var(--sv-muted);
 }
 :is(.marketing-home, .pricing-section) :is(.price-card, .local-payment-test, .checkout-dialog) {
   border-radius: var(--landing-panel-radius);
@@ -63,6 +72,11 @@
   border-radius: var(--landing-radius);
   font-size: var(--landing-small);
   font-weight: 500;
+}
+.marketing-header .header-action,
+.marketing-home .intro-actions .button {
+  justify-content: space-between;
+  gap: 12px;
 }
 :is(.marketing-home, .pricing-section) .billing-toggle button {
   border-radius: var(--landing-radius);
@@ -117,10 +131,11 @@
   border-color: var(--sv-text);
 }
 .marketing-home .faq-section {
-  max-width: 960px;
+  max-width: 1240px;
   grid-template-columns: minmax(0, 1fr);
   gap: 24px;
 }
+.marketing-home .faq-section>div:first-child { text-align: left; }
 .dedicated-faq #faq-heading {
   margin: 0;
   font-size: 40px;
@@ -142,6 +157,13 @@
 }
 .marketing-header .sv-appearance-control #sv-color-mode:hover { background: var(--sv-raised); }
 .marketing-header .sv-appearance-control #sv-color-mode:focus-visible { outline: 2px solid var(--sv-focus); outline-offset: 4px; }
+.marketing-header .sv-appearance-control .sv-appearance-icon { display: none; }
+.marketing-header .header-sign-in[aria-current="page"] {
+  color: var(--sv-text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 8px;
+}
 .marketing-header :is(nav a, .header-sign-in) {
   display: inline-flex;
   align-items: center;

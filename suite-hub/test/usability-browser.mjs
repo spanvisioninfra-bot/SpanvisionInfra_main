@@ -12,8 +12,11 @@ async function checkSharedUi(page,width){
     const box=e=>e.getBoundingClientRect();
     const brand=box(document.querySelector('.footer-main>.brand-lockup'));
     const copy=box(document.querySelector('.footer-copyright'));
-    const contact=box(document.querySelector('.footer-contact'));
+    const email=document.querySelector('.footer-email');
+    const contact=box(email);
     const social=box(document.querySelector('.footer-social'));
+    const logo=document.querySelector('.footer-main>.brand-lockup');
+    const logoText=box(logo.querySelector('span'));
     const theme=getComputedStyle(document.querySelector('#sv-color-mode'));
     const active=document.querySelector('.marketing-header nav a[aria-current="page"]');
     const text=document.createRange();
@@ -26,6 +29,12 @@ async function checkSharedUi(page,width){
       copyrightBeforeContact:copy.bottom<=contact.top,
       contactCenter:Math.abs((contact.top+contact.bottom-brand.top-brand.bottom)/2),
       socialCenter:Math.abs((social.top+social.bottom-brand.top-brand.bottom)/2),
+      emailSocialCenter:Math.abs((social.top+social.bottom-contact.top-contact.bottom)/2),
+      logoExtraWidth:brand.right-logoText.right,
+      emailUnderline:getComputedStyle(email).textDecorationLine,
+      emailWeight:Number(getComputedStyle(email).fontWeight),
+      themeIconHidden:getComputedStyle(document.querySelector('.sv-appearance-icon')).display==='none',
+      underlineHeight:underline?parseFloat(underline.height):null,
       underlineGap:active?box(active).bottom-parseFloat(underline.bottom)-parseFloat(underline.height)-text.getBoundingClientRect().bottom:null,
       themeBackground:theme.backgroundColor,themeBorder:theme.borderTopColor,
       styles:new Set(actions.map(e=>{const s=getComputedStyle(e);return JSON.stringify([s.backgroundColor,s.color,s.borderTopColor,s.borderTopWidth,s.borderRadius,s.fontSize,s.fontWeight,s.letterSpacing,s.padding]);})).size,
@@ -33,8 +42,13 @@ async function checkSharedUi(page,width){
   });
   assert.ok(result.footerAnchor<1);assert.equal(result.copyrightBelowBrand,true);
   if(width>=1024){assert.ok(result.contactCenter<1);assert.ok(result.socialCenter<1);}
+  if(width>=600)assert.ok(result.emailSocialCenter<1,JSON.stringify(result));
   if(width<600)assert.equal(result.copyrightBeforeContact,true);
+  assert.ok(result.logoExtraWidth<1,JSON.stringify(result));
+  assert.equal(result.emailUnderline,'underline');assert.ok(result.emailWeight>=500);
+  assert.equal(result.themeIconHidden,true);
   if(result.underlineGap!==null)assert.ok(result.underlineGap>=6,JSON.stringify(result));
+  if(result.underlineHeight!==null)assert.equal(result.underlineHeight,1);
   assert.equal(result.themeBackground,'rgba(0, 0, 0, 0)');assert.equal(result.themeBorder,'rgba(0, 0, 0, 0)');
   assert.ok(result.styles<=5,JSON.stringify(result));
   return result;
@@ -52,6 +66,12 @@ try {
     {id:'qa-cameron',name:'Cameron Lee',email:'cameron@example.test',emailVerified:true,role:'super_admin',access:{plan:'team',source:'super_admin'}},
   ];
   let adminWrites=0;
+  // Serve local assets at a simulated public origin so trial-only UI is exercised.
+  await page.route('https://spanvision.example.test/**',async route=>{
+    const url=new URL(route.request().url());
+    const response=await route.fetch({url:`http://127.0.0.1:4237${url.pathname}${url.search}`});
+    await route.fulfill({response});
+  });
   // Exercise the optional payment panel without creating orders or payments.
   await page.route('**/api/**',route=>{
     const url=route.request().url();
@@ -74,7 +94,7 @@ try {
       url.endsWith('/config')?{enabled:true,live:false}:{};
     return route.fulfill({json:data});
   });
-  for(const width of [320,390,820,1440,1920])for(const theme of ['dark','light']) {
+  if(!process.argv.includes('--tools'))for(const width of [320,390,820,1440,1920])for(const theme of ['dark','light']) {
     await page.setViewportSize({width,height:960});
     await page.goto(`http://127.0.0.1:4237/?appearance=${theme}`);
     await page.waitForSelector('.local-payment-test');
@@ -118,6 +138,8 @@ try {
         controlCenterDifference:Math.abs((toggleButton.top+toggleButton.bottom-select.top-select.bottom)/2),
         faqStacked:faqList.top>=faqHeading.bottom,
         faqWidth:faqList.width,
+        faqLeftDifference:Math.abs(faqHeading.left-document.querySelector('#pricing-heading').getBoundingClientRect().left),
+        cardBottomDifference:(()=>{const bottoms=[...document.querySelectorAll('.price-card')].map(c=>rect(c).bottom);return Math.max(...bottoms)-Math.min(...bottoms);})(),
         summaryWeight:Number(summary.fontWeight),
       };
     });
@@ -132,9 +154,11 @@ try {
     else {assert.ok(layout.labelAbove);assert.ok(layout.labelLeftDifference<1);}
     assert.equal(layout.selectHeight,44);
     assert.equal(await page.locator('.region-selector select').evaluate(e=>getComputedStyle(e).borderRadius),'8px');
-    if(width>=768)assert.ok(layout.controlCenterDifference<1,JSON.stringify(layout));
+    if(width>=768){assert.ok(layout.controlCenterDifference<1,JSON.stringify(layout));assert.ok(layout.cardBottomDifference<1);}
+    assert.ok(layout.faqLeftDifference<1);
     assert.equal(await page.locator('.pricing-grid .button-light').count(),1);
-    assert.equal(await page.locator('.pricing-grid .button-light').getAttribute('href'),'/signup');
+    assert.equal(await page.locator('.price-card').nth(1).locator('.button-light').count(),1);
+    assert.equal(await page.getByRole('button',{name:'Explore scan & OCR',exact:true}).locator('svg[aria-hidden="true"]').count(),1);
     const annual=page.getByRole('button',{name:'Annually'});
     await annual.click();assert.equal(await annual.getAttribute('aria-pressed'),'true');
     assert.equal(await page.getByRole('button',{name:'Monthly',exact:true}).getAttribute('aria-pressed'),'false');
@@ -146,12 +170,17 @@ try {
   }
   if(!process.argv.includes('--home')) {
   const brand=JSON.parse(await readFile(new URL('../src/brand.json',import.meta.url),'utf8'));
-  await page.route('**/__suite/status',route=>route.fulfill({json:{modules:brand.modules.map(m=>({...m,available:true}))}}));
+  const adminUser=accountUser,adminAccess=accountAccess;
+  accountUser={...accountUser,role:'member'};accountAccess={plan:'explorer',source:'free'};
+  let unavailableTool=false;
+  await page.route('**/__suite/status',route=>route.fulfill({json:{modules:brand.modules.map(m=>({...m,url:`https://${m.id}.example.test/`,available:!unavailableTool||m.id!=='cad',message:m.id==='cad'&&unavailableTool?'Temporarily unavailable. Please try again later.':undefined}))}}));
   await page.route('**/__stl/status',route=>route.fulfill({json:{id:'stl',available:true}}));
   for(const width of [320,390,820,1440,1920])for(const theme of ['dark','light']) {
     await page.setViewportSize({width,height:960});
-    await page.goto(`http://127.0.0.1:4237/tools?appearance=${theme}`);
+    await page.goto(`https://spanvision.example.test/tools?appearance=${theme}`);
     await page.waitForSelector('.module-bottom a');
+    assert.equal(await page.locator('.module-bottom button:disabled').count(),3);
+    assert.ok(await page.locator('.module-ai-status').count()>0);
     await checkSharedUi(page,width);
     const result=await page.evaluate(()=>{
       const all=[...document.querySelectorAll('.company-catalog *, .marketing-header *, .preview-footer *')].filter(e=>e.getClientRects().length);
@@ -165,6 +194,11 @@ try {
         names:cards.every(c=>{const a=c.querySelector('.module-bottom a');return !a||a.textContent===`Open ${c.querySelector('h2').textContent}`;}),
         count:cards.length,unique:new Set(cards.map(c=>c.dataset.module)).size,
         actionsContained:cards.every(c=>{const card=c.getBoundingClientRect(),a=c.querySelector('.module-bottom .button').getBoundingClientRect();return a.top>=card.top&&a.bottom<=card.bottom&&a.left>=card.left&&a.right<=card.right;}),
+        actionsAligned:cards.every(c=>{const r=c.getBoundingClientRect(),a=c.querySelector('.module-bottom .button').getBoundingClientRect();return cards.filter(other=>Math.abs(other.getBoundingClientRect().top-r.top)<1).every(other=>Math.abs(other.querySelector('.module-bottom .button').getBoundingClientRect().bottom-a.bottom)<1);}),
+        repeatedTabHints:[...document.querySelectorAll('.module-bottom small')].some(e=>e.textContent==='Opens in a new tab'),
+        accessibleTabHints:cards.every(c=>{const a=c.querySelector('.module-bottom a');return !a||a.getAttribute('aria-label').includes('in a new tab')&&a.title.includes('in a new tab');}),
+        disabledClear:[...document.querySelectorAll('.module-bottom button:disabled')].every(e=>{const s=getComputedStyle(e);return s.opacity==='1'&&s.cursor==='not-allowed'&&s.backgroundColor!=='rgba(0, 0, 0, 0)'&&e.querySelector('svg');}),
+        informationalBanners:[...document.querySelectorAll('.module-ai-status')].every(e=>e.getAttribute('role')==='note'&&getComputedStyle(e).borderTopWidth==='0px'&&parseFloat(getComputedStyle(e).borderInlineStartWidth)===2),
         list:document.querySelectorAll('.trial-notice-details li').length,
         small:['.catalog-heading>.eyebrow','.footer-copyright'].map(s=>parseFloat(getComputedStyle(document.querySelector(s)).fontSize)),
         sizes:[...new Set(all.filter(e=>[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())).map(e=>getComputedStyle(e).fontSize))],
@@ -175,12 +209,29 @@ try {
     assert.equal(result.overflow,false);assert.equal(result.headings,true);assert.equal(result.names,true);
     assert.equal(result.secondary,true);assert.equal(result.list,3);assert.ok(result.small.every(n=>n>=12));
     assert.equal(result.count,16);assert.equal(result.unique,16);assert.equal(result.actionsContained,true);
+    assert.equal(result.actionsAligned,true);assert.equal(result.repeatedTabHints,false);assert.equal(result.accessibleTabHints,true);
+    assert.equal(result.disabledClear,true);assert.equal(result.informationalBanners,true);
     assert.equal(await page.locator('.catalog-heading>.eyebrow').textContent(),'Spanvision Infra toolkit');
     if(width>=768)assert.ok(result.centerDifference<1);
     assert.ok(result.sizes.length<=10,JSON.stringify(result.sizes));assert.ok(result.radii.length<=6,JSON.stringify(result.radii));
     if(width===390||width===1440)await page.screenshot({path:`test-results/usability/tools-${width}-${theme}.png`,fullPage:true});
     console.log('PASS tools',width,theme,JSON.stringify(result));
   }
+  unavailableTool=true;
+  await page.setViewportSize({width:1440,height:960});
+  await page.goto('https://spanvision.example.test/tools');
+  await page.getByText('Temporarily unavailable. Please try again later.',{exact:true}).waitFor();
+  const unavailable=page.locator('.module-card[data-module="cad"]');
+  assert.equal(await unavailable.getByRole('button',{name:'Unavailable',exact:true}).isDisabled(),true);
+  assert.equal(await page.locator('.module-card').evaluateAll(cards=>{
+    const row=cards.filter(c=>Math.abs(c.getBoundingClientRect().top-cards[0].getBoundingClientRect().top)<1);
+    const bottoms=row.map(c=>c.querySelector('.module-bottom .button').getBoundingClientRect().bottom);
+    return Math.max(...bottoms)-Math.min(...bottoms)<1;
+  }),true);
+  unavailableTool=false;
+  accountUser=adminUser;accountAccess=adminAccess;
+  console.log('PASS tool action alignment with a temporary availability message');
+  if(!process.argv.includes('--tools')) {
   // Simulate a pending checkout callback locally; never load a payment provider.
   await page.addInitScript(()=>{
     window.Razorpay=function(options){
@@ -200,6 +251,8 @@ try {
     assert.equal(await page.getByRole('group',{name:'Billing cycle',exact:true}).count(),1);
     assert.equal(await page.locator('.plan-tag').count(),3);
     assert.equal(await page.locator('.price-card').first().locator('.plan-features li').count(),3);
+    assert.deepEqual(await page.locator('.plan-price>span').allTextContents(),['/ two-day trial','/ month','/ month']);
+    assert.equal(await page.getByRole('button',{name:'Annually',exact:true}).getAttribute('aria-describedby'),'annual-billing-note');
     const bottoms=await page.locator('.price-card').evaluateAll(cards=>cards.map(c=>c.getBoundingClientRect().bottom));
     if(width>=768)assert.ok(Math.max(...bottoms)-Math.min(...bottoms)<1);
     await page.getByRole('button',{name:'Test ₹1 checkout',exact:true}).click();
@@ -219,6 +272,7 @@ try {
         overflow:document.documentElement.scrollWidth>innerWidth+1,
         controlGap:r.left-t.right,
         sameRow:Math.abs(r.top-t.top)<16,
+        labelGapDifference:(()=>{const cycleLabel=document.querySelector('.billing-cycle-control>span').getBoundingClientRect();const regionLabel=region.querySelector('span').getBoundingClientRect();const select=region.querySelector('select').getBoundingClientRect();return Math.abs(t.left-cycleLabel.right-(select.left-regionLabel.right));})(),
         sizes:[...new Set(visible.filter(e=>[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())).map(e=>getComputedStyle(e).fontSize))],
         radii:[...new Set(visible.map(e=>getComputedStyle(e).borderRadius))],
         small:['.plan-billing','.local-payment-badge','.footer-copyright'].map(s=>parseFloat(getComputedStyle(document.querySelector(s)).fontSize)),
@@ -231,9 +285,10 @@ try {
     assert.ok(result.small.every(n=>n>=12));
     assert.equal(result.secondary.length,3);
     assert.ok(result.secondary.every(s=>parseFloat(s.border)>0&&s.color!=='rgba(0, 0, 0, 0)'&&s.background!=='rgba(0, 0, 0, 0)'));
-    if(width>=768){assert.equal(result.sameRow,true);assert.ok(result.controlGap<=24);}
+    if(width>=768){assert.equal(result.sameRow,true);assert.ok(result.controlGap<=24);assert.ok(result.labelGapDifference<1);}
     const annual=page.getByRole('button',{name:'Annually'});
     await annual.click();assert.equal(await annual.getAttribute('aria-pressed'),'true');
+    assert.deepEqual(await page.locator('.plan-price>span').allTextContents(),['/ two-day trial','/ year','/ year']);
     await page.getByRole('combobox',{name:'Billing region'}).selectOption('US');
     assert.ok((await page.locator('.price-card').nth(1).locator('.plan-price').textContent()).includes('$'));
     const choose=page.locator('.price-card').nth(1).getByRole('button',{name:'Choose this plan'});
@@ -385,8 +440,21 @@ try {
       const account=textBox(document.querySelector('.header-sign-in'));
       const admin=textBox(document.querySelector('.marketing-header nav a[href="/admin"]'));
       const signOut=getComputedStyle(document.querySelector('.account-sign-out'));
-      const identity=document.querySelector('.online-account-heading>div').getBoundingClientRect();
+      const identity=document.querySelector('.online-account-heading h1').getBoundingClientRect();
       const signOutBox=document.querySelector('.account-sign-out').getBoundingClientRect();
+      const baseline=e=>{
+        const text=[...e.childNodes].find(node=>node.nodeType===Node.TEXT_NODE&&node.textContent.trim());
+        const wrapper=document.createElement('span'),probe=document.createElement('span');
+        probe.style.cssText='display:inline-block;width:0;height:0;vertical-align:baseline';
+        text.replaceWith(wrapper);wrapper.append(text,probe);
+        const y=probe.getBoundingClientRect().top;wrapper.replaceWith(text);return y;
+      };
+      const baselineDifference=Math.abs(baseline(document.querySelector('.online-account h1'))-baseline(document.querySelector('.account-sign-out')));
+      const currentLink=getComputedStyle(document.querySelector('.header-sign-in'));
+      const actionIcons=[...document.querySelectorAll('.header-action,.online-account-grid .button')].filter(e=>e.getClientRects().length).map(e=>{
+        const s=getComputedStyle(e),icon=e.lastElementChild;
+        return e.getBoundingClientRect().right-icon.getBoundingClientRect().right-parseFloat(s.paddingRight)-parseFloat(s.borderRightWidth);
+      });
       const cardActions=[...document.querySelectorAll('.online-account-grid .button')].map(e=>{
         const s=getComputedStyle(e),card=e.closest('article'),cs=getComputedStyle(card);
         return {radius:s.borderRadius,size:s.fontSize,height:e.getBoundingClientRect().height,border:parseFloat(s.borderTopWidth),widthDifference:Math.abs(e.getBoundingClientRect().width-(card.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)))};
@@ -399,6 +467,7 @@ try {
         small:['.online-account-grid article:nth-child(2)>.eyebrow','.billing-help','.footer-copyright'].map(s=>parseFloat(getComputedStyle(document.querySelector(s)).fontSize)),
         signOut:{background:signOut.backgroundColor,border:signOut.borderTopWidth,minHeight:parseFloat(signOut.minHeight),size:signOut.fontSize},
         signOutGap:signOutBox.left-identity.right,
+        baselineDifference,actionIcons,accountActiveUnderline:currentLink.textDecorationLine,
         cardActions,
       };
     });
@@ -407,7 +476,8 @@ try {
     assert.ok(result.cardActions.every(s=>s.radius==='8px'&&s.size==='12px'&&s.height>=44&&s.border>0&&s.widthDifference<1));
     assert.equal(result.signOut.background,'rgba(0, 0, 0, 0)');assert.equal(parseFloat(result.signOut.border),0);assert.ok(result.signOut.minHeight>=44);
     if(width>=1024)assert.ok(result.headerTextDifference<1,JSON.stringify(result));
-    if(width>=768)assert.ok(result.signOutGap>=0&&result.signOutGap<=24);
+    if(width>=768){assert.ok(result.signOutGap>=0&&result.signOutGap<=24);assert.ok(result.baselineDifference<1,JSON.stringify(result));}
+    assert.equal(result.accountActiveUnderline,'underline');assert.ok(result.actionIcons.every(gap=>Math.abs(gap)<1),JSON.stringify(result));
     assert.equal(await page.locator('.online-account-grid article:nth-child(2)>.eyebrow').textContent(),'Subscriptions & billing');
     const previousReads=billingReads;
     const updated=page.waitForResponse(r=>r.url().endsWith('/billing/status'));
@@ -436,6 +506,7 @@ try {
   await page.getByRole('link',{name:'Sign in →',exact:true}).waitFor();
   assert.equal(await page.locator('.online-account-grid').count(),0);
   console.log('PASS account keyboard navigation, member trial, sign-out and signed-out view');
+  }
   }
 } finally {
   await browser.close();
