@@ -13,17 +13,46 @@
   .region-selector, .pricing-draft, .billing-toggle button span) {
   font-size: var(--landing-small);
 }
-.marketing-home .company-home-page .intro-summary { font-size: var(--landing-small); }
+.marketing-home .company-home-page .intro-summary {
+  font-size: var(--landing-body);
+  font-weight: 500;
+  margin-top: 20px;
+}
 :is(.marketing-home, .pricing-section, .faq-section) :is(.plan-caption, .plan-features li, .plan-price > span,
   .faq-list summary, .faq-list p),
 .preview-footer :is(.footer-email, .footer-social-link) { font-size: var(--landing-body); }
 .marketing-home .company-intro-bottom p { font-size: 16px; }
-:is(.marketing-home, .pricing-section) .region-selector { color: var(--sv-muted); }
+.pricing-section .region-selector {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  color: var(--sv-muted);
+}
+.pricing-section .billing-cycle-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--sv-muted);
+  font-size: var(--landing-small);
+}
+.pricing-section .billing-cycle-control>span { white-space: nowrap; }
+.pricing-section .pricing-grid { align-items: stretch; }
+.pricing-section .price-card-top { flex-wrap: wrap; }
+.pricing-section .region-selector>span { white-space: nowrap; }
+.pricing-section .region-selector select {
+  width: auto;
+  max-width: none;
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 8px 12px;
+  border-radius: var(--landing-radius);
+}
 :is(.marketing-home, .pricing-section) :is(.price-card, .local-payment-test, .checkout-dialog) {
   border-radius: var(--landing-panel-radius);
 }
 :is(.marketing-home, .pricing-section) :is(.billing-toggle, .plan-tag, .pricing-draft),
-.marketing-header .sv-appearance-control select {
+.marketing-header .sv-appearance-control #sv-color-mode {
   border-radius: var(--landing-radius);
 }
 :is(.marketing-home, .pricing-section, .admin-page, .online-account) .button,
@@ -75,6 +104,23 @@
   background: var(--sv-surface);
   border-color: var(--sv-text);
 }
+:is(.marketing-home, .pricing-section, .online-account, .marketing-header) .button.button-outline,
+.preview-footer .footer-social-link {
+  background: var(--sv-raised);
+  border-color: var(--sv-focus);
+  color: var(--sv-text);
+  letter-spacing: -.015em;
+}
+:is(.marketing-home, .pricing-section, .online-account, .marketing-header) .button.button-outline:hover:not(:disabled),
+.preview-footer .footer-social-link:hover {
+  background: var(--sv-surface);
+  border-color: var(--sv-text);
+}
+.marketing-home .faq-section {
+  max-width: 960px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+}
 .dedicated-faq #faq-heading {
   margin: 0;
   font-size: 40px;
@@ -84,21 +130,32 @@
   color: var(--sv-text);
 }
 .dedicated-faq .faq-section { padding-bottom: 64px; }
-.marketing-header .sv-appearance-control select {
+.marketing-header .sv-appearance-control #sv-color-mode {
   font: 500 var(--landing-small)/1.5 'Segoe UI', Arial, sans-serif;
-  background: var(--sv-surface);
+  background: transparent;
   color: var(--sv-text);
-  border: 1px solid var(--sv-focus);
+  border: 1px solid transparent;
+  box-shadow: none;
   min-height: 44px;
   max-width: none;
   padding: 8px;
 }
+.marketing-header .sv-appearance-control #sv-color-mode:hover { background: var(--sv-raised); }
+.marketing-header .sv-appearance-control #sv-color-mode:focus-visible { outline: 2px solid var(--sv-focus); outline-offset: 4px; }
 .marketing-header :is(nav a, .header-sign-in) {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
   padding: 8px 0;
   line-height: 1.5;
+}
+@media (max-width: 767px) {
+  .pricing-section :is(.billing-cycle-control, .region-selector) {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .pricing-section .region-selector select { width: 100%; }
 }
 @media (forced-colors: active) {
   :is(.marketing-home, .pricing-section) .billing-toggle button[aria-pressed="true"] {

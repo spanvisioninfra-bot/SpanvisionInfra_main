@@ -21,7 +21,7 @@ export const regions=[
   {id:'GB',label:'United Kingdom',currency:'GBP',locale:'en-GB'},
 ];
 export const plans=[
-  {id:'explorer',name:'Explorer trial',caption:'Try 13 tools for two days.',features:['3 tool launches per day shared across 13 trial tools','BIM, STL-3D and FEM: coming soon for trial users','AI features: coming soon; regular tool features remain available','Two 24-hour trial days from your first launch','Sign in to track your trial across devices'],prices:{INR:0,USD:0,GBP:0}},
+  {id:'explorer',name:'Explorer trial',caption:'Try 13 tools for two days.',features:['48 hours from your first launch, tracked across devices','3 launches per 24-hour day, shared across 13 tools','BIM, STL-3D, FEM and AI features: coming soon'],prices:{INR:0,USD:0,GBP:0}},
   {id:'studio',name:'Studio',caption:'For individual practice.',features:['All 16 tools without trial launch limits','Your online account','Subscription and billing management'],prices:{INR:99900,USD:1900,GBP:1500}},
   {id:'team',name:'Team',caption:'For growing practices.',features:['All 16 tools without trial launch limits','Studio account and billing','Additional team features under development'],prices:{INR:299900,USD:4900,GBP:3900}},
 ];

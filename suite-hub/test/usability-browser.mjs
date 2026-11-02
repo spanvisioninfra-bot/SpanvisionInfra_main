@@ -1,11 +1,44 @@
-import {createServer} from 'vite';
+import {createServer,preview} from 'vite';
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
 import {mkdir,readFile} from 'node:fs/promises';
 
-const server=await createServer({server:{port:4237}});
-await server.listen();
+const built=process.argv.includes('--built');
+const server=built?await preview({preview:{host:'127.0.0.1',port:4237,strictPort:true}}):await createServer({server:{port:4237}});
+if(!built)await server.listen();
 const browser=await chromium.launch({channel:'chrome',headless:true});
+async function checkSharedUi(page,width){
+  const result=await page.evaluate(()=>{
+    const box=e=>e.getBoundingClientRect();
+    const brand=box(document.querySelector('.footer-main>.brand-lockup'));
+    const copy=box(document.querySelector('.footer-copyright'));
+    const contact=box(document.querySelector('.footer-contact'));
+    const social=box(document.querySelector('.footer-social'));
+    const theme=getComputedStyle(document.querySelector('#sv-color-mode'));
+    const active=document.querySelector('.marketing-header nav a[aria-current="page"]');
+    const text=document.createRange();
+    if(active)text.selectNodeContents(active);
+    const underline=active?getComputedStyle(active,'::after'):null;
+    const actions=[...document.querySelectorAll('.button,.account-sign-out,.footer-social-link,.billing-toggle button')].filter(e=>e.getClientRects().length);
+    return {
+      footerAnchor:Math.abs(copy.left-brand.left),
+      copyrightBelowBrand:copy.top>=brand.bottom,
+      copyrightBeforeContact:copy.bottom<=contact.top,
+      contactCenter:Math.abs((contact.top+contact.bottom-brand.top-brand.bottom)/2),
+      socialCenter:Math.abs((social.top+social.bottom-brand.top-brand.bottom)/2),
+      underlineGap:active?box(active).bottom-parseFloat(underline.bottom)-parseFloat(underline.height)-text.getBoundingClientRect().bottom:null,
+      themeBackground:theme.backgroundColor,themeBorder:theme.borderTopColor,
+      styles:new Set(actions.map(e=>{const s=getComputedStyle(e);return JSON.stringify([s.backgroundColor,s.color,s.borderTopColor,s.borderTopWidth,s.borderRadius,s.fontSize,s.fontWeight,s.letterSpacing,s.padding]);})).size,
+    };
+  });
+  assert.ok(result.footerAnchor<1);assert.equal(result.copyrightBelowBrand,true);
+  if(width>=1024){assert.ok(result.contactCenter<1);assert.ok(result.socialCenter<1);}
+  if(width<600)assert.equal(result.copyrightBeforeContact,true);
+  if(result.underlineGap!==null)assert.ok(result.underlineGap>=6,JSON.stringify(result));
+  assert.equal(result.themeBackground,'rgba(0, 0, 0, 0)');assert.equal(result.themeBorder,'rgba(0, 0, 0, 0)');
+  assert.ok(result.styles<=5,JSON.stringify(result));
+  return result;
+}
 try {
   await mkdir('test-results/usability',{recursive:true});
   const page=await browser.newPage({reducedMotion:'reduce'});
@@ -45,12 +78,28 @@ try {
     await page.setViewportSize({width,height:960});
     await page.goto(`http://127.0.0.1:4237/?appearance=${theme}`);
     await page.waitForSelector('.local-payment-test');
+    await checkSharedUi(page,width);
+    // The skip link must be first in the tab order and reveal only on focus.
+    const skip=page.getByRole('link',{name:'Skip to content',exact:true});
+    assert.equal(await skip.evaluate(e=>e.getBoundingClientRect().width),1);
+    await page.keyboard.press('Tab');
+    assert.equal(await skip.evaluate(e=>e===document.activeElement&&getComputedStyle(e).clipPath==='none'),true);
+    await page.keyboard.press('Enter');
+    assert.equal(await page.locator('#main-content').evaluate(e=>e===document.activeElement),true);
+    assert.equal(await skip.evaluate(e=>e.getBoundingClientRect().width),1);
     const layout=await page.evaluate(()=>{
       const rect=e=>e.getBoundingClientRect();
       const hero=rect(document.querySelector('.company-intro'));
       const pricing=rect(document.querySelector('#pricing-section'));
       const size=s=>parseFloat(getComputedStyle(document.querySelector(s)).fontSize);
       const visible=[...document.querySelectorAll('.marketing-home *, .marketing-header *, .preview-footer *')].filter(e=>e.getClientRects().length);
+      const toggleButton=rect(document.querySelector('.billing-toggle button'));
+      const select=rect(document.querySelector('.region-selector select'));
+      const label=rect(document.querySelector('.region-selector>span'));
+      const faqHeading=rect(document.querySelector('#faq-heading'));
+      const faqList=rect(document.querySelector('.faq-list'));
+      const summary=getComputedStyle(document.querySelector('.intro-summary'));
+      const buttons=[...document.querySelectorAll('.button, .billing-toggle button, .footer-social-link')].filter(e=>e.getClientRects().length);
       return {
         gap:pricing.top-hero.bottom,
         overflow:document.documentElement.scrollWidth>innerWidth+1,
@@ -62,20 +111,40 @@ try {
         small:['.intro-summary','.plan-billing','.local-payment-badge'].map(size),
         sizes:[...new Set(visible.filter(e=>[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())).map(e=>getComputedStyle(e).fontSize))],
         radii:[...new Set(visible.map(e=>getComputedStyle(e).borderRadius))],
+        buttonStyles:[...new Set(buttons.map(e=>{const s=getComputedStyle(e);return JSON.stringify([s.backgroundColor,s.color,s.borderTopColor,s.borderTopWidth,s.borderTopStyle,s.borderRadius,s.fontFamily,s.fontSize,s.fontWeight,s.letterSpacing,s.padding]);}))],
+        selectHeight:select.height,
+        labelCenterDifference:Math.abs((label.top+label.bottom-select.top-select.bottom)/2),
+        labelLeftDifference:Math.abs(label.left-select.left),labelAbove:label.bottom<=select.top,
+        controlCenterDifference:Math.abs((toggleButton.top+toggleButton.bottom-select.top-select.bottom)/2),
+        faqStacked:faqList.top>=faqHeading.bottom,
+        faqWidth:faqList.width,
+        summaryWeight:Number(summary.fontWeight),
       };
     });
     assert.equal(layout.gap,0);assert.equal(layout.overflow,false);assert.equal(layout.contained,true);
     assert.ok(layout.heading>layout.title);assert.ok(layout.small.every(n=>n>=12));
     assert.ok(layout.sizes.length<=10,JSON.stringify(layout.sizes));
     assert.ok(layout.radii.length<=6,JSON.stringify(layout.radii));
+    assert.ok(layout.buttonStyles.length<=5,JSON.stringify(layout.buttonStyles));
+    assert.ok(layout.small[0]>=14);assert.ok(layout.summaryWeight>=500);
+    assert.ok(layout.faqStacked);
+    if(width>=768)assert.ok(layout.labelCenterDifference<1);
+    else {assert.ok(layout.labelAbove);assert.ok(layout.labelLeftDifference<1);}
+    assert.equal(layout.selectHeight,44);
+    assert.equal(await page.locator('.region-selector select').evaluate(e=>getComputedStyle(e).borderRadius),'8px');
+    if(width>=768)assert.ok(layout.controlCenterDifference<1,JSON.stringify(layout));
+    assert.equal(await page.locator('.pricing-grid .button-light').count(),1);
+    assert.equal(await page.locator('.pricing-grid .button-light').getAttribute('href'),'/signup');
     const annual=page.getByRole('button',{name:'Annually'});
     await annual.click();assert.equal(await annual.getAttribute('aria-pressed'),'true');
     assert.equal(await page.getByRole('button',{name:'Monthly',exact:true}).getAttribute('aria-pressed'),'false');
     await page.locator('#sv-color-mode').focus();
     assert.equal(await page.locator('#sv-color-mode').evaluate(e=>e===document.activeElement),true);
     if(width===390||width===1440)await page.screenshot({path:`test-results/usability/home-${width}-${theme}.png`,fullPage:true});
-    console.log('PASS',width,theme,JSON.stringify(layout));
+    const {buttonStyles,...report}=layout;
+    console.log('PASS',built?'built home':'home',width,theme,JSON.stringify({...report,buttonStyleCount:buttonStyles.length}));
   }
+  if(!process.argv.includes('--home')) {
   const brand=JSON.parse(await readFile(new URL('../src/brand.json',import.meta.url),'utf8'));
   await page.route('**/__suite/status',route=>route.fulfill({json:{modules:brand.modules.map(m=>({...m,available:true}))}}));
   await page.route('**/__stl/status',route=>route.fulfill({json:{id:'stl',available:true}}));
@@ -83,6 +152,7 @@ try {
     await page.setViewportSize({width,height:960});
     await page.goto(`http://127.0.0.1:4237/tools?appearance=${theme}`);
     await page.waitForSelector('.module-bottom a');
+    await checkSharedUi(page,width);
     const result=await page.evaluate(()=>{
       const all=[...document.querySelectorAll('.company-catalog *, .marketing-header *, .preview-footer *')].filter(e=>e.getClientRects().length);
       const heading=document.querySelector('#tools-title').getBoundingClientRect();
@@ -93,6 +163,8 @@ try {
         centerDifference:Math.abs((heading.top+heading.bottom-action.top-action.bottom)/2),
         headings:cards.every(c=>c.querySelector('h2')&&!c.querySelector('h3')),
         names:cards.every(c=>{const a=c.querySelector('.module-bottom a');return !a||a.textContent===`Open ${c.querySelector('h2').textContent}`;}),
+        count:cards.length,unique:new Set(cards.map(c=>c.dataset.module)).size,
+        actionsContained:cards.every(c=>{const card=c.getBoundingClientRect(),a=c.querySelector('.module-bottom .button').getBoundingClientRect();return a.top>=card.top&&a.bottom<=card.bottom&&a.left>=card.left&&a.right<=card.right;}),
         list:document.querySelectorAll('.trial-notice-details li').length,
         small:['.catalog-heading>.eyebrow','.footer-copyright'].map(s=>parseFloat(getComputedStyle(document.querySelector(s)).fontSize)),
         sizes:[...new Set(all.filter(e=>[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())).map(e=>getComputedStyle(e).fontSize))],
@@ -102,6 +174,8 @@ try {
     });
     assert.equal(result.overflow,false);assert.equal(result.headings,true);assert.equal(result.names,true);
     assert.equal(result.secondary,true);assert.equal(result.list,3);assert.ok(result.small.every(n=>n>=12));
+    assert.equal(result.count,16);assert.equal(result.unique,16);assert.equal(result.actionsContained,true);
+    assert.equal(await page.locator('.catalog-heading>.eyebrow').textContent(),'Spanvision Infra toolkit');
     if(width>=768)assert.ok(result.centerDifference<1);
     assert.ok(result.sizes.length<=10,JSON.stringify(result.sizes));assert.ok(result.radii.length<=6,JSON.stringify(result.radii));
     if(width===390||width===1440)await page.screenshot({path:`test-results/usability/tools-${width}-${theme}.png`,fullPage:true});
@@ -118,10 +192,16 @@ try {
     await page.setViewportSize({width,height:960});
     await page.goto(`http://127.0.0.1:4237/pricing?appearance=${theme}`);
     await page.waitForSelector('.local-payment-test');
+    await checkSharedUi(page,width);
     assert.equal(await page.locator('h1').count(),1);
     assert.equal(await page.getByRole('heading',{name:'Pricing',level:1}).count(),1);
     assert.equal(await page.locator('.price-card>h2').count(),3);
     assert.equal(await page.locator('.header-action.button-light').count(),0);
+    assert.equal(await page.getByRole('group',{name:'Billing cycle',exact:true}).count(),1);
+    assert.equal(await page.locator('.plan-tag').count(),3);
+    assert.equal(await page.locator('.price-card').first().locator('.plan-features li').count(),3);
+    const bottoms=await page.locator('.price-card').evaluateAll(cards=>cards.map(c=>c.getBoundingClientRect().bottom));
+    if(width>=768)assert.ok(Math.max(...bottoms)-Math.min(...bottoms)<1);
     await page.getByRole('button',{name:'Test ₹1 checkout',exact:true}).click();
     const checkStatus=page.getByRole('button',{name:'Check payment status',exact:true});
     await checkStatus.waitFor();
@@ -176,6 +256,19 @@ try {
     await page.setViewportSize({width,height:960});
     await page.goto(`http://127.0.0.1:4237/faq?appearance=${theme}`);
     await page.waitForSelector('.faq-list summary');
+    await checkSharedUi(page,width);
+    assert.equal(await page.locator('.skip-link').evaluate(e=>e.getBoundingClientRect().width),1);
+    await page.keyboard.press('Tab');
+    assert.equal(await page.locator('.skip-link').evaluate(e=>e===document.activeElement&&getComputedStyle(e).clipPath==='none'),true);
+    await page.keyboard.press('Enter');
+    assert.equal(await page.locator('#main-content').evaluate(e=>e===document.activeElement),true);
+    const colorMode=page.getByRole('combobox',{name:'Color mode',exact:true});
+    await colorMode.focus();
+    assert.equal(await colorMode.evaluate(e=>getComputedStyle(e).outlineStyle),'solid');
+    await page.keyboard.press(theme==='dark'?'ArrowDown':'ArrowUp');
+    await page.waitForFunction(mode=>document.documentElement.dataset.svMode===mode,theme==='dark'?'light':'dark');
+    await page.keyboard.press(theme==='dark'?'ArrowUp':'ArrowDown');
+    await page.waitForFunction(mode=>document.documentElement.dataset.svMode===mode,theme);
     assert.equal(await page.locator('h1').count(),1);
     assert.equal(await page.getByRole('heading',{level:1,name:'Frequently asked questions.'}).count(),1);
     assert.equal(await page.locator('.header-action.button-outline').count(),1);
@@ -258,13 +351,26 @@ try {
   console.log('PASS admin access guard; no plan changes submitted');
   signedIn=true;
   accountSubscriptions=[
-    {plan_key:'studio_IN_monthly',status:'active',provider:'stripe',current_period_end:'2027-01-31T00:00:00Z'},
-    {plan_key:'team_IN_monthly',status:'cancelled',provider:'razorpay'},
+    {plan_key:'STUDIO_MONTHLY_GBP',status:'active',provider:'stripe',current_period_end:'2027-01-31T00:00:00Z'},
+    {plan_key:'STUDIO_ANNUAL_INR',status:'cancelled',provider:'razorpay'},
+    {plan_key:'TEAM_MONTHLY_USD',status:'past_due',provider:'stripe'},
   ];
   for(const width of [320,390,820,1440,1920])for(const theme of ['dark','light']) {
     await page.setViewportSize({width,height:960});
     await page.goto(`http://127.0.0.1:4237/account?appearance=${theme}`);
-    await page.waitForSelector('.subscription-list li');
+    await page.waitForSelector('.billing-history summary');
+    await checkSharedUi(page,width);
+    assert.equal(await page.locator('.billing-history').getAttribute('open'),null);
+    const history=page.locator('.billing-history summary');
+    await history.focus();await page.keyboard.press('Enter');
+    assert.equal(await page.locator('.subscription-list li').count(),3);
+    assert.equal(await page.getByText('Studio · Monthly · GBP',{exact:true}).isVisible(),true);
+    assert.equal(await page.getByText('Payment overdue',{exact:true}).isVisible(),true);
+    await page.keyboard.press('Enter');
+    assert.equal(await page.locator('.subscription-list').isVisible(),false);
+    assert.equal(await page.getByRole('group',{name:'Plan and billing actions',exact:true}).count(),1);
+    const actionNames=await page.locator('.billing-actions>.button').allTextContents();
+    assert.ok(actionNames[0].startsWith('Explore plans'));assert.ok(actionNames[1].startsWith('Refresh billing status'));
     assert.equal(await page.locator('.header-action.button-outline').count(),1);
     assert.equal(await page.getByRole('link',{name:'My account',exact:true}).getAttribute('aria-current'),'page');
     const profile=page.getByRole('link',{name:'Manage local profile',exact:true});
@@ -279,6 +385,8 @@ try {
       const account=textBox(document.querySelector('.header-sign-in'));
       const admin=textBox(document.querySelector('.marketing-header nav a[href="/admin"]'));
       const signOut=getComputedStyle(document.querySelector('.account-sign-out'));
+      const identity=document.querySelector('.online-account-heading>div').getBoundingClientRect();
+      const signOutBox=document.querySelector('.account-sign-out').getBoundingClientRect();
       const cardActions=[...document.querySelectorAll('.online-account-grid .button')].map(e=>{
         const s=getComputedStyle(e),card=e.closest('article'),cs=getComputedStyle(card);
         return {radius:s.borderRadius,size:s.fontSize,height:e.getBoundingClientRect().height,border:parseFloat(s.borderTopWidth),widthDifference:Math.abs(e.getBoundingClientRect().width-(card.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)))};
@@ -290,6 +398,7 @@ try {
         radii:[...new Set(visible.map(e=>getComputedStyle(e).borderRadius))],
         small:['.online-account-grid article:nth-child(2)>.eyebrow','.billing-help','.footer-copyright'].map(s=>parseFloat(getComputedStyle(document.querySelector(s)).fontSize)),
         signOut:{background:signOut.backgroundColor,border:signOut.borderTopWidth,minHeight:parseFloat(signOut.minHeight),size:signOut.fontSize},
+        signOutGap:signOutBox.left-identity.right,
         cardActions,
       };
     });
@@ -298,6 +407,8 @@ try {
     assert.ok(result.cardActions.every(s=>s.radius==='8px'&&s.size==='12px'&&s.height>=44&&s.border>0&&s.widthDifference<1));
     assert.equal(result.signOut.background,'rgba(0, 0, 0, 0)');assert.equal(parseFloat(result.signOut.border),0);assert.ok(result.signOut.minHeight>=44);
     if(width>=1024)assert.ok(result.headerTextDifference<1,JSON.stringify(result));
+    if(width>=768)assert.ok(result.signOutGap>=0&&result.signOutGap<=24);
+    assert.equal(await page.locator('.online-account-grid article:nth-child(2)>.eyebrow').textContent(),'Subscriptions & billing');
     const previousReads=billingReads;
     const updated=page.waitForResponse(r=>r.url().endsWith('/billing/status'));
     await refresh.click();await updated;
@@ -325,4 +436,9 @@ try {
   await page.getByRole('link',{name:'Sign in →',exact:true}).waitFor();
   assert.equal(await page.locator('.online-account-grid').count(),0);
   console.log('PASS account keyboard navigation, member trial, sign-out and signed-out view');
-} finally {await browser.close();await server.close();}
+  }
+} finally {
+  await browser.close();
+  if(built)await new Promise((resolve,reject)=>server.httpServer.close(error=>error?reject(error):resolve()));
+  else await server.close();
+}

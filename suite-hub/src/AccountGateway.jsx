@@ -4,6 +4,19 @@ import {passwordPolicy} from '../../commerce/password-policy.mjs';
 import brand from './brand.json';
 import {navigate,routeHref} from './router.mjs';
 
+function subscriptionLabel(key){
+  const parts=String(key||'').toUpperCase().split('_');
+  const plan=({STUDIO:'Studio',TEAM:'Team',EXPLORER:'Explorer'})[parts[0]]||'Subscription';
+  const cycle=parts.includes('ANNUAL')?'Annual':parts.includes('MONTHLY')?'Monthly':null;
+  const currency=parts.find(part=>['INR','USD','GBP'].includes(part));
+  return [plan,cycle,currency].filter(Boolean).join(' · ');
+}
+function subscriptionStatus(status){
+  const labels={active:'Active',trialing:'Trial',past_due:'Payment overdue',unpaid:'Unpaid',incomplete:'Checkout incomplete',incomplete_expired:'Checkout expired',canceled:'Cancelled',cancelled:'Cancelled',created:'Checkout created',authenticated:'Authorization received',pending:'Payment pending',halted:'Payments halted',completed:'Completed',expired:'Expired',paused:'Paused'};
+  const text=String(status||'Unknown').replaceAll('_',' ').toLowerCase();
+  return labels[status]||text.charAt(0).toUpperCase()+text.slice(1);
+}
+
 export function AuthGateway(props){
   const [busy,setBusy]=createSignal(false),[error,setError]=createSignal(''),[email,setEmail]=createSignal(''),[notice,setNotice]=createSignal(''),[recovery,setRecovery]=createSignal(false),[visible,setVisible]=createSignal(false);
   createEffect(()=>{props.screen;setError('');setNotice('');setVisible(false);});
@@ -87,18 +100,20 @@ export function OnlineAccount(props){
           <Show when={user().role==='super_admin'}><a href="/admin" class="button button-outline">Manage users & plans <span aria-hidden="true">→</span></a></Show>
         </article>
         <article>
-          <span class="eyebrow">SUBSCRIPTIONS & BILLING</span><h2>Your plan.</h2>
+          <span class="eyebrow">Subscriptions & billing</span><h2>Your plan.</h2>
           <Show when={user().role==='super_admin'} fallback={<Show when={access()}><p class="account-access-plan">Account access: <strong>{({explorer:'Explorer',studio:'Studio',team:'Team'})[access().plan]}</strong>{access().source==='admin'?' · Admin grant':''}</p></Show>}>
             <p class="account-access-plan"><strong>Super admin · All plans</strong><br/>Explorer, Studio and Team access.</p>
           </Show>
           <Show when={billing().length} fallback={<p>No paid subscription is recorded. After the two-day trial, a Studio or Team plan is required.</p>}>
-            <ul class="subscription-list"><For each={billing()}>{subscription=><li><b>{subscription.plan_key.replaceAll('_',' ')}</b><span>{subscription.status}</span><Show when={subscription.current_period_end}><small>Current billing period ends {new Date(subscription.current_period_end).toLocaleDateString('en-GB')}</small></Show></li>}</For></ul>
+            <details class="billing-history"><summary>Subscription history ({billing().length})</summary><ul class="subscription-list"><For each={billing()}>{subscription=><li><b>{subscriptionLabel(subscription.plan_key)}</b><span>{subscriptionStatus(subscription.status)}</span><Show when={subscription.current_period_end}><small>Current billing period ends {new Date(subscription.current_period_end).toLocaleDateString('en-GB')}</small></Show></li>}</For></ul></details>
           </Show>
           <Show when={access()?.plan==='explorer'&&trial()}><div class="trial-status" role="status"><strong>{trial().status==='not_started'?'Your two-day trial is ready':trial().status==='expired'?'Your trial has ended':`Trial day ${trial().day} of 2 · ${trial().remaining} ${trial().remaining===1?'launch':'launches'} remaining`}</strong><p>{trial().status==='not_started'?'Your first trial tool launch starts the trial. You get 3 launches shared across 13 tools on each trial day. BIM, STL-3D and FEM are coming soon for trial users.':trial().status==='expired'?'Choose Studio or Team to continue using the tools.':`Your trial ends ${new Date(trial().expiresAt).toLocaleString()}.`}</p></div></Show>
-          <a href="/pricing" class="button button-outline">Explore plans <span aria-hidden="true">→</span></a>
-          <Show when={billing().some(subscription=>subscription.provider==='stripe')}><button class="button button-outline" disabled={busy()} onClick={()=>action(async()=>{const result=await accountRequest('billing/portal',{});location.assign(result.url);})}>Manage Stripe billing <span aria-hidden="true">↗</span></button></Show>
+          <div class="billing-actions" role="group" aria-label="Plan and billing actions" aria-busy={busy()}>
+            <a href="/pricing" class="button button-outline">Explore plans <span aria-hidden="true">→</span></a>
+            <button class="button button-outline" disabled={busy()} onClick={()=>action(refreshBilling)}>Refresh billing status <span aria-hidden="true">↻</span></button>
+            <Show when={billing().some(subscription=>subscription.provider==='stripe')}><button class="button button-outline" disabled={busy()} onClick={()=>action(async()=>{const result=await accountRequest('billing/portal',{});location.assign(result.url);})}>Manage Stripe billing <span aria-hidden="true">↗</span></button></Show>
+          </div>
           <Show when={billing().some(subscription=>subscription.provider==='razorpay')}><p class="billing-help">Use the Razorpay subscription link in your payment email to manage your subscription.</p></Show>
-          <button class="button button-outline" disabled={busy()} onClick={()=>action(refreshBilling)}>Refresh billing status <span aria-hidden="true">↻</span></button>
           <p class="billing-help">A checkout return is not proof of payment. Your plan updates after confirmation from the payment provider.</p>
         </article>
       </div>

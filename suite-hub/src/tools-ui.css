@@ -6,7 +6,7 @@
   align-items:center;
   gap:12px 24px;
 }
-.company-catalog .catalog-heading>.eyebrow {grid-area:eyebrow;font-size:var(--landing-small)}
+.company-catalog .catalog-heading>.eyebrow {grid-area:eyebrow;font-size:var(--landing-small);letter-spacing:.04em}
 .company-catalog #tools-title {grid-area:title;margin:0;font-size:28px}
 .company-catalog .catalog-heading>p {grid-area:description;margin:0;font-size:var(--landing-body)}
 .company-catalog .catalog-heading>.button {grid-area:action}
