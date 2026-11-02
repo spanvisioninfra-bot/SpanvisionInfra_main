@@ -10,7 +10,8 @@
     "admin:create": "node provision-admin.mjs create",
     "admin:verify": "node provision-admin.mjs verify",
     "admin:status": "node provision-admin.mjs status",
-    "test:trial-schema": "node --wasm-num-compilation-tasks=1 --no-wasm-tier-up --test tool-trial-schema.test.mjs"
+    "test:trial-schema": "node --wasm-num-compilation-tasks=1 --no-wasm-tier-up --test tool-trial-schema.test.mjs",
+    "test:day-pass": "node --wasm-num-compilation-tasks=1 --no-wasm-tier-up --test --test-concurrency=1 day-pass.test.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "1.2.0"

@@ -6,6 +6,7 @@ import {databaseConfigured,neonStore,bindNeonStore} from './neon-store.mjs';
 import {passwordPolicy} from './password-policy.mjs';
 import {toolIds,trialPolicy,issueToolTicket,readToolTicket} from './tool-trial.mjs';
 import {paymentTestRoute,PaymentTestError} from './payment-test.mjs';
+import {dayPassRoute,dayPassWebhook,dayPassEnabled,dayPassReady,getDayPass,publicDayPass,DayPassError} from './day-pass.mjs';
 
 const cookieName='sv_account';
 class RequestError extends Error {constructor(status,message,details={}){super(message);this.status=status;this.details=details;}}
@@ -157,7 +158,10 @@ async function planRecords(userIds,env,fetcher){
 }
 async function toolAccess(user,env,fetcher){
   const data=await planRecords([user.id],env,fetcher);
-  return planAccess(user,data.subscriptions,data.overrides[0]);
+  const access=planAccess(user,data.subscriptions,data.overrides[0]);
+  if(access.plan!=='explorer'||!dayPassEnabled(env))return access;
+  const pass=await getDayPass(user.id,{env,store:(resource,options)=>db(env,resource,fetcher,options)});
+  return pass?.status==='active'&&Date.parse(pass.expiresAt)>Date.now()?{...access,source:'day_pass',expiresAt:pass.expiresAt}:access;
 }
 async function verifyToolAccess(body,env,fetcher){
   const ticket=readToolTicket(body.ticket,env.SESSION_SECRET);
@@ -169,6 +173,10 @@ async function verifyToolAccess(body,env,fetcher){
     if(trialComingSoonTools.includes(ticket.tool))fail(402,trialComingSoonMessage);
     const trial=await db(env,'rpc/tool_trial_status',fetcher,{method:'POST',body:JSON.stringify({account_id:ticket.sub})});
     if(trial.status==='expired')fail(402,'Your two-day trial has ended. Choose Studio or Team to continue.');
+  }else if(grant.access_source==='day_pass'){
+    if(trialComingSoonTools.includes(ticket.tool))fail(402,trialComingSoonMessage);
+    const pass=await getDayPass(ticket.sub,{env,store:(resource,options)=>db(env,resource,fetcher,options)});
+    if(pass?.status!=='active'||!(Date.parse(pass.expiresAt)>Date.now()))fail(402,'Your day pass has ended. Choose Studio or Team to continue.');
   }else{
     const user={id:ticket.sub,role:grant.access_source==='super_admin'&&ticket.sub===env.SUPER_ADMIN_USER_ID?'super_admin':'member'};
     const access=await toolAccess(user,env,fetcher);
@@ -257,6 +265,9 @@ async function applyWebhook(provider,raw,req,env,fetcher){
   if(!providerId(id))fail(400,'Webhook event ID is missing.');
   const receipts=await db(env,`billing_events?provider=eq.${provider}&event_id=eq.${id}&select=event_id`,fetcher);
   if(receipts.length)return {received:true};
+  if(provider==='razorpay'&&['payment.captured','order.paid','refund.created','refund.processed','payment.dispute.created'].includes(event.event)){
+    await dayPassWebhook(event,{env,fetcher,store:(resource,options)=>db(env,resource,fetcher,options)});
+  }
   let subscriptionId;
   if(provider==='stripe'){
     if(event.type==='checkout.session.completed')subscriptionId=event.data?.object?.subscription;
@@ -428,7 +439,7 @@ export function createHandler({env=process.env,fetcher=fetch,store}={}){
       if(route==='/api/account/config'&&method==='GET'){
         const ready=configured(env);
         const checkoutAvailability=Object.fromEntries(plans.filter(plan=>plan.id!=='explorer').flatMap(plan=>regions.flatMap(region=>['monthly','annual'].map(interval=>{const choice=selection(plan.id,region.id,interval);return [choice.key,env.PRICING_APPROVED==='true'&&billingReady(env,choice)];}))));
-        result={authAvailable:ready,authProvider:neonSelected(env)?'neon':'supabase',databaseAvailable:storageReady(env),passwordPolicy,trialPolicy,pricingApproved:env.PRICING_APPROVED==='true',plans,regions,checkoutAvailability,checkoutAvailable:Object.fromEntries(regions.map(region=>[region.id,checkoutAvailability[selection('studio',region.id,'monthly').key]]))};
+        result={authAvailable:ready,authProvider:neonSelected(env)?'neon':'supabase',databaseAvailable:storageReady(env),passwordPolicy,trialPolicy,dayPassAvailable:ready&&storageReady(env)&&dayPassReady(env),pricingApproved:env.PRICING_APPROVED==='true',plans,regions,checkoutAvailability,checkoutAvailable:Object.fromEntries(regions.map(region=>[region.id,checkoutAvailability[selection('studio',region.id,'monthly').key]]))};
       }else if(route==='/api/account/tool-verify'&&method==='POST'){
         // Server-to-server validation uses a signed, tool-bound ticket rather than browser cookies.
         const body=jsonBody(await rawBody(req,4096));
@@ -448,20 +459,26 @@ export function createHandler({env=process.env,fetcher=fetch,store}={}){
             if(route==='/api/billing/payment-test/config'&&method==='GET')result={enabled:false};
             else fail(current?403:401,'Administrator access is required for the ₹1 payment test.');
           }else result=await paymentTestRoute(route,method,body,req,res,{env,fetcher,user:current.user,storageReady:storageReady(env),store:(resource,options)=>db(env,resource,fetcher,options)});
+        }else if(route.startsWith('/api/billing/day-pass/')){
+          const current=await identity(req,res,env,fetcher);
+          if(current.session.recovery||!current.user.emailVerified)fail(403,'Verify your email and finish signing in before buying a day pass.');
+          result=await dayPassRoute(route.slice('/api/billing/day-pass/'.length),method,body,current.user,{env,fetcher,store:(resource,options)=>db(env,resource,fetcher,options),access:await toolAccess(current.user,env,fetcher)});
         }else if(route==='/api/account/session'&&method==='GET'){
           result={user:configured(env)?(await identity(req,res,env,fetcher,true))?.user||null:null};
         }else if(route==='/api/account/tool-status'&&method==='GET'){
           const current=await identity(req,res,env,fetcher);
           if(current.session.recovery)fail(403,'Set your password before opening tools.');
-          result={policy:trialPolicy,access:await toolAccess(current.user,env,fetcher),trial:await db(env,'rpc/tool_trial_status',fetcher,{method:'POST',body:JSON.stringify({account_id:current.user.id})})};
+          result={policy:trialPolicy,access:await toolAccess(current.user,env,fetcher),trial:await db(env,'rpc/tool_trial_status',fetcher,{method:'POST',body:JSON.stringify({account_id:current.user.id})}),...(dayPassEnabled(env)?{dayPass:publicDayPass(await getDayPass(current.user.id,{env,store:(resource,options)=>db(env,resource,fetcher,options)}))}:{})};
         }else if(route==='/api/account/tool-launch'&&method==='POST'){
           const current=await identity(req,res,env,fetcher);
           if(current.session.recovery||!current.user.emailVerified)fail(403,'Verify your email and finish signing in before opening tools.');
           if(!toolIds.includes(body.tool)||!uuid(body.requestId))fail(400,'Choose a valid tool and launch request.');
           const access=await toolAccess(current.user,env,fetcher);
           if(!['studio','team'].includes(access.plan)&&trialComingSoonTools.includes(body.tool))fail(403,trialComingSoonMessage);
-          const grant=await db(env,'rpc/claim_tool_launch',fetcher,{method:'POST',body:JSON.stringify({account_id:current.user.id,selected_tool:body.tool,launch_request:body.requestId,
-            access_source:['studio','team'].includes(access.plan)?access.source:'trial',access_expires:access.expiresAt})});
+          const grant=access.source==='day_pass'?
+            await db(env,'rpc/claim_day_pass_launch',fetcher,{method:'POST',body:JSON.stringify({account_id:current.user.id,selected_tool:body.tool,launch_request:body.requestId})}):
+            await db(env,'rpc/claim_tool_launch',fetcher,{method:'POST',body:JSON.stringify({account_id:current.user.id,selected_tool:body.tool,launch_request:body.requestId,
+              access_source:['studio','team'].includes(access.plan)?access.source:'trial',access_expires:access.expiresAt})});
           result={...grant,policy:trialPolicy,...(grant.allowed?{ticket:issueToolTicket(grant,current.user,body.tool,env.SESSION_SECRET)}:{})};
         }else if(route.startsWith('/api/admin/')){
           result=await adminRoute(route,method,url,body,await identity(req,res,env,fetcher),env,fetcher);
@@ -551,7 +568,7 @@ export function createHandler({env=process.env,fetcher=fetch,store}={}){
         }else fail(404,'Endpoint not found.');
       }
       res.statusCode=200;res.end(JSON.stringify(result));
-    }catch(error){const known=error instanceof RequestError||error instanceof PaymentTestError;res.statusCode=known?error.status:500;res.end(JSON.stringify({error:known?error.message:'The request could not be completed. Please try again.',...(error instanceof RequestError?error.details:{})}));}
+    }catch(error){const known=error instanceof RequestError||error instanceof PaymentTestError||error instanceof DayPassError;res.statusCode=known?error.status:500;res.end(JSON.stringify({error:known?error.message:'The request could not be completed. Please try again.',...(error instanceof RequestError?error.details:{})}));}
   };
 }
 export default createHandler();

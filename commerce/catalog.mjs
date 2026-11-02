@@ -15,6 +15,7 @@ export function toolFeatures(tool,source){
   return aiFeatures[tool]?{ai:{label:aiFeatures[tool],available,status:available?'requires_configuration':'coming_soon',message:available?'An AI provider or supported local model must be configured.':aiComingSoonMessage}}:{};
 }
 export const trialPolicy=Object.freeze({days:2,hours:48,dailyLimit:3,scope:'trial_tools',starts:'first_launch',reset:'every_24_hours_from_first_launch',availableTools:trialToolIds,comingSoonTools:trialComingSoonTools,comingSoonFeatures:{ai:Object.keys(aiFeatures)}});
+export const dayPassPolicy=Object.freeze({amount:100,currency:'INR',hours:24,unlimitedLaunches:true,purchasesPerAccount:1,availableTools:trialToolIds,comingSoonTools:trialComingSoonTools});
 export const regions=[
   {id:'IN',label:'India',currency:'INR',locale:'en-IN'},
   {id:'US',label:'United States',currency:'USD',locale:'en-US'},

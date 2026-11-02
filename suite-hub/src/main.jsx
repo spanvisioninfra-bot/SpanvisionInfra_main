@@ -4,6 +4,7 @@ import brand from './brand.json';
 import { readLocalProfile, saveLocalProfile } from './local-profile';
 import MarketingHome, {Pricing,FAQ} from './MarketingHome';
 import {AuthGateway,OnlineAccount} from './AccountGateway';
+import DayPass from './DayPass';
 import {createAccountState,accountRequest} from './account-client';
 import {trialComingSoonTools,trialToolIds,aiFeatures} from '../../commerce/catalog.mjs';
 import AdminPanel from './AdminPanel';
@@ -218,6 +219,7 @@ function App() {
           <section class="company-catalog" aria-labelledby="tools-title">
             <div class="catalog-heading" data-sv-reveal><span class="eyebrow">Spanvision Infra toolkit</span><h1 id="tools-title">All tools <span>{brand.modules.length}</span></h1><p>Choose a tool for your project, wherever you work. Each workspace opens in a new tab.</p><button class="button button-outline" onClick={refreshStatus}>Check availability<Arrow/></button></div>
             <TrialNotice/>
+            <Show when={!account.loading()&&account.config()?.dayPassAvailable&&account.user()?.role!=='super_admin'}><DayPass account={account} onActivated={refreshToolPlan}/></Show>
             <Modules/>
             <p class="catalog-note">{localPreview?'Files and saved preferences stay with each workspace.':'Browser drafts stay with each workspace. BIM and map processing uses temporary cloud storage; download your results to keep them.'}</p>
           </section>

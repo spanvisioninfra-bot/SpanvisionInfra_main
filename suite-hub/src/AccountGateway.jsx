@@ -3,6 +3,7 @@ import {accountRequest} from './account-client';
 import {passwordPolicy} from '../../commerce/password-policy.mjs';
 import brand from './brand.json';
 import {navigate,routeHref} from './router.mjs';
+import DayPass from './DayPass';
 
 function subscriptionLabel(key){
   const parts=String(key||'').toUpperCase().split('_');
@@ -81,7 +82,7 @@ export function OnlineAccount(props){
   const [billing,setBilling]=createSignal([]),[access,setAccess]=createSignal(null),[trial,setTrial]=createSignal(null),[error,setError]=createSignal(''),[busy,setBusy]=createSignal(false);
   async function refreshBilling(){
     if(!props.account.user())return;
-    try{const [result,usage]=await Promise.all([accountRequest('billing/status'),accountRequest('account/tool-status')]);setBilling(result.subscriptions);setAccess(result.access||null);setTrial(usage.trial);}catch(error){setError(error.message);}
+    try{const [result,usage]=await Promise.all([accountRequest('billing/status'),accountRequest('account/tool-status')]);setBilling(result.subscriptions);setAccess(usage.access||result.access||null);setTrial(usage.trial);}catch(error){setError(error.message);}
   }
   createEffect(()=>{if(props.account.user())void refreshBilling();else{setBilling([]);setAccess(null);setTrial(null);}});
   async function action(callback){setBusy(true);setError('');try{await callback();}catch(error){setError(error.message);}finally{setBusy(false);}}
@@ -101,13 +102,14 @@ export function OnlineAccount(props){
         </article>
         <article>
           <span class="eyebrow">Subscriptions & billing</span><h2>Your plan.</h2>
-          <Show when={user().role==='super_admin'} fallback={<Show when={access()}><p class="account-access-plan">Account access: <strong>{({explorer:'Explorer',studio:'Studio',team:'Team'})[access().plan]}</strong>{access().source==='admin'?' · Admin grant':''}</p></Show>}>
+          <Show when={user().role==='super_admin'} fallback={<Show when={access()}><p class="account-access-plan">Account access: <strong>{access().source==='day_pass'?'One-day pass':({explorer:'Explorer',studio:'Studio',team:'Team'})[access().plan]}</strong>{access().source==='admin'?' · Admin grant':''}</p></Show>}>
             <p class="account-access-plan"><strong>Super admin · All plans</strong><br/>Explorer, Studio and Team access.</p>
           </Show>
-          <Show when={billing().length} fallback={<p>No paid subscription is recorded. After the two-day trial, a Studio or Team plan is required.</p>}>
+          <Show when={billing().length} fallback={<p>No paid subscription is recorded. Choose Studio or Team for ongoing access.</p>}>
             <details class="billing-history"><summary>Subscription history ({billing().length})</summary><ul class="subscription-list"><For each={billing()}>{subscription=><li><b>{subscriptionLabel(subscription.plan_key)}</b><span>{subscriptionStatus(subscription.status)}</span><Show when={subscription.current_period_end}><small>Current billing period ends {new Date(subscription.current_period_end).toLocaleDateString('en-GB')}</small></Show></li>}</For></ul></details>
           </Show>
-          <Show when={access()?.plan==='explorer'&&trial()}><div class="trial-status" role="status"><strong>{trial().status==='not_started'?'Your two-day trial is ready':trial().status==='expired'?'Your trial has ended':`Trial day ${trial().day} of 2 · ${trial().remaining} ${trial().remaining===1?'launch':'launches'} remaining`}</strong><p>{trial().status==='not_started'?'Your first trial tool launch starts the trial. You get 3 launches shared across 13 tools on each trial day. BIM, STL-3D and FEM are coming soon for trial users.':trial().status==='expired'?'Choose Studio or Team to continue using the tools.':`Your trial ends ${new Date(trial().expiresAt).toLocaleString()}.`}</p></div></Show>
+          <Show when={access()?.plan==='explorer'&&access()?.source!=='day_pass'&&trial()}><div class="trial-status" role="status"><strong>{trial().status==='not_started'?'Your two-day trial is ready':trial().status==='expired'?'Your trial has ended':`Trial day ${trial().day} of 2 · ${trial().remaining} ${trial().remaining===1?'launch':'launches'} remaining`}</strong><p>{trial().status==='not_started'?'Your first trial tool launch starts the trial. You get 3 launches shared across 13 tools on each trial day. BIM, STL-3D and FEM are coming soon for trial users.':trial().status==='expired'?(props.account.config()?.dayPassAvailable?'Explore your access options below, or choose Studio or Team.':'Choose Studio or Team to continue using the tools.'):`Your trial ends ${new Date(trial().expiresAt).toLocaleString()}.`}</p></div></Show>
+          <Show when={props.account.config()?.dayPassAvailable&&user().role!=='super_admin'}><DayPass account={props.account} onActivated={refreshBilling}/></Show>
           <div class="billing-actions" role="group" aria-label="Plan and billing actions" aria-busy={busy()}>
             <a href="/pricing" class="button button-outline">Explore plans <span aria-hidden="true">→</span></a>
             <button class="button button-outline" disabled={busy()} onClick={()=>action(refreshBilling)}>Refresh billing status <span aria-hidden="true">↻</span></button>

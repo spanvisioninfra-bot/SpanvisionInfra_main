@@ -2,6 +2,7 @@
 const schema = 'spanvision_commerce';
 const tables = {
   tool_trials: ['user_id', 'started_at'],
+  tool_day_passes: ['user_id','receipt','order_id','payment_id','state','created_at','activated_at','expires_at'],
   tool_launch_grants: ['id', 'user_id', 'request_id', 'tool_id', 'access_source', 'trial_day', 'expires_at', 'created_at'],
   billing_customers: ['user_id', 'provider', 'provider_customer_id'],
   billing_subscriptions: ['provider', 'provider_subscription_id', 'user_id', 'plan_key', 'status', 'current_period_end', 'observed_at'],
@@ -63,6 +64,14 @@ export function createNeonStore(query, env = {}) {
         let sql, params;
         if (table === 'rpc/tool_trial_status') {
           sql = `select ${schema}.tool_trial_status($1) as result`; params = [body.account_id];
+        } else if (['rpc/day_pass_status','rpc/claim_day_pass_order'].includes(table)) {
+          sql = `select ${schema}.${table.slice(4)}($1) as result`; params = [body.account_id];
+        } else if (table === 'rpc/save_day_pass_order') {
+          sql = `select ${schema}.save_day_pass_order($1,$2,$3,$4) as result`;
+          params = [body.account_id,body.selected_order,body.verified_payment,body.revoked];
+        } else if (table === 'rpc/claim_day_pass_launch') {
+          sql = `select ${schema}.claim_day_pass_launch($1,$2,$3) as result`;
+          params = [body.account_id,body.selected_tool,body.launch_request];
         } else if (table === 'rpc/claim_tool_launch') {
           sql = `select ${schema}.claim_tool_launch($1,$2,$3,$4,$5) as result`;
           params = [body.account_id, body.selected_tool, body.launch_request, body.access_source, body.access_expires];

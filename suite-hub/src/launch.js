@@ -40,7 +40,7 @@ async function authorizeTool(signal){
   if(!grant.allowed){
     plansLink.hidden=false;
     if(grant.trial?.status==='daily_limit')throw new Error(grant.trial.day===1?'You have used today’s 3 trial launches. Your next trial day starts '+new Date(grant.trial.nextResetAt).toLocaleString()+'. You can also choose a paid plan.':'You have used today’s 3 trial launches on your final trial day. Choose Studio or Team to continue using the tools.');
-    throw new Error('Your two-day trial has ended. Choose Studio or Team to continue using the tools.');
+    throw new Error('Your two-day trial has ended. Visit Pricing for access options, including the ₹1 day pass when available.');
   }
   return grant;
 }
